@@ -1,0 +1,192 @@
+:root {
+  color-scheme: light dark;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  line-height: 1.5;
+  color: #182124;
+  background: #f4f6f7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  border: 0;
+  border-radius: 6px;
+  background: #155e63;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 10px 14px;
+}
+
+button:hover {
+  background: #104c50;
+}
+
+input {
+  min-width: 0;
+  width: 100%;
+  border: 1px solid #c7d1d5;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #182124;
+  padding: 10px 12px;
+}
+
+label {
+  color: #35464c;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.shell {
+  display: grid;
+  gap: 18px;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 28px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid #d5dde0;
+  padding-bottom: 18px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.15;
+}
+
+.eyebrow {
+  margin: 0 0 3px;
+  color: #607179;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.toolbar,
+.summary {
+  display: grid;
+  gap: 10px;
+}
+
+.search-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+}
+
+.summary {
+  grid-template-columns: 1fr auto;
+  color: #52646c;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.results {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.result {
+  display: grid;
+  gap: 6px;
+  border: 1px solid #d5dde0;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 14px;
+}
+
+.result a {
+  color: #155e63;
+  font-size: 16px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.result a:hover {
+  text-decoration: underline;
+}
+
+.url {
+  overflow-wrap: anywhere;
+  color: #52646c;
+  font-size: 13px;
+}
+
+.meta {
+  color: #607179;
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .shell {
+    padding: 18px;
+  }
+
+  .header,
+  .search-row,
+  .summary {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    display: grid;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #eef5f6;
+    background: #101719;
+  }
+
+  input,
+  .result {
+    border-color: #304146;
+    background: #172225;
+    color: #eef5f6;
+  }
+
+  label {
+    color: #d8e3e5;
+  }
+
+  .header {
+    border-bottom-color: #304146;
+  }
+
+  .eyebrow,
+  .summary,
+  .url,
+  .meta {
+    color: #9fb0b6;
+  }
+
+  .result a {
+    color: #79d0d6;
+  }
+}
+

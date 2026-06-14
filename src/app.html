@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BrowseVault</title>
+    <link rel="stylesheet" href="app.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="header">
+        <div>
+          <p class="eyebrow">BrowseVault</p>
+          <h1>History Search & Backup</h1>
+        </div>
+        <button id="export-json" type="button">Export JSON</button>
+      </header>
+
+      <section class="toolbar" aria-label="History search">
+        <label for="query">Search history</label>
+        <div class="search-row">
+          <input id="query" type="search" placeholder="Search title or URL">
+          <button id="search" type="button">Search</button>
+        </div>
+      </section>
+
+      <section class="summary" aria-live="polite">
+        <span id="result-count">0 results</span>
+        <span id="status">Ready</span>
+      </section>
+
+      <ol id="results" class="results"></ol>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
+

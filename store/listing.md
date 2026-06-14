@@ -1,0 +1,50 @@
+# Chrome Web Store Listing Draft
+
+## Name
+
+BrowseVault: History Search & Backup
+
+## Short Description
+
+Search, back up, export, and preserve your browser history locally.
+
+## One-Line Positioning
+
+Private browser history search with local backup and export.
+
+## Longer Description Draft
+
+BrowseVault helps you find, preserve, and back up your browsing history without sending it to a remote service.
+
+Chrome's built-in history is limited and hard to search when you need to recover a page, retrace work, or export records. BrowseVault is designed as a local-first history vault: fast search, clear export, reliable backup, and precise control over your browsing memory.
+
+The current scaffold supports local Chrome history search and JSON backup export. The product direction is unlimited local preservation from install onward, stronger search filters, import/export, backup/restore integrity, and precise bulk cleanup.
+
+## Keywords
+
+- Chrome history search
+- browser history backup
+- export Chrome history
+- unlimited browser history
+- private history search
+- local-first history manager
+- Chrome history export
+- browsing history vault
+- search browser history
+- preserve browser history
+
+## GitHub Description
+
+Private local-first browser history search, backup, export, and preservation extension.
+
+## GitHub Topics
+
+- chrome-extension
+- browser-history
+- history-search
+- history-backup
+- local-first
+- privacy-first
+- export-history
+- manifest-v3
+
