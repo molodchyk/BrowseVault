@@ -401,12 +401,19 @@ function renderQuickResults(results, total, warnings = []) {
     const title = fragment.querySelector(".result-title");
     const url = fragment.querySelector(".url");
     const meta = fragment.querySelector(".meta");
+    const action = fragment.querySelector(".quick-action");
 
     source.textContent = item.type;
     title.href = item.url;
     title.textContent = item.title || item.url;
     url.textContent = item.url;
     meta.textContent = `${item.detail} · ${item.domain || "unknown domain"} · ${formatDate(item.visitTime)}`;
+    action.textContent = item.action?.type === "activate-tab"
+      ? "Switch"
+      : item.action?.type === "restore-session"
+        ? "Restore"
+        : "Open";
+    action.addEventListener("click", () => performQuickAction(item).catch((error) => setStatus(error.message)));
 
     elements.quickResults.append(fragment);
   }
@@ -414,6 +421,31 @@ function renderQuickResults(results, total, warnings = []) {
   if (warnings.length) {
     setStatus(`${total} source results; ${warnings.length} source warning${warnings.length === 1 ? "" : "s"}`);
   }
+}
+
+async function performQuickAction(item) {
+  const action = item.action || { type: "open-url", url: item.url };
+  const messageByType = {
+    "activate-tab": {
+      type: "browseVault.activateTab",
+      tabId: action.tabId,
+      windowId: action.windowId
+    },
+    "restore-session": {
+      type: "browseVault.restoreSession",
+      sessionId: action.sessionId
+    },
+    "open-url": {
+      type: "browseVault.openUrl",
+      url: action.url || item.url
+    }
+  };
+
+  const response = await chrome.runtime.sendMessage(messageByType[action.type] || messageByType["open-url"]);
+  if (!response?.ok) {
+    throw new Error(response?.error || "Quick action failed.");
+  }
+  setStatus(`${action.type === "activate-tab" ? "Switched to" : "Opened"} ${item.title || item.url}`);
 }
 
 async function runQuickSearch() {

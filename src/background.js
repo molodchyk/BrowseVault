@@ -177,5 +177,30 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
 
+  if (message?.type === "browseVault.activateTab") {
+    chrome.windows
+      .update(message.windowId, { focused: true })
+      .then(() => chrome.tabs.update(message.tabId, { active: true }))
+      .then(() => sendResponse({ ok: true }))
+      .catch((error) => sendResponse({ ok: false, error: error.message }));
+    return true;
+  }
+
+  if (message?.type === "browseVault.restoreSession") {
+    chrome.sessions
+      .restore(message.sessionId || undefined)
+      .then(() => sendResponse({ ok: true }))
+      .catch((error) => sendResponse({ ok: false, error: error.message }));
+    return true;
+  }
+
+  if (message?.type === "browseVault.openUrl") {
+    chrome.tabs
+      .create({ url: message.url })
+      .then(() => sendResponse({ ok: true }))
+      .catch((error) => sendResponse({ ok: false, error: error.message }));
+    return true;
+  }
+
   return false;
 });

@@ -236,6 +236,10 @@ code {
   padding: 14px;
 }
 
+.quick-result {
+  grid-template-columns: auto 1fr auto;
+}
+
 .source-pill {
   align-self: start;
   min-width: 76px;

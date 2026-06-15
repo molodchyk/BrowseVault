@@ -26,7 +26,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - background capture for new Chrome history visits;
 - manual sync from currently available Chrome history, expanded to individual visits where Chrome exposes them;
 - query syntax for domain, title, URL, dates, exclusions, phrases, and regex;
-- Quick Open search across open tabs, bookmarks, downloads, and recently closed tabs;
+- Quick Open search across open tabs, bookmarks, downloads, and recently closed tabs, with source-aware switch/open/restore actions;
 - a keyboard command for opening BrowseVault;
 - JSON backup export and import;
 - CSV and HTML exports;

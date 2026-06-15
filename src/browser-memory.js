@@ -18,7 +18,7 @@ function domainFromUrl(url) {
   }
 }
 
-function memoryRecord({ id, type, title, url, visitTime = Date.now(), detail = "" }) {
+function memoryRecord({ id, type, title, url, visitTime = Date.now(), detail = "", action = null }) {
   return {
     id,
     type,
@@ -28,7 +28,8 @@ function memoryRecord({ id, type, title, url, visitTime = Date.now(), detail = "
     normalizedUrl: normalizeUrl(url).toLowerCase(),
     domain: domainFromUrl(url),
     visitTime,
-    detail
+    detail,
+    action
   };
 }
 
@@ -43,7 +44,12 @@ async function searchTabs() {
         title: tab.title,
         url: tab.url,
         visitTime: Date.now(),
-        detail: tab.active ? "Open tab, active" : "Open tab"
+        detail: tab.active ? "Open tab, active" : "Open tab",
+        action: {
+          type: "activate-tab",
+          tabId: tab.id,
+          windowId: tab.windowId
+        }
       })
     );
 }
@@ -74,7 +80,11 @@ async function searchBookmarks() {
         title: bookmark.title,
         url: bookmark.url,
         visitTime: bookmark.dateAdded || Date.now(),
-        detail: "Bookmark"
+        detail: "Bookmark",
+        action: {
+          type: "open-url",
+          url: bookmark.url
+        }
       })
     );
 }
@@ -94,7 +104,11 @@ async function searchDownloads() {
         title: download.filename?.split(/[\\/]/).pop() || download.url,
         url: download.url,
         visitTime: Date.parse(download.startTime) || Date.now(),
-        detail: `Download${download.exists === false ? ", missing file" : ""}`
+        detail: `Download${download.exists === false ? ", missing file" : ""}`,
+        action: {
+          type: "open-url",
+          url: download.url
+        }
       })
     );
 }
@@ -126,7 +140,12 @@ async function searchRecentlyClosed() {
           title: tab.title,
           url: tab.url,
           visitTime: session.lastModified ? session.lastModified * 1000 : Date.now(),
-          detail: "Recently closed"
+          detail: "Recently closed",
+          action: {
+            type: session.sessionId ? "restore-session" : "open-url",
+            sessionId: session.sessionId || "",
+            url: tab.url
+          }
         })
       )
   );
