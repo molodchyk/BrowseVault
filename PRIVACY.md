@@ -4,9 +4,10 @@ BrowseVault is intended to be local-first.
 
 Current scaffold behavior:
 
-- Searches Chrome history only when the BrowseVault page is open.
-- Exports a JSON backup only when the user clicks the export button.
-- Stores only lightweight local metadata in `chrome.storage.local`.
+- Stores the BrowseVault archive locally in IndexedDB.
+- Captures new Chrome history visits in the background after installation.
+- Imports currently available Chrome history when the extension is installed, started, or manually synced.
+- Exports a JSON backup only when the user clicks an export button.
 - Does not automatically read page contents.
 - Does not take screenshots.
 - Does not make remote network requests.
@@ -25,4 +26,3 @@ Planned product direction:
 - Make destructive cleanup actions explicit and reversible where possible.
 - Request optional permissions only when a feature needs them.
 - Keep network, sync, and AI features opt-in.
-

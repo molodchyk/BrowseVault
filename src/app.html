@@ -12,27 +12,115 @@
         <div>
           <p class="eyebrow">BrowseVault</p>
           <h1>History Search & Backup</h1>
+          <p class="lede">Local-first browser memory with search, backup, import, export, and precise cleanup.</p>
         </div>
-        <button id="export-json" type="button">Export JSON</button>
+        <div class="header-actions">
+          <button id="sync-chrome" type="button">Sync Chrome History</button>
+          <button id="export-archive" type="button">Export Archive</button>
+          <label class="file-button" for="import-archive">Import Archive</label>
+          <input id="import-archive" class="visually-hidden" type="file" accept=".json,application/json">
+        </div>
       </header>
 
-      <section class="toolbar" aria-label="History search">
-        <label for="query">Search history</label>
+      <section class="stats-grid" aria-label="Vault stats">
+        <div class="stat">
+          <span id="stat-visits">0</span>
+          <p>vault records</p>
+        </div>
+        <div class="stat">
+          <span id="stat-domains">0</span>
+          <p>domains</p>
+        </div>
+        <div class="stat">
+          <span id="stat-newest">No visits yet</span>
+          <p>newest visit</p>
+        </div>
+      </section>
+
+      <section class="panel search-panel" aria-label="History search">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Search</p>
+            <h2>Find history in the local vault</h2>
+          </div>
+          <button id="clear-search" class="ghost" type="button">Clear</button>
+        </div>
+
+        <label for="query">Query</label>
         <div class="search-row">
-          <input id="query" type="search" placeholder="Search title or URL">
+          <input id="query" type="search" placeholder='docs site:github.com -ads after:2026-01-01 "exact phrase"'>
           <button id="search" type="button">Search</button>
+        </div>
+
+        <div class="filters">
+          <label>
+            After
+            <input id="after" type="date">
+          </label>
+          <label>
+            Before
+            <input id="before" type="date">
+          </label>
+          <label>
+            Limit
+            <input id="limit" type="number" min="25" max="5000" step="25" value="500">
+          </label>
+        </div>
+
+        <p class="hint">Supported syntax: <code>site:</code>, <code>title:</code>, <code>url:</code>, <code>after:</code>, <code>before:</code>, <code>-exclude</code>, quoted phrases, and <code>regex:</code>.</p>
+      </section>
+
+      <section class="panel rules-panel" aria-label="Domain rules">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Rules</p>
+            <h2>Control what gets archived</h2>
+          </div>
+        </div>
+
+        <div class="rule-row">
+          <input id="rule-domain" type="text" placeholder="example.com">
+          <button id="add-blacklist" type="button">Blacklist</button>
+          <button id="add-whitelist" class="ghost" type="button">Whitelist</button>
+        </div>
+        <ul id="rules-list" class="rules-list"></ul>
+      </section>
+
+      <section class="bulkbar" aria-label="Bulk actions">
+        <div>
+          <strong id="result-count">0 results</strong>
+          <span id="selected-count">0 selected</span>
+        </div>
+        <div class="bulk-actions">
+          <button id="select-visible" class="ghost" type="button">Select Visible</button>
+          <button id="clear-selection" class="ghost" type="button">Clear Selection</button>
+          <button id="export-selected" type="button">Export Selected</button>
+          <button id="delete-vault" class="danger" type="button">Delete From Vault</button>
+          <button id="delete-chrome" class="danger" type="button">Delete URLs From Chrome</button>
         </div>
       </section>
 
       <section class="summary" aria-live="polite">
-        <span id="result-count">0 results</span>
         <span id="status">Ready</span>
       </section>
 
       <ol id="results" class="results"></ol>
     </main>
 
-    <script src="app.js"></script>
+    <template id="result-template">
+      <li class="result">
+        <label class="check-wrap">
+          <input class="result-check" type="checkbox">
+          <span>Select</span>
+        </label>
+        <div class="result-main">
+          <a class="result-title" target="_blank" rel="noreferrer"></a>
+          <div class="url"></div>
+          <div class="meta"></div>
+        </div>
+      </li>
+    </template>
+
+    <script type="module" src="app.js"></script>
   </body>
 </html>
-

@@ -2,9 +2,11 @@
   "name": "browsevault",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "Private local-first browser history search, backup, export, and preservation extension.",
   "scripts": {
-    "validate": "node scripts/validate-extension.mjs"
+    "validate": "node scripts/validate-extension.mjs",
+    "check": "node --check src/background.js && node --check src/storage.js && node --check src/app.js && node --check scripts/validate-extension.mjs"
   },
   "keywords": [
     "chrome-extension",
@@ -18,4 +20,3 @@
   ],
   "license": "MIT"
 }
-

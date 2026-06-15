@@ -22,8 +22,15 @@ This repository is an early Manifest V3 scaffold. It includes:
 
 - a loadable Chrome extension shell;
 - a full-page BrowseVault app;
-- local search over Chrome history through `chrome.history`;
-- JSON backup export of current searchable history;
+- local IndexedDB archive storage;
+- background capture for new Chrome history visits;
+- manual sync from currently available Chrome history;
+- query syntax for domain, title, URL, dates, exclusions, phrases, and regex;
+- JSON backup export and import;
+- selected-record export;
+- bulk deletion from the BrowseVault vault;
+- optional URL-level deletion from Chrome history for selected records;
+- domain blacklist and whitelist rules;
 - local-first privacy documentation;
 - copied research and product docs in [`docs/`](docs/);
 - Chrome Web Store listing notes in [`store/listing.md`](store/listing.md);
@@ -40,7 +47,8 @@ This repository is an early Manifest V3 scaffold. It includes:
 │   ├── app.css
 │   ├── app.html
 │   ├── app.js
-│   └── background.js
+│   ├── background.js
+│   └── storage.js
 ├── store/
 │   └── listing.md
 ├── manifest.json
@@ -63,6 +71,19 @@ This scaffold has no runtime dependencies.
 
 ```bash
 npm run validate
+npm run check
+```
+
+## Current Search Syntax
+
+Examples:
+
+```text
+github site:github.com
+title:invoice after:2026-01-01
+url:docs -youtube
+"exact phrase"
+regex:github|gitlab
 ```
 
 ## GitHub Description
@@ -85,4 +106,3 @@ BrowseVault and Research Replay should stay separate products at the user-facing
 - Research Replay: preserve the reasoning trail behind explicit research sessions.
 
 They may later share infrastructure such as URL normalization, local storage, search indexing, backup, and export.
-
