@@ -97,7 +97,14 @@ export function normalizeDomain(url) {
 
 function normalizeTimestamp(value) {
   if (typeof value === "number" && Number.isFinite(value)) {
+    if (value > 100000000000000) {
+      return Math.floor(value / 1000);
+    }
     return value;
+  }
+
+  if (typeof value === "string" && /^\d+$/.test(value.trim())) {
+    return normalizeTimestamp(Number(value.trim()));
   }
 
   const parsed = Date.parse(value);
@@ -321,11 +328,7 @@ export async function exportArchive(items = null) {
 
 export async function importArchive(archive) {
   const importedAt = new Date().toISOString();
-  const visits = Array.isArray(archive?.visits)
-    ? archive.visits
-    : Array.isArray(archive?.items)
-      ? archive.items
-      : [];
+  const visits = extractImportVisits(archive);
 
   const normalized = visits
     .filter((visit) => visit?.url)
@@ -374,6 +377,31 @@ export async function importArchive(archive) {
     importedAt,
     visits: normalized.length
   };
+}
+
+function extractImportVisits(archive) {
+  if (Array.isArray(archive?.visits)) {
+    return archive.visits;
+  }
+
+  if (Array.isArray(archive?.items)) {
+    return archive.items;
+  }
+
+  if (Array.isArray(archive?.["Browser History"])) {
+    return archive["Browser History"].map((item) => ({
+      url: item.url,
+      title: item.title,
+      visitTime: item.time_usec,
+      source: "google-takeout"
+    }));
+  }
+
+  if (Array.isArray(archive?.browserHistory)) {
+    return archive.browserHistory;
+  }
+
+  return [];
 }
 
 export async function getStats() {

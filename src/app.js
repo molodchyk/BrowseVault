@@ -183,6 +183,96 @@ ${rows}
 </html>`;
 }
 
+function parseDelimitedRows(text, delimiter) {
+  const rows = [];
+  let row = [];
+  let cell = "";
+  let quoted = false;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    const next = text[index + 1];
+
+    if (quoted && char === '"' && next === '"') {
+      cell += '"';
+      index += 1;
+      continue;
+    }
+
+    if (char === '"') {
+      quoted = !quoted;
+      continue;
+    }
+
+    if (!quoted && char === delimiter) {
+      row.push(cell);
+      cell = "";
+      continue;
+    }
+
+    if (!quoted && (char === "\n" || char === "\r")) {
+      if (char === "\r" && next === "\n") {
+        index += 1;
+      }
+      row.push(cell);
+      if (row.some((value) => value.length > 0)) {
+        rows.push(row);
+      }
+      row = [];
+      cell = "";
+      continue;
+    }
+
+    cell += char;
+  }
+
+  row.push(cell);
+  if (row.some((value) => value.length > 0)) {
+    rows.push(row);
+  }
+
+  return rows;
+}
+
+function normalizeHeader(value) {
+  return String(value || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+function delimitedArchiveFromText(text, delimiter, source) {
+  const rows = parseDelimitedRows(text, delimiter);
+  const headers = (rows.shift() || []).map(normalizeHeader);
+  const visits = rows
+    .map((row) => Object.fromEntries(headers.map((header, index) => [header, row[index] || ""])))
+    .map((row) => ({
+      url: row.url || row.uri || row.link,
+      title: row.title || row.name || row.pagetitle || "",
+      visitTime: row.visittime || row.lastvisittime || row.time || row.timestamp || row.date || row.datetime,
+      visitCount: row.visitcount || row.visits || 1,
+      source
+    }))
+    .filter((visit) => visit.url);
+
+  return {
+    app: source,
+    schemaVersion: 1,
+    visits
+  };
+}
+
+function archiveFromFileText(file, text) {
+  const lowerName = file.name.toLowerCase();
+
+  if (lowerName.endsWith(".csv")) {
+    return delimitedArchiveFromText(text, ",", "csv-import");
+  }
+
+  if (lowerName.endsWith(".tsv")) {
+    return delimitedArchiveFromText(text, "\t", "tsv-import");
+  }
+
+  return JSON.parse(text);
+}
+
 function selectedResults() {
   return currentResults.filter((result) => selectedIds.has(result.id));
 }
@@ -381,11 +471,13 @@ async function exportSelected() {
 async function importFromFile(file) {
   setStatus("Importing archive");
   const text = await file.text();
-  const archive = JSON.parse(text);
+  const archive = archiveFromFileText(file, text);
   const visitCount = Array.isArray(archive?.visits)
     ? archive.visits.length
     : Array.isArray(archive?.items)
       ? archive.items.length
+      : Array.isArray(archive?.["Browser History"])
+        ? archive["Browser History"].length
       : 0;
 
   if (!confirm(`Import ${visitCount} records from ${archive?.app || "this archive"}?`)) {

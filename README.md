@@ -30,6 +30,7 @@ This repository is an early Manifest V3 scaffold. It includes:
 - CSV and HTML exports;
 - visible last-backup status;
 - import confirmation with record count;
+- JSON, CSV, TSV, and Google Takeout-style import handling;
 - selected-record export;
 - bulk deletion from the BrowseVault vault;
 - optional URL-level deletion from Chrome history for selected records;
