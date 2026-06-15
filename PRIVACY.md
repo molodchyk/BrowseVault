@@ -9,6 +9,7 @@ Current scaffold behavior:
 - Imports currently available Chrome history when the extension is installed, started, or manually synced, including individual visits where Chrome exposes them.
 - Imports JSON, CSV, TSV, and Google Takeout-style files only when the user chooses a local file.
 - Exports JSON, CSV, or HTML only when the user clicks an export button.
+- Adds a local SHA-256 checksum to JSON backups so later imports can warn about changed archive payloads.
 - Does not automatically read page contents.
 - Does not take screenshots.
 - Does not make remote network requests.

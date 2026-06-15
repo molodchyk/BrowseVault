@@ -29,6 +29,7 @@ This repository is an early Manifest V3 scaffold. It includes:
 - JSON backup export and import;
 - CSV and HTML exports;
 - visible last-backup status;
+- SHA-256 integrity metadata for JSON backups;
 - import confirmation with record count;
 - JSON, CSV, TSV, and Google Takeout-style import handling;
 - selected-record export;

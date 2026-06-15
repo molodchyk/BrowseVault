@@ -101,6 +101,48 @@ function downloadJson(filename, data) {
   URL.revokeObjectURL(url);
 }
 
+async function sha256(text) {
+  const bytes = new TextEncoder().encode(text);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function integrityPayload(archive) {
+  return JSON.stringify({
+    schemaVersion: archive.schemaVersion || 1,
+    rules: archive.rules || [],
+    visits: archive.visits || archive.items || []
+  });
+}
+
+async function attachIntegrity(archive) {
+  return {
+    ...archive,
+    integrity: {
+      algorithm: "SHA-256",
+      scope: "schemaVersion,rules,visits",
+      sha256: await sha256(integrityPayload(archive))
+    }
+  };
+}
+
+async function verifyArchiveIntegrity(archive) {
+  if (!archive?.integrity?.sha256) {
+    return {
+      checked: false,
+      ok: true
+    };
+  }
+
+  const actual = await sha256(integrityPayload(archive));
+  return {
+    checked: true,
+    ok: actual === archive.integrity.sha256,
+    expected: archive.integrity.sha256,
+    actual
+  };
+}
+
 function escapeCsv(value) {
   const text = String(value ?? "");
   return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
@@ -413,12 +455,13 @@ async function syncChromeHistory() {
 
 async function exportAll() {
   setStatus("Preparing archive");
-  const archive = await exportArchive();
+  const archive = await attachIntegrity(await exportArchive());
   downloadJson(`browsevault-archive-${archive.exportedAt.slice(0, 10)}.json`, archive);
   await setMeta("lastBackup", {
     exportedAt: archive.exportedAt,
     format: "json",
-    records: archive.counts.visits
+    records: archive.counts.visits,
+    sha256: archive.integrity.sha256
   });
   await refreshStats();
   setStatus("Exported archive");
@@ -465,7 +508,7 @@ async function exportSelected() {
     return;
   }
 
-  const archive = await exportArchive(items);
+  const archive = await attachIntegrity(await exportArchive(items));
   downloadJson(`browsevault-selected-${archive.exportedAt.slice(0, 10)}.json`, archive);
   setStatus(`Exported ${items.length} selected records`);
 }
@@ -474,6 +517,7 @@ async function importFromFile(file) {
   setStatus("Importing archive");
   const text = await file.text();
   const archive = archiveFromFileText(file, text);
+  const integrity = await verifyArchiveIntegrity(archive);
   const visitCount = Array.isArray(archive?.visits)
     ? archive.visits.length
     : Array.isArray(archive?.items)
@@ -481,6 +525,11 @@ async function importFromFile(file) {
       : Array.isArray(archive?.["Browser History"])
         ? archive["Browser History"].length
       : 0;
+
+  if (integrity.checked && !integrity.ok && !confirm("This archive checksum does not match. Import anyway?")) {
+    setStatus("Import canceled");
+    return;
+  }
 
   if (!confirm(`Import ${visitCount} records from ${archive?.app || "this archive"}?`)) {
     setStatus("Import canceled");
@@ -491,7 +540,7 @@ async function importFromFile(file) {
   await refreshStats();
   await renderRules();
   await runSearch();
-  setStatus(`Imported ${result.visits} records`);
+  setStatus(`Imported ${result.visits} records${integrity.checked ? " with verified checksum" : ""}`);
 }
 
 async function deleteFromVault() {
