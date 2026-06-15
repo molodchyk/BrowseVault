@@ -3,6 +3,7 @@ import {
   clearVaultData,
   exportArchive,
   getRules,
+  getVisitsByIds,
   getStats,
   importArchive,
   markDeletedByIds,
@@ -32,6 +33,7 @@ const elements = {
   deleteChrome: document.querySelector("#delete-chrome"),
   undoDelete: document.querySelector("#undo-delete"),
   selectVisible: document.querySelector("#select-visible"),
+  selectFiltered: document.querySelector("#select-filtered"),
   clearSelection: document.querySelector("#clear-selection"),
   resultCount: document.querySelector("#result-count"),
   selectedCount: document.querySelector("#selected-count"),
@@ -323,8 +325,8 @@ function archiveFromFileText(file, text) {
   return JSON.parse(text);
 }
 
-function selectedResults() {
-  return currentResults.filter((result) => selectedIds.has(result.id));
+async function selectedResults() {
+  return getVisitsByIds([...selectedIds]);
 }
 
 function renderResults(results, total) {
@@ -585,7 +587,7 @@ async function exportHtml() {
 }
 
 async function exportSelected() {
-  const items = selectedResults();
+  const items = await selectedResults();
   if (!items.length) {
     setStatus("Select records first");
     return;
@@ -650,7 +652,7 @@ async function deleteFromVault() {
 }
 
 async function deleteFromChrome() {
-  const items = selectedResults();
+  const items = await selectedResults();
   if (!items.length) {
     setStatus("Select records first");
     return;
@@ -700,6 +702,15 @@ async function addRule(type) {
   setStatus(`Added ${type} rule`);
 }
 
+async function selectAllFiltered() {
+  const { results, total } = await searchVisits(getSearchText(), {
+    limit: "all"
+  });
+  selectedIds = new Set(results.map((result) => result.id));
+  renderResults(currentResults, currentTotal);
+  setStatus(`Selected ${total} matching vault records`);
+}
+
 async function resetVault() {
   if (!confirm("Erase all BrowseVault local archive data, rules, and backup metadata? This will not delete Chrome history.")) {
     return;
@@ -743,6 +754,7 @@ function bindEvents() {
     selectedIds = new Set(currentResults.map((result) => result.id));
     renderResults(currentResults, currentTotal);
   });
+  elements.selectFiltered.addEventListener("click", () => selectAllFiltered().catch((error) => setStatus(error.message)));
   elements.clearSelection.addEventListener("click", () => {
     selectedIds.clear();
     renderResults(currentResults, currentTotal);

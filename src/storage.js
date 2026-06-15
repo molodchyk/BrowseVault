@@ -191,6 +191,12 @@ export async function getAllVisits(options = {}) {
   return visits.filter((visit) => !visit.deletedAt);
 }
 
+export async function getVisitsByIds(ids) {
+  const idSet = new Set(ids);
+  const visits = await getAllVisits();
+  return visits.filter((visit) => idSet.has(visit.id));
+}
+
 export async function countVisits() {
   return (await getAllVisits()).length;
 }
@@ -268,7 +274,7 @@ export async function removeRule(id) {
 export async function searchVisits(input = "", options = {}) {
   const visits = await getAllVisits();
   const query = parseQuery(input);
-  const limit = Number(options.limit || DEFAULT_RESULT_LIMIT);
+  const limit = options.limit === "all" ? Infinity : Number(options.limit || DEFAULT_RESULT_LIMIT);
   const filtered = visits
     .filter((visit) => matchesVisitQuery(visit, query))
     .sort((a, b) => b.visitTime - a.visitTime);
