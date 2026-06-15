@@ -591,7 +591,12 @@ async function importFromFile(file) {
   await refreshStats();
   await renderRules();
   await runSearch();
-  setStatus(`Imported ${result.visits} records${integrity.checked ? " with verified checksum" : ""}`);
+  const integrityLabel = integrity.checked
+    ? integrity.ok
+      ? " with verified checksum"
+      : " after checksum warning"
+    : "";
+  setStatus(`Imported ${result.visits} records${integrityLabel}`);
 }
 
 async function deleteFromVault() {
