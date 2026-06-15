@@ -292,7 +292,32 @@ export async function markDeletedByIds(ids, deletedAt = new Date().toISOString()
     }));
 
   await putMany(VISIT_STORE, changed);
-  await setMeta("lastVaultDelete", { deletedAt, count: changed.length });
+  await setMeta("lastVaultDelete", {
+    deletedAt,
+    count: changed.length,
+    ids: changed.map((visit) => visit.id)
+  });
+  return changed.length;
+}
+
+export async function restoreDeletedByIds(ids) {
+  const idSet = new Set(ids);
+  const restoredAt = new Date().toISOString();
+  const visits = await getAllVisits({ includeDeleted: true });
+  const changed = visits
+    .filter((visit) => idSet.has(visit.id) && visit.deletedAt)
+    .map((visit) => ({
+      ...visit,
+      deletedAt: null,
+      updatedAt: restoredAt
+    }));
+
+  await putMany(VISIT_STORE, changed);
+  await setMeta("lastVaultRestore", {
+    restoredAt,
+    count: changed.length,
+    ids: changed.map((visit) => visit.id)
+  });
   return changed.length;
 }
 

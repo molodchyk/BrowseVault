@@ -6,6 +6,7 @@ import {
   importArchive,
   markDeletedByIds,
   removeRule,
+  restoreDeletedByIds,
   searchVisits,
   setMeta
 } from "./storage.js";
@@ -25,6 +26,7 @@ const elements = {
   exportSelected: document.querySelector("#export-selected"),
   deleteVault: document.querySelector("#delete-vault"),
   deleteChrome: document.querySelector("#delete-chrome"),
+  undoDelete: document.querySelector("#undo-delete"),
   selectVisible: document.querySelector("#select-visible"),
   clearSelection: document.querySelector("#clear-selection"),
   resultCount: document.querySelector("#result-count"),
@@ -539,6 +541,21 @@ async function deleteFromChrome() {
   setStatus(`Deleted ${deleted} records from Chrome and vault`);
 }
 
+async function undoVaultDelete() {
+  const stats = await getStats();
+  const ids = stats.meta.lastVaultDelete?.ids || [];
+
+  if (!ids.length) {
+    setStatus("No vault delete to undo");
+    return;
+  }
+
+  const restored = await restoreDeletedByIds(ids);
+  await refreshStats();
+  await runSearch();
+  setStatus(`Restored ${restored} vault records`);
+}
+
 async function addRule(type) {
   await addDomainRule(type, elements.ruleDomain.value);
   elements.ruleDomain.value = "";
@@ -566,6 +583,7 @@ function bindEvents() {
   elements.exportSelected.addEventListener("click", () => exportSelected().catch((error) => setStatus(error.message)));
   elements.deleteVault.addEventListener("click", () => deleteFromVault().catch((error) => setStatus(error.message)));
   elements.deleteChrome.addEventListener("click", () => deleteFromChrome().catch((error) => setStatus(error.message)));
+  elements.undoDelete.addEventListener("click", () => undoVaultDelete().catch((error) => setStatus(error.message)));
   elements.selectVisible.addEventListener("click", () => {
     selectedIds = new Set(currentResults.map((result) => result.id));
     renderResults(currentResults, currentTotal);

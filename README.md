@@ -33,6 +33,7 @@ This repository is an early Manifest V3 scaffold. It includes:
 - JSON, CSV, TSV, and Google Takeout-style import handling;
 - selected-record export;
 - bulk deletion from the BrowseVault vault;
+- undo for the last BrowseVault vault deletion;
 - optional URL-level deletion from Chrome history for selected records;
 - domain blacklist and whitelist rules;
 - local-first privacy documentation;
