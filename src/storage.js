@@ -125,6 +125,8 @@ export function normalizeHistoryItem(item, options = {}) {
     visitCount: Number(item.visitCount || 1),
     typedCount: Number(item.typedCount || 0),
     transition: item.transition || item.transitionType || "",
+    visitId: item.visitId || "",
+    referringVisitId: item.referringVisitId || "",
     source: options.source || item.source || "import",
     sourceReason: options.reason || item.sourceReason || "",
     importedAt: item.importedAt || null,

@@ -24,9 +24,12 @@ This repository is an early Manifest V3 scaffold. It includes:
 - a full-page BrowseVault app;
 - local IndexedDB archive storage;
 - background capture for new Chrome history visits;
-- manual sync from currently available Chrome history;
+- manual sync from currently available Chrome history, expanded to individual visits where Chrome exposes them;
 - query syntax for domain, title, URL, dates, exclusions, phrases, and regex;
 - JSON backup export and import;
+- CSV and HTML exports;
+- visible last-backup status;
+- import confirmation with record count;
 - selected-record export;
 - bulk deletion from the BrowseVault vault;
 - optional URL-level deletion from Chrome history for selected records;

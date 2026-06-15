@@ -6,7 +6,8 @@ import {
   importArchive,
   markDeletedByIds,
   removeRule,
-  searchVisits
+  searchVisits,
+  setMeta
 } from "./storage.js";
 
 const elements = {
@@ -17,7 +18,9 @@ const elements = {
   search: document.querySelector("#search"),
   clearSearch: document.querySelector("#clear-search"),
   syncChrome: document.querySelector("#sync-chrome"),
-  exportArchive: document.querySelector("#export-archive"),
+  exportJson: document.querySelector("#export-json"),
+  exportCsv: document.querySelector("#export-csv"),
+  exportHtml: document.querySelector("#export-html"),
   importArchive: document.querySelector("#import-archive"),
   exportSelected: document.querySelector("#export-selected"),
   deleteVault: document.querySelector("#delete-vault"),
@@ -32,6 +35,7 @@ const elements = {
   statVisits: document.querySelector("#stat-visits"),
   statDomains: document.querySelector("#stat-domains"),
   statNewest: document.querySelector("#stat-newest"),
+  statBackup: document.querySelector("#stat-backup"),
   ruleDomain: document.querySelector("#rule-domain"),
   addBlacklist: document.querySelector("#add-blacklist"),
   addWhitelist: document.querySelector("#add-whitelist"),
@@ -93,6 +97,90 @@ function downloadJson(filename, data) {
   anchor.click();
 
   URL.revokeObjectURL(url);
+}
+
+function escapeCsv(value) {
+  const text = String(value ?? "");
+  return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+}
+
+function downloadText(filename, mimeType, text) {
+  const blob = new Blob([text], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+
+  URL.revokeObjectURL(url);
+}
+
+function visitsToCsv(visits) {
+  const headers = [
+    "visitTimeIso",
+    "visitTime",
+    "domain",
+    "title",
+    "url",
+    "visitCount",
+    "transition",
+    "source"
+  ];
+
+  const rows = visits.map((visit) => [
+    new Date(visit.visitTime).toISOString(),
+    visit.visitTime,
+    visit.domain,
+    visit.title,
+    visit.url,
+    visit.visitCount,
+    visit.transition,
+    visit.source
+  ]);
+
+  return [headers, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\n");
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function visitsToHtml(visits, exportedAt) {
+  const rows = visits
+    .map(
+      (visit) => `<tr><td>${escapeHtml(new Date(visit.visitTime).toLocaleString())}</td><td>${escapeHtml(visit.domain)}</td><td><a href="${escapeHtml(visit.url)}">${escapeHtml(visit.title || visit.url)}</a></td><td>${escapeHtml(visit.source)}</td></tr>`
+    )
+    .join("\n");
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>BrowseVault Export</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+    th { background: #f6f8fa; }
+    a { color: #0969da; }
+  </style>
+</head>
+<body>
+  <h1>BrowseVault Export</h1>
+  <p>Exported ${escapeHtml(exportedAt)} with ${visits.length} records.</p>
+  <table>
+    <thead><tr><th>Visited</th><th>Domain</th><th>Page</th><th>Source</th></tr></thead>
+    <tbody>
+${rows}
+    </tbody>
+  </table>
+</body>
+</html>`;
 }
 
 function selectedResults() {
@@ -159,6 +247,9 @@ async function refreshStats() {
   elements.statVisits.textContent = String(stats.visits);
   elements.statDomains.textContent = String(stats.domains);
   elements.statNewest.textContent = formatShortDate(stats.newestVisitTime);
+  elements.statBackup.textContent = stats.meta.lastBackup?.exportedAt
+    ? formatShortDate(Date.parse(stats.meta.lastBackup.exportedAt))
+    : "Never";
 }
 
 async function renderRules() {
@@ -232,7 +323,47 @@ async function exportAll() {
   setStatus("Preparing archive");
   const archive = await exportArchive();
   downloadJson(`browsevault-archive-${archive.exportedAt.slice(0, 10)}.json`, archive);
+  await setMeta("lastBackup", {
+    exportedAt: archive.exportedAt,
+    format: "json",
+    records: archive.counts.visits
+  });
+  await refreshStats();
   setStatus("Exported archive");
+}
+
+async function exportCsv() {
+  setStatus("Preparing CSV");
+  const archive = await exportArchive();
+  downloadText(
+    `browsevault-history-${archive.exportedAt.slice(0, 10)}.csv`,
+    "text/csv",
+    visitsToCsv(archive.visits)
+  );
+  await setMeta("lastBackup", {
+    exportedAt: archive.exportedAt,
+    format: "csv",
+    records: archive.counts.visits
+  });
+  await refreshStats();
+  setStatus("Exported CSV");
+}
+
+async function exportHtml() {
+  setStatus("Preparing HTML");
+  const archive = await exportArchive();
+  downloadText(
+    `browsevault-history-${archive.exportedAt.slice(0, 10)}.html`,
+    "text/html",
+    visitsToHtml(archive.visits, archive.exportedAt)
+  );
+  await setMeta("lastBackup", {
+    exportedAt: archive.exportedAt,
+    format: "html",
+    records: archive.counts.visits
+  });
+  await refreshStats();
+  setStatus("Exported HTML");
 }
 
 async function exportSelected() {
@@ -251,6 +382,17 @@ async function importFromFile(file) {
   setStatus("Importing archive");
   const text = await file.text();
   const archive = JSON.parse(text);
+  const visitCount = Array.isArray(archive?.visits)
+    ? archive.visits.length
+    : Array.isArray(archive?.items)
+      ? archive.items.length
+      : 0;
+
+  if (!confirm(`Import ${visitCount} records from ${archive?.app || "this archive"}?`)) {
+    setStatus("Import canceled");
+    return;
+  }
+
   const result = await importArchive(archive);
   await refreshStats();
   await renderRules();
@@ -326,7 +468,9 @@ function bindEvents() {
     }
   });
   elements.syncChrome.addEventListener("click", () => syncChromeHistory().catch((error) => setStatus(error.message)));
-  elements.exportArchive.addEventListener("click", () => exportAll().catch((error) => setStatus(error.message)));
+  elements.exportJson.addEventListener("click", () => exportAll().catch((error) => setStatus(error.message)));
+  elements.exportCsv.addEventListener("click", () => exportCsv().catch((error) => setStatus(error.message)));
+  elements.exportHtml.addEventListener("click", () => exportHtml().catch((error) => setStatus(error.message)));
   elements.exportSelected.addEventListener("click", () => exportSelected().catch((error) => setStatus(error.message)));
   elements.deleteVault.addEventListener("click", () => deleteFromVault().catch((error) => setStatus(error.message)));
   elements.deleteChrome.addEventListener("click", () => deleteFromChrome().catch((error) => setStatus(error.message)));

@@ -6,8 +6,8 @@ Current scaffold behavior:
 
 - Stores the BrowseVault archive locally in IndexedDB.
 - Captures new Chrome history visits in the background after installation.
-- Imports currently available Chrome history when the extension is installed, started, or manually synced.
-- Exports a JSON backup only when the user clicks an export button.
+- Imports currently available Chrome history when the extension is installed, started, or manually synced, including individual visits where Chrome exposes them.
+- Exports JSON, CSV, or HTML only when the user clicks an export button.
 - Does not automatically read page contents.
 - Does not take screenshots.
 - Does not make remote network requests.

@@ -7,7 +7,8 @@ import {
 } from "./storage.js";
 
 const APP_URL = "src/app.html";
-const BOOTSTRAP_LIMIT = 5000;
+const BOOTSTRAP_URL_LIMIT = 3000;
+const VISIT_EXPANSION_CONCURRENCY = 8;
 
 function now() {
   return new Date().toISOString();
@@ -21,7 +22,7 @@ function hostMatchesRule(host, rule) {
   return host === rule || host.endsWith(`.${rule}`);
 }
 
-async function shouldArchiveUrl(url) {
+async function shouldArchiveUrl(url, existingRules = null) {
   if (!url || isInternalUrl(url)) {
     return false;
   }
@@ -33,7 +34,7 @@ async function shouldArchiveUrl(url) {
     return false;
   }
 
-  const rules = await getRules();
+  const rules = existingRules || (await getRules());
   if (rules.whitelist.some((rule) => hostMatchesRule(host, rule))) {
     return true;
   }
@@ -45,10 +46,11 @@ async function bootstrapChromeHistory(reason = "startup") {
   const items = await chrome.history.search({
     text: "",
     startTime: 0,
-    maxResults: BOOTSTRAP_LIMIT
+    maxResults: BOOTSTRAP_URL_LIMIT
   });
 
-  const result = await syncChromeHistoryItems(items, {
+  const expandedItems = await expandHistoryItems(items);
+  const result = await syncChromeHistoryItems(expandedItems, {
     source: "chrome-history",
     reason
   });
@@ -60,6 +62,53 @@ async function bootstrapChromeHistory(reason = "startup") {
   });
 
   return result;
+}
+
+async function expandHistoryItems(items) {
+  const expanded = [];
+  const rules = await getRules();
+  let cursor = 0;
+
+  async function worker() {
+    while (cursor < items.length) {
+      const item = items[cursor];
+      cursor += 1;
+
+      if (!(await shouldArchiveUrl(item.url, rules))) {
+        continue;
+      }
+
+      try {
+        const visits = await chrome.history.getVisits({ url: item.url });
+        if (!visits.length) {
+          expanded.push(item);
+          continue;
+        }
+
+        for (const visit of visits) {
+          expanded.push({
+            ...item,
+            id: `${item.url}|${visit.visitId || visit.visitTime}`,
+            visitId: visit.visitId || "",
+            visitTime: visit.visitTime,
+            transition: visit.transition || "",
+            referringVisitId: visit.referringVisitId || ""
+          });
+        }
+      } catch {
+        expanded.push(item);
+      }
+    }
+  }
+
+  await Promise.all(
+    Array.from(
+      { length: Math.min(VISIT_EXPANSION_CONCURRENCY, items.length) },
+      () => worker()
+    )
+  );
+
+  return expanded;
 }
 
 chrome.runtime.onInstalled.addListener(async () => {
@@ -120,4 +169,3 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   return false;
 });
-
