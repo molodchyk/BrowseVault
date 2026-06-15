@@ -8,6 +8,7 @@ const requiredFiles = [
   "PRIVACY.md",
   "src/background.js",
   "src/storage.js",
+  "src/query.js",
   "src/app.html",
   "src/app.css",
   "src/app.js",
@@ -47,7 +48,7 @@ assert(packageJson.keywords.includes("history-backup"), "Missing history-backup 
 const appHtml = fs.readFileSync(path.join(root, "src/app.html"), "utf8");
 assert(appHtml.includes('type="module"'), "App script should load as a module.");
 
-const sourceFiles = ["src/background.js", "src/storage.js", "src/app.js", "src/app.html", "src/app.css"];
+const sourceFiles = ["src/background.js", "src/storage.js", "src/query.js", "src/app.js", "src/app.html", "src/app.css"];
 for (const file of sourceFiles) {
   const source = fs.readFileSync(path.join(root, file), "utf8");
   assert(!/https?:\/\//i.test(source), `Unexpected remote URL in ${file}`);
