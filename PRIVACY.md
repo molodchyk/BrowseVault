@@ -2,7 +2,7 @@
 
 BrowseVault is intended to be local-first.
 
-Current scaffold behavior:
+Current extension behavior:
 
 - Stores the BrowseVault archive locally in IndexedDB.
 - Captures new Chrome history visits in the background after installation.
@@ -15,17 +15,18 @@ Current scaffold behavior:
 - Does not take screenshots.
 - Does not make remote network requests.
 - Does not include analytics, ads, or tracking scripts.
+- Can erase all BrowseVault local data without deleting Chrome history.
 
 Current permissions:
 
-- `history`: searches browser history and can later listen for new visits.
+- `history`: searches browser history, listens for new visits, and supports explicit URL-level Chrome history deletion.
 - `bookmarks`: searches bookmark titles and URLs in Quick Open.
 - `downloads`: searches download URLs and filenames in Quick Open.
 - `sessions`: searches recently closed tabs in Quick Open.
-- `storage`: saves local extension state and future archive metadata.
+- `storage`: saves local extension state and archive metadata.
 - `tabs`: opens the BrowseVault page from the extension action.
 
-Planned product direction:
+Future product direction:
 
 - Preserve history locally from installation onward.
 - Keep backup and restore as first-class workflows.

@@ -75,4 +75,4 @@ for (const file of sourceFiles) {
   assert(!/https?:\/\//i.test(source), `Unexpected remote URL in ${file}`);
 }
 
-console.log("BrowseVault extension scaffold validated.");
+console.log("BrowseVault extension validated.");

@@ -442,3 +442,18 @@ export async function getStats() {
     meta
   };
 }
+
+export async function clearVaultData() {
+  const db = await openVaultDb();
+  const tx = db.transaction([VISIT_STORE, META_STORE, RULE_STORE], "readwrite");
+
+  tx.objectStore(VISIT_STORE).clear();
+  tx.objectStore(META_STORE).clear();
+  tx.objectStore(RULE_STORE).clear();
+
+  await new Promise((resolve, reject) => {
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}

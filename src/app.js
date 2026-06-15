@@ -1,5 +1,6 @@
 import {
   addDomainRule,
+  clearVaultData,
   exportArchive,
   getRules,
   getStats,
@@ -25,6 +26,7 @@ const elements = {
   exportCsv: document.querySelector("#export-csv"),
   exportHtml: document.querySelector("#export-html"),
   importArchive: document.querySelector("#import-archive"),
+  resetVault: document.querySelector("#reset-vault"),
   exportSelected: document.querySelector("#export-selected"),
   deleteVault: document.querySelector("#delete-vault"),
   deleteChrome: document.querySelector("#delete-chrome"),
@@ -661,6 +663,22 @@ async function addRule(type) {
   setStatus(`Added ${type} rule`);
 }
 
+async function resetVault() {
+  if (!confirm("Erase all BrowseVault local archive data, rules, and backup metadata? This will not delete Chrome history.")) {
+    return;
+  }
+
+  await clearVaultData();
+  currentResults = [];
+  currentTotal = 0;
+  selectedIds.clear();
+  elements.quickResults.replaceChildren();
+  await refreshStats();
+  await renderRules();
+  await runSearch();
+  setStatus("BrowseVault local data erased");
+}
+
 function bindEvents() {
   elements.search.addEventListener("click", runSearch);
   elements.quickSearch.addEventListener("click", () => runQuickSearch().catch((error) => setStatus(error.message)));
@@ -701,6 +719,7 @@ function bindEvents() {
   });
   elements.addBlacklist.addEventListener("click", () => addRule("blacklist").catch((error) => setStatus(error.message)));
   elements.addWhitelist.addEventListener("click", () => addRule("whitelist").catch((error) => setStatus(error.message)));
+  elements.resetVault.addEventListener("click", () => resetVault().catch((error) => setStatus(error.message)));
 }
 
 async function init() {

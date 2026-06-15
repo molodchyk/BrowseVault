@@ -18,7 +18,7 @@ Search, back up, export, and preserve your browser history locally.
 
 ## Status
 
-This repository is an early Manifest V3 scaffold. It includes:
+This repository contains a working Manifest V3 extension implementation. It includes:
 
 - a loadable Chrome extension shell;
 - a full-page BrowseVault app;
@@ -38,6 +38,7 @@ This repository is an early Manifest V3 scaffold. It includes:
 - bulk deletion from the BrowseVault vault;
 - undo for the last BrowseVault vault deletion;
 - optional URL-level deletion from Chrome history for selected records;
+- full local BrowseVault data reset without touching Chrome history;
 - domain blacklist and whitelist rules;
 - local-first privacy documentation;
 - generated PNG extension icons;
@@ -83,7 +84,7 @@ The manifest also registers `Ctrl+Shift+Y` / `Command+Shift+Y` as a suggested sh
 
 ## Development
 
-This scaffold has no runtime dependencies.
+This extension has no runtime dependencies.
 
 ```bash
 npm run validate
