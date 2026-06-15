@@ -26,6 +26,8 @@ This repository is an early Manifest V3 scaffold. It includes:
 - background capture for new Chrome history visits;
 - manual sync from currently available Chrome history, expanded to individual visits where Chrome exposes them;
 - query syntax for domain, title, URL, dates, exclusions, phrases, and regex;
+- Quick Open search across open tabs, bookmarks, downloads, and recently closed tabs;
+- a keyboard command for opening BrowseVault;
 - JSON backup export and import;
 - CSV and HTML exports;
 - visible last-backup status;
@@ -71,6 +73,8 @@ This repository is an early Manifest V3 scaffold. It includes:
 4. Select this repository folder.
 5. Click the BrowseVault extension icon.
 
+The manifest also registers `Ctrl+Shift+Y` / `Command+Shift+Y` as a suggested shortcut for opening BrowseVault.
+
 ## Development
 
 This scaffold has no runtime dependencies.
@@ -91,6 +95,8 @@ url:docs -youtube
 "exact phrase"
 regex:github|gitlab
 ```
+
+The main vault search is used for archived history management. Quick Open uses the same query text to search current browser sources such as open tabs, bookmarks, downloads, and recently closed tabs. Quick Open results are read-only and are not affected by vault delete/export actions.
 
 ## GitHub Description
 

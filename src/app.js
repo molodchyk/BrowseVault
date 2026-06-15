@@ -10,6 +10,7 @@ import {
   searchVisits,
   setMeta
 } from "./storage.js";
+import { searchBrowserMemory } from "./browser-memory.js";
 
 const elements = {
   query: document.querySelector("#query"),
@@ -17,6 +18,7 @@ const elements = {
   before: document.querySelector("#before"),
   limit: document.querySelector("#limit"),
   search: document.querySelector("#search"),
+  quickSearch: document.querySelector("#quick-search"),
   clearSearch: document.querySelector("#clear-search"),
   syncChrome: document.querySelector("#sync-chrome"),
   exportJson: document.querySelector("#export-json"),
@@ -33,7 +35,9 @@ const elements = {
   selectedCount: document.querySelector("#selected-count"),
   status: document.querySelector("#status"),
   results: document.querySelector("#results"),
+  quickResults: document.querySelector("#quick-results"),
   resultTemplate: document.querySelector("#result-template"),
+  quickResultTemplate: document.querySelector("#quick-result-template"),
   statVisits: document.querySelector("#stat-visits"),
   statDomains: document.querySelector("#stat-domains"),
   statNewest: document.querySelector("#stat-newest"),
@@ -376,6 +380,51 @@ function renderResults(results, total) {
   updateSelectionCount();
 }
 
+function renderQuickResults(results, total, warnings = []) {
+  elements.quickResults.replaceChildren();
+
+  if (!results.length) {
+    const empty = document.createElement("li");
+    empty.className = "quick-result";
+    empty.textContent = warnings.length
+      ? `No source results. ${warnings.join(" ")}`
+      : "No source results.";
+    elements.quickResults.append(empty);
+    return;
+  }
+
+  for (const item of results) {
+    const fragment = elements.quickResultTemplate.content.cloneNode(true);
+    const source = fragment.querySelector(".source-pill");
+    const title = fragment.querySelector(".result-title");
+    const url = fragment.querySelector(".url");
+    const meta = fragment.querySelector(".meta");
+
+    source.textContent = item.type;
+    title.href = item.url;
+    title.textContent = item.title || item.url;
+    url.textContent = item.url;
+    meta.textContent = `${item.detail} · ${item.domain || "unknown domain"} · ${formatDate(item.visitTime)}`;
+
+    elements.quickResults.append(fragment);
+  }
+
+  if (warnings.length) {
+    setStatus(`${total} source results; ${warnings.length} source warning${warnings.length === 1 ? "" : "s"}`);
+  }
+}
+
+async function runQuickSearch() {
+  setStatus("Searching browser sources");
+  const { results, total, warnings } = await searchBrowserMemory(getSearchText(), {
+    limit: Math.min(Number(elements.limit.value || 500), 100)
+  });
+  renderQuickResults(results, total, warnings);
+  if (!warnings.length) {
+    setStatus(`${total} source result${total === 1 ? "" : "s"}`);
+  }
+}
+
 async function refreshStats() {
   const stats = await getStats();
   elements.statVisits.textContent = String(stats.visits);
@@ -614,6 +663,7 @@ async function addRule(type) {
 
 function bindEvents() {
   elements.search.addEventListener("click", runSearch);
+  elements.quickSearch.addEventListener("click", () => runQuickSearch().catch((error) => setStatus(error.message)));
   elements.clearSearch.addEventListener("click", () => {
     elements.query.value = "";
     elements.after.value = "";
@@ -623,6 +673,7 @@ function bindEvents() {
   elements.query.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       runSearch();
+      runQuickSearch().catch((error) => setStatus(error.message));
     }
   });
   elements.syncChrome.addEventListener("click", () => syncChromeHistory().catch((error) => setStatus(error.message)));
@@ -658,6 +709,7 @@ async function init() {
   await refreshStats();
   await renderRules();
   await runSearch();
+  await runQuickSearch();
 }
 
 init().catch((error) => setStatus(error.message));

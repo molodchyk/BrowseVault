@@ -13,9 +13,20 @@
     "type": "module"
   },
   "permissions": [
+    "bookmarks",
+    "downloads",
     "history",
+    "sessions",
     "storage",
     "tabs"
-  ]
+  ],
+  "commands": {
+    "open-browsevault": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Open BrowseVault"
+    }
+  }
 }
-

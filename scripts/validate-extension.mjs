@@ -9,6 +9,7 @@ const requiredFiles = [
   "src/background.js",
   "src/storage.js",
   "src/query.js",
+  "src/browser-memory.js",
   "src/app.html",
   "src/app.css",
   "src/app.js",
@@ -37,9 +38,10 @@ assert(manifest.short_name === "BrowseVault", "Unexpected short_name.");
 assert(manifest.description.length <= 132, "Manifest description should stay within Chrome Web Store summary length.");
 assert(manifest.background?.type === "module", "Background script should be an ES module.");
 
-for (const permission of ["history", "storage", "tabs"]) {
+for (const permission of ["bookmarks", "downloads", "history", "sessions", "storage", "tabs"]) {
   assert(manifest.permissions.includes(permission), `Missing permission: ${permission}`);
 }
+assert(manifest.commands?.["open-browsevault"], "Missing open-browsevault command.");
 
 const packageJson = readJson("package.json");
 assert(packageJson.keywords.includes("browser-history"), "Missing browser-history keyword.");
@@ -48,7 +50,7 @@ assert(packageJson.keywords.includes("history-backup"), "Missing history-backup 
 const appHtml = fs.readFileSync(path.join(root, "src/app.html"), "utf8");
 assert(appHtml.includes('type="module"'), "App script should load as a module.");
 
-const sourceFiles = ["src/background.js", "src/storage.js", "src/query.js", "src/app.js", "src/app.html", "src/app.css"];
+const sourceFiles = ["src/background.js", "src/storage.js", "src/query.js", "src/browser-memory.js", "src/app.js", "src/app.html", "src/app.css"];
 for (const file of sourceFiles) {
   const source = fs.readFileSync(path.join(root, file), "utf8");
   assert(!/https?:\/\//i.test(source), `Unexpected remote URL in ${file}`);

@@ -7,6 +7,7 @@ Current scaffold behavior:
 - Stores the BrowseVault archive locally in IndexedDB.
 - Captures new Chrome history visits in the background after installation.
 - Imports currently available Chrome history when the extension is installed, started, or manually synced, including individual visits where Chrome exposes them.
+- Searches open tabs, bookmarks, downloads, and recently closed tabs only in the local extension UI.
 - Imports JSON, CSV, TSV, and Google Takeout-style files only when the user chooses a local file.
 - Exports JSON, CSV, or HTML only when the user clicks an export button.
 - Adds a local SHA-256 checksum to JSON backups so later imports can warn about changed archive payloads.
@@ -18,6 +19,9 @@ Current scaffold behavior:
 Current permissions:
 
 - `history`: searches browser history and can later listen for new visits.
+- `bookmarks`: searches bookmark titles and URLs in Quick Open.
+- `downloads`: searches download URLs and filenames in Quick Open.
+- `sessions`: searches recently closed tabs in Quick Open.
 - `storage`: saves local extension state and future archive metadata.
 - `tabs`: opens the BrowseVault page from the extension action.
 

@@ -216,6 +216,7 @@ code {
 }
 
 .results,
+.quick-results,
 .rules-list {
   display: grid;
   gap: 10px;
@@ -224,7 +225,8 @@ code {
   list-style: none;
 }
 
-.result {
+.result,
+.quick-result {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 12px;
@@ -232,6 +234,19 @@ code {
   border-radius: 8px;
   background: #ffffff;
   padding: 14px;
+}
+
+.source-pill {
+  align-self: start;
+  min-width: 76px;
+  border-radius: 999px;
+  background: #e5ecef;
+  color: #203439;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 5px 8px;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .check-wrap {
@@ -336,6 +351,7 @@ code {
   .summary,
   .stat,
   .result,
+  .quick-result,
   .rule-item {
     border-color: #304146;
     background: #172225;
@@ -381,5 +397,10 @@ code {
   .stat span,
   .result a {
     color: #79d0d6;
+  }
+
+  .source-pill {
+    background: #213135;
+    color: #d7eef1;
   }
 }

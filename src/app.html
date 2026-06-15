@@ -76,6 +76,18 @@
         <p class="hint">Supported syntax: <code>site:</code>, <code>title:</code>, <code>url:</code>, <code>after:</code>, <code>before:</code>, <code>-exclude</code>, quoted phrases, and <code>regex:</code>.</p>
       </section>
 
+      <section class="panel quick-panel" aria-label="Quick open">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Quick Open</p>
+            <h2>Search tabs, bookmarks, downloads, and closed tabs</h2>
+          </div>
+          <button id="quick-search" type="button">Search Sources</button>
+        </div>
+        <p class="hint">Uses the same query text and date filters as the vault search. Results here are read-only and never affected by vault cleanup.</p>
+        <ol id="quick-results" class="quick-results"></ol>
+      </section>
+
       <section class="panel rules-panel" aria-label="Domain rules">
         <div class="section-heading">
           <div>
@@ -120,6 +132,17 @@
           <input class="result-check" type="checkbox">
           <span>Select</span>
         </label>
+        <div class="result-main">
+          <a class="result-title" target="_blank" rel="noreferrer"></a>
+          <div class="url"></div>
+          <div class="meta"></div>
+        </div>
+      </li>
+    </template>
+
+    <template id="quick-result-template">
+      <li class="quick-result">
+        <span class="source-pill"></span>
         <div class="result-main">
           <a class="result-title" target="_blank" rel="noreferrer"></a>
           <div class="url"></div>

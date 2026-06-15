@@ -127,6 +127,16 @@ chrome.action.onClicked.addListener(async () => {
   });
 });
 
+chrome.commands?.onCommand.addListener(async (command) => {
+  if (command !== "open-browsevault") {
+    return;
+  }
+
+  await chrome.tabs.create({
+    url: chrome.runtime.getURL(APP_URL)
+  });
+});
+
 chrome.history.onVisited.addListener(async (item) => {
   if (!(await shouldArchiveUrl(item.url))) {
     return;
