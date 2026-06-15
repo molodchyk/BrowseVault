@@ -40,6 +40,8 @@ This repository is an early Manifest V3 scaffold. It includes:
 - optional URL-level deletion from Chrome history for selected records;
 - domain blacklist and whitelist rules;
 - local-first privacy documentation;
+- generated PNG extension icons;
+- deterministic local ZIP packaging;
 - copied research and product docs in [`docs/`](docs/);
 - Chrome Web Store listing notes in [`store/listing.md`](store/listing.md);
 - repository description and topic/tag metadata in [`package.json`](package.json).
@@ -49,7 +51,11 @@ This repository is an early Manifest V3 scaffold. It includes:
 ```text
 .
 ├── docs/
+├── assets/
+│   └── icons/
 ├── scripts/
+│   ├── generate-icons.mjs
+│   ├── package-extension.mjs
 │   └── validate-extension.mjs
 ├── src/
 │   ├── app.css
@@ -82,7 +88,12 @@ This scaffold has no runtime dependencies.
 ```bash
 npm run validate
 npm run check
+npm test
+npm run icons
+npm run package
 ```
+
+`npm run package` writes `dist/browsevault-0.1.0.zip`.
 
 ## Current Search Syntax
 

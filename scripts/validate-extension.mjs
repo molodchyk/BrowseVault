@@ -14,7 +14,14 @@ const requiredFiles = [
   "src/app.css",
   "src/app.js",
   "store/listing.md",
-  "docs/README.md"
+  "docs/README.md",
+  "assets/icons/icon16.png",
+  "assets/icons/icon32.png",
+  "assets/icons/icon48.png",
+  "assets/icons/icon128.png",
+  "scripts/generate-icons.mjs",
+  "scripts/package-extension.mjs",
+  "scripts/zip-utils.mjs"
 ];
 
 function readJson(file) {
@@ -37,6 +44,10 @@ assert(manifest.name === "BrowseVault: History Search & Backup", "Unexpected ext
 assert(manifest.short_name === "BrowseVault", "Unexpected short_name.");
 assert(manifest.description.length <= 132, "Manifest description should stay within Chrome Web Store summary length.");
 assert(manifest.background?.type === "module", "Background script should be an ES module.");
+for (const size of ["16", "32", "48", "128"]) {
+  assert(manifest.icons?.[size] === `assets/icons/icon${size}.png`, `Missing manifest icon ${size}.`);
+  assert(manifest.action?.default_icon?.[size] === `assets/icons/icon${size}.png`, `Missing action icon ${size}.`);
+}
 
 for (const permission of ["bookmarks", "downloads", "history", "sessions", "storage", "tabs"]) {
   assert(manifest.permissions.includes(permission), `Missing permission: ${permission}`);
@@ -46,6 +57,14 @@ assert(manifest.commands?.["open-browsevault"], "Missing open-browsevault comman
 const packageJson = readJson("package.json");
 assert(packageJson.keywords.includes("browser-history"), "Missing browser-history keyword.");
 assert(packageJson.keywords.includes("history-backup"), "Missing history-backup keyword.");
+assert(packageJson.scripts.icons, "Missing icons script.");
+assert(packageJson.scripts.package, "Missing package script.");
+
+for (const size of [16, 32, 48, 128]) {
+  const icon = fs.readFileSync(path.join(root, "assets", "icons", `icon${size}.png`));
+  assert(icon[0] === 137 && icon[1] === 80 && icon[2] === 78 && icon[3] === 71, `Icon ${size} is not a PNG.`);
+  assert(icon.readUInt32BE(16) === size && icon.readUInt32BE(20) === size, `Icon ${size} has wrong dimensions.`);
+}
 
 const appHtml = fs.readFileSync(path.join(root, "src/app.html"), "utf8");
 assert(appHtml.includes('type="module"'), "App script should load as a module.");
