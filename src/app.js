@@ -17,6 +17,7 @@ import { searchBrowserMemory } from "./browser-memory.js";
 import { visitsToCsv, visitsToHtml } from "./export-format.js";
 import { archiveFromFileText } from "./features/backup-import/core/archive-parser.js";
 import { renderImportPreview as renderImportPreviewUi } from "./features/backup-import/ui/render-import-preview.js";
+import { BACKGROUND_MESSAGE_TYPES } from "./features/background-runtime/core/messages.js";
 import {
   DEFAULT_PREFERENCES,
   MAX_RESULT_LIMIT,
@@ -489,16 +490,16 @@ async function performQuickAction(item) {
   const action = item.action || { type: "open-url", url: item.url };
   const messageByType = {
     "activate-tab": {
-      type: "browseVault.activateTab",
+      type: BACKGROUND_MESSAGE_TYPES.ACTIVATE_TAB,
       tabId: action.tabId,
       windowId: action.windowId
     },
     "restore-session": {
-      type: "browseVault.restoreSession",
+      type: BACKGROUND_MESSAGE_TYPES.RESTORE_SESSION,
       sessionId: action.sessionId
     },
     "open-url": {
-      type: "browseVault.openUrl",
+      type: BACKGROUND_MESSAGE_TYPES.OPEN_URL,
       url: action.url || item.url
     }
   };
@@ -545,7 +546,7 @@ async function openSelected() {
   }
 
   const response = await sendRuntimeMessage({
-    type: "browseVault.openUrls",
+    type: BACKGROUND_MESSAGE_TYPES.OPEN_URLS,
     urls: urlsToOpen
   });
 
@@ -722,7 +723,7 @@ async function loadMoreResults() {
 async function syncChromeHistory() {
   setStatus("Syncing Chrome history");
   const response = await sendRuntimeMessage({
-    type: "browseVault.bootstrapChromeHistory"
+    type: BACKGROUND_MESSAGE_TYPES.BOOTSTRAP_CHROME_HISTORY
   });
 
   if (!response?.ok) {
@@ -919,7 +920,7 @@ async function deleteFromChrome() {
   }
 
   const response = await sendRuntimeMessage({
-    type: "browseVault.deleteChromeUrls",
+    type: BACKGROUND_MESSAGE_TYPES.DELETE_CHROME_URLS,
     urls
   });
 

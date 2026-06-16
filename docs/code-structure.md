@@ -5,11 +5,12 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 ## Current Ownership
 
 - `src/app.html`, `src/app.css`, and `src/app.js` own the extension page runtime shell while the UI is being split.
-- `src/background.js` owns MV3 service worker listeners, Chrome history capture, tab/session actions, and privileged message handling.
+- `src/background.js` owns MV3 service worker listener wiring, Chrome history capture, and startup/bootstrap orchestration.
 - `src/storage.js` owns IndexedDB vault records, import normalization, backup metadata, rules, and vault mutations.
 - `src/browser-memory.js` owns read-only search over tabs, bookmarks, downloads, and recently closed sessions.
 - `src/query.js` owns search parsing and matching.
 - `src/features/backup-import/` owns archive file parsing plus import-preview display state and rendering for restore flows.
+- `src/features/background-runtime/` owns background message routing, payload validation, and privileged action dispatch.
 - `src/features/display-preferences/core/preferences.js` owns pure preference normalization, result-limit clamping, date/count formatting, and backup status summaries.
 - `src/features/history-export/core/export-format.js` owns pure CSV and HTML export formatting.
 - `src/features/history-results/core/results.js` owns pure result selection, URL/domain extraction, grouping, count labels, and load-more state.
@@ -19,7 +20,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 
 ## Next Split Candidates
 
-- Extract background message routing and payload validation into a background runtime module.
+- Move Chrome history bootstrap, archive filtering, and visit expansion out of `src/background.js` into a background runtime module.
 
 ## Rules For Future Edits
 

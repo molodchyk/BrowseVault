@@ -23,10 +23,12 @@ import {
 import { restoreSession } from "./platform/chrome/sessions.js";
 import { activateTab, createTab } from "./platform/chrome/tabs.js";
 import { focusWindow } from "./platform/chrome/windows.js";
+import { createBackgroundMessageRouter } from "./features/background-runtime/background/message-router.js";
 
 const APP_URL = "src/app.html";
 const BOOTSTRAP_URL_LIMIT = 3000;
 const VISIT_EXPANSION_CONCURRENCY = 8;
+const EXTENSION_URL_PREFIX = getExtensionUrl("");
 
 function now() {
   return new Date().toISOString();
@@ -38,6 +40,11 @@ function isInternalUrl(url) {
 
 function hostMatchesRule(host, rule) {
   return host === rule || host.endsWith(`.${rule}`);
+}
+
+function isAllowedBackgroundMessageSender(sender) {
+  const senderUrl = sender?.url || sender?.tab?.url || "";
+  return senderUrl.startsWith(EXTENSION_URL_PREFIX);
 }
 
 async function shouldArchiveUrl(url, existingRules = null) {
@@ -178,52 +185,13 @@ onHistoryVisitRemoved(async (removed) => {
   }
 });
 
-onRuntimeMessage((message, _sender, sendResponse) => {
-  if (message?.type === "browseVault.bootstrapChromeHistory") {
-    bootstrapChromeHistory("manual")
-      .then((result) => sendResponse({ ok: true, result }))
-      .catch((error) => sendResponse({ ok: false, error: error.message }));
-    return true;
-  }
-
-  if (message?.type === "browseVault.deleteChromeUrls") {
-    Promise.all(
-      [...new Set(message.urls || [])].map((url) => deleteHistoryUrl({ url }))
-    )
-      .then(() => sendResponse({ ok: true }))
-      .catch((error) => sendResponse({ ok: false, error: error.message }));
-    return true;
-  }
-
-  if (message?.type === "browseVault.activateTab") {
-    focusWindow(message.windowId)
-      .then(() => activateTab(message.tabId))
-      .then(() => sendResponse({ ok: true }))
-      .catch((error) => sendResponse({ ok: false, error: error.message }));
-    return true;
-  }
-
-  if (message?.type === "browseVault.restoreSession") {
-    restoreSession(message.sessionId || undefined)
-      .then(() => sendResponse({ ok: true }))
-      .catch((error) => sendResponse({ ok: false, error: error.message }));
-    return true;
-  }
-
-  if (message?.type === "browseVault.openUrl") {
-    createTab({ url: message.url })
-      .then(() => sendResponse({ ok: true }))
-      .catch((error) => sendResponse({ ok: false, error: error.message }));
-    return true;
-  }
-
-  if (message?.type === "browseVault.openUrls") {
-    const urls = [...new Set(message.urls || [])].filter(Boolean);
-    Promise.all(urls.map((url) => createTab({ url })))
-      .then(() => sendResponse({ ok: true, opened: urls.length }))
-      .catch((error) => sendResponse({ ok: false, error: error.message }));
-    return true;
-  }
-
-  return false;
-});
+onRuntimeMessage(createBackgroundMessageRouter({
+  activateTab,
+  bootstrapChromeHistory,
+  createTab,
+  deleteHistoryUrl,
+  focusWindow,
+  restoreSession
+}, {
+  isAllowedSender: isAllowedBackgroundMessageSender
+}));
