@@ -22,6 +22,7 @@ const DEFAULT_PREFERENCES = {
   dateFormat: "system",
   defaultLimit: 500
 };
+const MAX_RESULT_LIMIT = 50000;
 
 const elements = {
   tabs: [...document.querySelectorAll(".tab")],
@@ -54,6 +55,7 @@ const elements = {
   undoDelete: document.querySelector("#undo-delete"),
   selectVisible: document.querySelector("#select-visible"),
   selectFiltered: document.querySelector("#select-filtered"),
+  loadMore: document.querySelector("#load-more"),
   clearSelection: document.querySelector("#clear-selection"),
   selectionActions: [...document.querySelectorAll(".requires-selection")],
   resultCount: document.querySelector("#result-count"),
@@ -80,6 +82,7 @@ const elements = {
 
 let currentResults = [];
 let currentTotal = 0;
+let currentShownLimit = DEFAULT_PREFERENCES.defaultLimit;
 let selectedIds = new Set();
 let lastCheckedIndex = null;
 let preferences = { ...DEFAULT_PREFERENCES };
@@ -143,7 +146,11 @@ function clampLimit(value) {
     return DEFAULT_PREFERENCES.defaultLimit;
   }
 
-  return Math.min(50000, Math.max(25, Math.round(parsed)));
+  return Math.min(MAX_RESULT_LIMIT, Math.max(25, Math.round(parsed)));
+}
+
+function requestedResultLimit() {
+  return clampLimit(elements.limit.value || preferences.defaultLimit);
 }
 
 async function loadPreferences() {
@@ -219,6 +226,17 @@ function updateSelectionCount() {
   const hasSelection = selectedIds.size > 0;
   for (const action of elements.selectionActions) {
     action.hidden = !hasSelection;
+  }
+}
+
+function updateLoadMoreButton() {
+  const shown = currentResults.length;
+  const canLoadMore = currentTotal > shown && shown < MAX_RESULT_LIMIT;
+  elements.loadMore.hidden = !canLoadMore;
+
+  if (canLoadMore) {
+    const nextCount = Math.min(requestedResultLimit(), currentTotal - shown, MAX_RESULT_LIMIT - shown);
+    elements.loadMore.textContent = `Load ${nextCount} More`;
   }
 }
 
@@ -509,6 +527,7 @@ function renderResults(results, total) {
   });
 
   updateSelectionCount();
+  updateLoadMoreButton();
 }
 
 function renderQuickResults(results, total, warnings = []) {
@@ -636,10 +655,11 @@ async function renderRules() {
 
 async function runSearch() {
   setStatus("Searching local vault");
+  currentShownLimit = requestedResultLimit();
 
   try {
     const { results, total } = await searchVisits(getSearchText(), {
-      limit: Number(elements.limit.value || 500)
+      limit: currentShownLimit
     });
 
     selectedIds = new Set([...selectedIds].filter((id) => results.some((result) => result.id === id)));
@@ -648,6 +668,25 @@ async function runSearch() {
   } catch (error) {
     setStatus(error.message);
   }
+}
+
+async function loadMoreResults() {
+  if (currentResults.length >= currentTotal || currentResults.length >= MAX_RESULT_LIMIT) {
+    setStatus("All loaded results are visible");
+    updateLoadMoreButton();
+    return;
+  }
+
+  const step = requestedResultLimit();
+  currentShownLimit = Math.min(currentResults.length + step, currentTotal, MAX_RESULT_LIMIT);
+  setStatus("Loading more results");
+
+  const { results, total } = await searchVisits(getSearchText(), {
+    limit: currentShownLimit
+  });
+
+  renderResults(results, total);
+  setStatus(`Showing ${results.length} of ${total} results`);
 }
 
 async function syncChromeHistory() {
@@ -943,6 +982,7 @@ function bindEvents() {
     renderResults(currentResults, currentTotal);
   });
   elements.selectFiltered.addEventListener("click", () => selectAllFiltered().catch((error) => setStatus(error.message)));
+  elements.loadMore.addEventListener("click", () => loadMoreResults().catch((error) => setStatus(error.message)));
   elements.clearSelection.addEventListener("click", () => {
     selectedIds.clear();
     renderResults(currentResults, currentTotal);

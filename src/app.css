@@ -588,7 +588,8 @@ code {
   }
 
   #delete-vault,
-  #delete-chrome {
+  #delete-chrome,
+  #load-more {
     grid-column: 1 / -1;
   }
 
