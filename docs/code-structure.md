@@ -14,11 +14,12 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `src/features/history-export/core/export-format.js` owns pure CSV and HTML export formatting.
 - `src/features/history-results/core/results.js` owns pure result selection, URL/domain extraction, grouping, count labels, and load-more state.
 - `src/features/history-results/ui/` owns history result DOM rendering and search-hit highlighting.
+- `src/platform/chrome/` owns explicit wrappers around Chrome extension APIs as they are extracted from runtime and feature modules.
 - `src/export-format.js` is a compatibility barrel for existing import paths.
 
 ## Next Split Candidates
 
-- Add platform wrappers before adding more direct `chrome.*` calls.
+- Extract background message routing and payload validation into a background runtime module.
 
 ## Rules For Future Edits
 

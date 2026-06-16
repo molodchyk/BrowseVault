@@ -1,4 +1,8 @@
 import { matchesVisitQuery, parseQuery } from "./query.js";
+import { getBookmarkTree } from "./platform/chrome/bookmarks.js";
+import { searchDownloadItems } from "./platform/chrome/downloads.js";
+import { getRecentlyClosedSessions } from "./platform/chrome/sessions.js";
+import { queryTabs } from "./platform/chrome/tabs.js";
 
 const DEFAULT_LIMIT = 40;
 
@@ -34,8 +38,8 @@ function memoryRecord({ id, type, title, url, visitTime = Date.now(), detail = "
   };
 }
 
-async function searchTabs() {
-  const tabs = await chrome.tabs.query({});
+async function searchTabRecords() {
+  const tabs = await queryTabs({});
   return tabs
     .filter((tab) => tab.url && !tab.url.startsWith("chrome://"))
     .map((tab) =>
@@ -55,8 +59,8 @@ async function searchTabs() {
     );
 }
 
-async function searchBookmarks() {
-  const tree = await chrome.bookmarks.getTree();
+async function searchBookmarkRecords() {
+  const tree = await getBookmarkTree();
   const bookmarks = [];
 
   function walk(nodes) {
@@ -90,8 +94,8 @@ async function searchBookmarks() {
     );
 }
 
-async function searchDownloads() {
-  const downloads = await chrome.downloads.search({
+async function searchDownloadRecords() {
+  const downloads = await searchDownloadItems({
     limit: 500,
     orderBy: ["-startTime"]
   });
@@ -126,8 +130,8 @@ function sessionEntries(session) {
   return [];
 }
 
-async function searchRecentlyClosed() {
-  const sessions = await chrome.sessions.getRecentlyClosed({
+async function searchRecentlyClosedRecords() {
+  const sessions = await getRecentlyClosedSessions({
     maxResults: 25
   });
 
@@ -156,10 +160,10 @@ export async function searchBrowserMemory(input = "", options = {}) {
   const limit = Number(options.limit || DEFAULT_LIMIT);
   const query = parseQuery(input);
   const settled = await Promise.allSettled([
-    searchTabs(),
-    searchBookmarks(),
-    searchDownloads(),
-    searchRecentlyClosed()
+    searchTabRecords(),
+    searchBookmarkRecords(),
+    searchDownloadRecords(),
+    searchRecentlyClosedRecords()
   ]);
 
   const warnings = settled

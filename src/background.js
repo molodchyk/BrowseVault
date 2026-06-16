@@ -5,6 +5,24 @@ import {
   setMeta,
   syncChromeHistoryItems
 } from "./storage.js";
+import { onActionClicked } from "./platform/chrome/action.js";
+import { onCommand } from "./platform/chrome/commands.js";
+import {
+  deleteHistoryUrl,
+  getHistoryVisits,
+  onHistoryVisitRemoved,
+  onHistoryVisited,
+  searchHistory
+} from "./platform/chrome/history.js";
+import {
+  getExtensionUrl,
+  onInstalled,
+  onRuntimeMessage,
+  onStartup
+} from "./platform/chrome/runtime.js";
+import { restoreSession } from "./platform/chrome/sessions.js";
+import { activateTab, createTab } from "./platform/chrome/tabs.js";
+import { focusWindow } from "./platform/chrome/windows.js";
 
 const APP_URL = "src/app.html";
 const BOOTSTRAP_URL_LIMIT = 3000;
@@ -43,7 +61,7 @@ async function shouldArchiveUrl(url, existingRules = null) {
 }
 
 async function bootstrapChromeHistory(reason = "startup") {
-  const items = await chrome.history.search({
+  const items = await searchHistory({
     text: "",
     startTime: 0,
     maxResults: BOOTSTRAP_URL_LIMIT
@@ -79,7 +97,7 @@ async function expandHistoryItems(items) {
       }
 
       try {
-        const visits = await chrome.history.getVisits({ url: item.url });
+        const visits = await getHistoryVisits({ url: item.url });
         if (!visits.length) {
           expanded.push(item);
           continue;
@@ -111,33 +129,33 @@ async function expandHistoryItems(items) {
   return expanded;
 }
 
-chrome.runtime.onInstalled.addListener(async () => {
+onInstalled(async () => {
   await setMeta("installedAt", now());
   await bootstrapChromeHistory("installed");
 });
 
-chrome.runtime.onStartup.addListener(async () => {
+onStartup(async () => {
   await setMeta("lastStartedAt", now());
   await bootstrapChromeHistory("startup");
 });
 
-chrome.action.onClicked.addListener(async () => {
-  await chrome.tabs.create({
-    url: chrome.runtime.getURL(APP_URL)
+onActionClicked(async () => {
+  await createTab({
+    url: getExtensionUrl(APP_URL)
   });
 });
 
-chrome.commands?.onCommand.addListener(async (command) => {
+onCommand(async (command) => {
   if (command !== "open-browsevault") {
     return;
   }
 
-  await chrome.tabs.create({
-    url: chrome.runtime.getURL(APP_URL)
+  await createTab({
+    url: getExtensionUrl(APP_URL)
   });
 });
 
-chrome.history.onVisited.addListener(async (item) => {
+onHistoryVisited(async (item) => {
   if (!(await shouldArchiveUrl(item.url))) {
     return;
   }
@@ -147,7 +165,7 @@ chrome.history.onVisited.addListener(async (item) => {
   });
 });
 
-chrome.history.onVisitRemoved.addListener(async (removed) => {
+onHistoryVisitRemoved(async (removed) => {
   if (removed.allHistory) {
     await setMeta("lastNativeHistoryClear", {
       clearedAt: now()
@@ -160,7 +178,7 @@ chrome.history.onVisitRemoved.addListener(async (removed) => {
   }
 });
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+onRuntimeMessage((message, _sender, sendResponse) => {
   if (message?.type === "browseVault.bootstrapChromeHistory") {
     bootstrapChromeHistory("manual")
       .then((result) => sendResponse({ ok: true, result }))
@@ -170,7 +188,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   if (message?.type === "browseVault.deleteChromeUrls") {
     Promise.all(
-      [...new Set(message.urls || [])].map((url) => chrome.history.deleteUrl({ url }))
+      [...new Set(message.urls || [])].map((url) => deleteHistoryUrl({ url }))
     )
       .then(() => sendResponse({ ok: true }))
       .catch((error) => sendResponse({ ok: false, error: error.message }));
@@ -178,25 +196,22 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 
   if (message?.type === "browseVault.activateTab") {
-    chrome.windows
-      .update(message.windowId, { focused: true })
-      .then(() => chrome.tabs.update(message.tabId, { active: true }))
+    focusWindow(message.windowId)
+      .then(() => activateTab(message.tabId))
       .then(() => sendResponse({ ok: true }))
       .catch((error) => sendResponse({ ok: false, error: error.message }));
     return true;
   }
 
   if (message?.type === "browseVault.restoreSession") {
-    chrome.sessions
-      .restore(message.sessionId || undefined)
+    restoreSession(message.sessionId || undefined)
       .then(() => sendResponse({ ok: true }))
       .catch((error) => sendResponse({ ok: false, error: error.message }));
     return true;
   }
 
   if (message?.type === "browseVault.openUrl") {
-    chrome.tabs
-      .create({ url: message.url })
+    createTab({ url: message.url })
       .then(() => sendResponse({ ok: true }))
       .catch((error) => sendResponse({ ok: false, error: error.message }));
     return true;
@@ -204,7 +219,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   if (message?.type === "browseVault.openUrls") {
     const urls = [...new Set(message.urls || [])].filter(Boolean);
-    Promise.all(urls.map((url) => chrome.tabs.create({ url })))
+    Promise.all(urls.map((url) => createTab({ url })))
       .then(() => sendResponse({ ok: true, opened: urls.length }))
       .catch((error) => sendResponse({ ok: false, error: error.message }));
     return true;

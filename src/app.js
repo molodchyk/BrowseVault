@@ -43,6 +43,8 @@ import {
   appendHighlightedText,
   highlightTokensForScope
 } from "./features/history-results/ui/text-highlighting.js";
+import { sendRuntimeMessage } from "./platform/chrome/runtime.js";
+import { getLocalStorage, setLocalStorage } from "./platform/chrome/storage.js";
 import { parseQuery } from "./query.js";
 
 const OPEN_SELECTED_LIMIT = 25;
@@ -155,7 +157,7 @@ function quickResultLimit() {
 }
 
 async function loadPreferences() {
-  const result = await chrome.storage.local.get(PREFERENCES_KEY);
+  const result = await getLocalStorage(PREFERENCES_KEY);
   preferences = normalizePreferences(result[PREFERENCES_KEY]);
   applyPreferences();
 }
@@ -168,7 +170,7 @@ async function savePreferences() {
     defaultLimit: elements.prefLimit.value
   });
 
-  await chrome.storage.local.set({
+  await setLocalStorage({
     [PREFERENCES_KEY]: preferences
   });
   elements.limit.value = String(preferences.defaultLimit);
@@ -501,7 +503,7 @@ async function performQuickAction(item) {
     }
   };
 
-  const response = await chrome.runtime.sendMessage(messageByType[action.type] || messageByType["open-url"]);
+  const response = await sendRuntimeMessage(messageByType[action.type] || messageByType["open-url"]);
   if (!response?.ok) {
     throw new Error(response?.error || "Quick action failed.");
   }
@@ -542,7 +544,7 @@ async function openSelected() {
     return;
   }
 
-  const response = await chrome.runtime.sendMessage({
+  const response = await sendRuntimeMessage({
     type: "browseVault.openUrls",
     urls: urlsToOpen
   });
@@ -719,7 +721,7 @@ async function loadMoreResults() {
 
 async function syncChromeHistory() {
   setStatus("Syncing Chrome history");
-  const response = await chrome.runtime.sendMessage({
+  const response = await sendRuntimeMessage({
     type: "browseVault.bootstrapChromeHistory"
   });
 
@@ -916,7 +918,7 @@ async function deleteFromChrome() {
     return;
   }
 
-  const response = await chrome.runtime.sendMessage({
+  const response = await sendRuntimeMessage({
     type: "browseVault.deleteChromeUrls",
     urls
   });

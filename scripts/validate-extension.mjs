@@ -26,6 +26,7 @@ const requiredFiles = [
   "assets/icons/icon32.png",
   "assets/icons/icon48.png",
   "assets/icons/icon128.png",
+  "scripts/check-syntax.mjs",
   "scripts/generate-icons.mjs",
   "scripts/package-extension.mjs",
   "scripts/zip-utils.mjs"
@@ -39,6 +40,19 @@ function assert(condition, message) {
   if (!condition) {
     throw new Error(message);
   }
+}
+
+function collectFilesByExtension(entry, extensions) {
+  const fullPath = path.join(root, entry);
+  const stat = fs.statSync(fullPath);
+
+  if (stat.isFile()) {
+    return extensions.has(path.extname(entry)) ? [entry] : [];
+  }
+
+  return fs
+    .readdirSync(fullPath)
+    .flatMap((child) => collectFilesByExtension(path.join(entry, child), extensions));
 }
 
 for (const file of requiredFiles) {
@@ -102,7 +116,7 @@ for (const key of ["single_purpose", "remote_code", "host_permission", "permissi
 const appHtml = fs.readFileSync(path.join(root, "src/app.html"), "utf8");
 assert(appHtml.includes('type="module"'), "App script should load as a module.");
 
-const sourceFiles = ["src/background.js", "src/storage.js", "src/query.js", "src/browser-memory.js", "src/export-format.js", "src/app.js", "src/app.html", "src/app.css"];
+const sourceFiles = collectFilesByExtension("src", new Set([".js", ".html", ".css"]));
 for (const file of sourceFiles) {
   const source = fs.readFileSync(path.join(root, file), "utf8");
   assert(!/https?:\/\//i.test(source), `Unexpected remote URL in ${file}`);
