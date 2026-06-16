@@ -3,8 +3,12 @@ StorePilot: Chrome Web Store Automation
 
 Import flat locale listing files and use them in extension store dashboards.
 
-Last updated on 10:50:12 16.06.2026.
+Last updated on 18:58:13 16.06.2026.
 Active project
+Preferences
+
+Shows Fill current language in the popup and dashboard panel for debugging or one-off manual fills.
+Show advanced fill actions
 Reference
 Project import reference
 Project import reference
@@ -41,9 +45,7 @@ Do not include field labels such as Name, Summary, Description, or Detailed Desc
 
 Example en.md content:
 
-New Tab: Custom URL lets you choose what opens when you create a new tab.
-
-Use a website, local HTML file, browser page, or a quiet blank page.
+New Tab: Custom URL lets you choose what opens when you create a new tab. Use a website, local HTML file, browser page, or a quiet blank page.
 
     store-listing/chrome-web-store/listing/en.md
     en.txt, en.md, en_US.md, de.md, pt_BR.md
@@ -152,7 +154,27 @@ remote_code:
 privacy_policy_url:
 https://example.com/privacy
 
+data_usage.personally_identifiable_information:
+no
+
+data_usage.web_history:
+no
+
+data_usage.website_content:
+no
+
+certification.no_sell_or_transfer:
+yes
+
+certification.no_unrelated_use:
+yes
+
+certification.no_creditworthiness:
+yes
+
 For permission justifications, use permission.<manifest permission code>. The suffix should match the code in your manifest permissions, optional_permissions, host_permissions, or content_scripts.matches.
+
+For data usage checkboxes, use data_usage.<category> and certification.<statement>. StorePilot only checks boxes with an explicit yes value; no, none, blank, or omitted means it will not click that checkbox.
 
 Recommended filenames: docs/chrome-web-store-privacy-form.md or STORE_JUSTIFICATIONS.md. StorePilot also accepts other .md or .txt files when the content contains a [privacy] block, canonical keys, or recognizable store-justification headings.
 Core keys
@@ -161,6 +183,21 @@ Core keys
     remote_code
     privacy_policy_url
     host_permission
+
+Data Usage
+
+    data_usage.personally_identifiable_information
+    data_usage.health_information
+    data_usage.financial_payment_information
+    data_usage.authentication_information
+    data_usage.personal_communications
+    data_usage.location
+    data_usage.web_history
+    data_usage.user_activity
+    data_usage.website_content
+    certification.no_sell_or_transfer
+    certification.no_unrelated_use
+    certification.no_creditworthiness
 
 Common permission keys
 

@@ -18,6 +18,8 @@ const requiredFiles = [
   "store-listing/chrome-web-store/README.md",
   "store-listing/chrome-web-store/listing/en.md",
   "store-listing/chrome-web-store/media/icon-128.png",
+  "store-listing/chrome-web-store/media/promo/.gitkeep",
+  "store-listing/chrome-web-store/media/screenshots/.gitkeep",
   "docs/README.md",
   "docs/chrome-web-store-additional-fields.md",
   "docs/chrome-web-store-category.md",
@@ -108,8 +110,30 @@ assert(
 const storePilotCategory = fs.readFileSync(path.join(root, "docs", "chrome-web-store-category.md"), "utf8");
 assert(/Selected category:\s*\S/i.test(storePilotCategory), "Chrome Web Store category document needs a selected category.");
 
+const storePilotAdditionalFields = fs.readFileSync(path.join(root, "docs", "chrome-web-store-additional-fields.md"), "utf8");
+for (const key of ["official_url", "homepage_url", "support_url", "mature_content"]) {
+  assert(storePilotAdditionalFields.includes(`${key}:`), `Missing StorePilot additional field key: ${key}`);
+}
+
 const storePilotPrivacy = fs.readFileSync(path.join(root, "docs", "chrome-web-store-privacy-form.md"), "utf8");
-for (const key of ["single_purpose", "remote_code", "host_permission", "permission.history", "permission.storage"]) {
+for (const key of [
+  "single_purpose",
+  "remote_code",
+  "privacy_policy_url",
+  "host_permission",
+  "permission.bookmarks",
+  "permission.downloads",
+  "permission.history",
+  "permission.sessions",
+  "permission.storage",
+  "permission.tabs",
+  "data_usage.personally_identifiable_information",
+  "data_usage.web_history",
+  "data_usage.website_content",
+  "certification.no_sell_or_transfer",
+  "certification.no_unrelated_use",
+  "certification.no_creditworthiness"
+]) {
   assert(storePilotPrivacy.includes(`${key}:`), `Missing StorePilot privacy key: ${key}`);
 }
 

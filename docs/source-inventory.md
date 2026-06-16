@@ -16,7 +16,7 @@ The raw files are preserved in [`raw-sources/`](raw-sources/) so future product,
 | [`raw-sources/history-trends-unlimited-reviews.txt`](raw-sources/history-trends-unlimited-reviews.txt) | History Trends Unlimited Chrome Web Store reviews | `f872aa64-cb8f-4eab-8de0-cda9f5b6b2fe` | Long-term archive, backup trust, analytics expectations |
 | [`raw-sources/recent-history-reviews.txt`](raw-sources/recent-history-reviews.txt) | Recent History Chrome Web Store reviews | `dbc92d6f-d0cb-4fcc-ba6f-b9f8c76010c0` | Recent-history workflow expectations and reliability issues |
 | [`raw-sources/view-chrome-history-overview.txt`](raw-sources/view-chrome-history-overview.txt) | View Chrome History Chrome Web Store listing and reviews | `434aff07-a23e-4f98-829b-a5474f2b3d60` | Default-history replacement, date-range browsing, theme/readability complaints |
-| [`raw-sources/storepilot-chrome-web-store-reference.txt`](raw-sources/storepilot-chrome-web-store-reference.txt) | StorePilot Chrome Web Store automation import reference | `e09bb4e2-a278-422a-93b4-f9525f87f3e1` | Store-facing file layout and dashboard field automation |
+| [`raw-sources/storepilot-chrome-web-store-reference.txt`](raw-sources/storepilot-chrome-web-store-reference.txt) | StorePilot Chrome Web Store automation import reference | `4a5ebccd-d431-4ee1-86c8-9970b67fca80` | Store-facing file layout and dashboard field automation |
 
 ## Handling Notes
 
