@@ -3,19 +3,17 @@ import {
   getStats,
   searchVisits
 } from "./storage.js";
-import { searchBrowserMemory } from "./browser-memory.js";
 import {
   clearSearchDebounce as clearAppSearchDebounce,
   createAppShellState,
   isCurrentHistorySearchRequestId,
-  isCurrentQuickSearchRequestId,
   nextHistorySearchRequestId,
-  nextQuickSearchRequestId,
   scheduleSearchDebounce as scheduleAppSearchDebounce
 } from "./features/app-shell/core/state.js";
 import { collectAppElements } from "./features/app-shell/ui/elements.js";
 import { bindAppEvents } from "./features/app-shell/ui/events.js";
 import { createBackupActions } from "./features/backup-import/ui/actions.js";
+import { createQuickOpenActions } from "./features/browser-memory/ui/quick-open-actions.js";
 import { BACKGROUND_MESSAGE_TYPES } from "./features/background-runtime/core/messages.js";
 import {
   DEFAULT_PREFERENCES,
@@ -23,8 +21,6 @@ import {
   PREFERENCES_KEY,
   backupStatusDetails,
   clampResultLimit,
-  formatCount,
-  formatDate,
   formatShortDate,
   normalizePreferences,
   themeDatasetValue
@@ -38,14 +34,9 @@ import {
   uniqueUrlsForItems
 } from "./features/history-results/core/results.js";
 import { renderHistoryResults } from "./features/history-results/ui/render-results.js";
-import {
-  appendHighlightedText,
-  highlightTokensForScope
-} from "./features/history-results/ui/text-highlighting.js";
 import { sendRuntimeMessage } from "./platform/chrome/runtime.js";
 import { getLocalStorage, setLocalStorage } from "./platform/chrome/storage.js";
 import { createVaultManagementActions } from "./features/vault-management/ui/actions.js";
-import { parseQuery } from "./query.js";
 
 const OPEN_SELECTED_LIMIT = 25;
 const SEARCH_DEBOUNCE_MS = 300;
@@ -141,7 +132,7 @@ function clearSearchDebounce() {
 async function runSearchesNow() {
   clearSearchDebounce();
   await runSearch();
-  await runQuickSearch();
+  await quickOpenActions.runQuickSearch();
 }
 
 function scheduleSearches() {
@@ -255,6 +246,16 @@ const backupActions = createBackupActions({
   switchTab
 });
 
+const quickOpenActions = createQuickOpenActions({
+  appState,
+  copyText,
+  elements,
+  getDateFormat: () => appState.preferences.dateFormat,
+  getSearchText,
+  quickResultLimit,
+  setStatus
+});
+
 function applyResultSelection({ selectedIds: nextSelectedIds, lastCheckedIndex: nextLastCheckedIndex, shouldRerender }) {
   appState.selectedIds = nextSelectedIds;
   appState.lastCheckedIndex = nextLastCheckedIndex;
@@ -291,88 +292,6 @@ function renderResults(results, total) {
 
   updateSelectionCount();
   updateLoadMoreButton();
-}
-
-function renderQuickResults(results, total, warnings = []) {
-  elements.quickResults.replaceChildren();
-  const query = parseQuery(getSearchText());
-  const titleTokens = highlightTokensForScope(query, "title");
-  const urlTokens = highlightTokensForScope(query, "url");
-  const metaTokens = highlightTokensForScope(query, "meta");
-
-  if (!results.length) {
-    const empty = document.createElement("li");
-    empty.className = "quick-result";
-    empty.textContent = warnings.length
-      ? `No source results. ${warnings.join(" ")}`
-      : "No source results.";
-    elements.quickResults.append(empty);
-    return;
-  }
-
-  for (const item of results) {
-    const fragment = elements.quickResultTemplate.content.cloneNode(true);
-    const source = fragment.querySelector(".source-pill");
-    const title = fragment.querySelector(".result-title");
-    const url = fragment.querySelector(".url");
-    const meta = fragment.querySelector(".meta");
-    const action = fragment.querySelector(".quick-action");
-    const copy = fragment.querySelector(".quick-copy");
-
-    source.textContent = item.type;
-    title.href = item.url;
-    appendHighlightedText(title, item.title || item.url, titleTokens, query.regex);
-    appendHighlightedText(url, item.url, urlTokens, query.regex);
-    appendHighlightedText(meta, `${item.detail} · ${item.domain || "unknown domain"} · ${formatDate(item.visitTime, appState.preferences.dateFormat)}`, metaTokens, query.regex);
-    action.textContent = item.action?.type === "activate-tab"
-      ? "Switch"
-      : item.action?.type === "restore-session"
-        ? "Restore"
-        : "Open";
-    action.addEventListener("click", () => performQuickAction(item).catch((error) => setStatus(error.message)));
-    copy.addEventListener("click", () => copyQuickUrl(item).catch((error) => setStatus(error.message)));
-
-    elements.quickResults.append(fragment);
-  }
-
-  if (warnings.length) {
-    setStatus(`${total} source results; ${warnings.length} source warning${warnings.length === 1 ? "" : "s"}`);
-  }
-}
-
-async function performQuickAction(item) {
-  const action = item.action || { type: "open-url", url: item.url };
-  const messageByType = {
-    "activate-tab": {
-      type: BACKGROUND_MESSAGE_TYPES.ACTIVATE_TAB,
-      tabId: action.tabId,
-      windowId: action.windowId
-    },
-    "restore-session": {
-      type: BACKGROUND_MESSAGE_TYPES.RESTORE_SESSION,
-      sessionId: action.sessionId
-    },
-    "open-url": {
-      type: BACKGROUND_MESSAGE_TYPES.OPEN_URL,
-      url: action.url || item.url
-    }
-  };
-
-  const response = await sendRuntimeMessage(messageByType[action.type] || messageByType["open-url"]);
-  if (!response?.ok) {
-    throw new Error(response?.error || "Quick action failed.");
-  }
-  setStatus(`${action.type === "activate-tab" ? "Switched to" : "Opened"} ${item.title || item.url}`);
-}
-
-async function copyQuickUrl(item) {
-  if (!item.url) {
-    setStatus("No URL to copy");
-    return;
-  }
-
-  await copyText(item.url);
-  setStatus(`Copied URL for ${item.title || item.url}`);
 }
 
 async function openSelected() {
@@ -426,25 +345,6 @@ async function copySelectedUrls() {
 
   await copyText(urls.join("\n"));
   setStatus(`Copied ${urls.length} selected URL${urls.length === 1 ? "" : "s"}`);
-}
-
-async function runQuickSearch() {
-  const requestId = nextQuickSearchRequestId(appState);
-  const searchText = getSearchText();
-  const limit = quickResultLimit();
-  setStatus("Searching browser sources");
-  const { results, total, warnings } = await searchBrowserMemory(searchText, {
-    limit
-  });
-
-  if (!isCurrentQuickSearchRequestId(appState, requestId)) {
-    return;
-  }
-
-  renderQuickResults(results, total, warnings);
-  if (!warnings.length) {
-    setStatus(`${total} source result${total === 1 ? "" : "s"}`);
-  }
 }
 
 async function refreshStats() {
@@ -581,7 +481,7 @@ function bindEvents() {
       loadMoreResults,
       openSelected,
       resetVault: vaultActions.resetVault,
-      runQuickSearch,
+      runQuickSearch: quickOpenActions.runQuickSearch,
       runSearchesNow,
       savePreferences,
       scheduleSearches,
@@ -602,7 +502,7 @@ async function init() {
   await refreshStats();
   await vaultActions.renderRules();
   await runSearch();
-  await runQuickSearch();
+  await quickOpenActions.runQuickSearch();
 }
 
 init().catch((error) => setStatus(error.message));

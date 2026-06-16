@@ -12,6 +12,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `src/features/app-shell/` owns extension-page shell state, element collection, event wiring, and shared shell UI behavior.
 - `src/features/backup-import/` owns archive import/export actions, file parsing, integrity metadata, import-preview display state, and restore-flow rendering.
 - `src/features/background-runtime/` owns background message routing, payload validation, privileged action dispatch, Chrome history bootstrap, archive filtering, live-visit capture, and native Chrome history removal reconciliation.
+- `src/features/browser-memory/` owns extension-page quick-open rendering and actions for tabs, bookmarks, downloads, and recently closed sessions.
 - `src/features/display-preferences/core/preferences.js` owns pure preference normalization, result-limit clamping, date/count formatting, and backup status summaries.
 - `src/features/history-export/core/export-format.js` owns pure CSV and HTML export formatting.
 - `src/features/history-results/core/results.js` owns pure result selection, URL/domain extraction, grouping, count labels, and load-more state.
@@ -23,7 +24,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 ## Next Split Candidates
 
 - Move search-page orchestration out of `src/app.js` into app-shell/history-results modules.
-- Move quick-open action orchestration out of `src/app.js` into a browser-memory feature module.
+- Move selected-result bulk actions out of `src/app.js` into history-results modules.
 
 ## Rules For Future Edits
 
