@@ -25,6 +25,31 @@ Raw source snapshots are preserved in [`raw-sources/`](raw-sources/) and indexed
   - dark-only UI, missing light theme;
   - automatic removal ran even when "Automatic remove Data" was off.
 
+### View Chrome History
+
+- Rating/users: 3.8, 163 ratings, 40,000 users.
+- Version observed: 3.0.1, updated 2025-01-23.
+- Positioning: simple Chrome history manager that can replace the default Chrome history viewer, search or clear history by date range, and load history day by day while scrolling.
+- Store signals:
+  - 41 languages, suggesting broader international reach than many history-manager competitors;
+  - privacy positioning says history remains local and is not sent to servers;
+  - related products overlap directly with Recent History, Simple History Manager, History by Date, and Browser History Plus.
+- Strengths users like:
+  - simple UI and keyword search;
+  - useful for deleting history from one site;
+  - helpful for testing workflows where users repeatedly remove history;
+  - perceived as better than Chrome's built-in history by some users.
+- Key complaints:
+  - search still shows all history or cannot search times;
+  - times appear out of order;
+  - date selection and date display failures;
+  - cannot see long-term or recent history in some cases;
+  - slow loading from the extension toolbar;
+  - dark-mode/readability failures, including black text on dark background;
+  - deletion requires too much mouse movement;
+  - users request select-all/open-all style checkboxes;
+  - rating prompts or Google Drive feature reminders are unwanted.
+
 ### Better History
 
 - Rating/users: 4.7, 1.5k ratings, 100,000 users.

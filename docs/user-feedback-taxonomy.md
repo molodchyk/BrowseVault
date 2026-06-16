@@ -114,6 +114,8 @@ Common complaints:
 - only CSV/JSON export, no import;
 - export misses data;
 - date/time fields are not Excel-friendly;
+- date selection or date display fails;
+- times are hidden, truncated, or out of order;
 - exported titles/URLs can be incorrect;
 - import creates "untitle" titles;
 - imported data appears in the extension but not Chrome;
@@ -125,6 +127,7 @@ Product implication:
 - Support CSV, JSON, HTML, and a native archive format.
 - Include schema versioning.
 - Validate export row counts and import integrity.
+- Treat date/time display as a first-class data-quality feature, not only a visual detail.
 - Preserve title history by visit, not only by URL.
 - Make limitations clear: browser APIs usually cannot write arbitrary old visits back into Chrome's native history in the way users imagine.
 
@@ -158,6 +161,7 @@ Common complaints:
 
 - missing light mode;
 - missing dark mode;
+- dark-mode contrast bugs that make text unreadable;
 - horizontal scrollbars on large screens;
 - small/invisible icons;
 - poor visual separation between sections;
@@ -168,6 +172,7 @@ Common complaints:
 Product implication:
 
 - Ship light and dark themes from day one.
+- Test theme contrast against real result rows, URLs, timestamps, and metadata.
 - Keep core controls sticky.
 - Use dense but clear layouts.
 - Avoid decorative UI that slows scanning.
@@ -221,4 +226,3 @@ P2:
 - custom categories/rules;
 - cross-browser sync through user-owned storage;
 - closed window/session history.
-

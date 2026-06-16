@@ -15,6 +15,7 @@ The raw files are preserved in [`raw-sources/`](raw-sources/) so future product,
 | [`raw-sources/export-chrome-history-reviews.txt`](raw-sources/export-chrome-history-reviews.txt) | Export Chrome History Chrome Web Store reviews | `1c66c343-15b1-4057-b2ec-100de86022d3` | Export expectations, 90-day confusion, format needs |
 | [`raw-sources/history-trends-unlimited-reviews.txt`](raw-sources/history-trends-unlimited-reviews.txt) | History Trends Unlimited Chrome Web Store reviews | `f872aa64-cb8f-4eab-8de0-cda9f5b6b2fe` | Long-term archive, backup trust, analytics expectations |
 | [`raw-sources/recent-history-reviews.txt`](raw-sources/recent-history-reviews.txt) | Recent History Chrome Web Store reviews | `dbc92d6f-d0cb-4fcc-ba6f-b9f8c76010c0` | Recent-history workflow expectations and reliability issues |
+| [`raw-sources/view-chrome-history-overview.txt`](raw-sources/view-chrome-history-overview.txt) | View Chrome History Chrome Web Store listing and reviews | `434aff07-a23e-4f98-829b-a5474f2b3d60` | Default-history replacement, date-range browsing, theme/readability complaints |
 
 ## Handling Notes
 

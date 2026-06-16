@@ -156,6 +156,7 @@ The product should clearly say:
 - Search input focused by default.
 - Timeline and result list should be dense and scannable.
 - Use light and dark themes from day one.
+- Use locale-aware display and user-selectable date formats; history tools attract international users and date/time mistakes read as data-quality failures.
 - Make backup status visible but not noisy.
 - Avoid charts in the primary workflow; keep analytics secondary.
 - Never surprise users with default history replacement or destructive cleanup.
@@ -210,4 +211,3 @@ Quality:
 - no UI-thread stalls over 50 ms during import/search;
 - backup restore test passes for generated archives;
 - zero network requests unless an explicit sync/import destination is configured.
-
