@@ -1,12 +1,6 @@
 import {
-  addDomainRule,
-  clearVaultData,
-  getRules,
   getVisitsByIds,
   getStats,
-  markDeletedByIds,
-  removeRule,
-  restoreDeletedByIds,
   searchVisits
 } from "./storage.js";
 import { searchBrowserMemory } from "./browser-memory.js";
@@ -41,7 +35,6 @@ import {
   reconcileSelectedIds,
   selectedCountLabel,
   selectedIdsForResults,
-  uniqueDomainsForItems,
   uniqueUrlsForItems
 } from "./features/history-results/core/results.js";
 import { renderHistoryResults } from "./features/history-results/ui/render-results.js";
@@ -51,6 +44,7 @@ import {
 } from "./features/history-results/ui/text-highlighting.js";
 import { sendRuntimeMessage } from "./platform/chrome/runtime.js";
 import { getLocalStorage, setLocalStorage } from "./platform/chrome/storage.js";
+import { createVaultManagementActions } from "./features/vault-management/ui/actions.js";
 import { parseQuery } from "./query.js";
 
 const OPEN_SELECTED_LIMIT = 25;
@@ -241,11 +235,20 @@ async function selectedResults() {
   return getVisitsByIds([...appState.selectedIds]);
 }
 
+const vaultActions = createVaultManagementActions({
+  appState,
+  elements,
+  refreshStats,
+  runSearch,
+  selectedResults,
+  setStatus
+});
+
 const backupActions = createBackupActions({
   appState,
   elements,
   refreshStats,
-  renderRules,
+  renderRules: vaultActions.renderRules,
   runSearch,
   selectedResults,
   setStatus,
@@ -425,36 +428,6 @@ async function copySelectedUrls() {
   setStatus(`Copied ${urls.length} selected URL${urls.length === 1 ? "" : "s"}`);
 }
 
-async function blacklistSelectedDomains() {
-  const items = await selectedResults();
-  if (!items.length) {
-    setStatus("Select records first");
-    return;
-  }
-
-  const domains = uniqueDomainsForItems(items);
-  if (!domains.length) {
-    setStatus("Selected records have no domains to blacklist");
-    return;
-  }
-
-  const message = `Blacklist ${domains.length} selected domain${domains.length === 1 ? "" : "s"} for future archiving? Existing vault records will stay until you delete them.`;
-  if (!confirm(message)) {
-    setStatus("Blacklist canceled");
-    return;
-  }
-
-  const existingRules = await getRules();
-  const movedFromWhitelist = domains.filter((domain) => existingRules.whitelist.includes(domain)).length;
-  await Promise.all(domains.map((domain) => addDomainRule("blacklist", domain)));
-  await renderRules();
-
-  const movedLabel = movedFromWhitelist
-    ? ` ${movedFromWhitelist} moved from whitelist.`
-    : "";
-  setStatus(`Blacklisted ${domains.length} domain${domains.length === 1 ? "" : "s"} for future archiving.${movedLabel}`);
-}
-
 async function runQuickSearch() {
   const requestId = nextQuickSearchRequestId(appState);
   const searchText = getSearchText();
@@ -483,42 +456,6 @@ async function refreshStats() {
     ? formatShortDate(Date.parse(stats.meta.lastBackup.exportedAt), appState.preferences.dateFormat)
     : "Never";
   renderBackupStatus(stats.meta.lastBackup);
-}
-
-async function renderRules() {
-  const { rules } = await getRules();
-  elements.rulesList.replaceChildren();
-
-  if (!rules.length) {
-    const empty = document.createElement("li");
-    empty.className = "rule-item";
-    empty.textContent = "No domain rules yet.";
-    elements.rulesList.append(empty);
-    return;
-  }
-
-  for (const rule of rules) {
-    const item = document.createElement("li");
-    item.className = "rule-item";
-
-    const label = document.createElement("span");
-    const type = document.createElement("strong");
-    type.textContent = rule.type;
-    label.append(type, ` ${rule.value}`);
-
-    const remove = document.createElement("button");
-    remove.className = "ghost";
-    remove.type = "button";
-    remove.textContent = "Remove";
-    remove.addEventListener("click", async () => {
-      await removeRule(rule.id);
-      await renderRules();
-      setStatus(`Removed ${rule.value}`);
-    });
-
-    item.append(label, remove);
-    elements.rulesList.append(item);
-  }
 }
 
 async function runSearch() {
@@ -586,75 +523,6 @@ async function syncChromeHistory() {
   setStatus(`Synced ${response.result.stored} records`);
 }
 
-async function deleteFromVault() {
-  const ids = [...appState.selectedIds];
-  if (!ids.length) {
-    setStatus("Select records first");
-    return;
-  }
-
-  if (!confirm(`Delete ${ids.length} selected records from BrowseVault?`)) {
-    return;
-  }
-
-  const deleted = await markDeletedByIds(ids);
-  appState.selectedIds.clear();
-  await refreshStats();
-  await runSearch();
-  setStatus(`Deleted ${deleted} records from vault`);
-}
-
-async function deleteFromChrome() {
-  const items = await selectedResults();
-  if (!items.length) {
-    setStatus("Select records first");
-    return;
-  }
-
-  const urls = uniqueUrlsForItems(items);
-
-  if (!confirm(`Delete ${urls.length} selected URL${urls.length === 1 ? "" : "s"} from Chrome history and ${items.length} selected record${items.length === 1 ? "" : "s"} from BrowseVault? Chrome deletion removes history by URL.`)) {
-    return;
-  }
-
-  const response = await sendRuntimeMessage({
-    type: BACKGROUND_MESSAGE_TYPES.DELETE_CHROME_URLS,
-    urls
-  });
-
-  if (!response?.ok) {
-    throw new Error(response?.error || "Chrome deletion failed.");
-  }
-
-  const deleted = await markDeletedByIds(items.map((item) => item.id));
-  appState.selectedIds.clear();
-  await refreshStats();
-  await runSearch();
-  setStatus(`Deleted ${deleted} records from Chrome and vault`);
-}
-
-async function undoVaultDelete() {
-  const stats = await getStats();
-  const ids = stats.meta.lastVaultDelete?.ids || [];
-
-  if (!ids.length) {
-    setStatus("No vault delete to undo");
-    return;
-  }
-
-  const restored = await restoreDeletedByIds(ids);
-  await refreshStats();
-  await runSearch();
-  setStatus(`Restored ${restored} vault records`);
-}
-
-async function addRule(type) {
-  await addDomainRule(type, elements.ruleDomain.value);
-  elements.ruleDomain.value = "";
-  await renderRules();
-  setStatus(`Added ${type} rule`);
-}
-
 async function selectAllFiltered() {
   const { results, total } = await searchVisits(getSearchText(), {
     limit: "all"
@@ -686,37 +554,21 @@ function clearVisibleSelection() {
   renderResults(appState.currentResults, appState.currentTotal);
 }
 
-async function resetVault() {
-  if (!confirm("Erase all BrowseVault local archive data, rules, and backup metadata? This will not delete Chrome history.")) {
-    return;
-  }
-
-  await clearVaultData();
-  appState.currentResults = [];
-  appState.currentTotal = 0;
-  appState.selectedIds.clear();
-  elements.quickResults.replaceChildren();
-  await refreshStats();
-  await renderRules();
-  await runSearch();
-  setStatus("BrowseVault local data erased");
-}
-
 function bindEvents() {
   bindAppEvents({
     elements,
     document,
     root: document.documentElement,
     handlers: {
-      addBlacklistRule: () => addRule("blacklist"),
-      addWhitelistRule: () => addRule("whitelist"),
-      blacklistSelectedDomains,
+      addBlacklistRule: () => vaultActions.addRule("blacklist"),
+      addWhitelistRule: () => vaultActions.addRule("whitelist"),
+      blacklistSelectedDomains: vaultActions.blacklistSelectedDomains,
       cancelStagedImport: backupActions.cancelStagedImport,
       clearSelection: clearVisibleSelection,
       confirmStagedImport: backupActions.confirmStagedImport,
       copySelectedUrls,
-      deleteFromChrome,
-      deleteFromVault,
+      deleteFromChrome: vaultActions.deleteFromChrome,
+      deleteFromVault: vaultActions.deleteFromVault,
       exportAll: backupActions.exportAll,
       exportCsv: backupActions.exportCsv,
       exportHtml: backupActions.exportHtml,
@@ -728,7 +580,7 @@ function bindEvents() {
       invertVisibleSelection,
       loadMoreResults,
       openSelected,
-      resetVault,
+      resetVault: vaultActions.resetVault,
       runQuickSearch,
       runSearchesNow,
       savePreferences,
@@ -738,7 +590,7 @@ function bindEvents() {
       setStatus,
       switchTab,
       syncChromeHistory,
-      undoVaultDelete
+      undoVaultDelete: vaultActions.undoVaultDelete
     }
   });
 }
@@ -748,7 +600,7 @@ async function init() {
   bindEvents();
   elements.query.focus();
   await refreshStats();
-  await renderRules();
+  await vaultActions.renderRules();
   await runSearch();
   await runQuickSearch();
 }

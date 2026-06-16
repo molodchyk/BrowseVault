@@ -16,13 +16,14 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `src/features/history-export/core/export-format.js` owns pure CSV and HTML export formatting.
 - `src/features/history-results/core/results.js` owns pure result selection, URL/domain extraction, grouping, count labels, and load-more state.
 - `src/features/history-results/ui/` owns history result DOM rendering and search-hit highlighting.
+- `src/features/vault-management/` owns extension-page vault deletion, Chrome-history deletion requests, undo, reset, and domain-rule actions.
 - `src/platform/chrome/` owns explicit wrappers around Chrome extension APIs as they are extracted from runtime and feature modules.
 - `src/export-format.js` is a compatibility barrel for existing import paths.
 
 ## Next Split Candidates
 
 - Move search-page orchestration out of `src/app.js` into app-shell/history-results modules.
-- Move vault deletion, undo, and domain-rule action orchestration out of `src/app.js` into narrower feature modules.
+- Move quick-open action orchestration out of `src/app.js` into a browser-memory feature module.
 
 ## Rules For Future Edits
 
