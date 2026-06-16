@@ -120,10 +120,12 @@ export function normalizeHistoryItem(item, options = {}) {
   const visitTime = normalizeTimestamp(item.visitTime || item.lastVisitTime || Date.now());
   const title = item.title || "";
   const domain = normalizeDomain(url);
+  const hasChromeVisitId = item.id && item.id.includes("|");
+  const hasExplicitChromeId = Object.prototype.hasOwnProperty.call(item, "chromeId");
 
   return {
-    id: item.id && item.id.includes("|") ? item.id : makeVisitId(url, visitTime),
-    chromeId: item.id || "",
+    id: hasChromeVisitId ? item.id : makeVisitId(url, visitTime),
+    chromeId: hasExplicitChromeId ? item.chromeId || "" : item.id || "",
     url,
     normalizedUrl: url.toLowerCase(),
     title,

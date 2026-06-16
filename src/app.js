@@ -14,6 +14,7 @@ import {
   setMeta
 } from "./storage.js";
 import { searchBrowserMemory } from "./browser-memory.js";
+import { visitsToCsv } from "./export-format.js";
 import { parseQuery } from "./query.js";
 
 const PREFERENCES_KEY = "browseVault.preferences";
@@ -365,11 +366,6 @@ async function verifyArchiveIntegrity(archive) {
   };
 }
 
-function escapeCsv(value) {
-  const text = String(value ?? "");
-  return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
-}
-
 function downloadText(filename, mimeType, text) {
   const blob = new Blob([text], { type: mimeType });
   const url = URL.createObjectURL(blob);
@@ -380,32 +376,6 @@ function downloadText(filename, mimeType, text) {
   anchor.click();
 
   URL.revokeObjectURL(url);
-}
-
-function visitsToCsv(visits) {
-  const headers = [
-    "visitTimeIso",
-    "visitTime",
-    "domain",
-    "title",
-    "url",
-    "visitCount",
-    "transition",
-    "source"
-  ];
-
-  const rows = visits.map((visit) => [
-    new Date(visit.visitTime).toISOString(),
-    visit.visitTime,
-    visit.domain,
-    visit.title,
-    visit.url,
-    visit.visitCount,
-    visit.transition,
-    visit.source
-  ]);
-
-  return [headers, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\n");
 }
 
 function escapeHtml(value) {
@@ -510,10 +480,13 @@ function delimitedArchiveFromText(text, delimiter, source) {
   const visits = rows
     .map((row) => Object.fromEntries(headers.map((header, index) => [header, row[index] || ""])))
     .map((row) => ({
+      id: row.visitid,
+      chromeId: row.chromeid,
       url: row.url || row.uri || row.link,
       title: row.title || row.name || row.pagetitle || "",
-      visitTime: row.visittime || row.lastvisittime || row.time || row.timestamp || row.date || row.datetime,
+      visitTime: row.visittimestampms || row.visittimeiso || row.visittime || row.lastvisittime || row.time || row.timestamp || row.date || row.datetime,
       visitCount: row.visitcount || row.visits || 1,
+      transition: row.transition,
       source
     }))
     .filter((visit) => visit.url);

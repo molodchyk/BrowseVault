@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { makeVisitId, summarizeImportArchive } from "../src/storage.js";
+import { makeVisitId, normalizeHistoryItem, summarizeImportArchive } from "../src/storage.js";
 
 test("summarizeImportArchive reports new, existing, duplicate, invalid, and rule counts", () => {
   const visitTime = Date.parse("2026-06-16T12:00:00Z");
@@ -66,4 +66,26 @@ test("summarizeImportArchive recognizes Google Takeout browser history rows", ()
   assert.equal(summary.rows, 1);
   assert.equal(summary.validRows, 1);
   assert.equal(summary.newVisits, 1);
+});
+
+test("normalizeHistoryItem keeps BrowseVault ids separate from Chrome ids", () => {
+  const visitTime = Date.parse("2026-06-16T12:00:00Z");
+  const csvImport = normalizeHistoryItem({
+    id: "browsevault-id",
+    chromeId: "chrome|visit",
+    url: "https://example.com/export",
+    title: "Exported",
+    visitTime
+  });
+  const chromeImport = normalizeHistoryItem({
+    id: "123",
+    url: "https://example.com/chrome",
+    title: "Chrome",
+    visitTime
+  });
+
+  assert.equal(csvImport.id, makeVisitId("https://example.com/export", visitTime));
+  assert.equal(csvImport.chromeId, "chrome|visit");
+  assert.equal(chromeImport.id, makeVisitId("https://example.com/chrome", visitTime));
+  assert.equal(chromeImport.chromeId, "123");
 });

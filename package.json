@@ -6,7 +6,7 @@
   "description": "Private local-first browser history search, backup, export, and preservation extension.",
   "scripts": {
     "validate": "node scripts/validate-extension.mjs",
-    "check": "node --check src/background.js && node --check src/storage.js && node --check src/query.js && node --check src/browser-memory.js && node --check src/app.js && node --check scripts/validate-extension.mjs",
+    "check": "node --check src/background.js && node --check src/storage.js && node --check src/query.js && node --check src/browser-memory.js && node --check src/export-format.js && node --check src/app.js && node --check scripts/validate-extension.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "package": "node scripts/package-extension.mjs",
     "test": "node --test"

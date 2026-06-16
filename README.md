@@ -31,7 +31,8 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - Quick Open search across open tabs, bookmarks, downloads, and recently closed tabs, with source-aware switch/open/restore actions;
 - a keyboard command for opening BrowseVault;
 - JSON backup export and import;
-- CSV and HTML exports;
+- CSV export with ISO timestamp, local date/time, visit id, and Chrome id fields;
+- HTML exports;
 - visible backup status with freshness, format, record count, and checksum details;
 - SHA-256 integrity metadata for JSON backups;
 - staged import preview with valid row, duplicate row, existing visit, new visit, rule, and checksum status;
