@@ -37,7 +37,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - HTML exports;
 - visible backup status with freshness, format, record count, and checksum details;
 - SHA-256 integrity metadata for JSON backups;
-- staged import preview with valid row, duplicate row, existing visit, new visit, rule, and checksum status;
+- staged import preview with valid row, duplicate row, existing visit, new visit, rule, and restore-check health status;
 - JSON, CSV, TSV, and Google Takeout-style import handling;
 - selected-record export;
 - selected-record URL copy;

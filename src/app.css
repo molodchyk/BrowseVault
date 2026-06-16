@@ -349,6 +349,26 @@ code {
   color: var(--danger);
 }
 
+.import-health {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 9px 11px;
+}
+
+.import-health.is-ok {
+  border-color: color-mix(in srgb, var(--accent), var(--border) 45%);
+  color: var(--accent);
+}
+
+.import-health.is-warning {
+  border-color: color-mix(in srgb, var(--danger), var(--border) 35%);
+  color: var(--danger);
+}
+
 .backup-meta {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

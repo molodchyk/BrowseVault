@@ -6,7 +6,7 @@ Use BrowseVault to search archived history by keyword, site, host, domain, title
 
 Scan results by local date with highlighted matches, then open, copy, export, select, or delete the records you need.
 
-Back up your vault as JSON with checksum metadata, restore from staged import previews, and import CSV, TSV, or Google Takeout-style history files.
+Back up your vault as JSON with checksum metadata, review restore-check health before import, and import CSV, TSV, or Google Takeout-style history files.
 
 Export history as JSON, spreadsheet-friendly CSV, or HTML, including ISO and local date-time fields for easier analysis.
 
