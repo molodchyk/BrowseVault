@@ -491,6 +491,10 @@ code {
     display: grid;
   }
 
+  .bulkbar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .backup-actions,
   .bulk-actions {
     justify-content: flex-start;
@@ -554,7 +558,26 @@ code {
 }
 
 @media (max-width: 480px) {
-  .bulk-actions button {
+  .bulk-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     width: 100%;
+  }
+
+  .bulk-actions button {
+    min-width: 0;
+    width: 100%;
+  }
+
+  #delete-vault,
+  #delete-chrome {
+    grid-column: 1 / -1;
+  }
+
+  #undo-delete {
+    grid-column: 1 / -1;
+    justify-self: start;
+    min-width: 92px;
+    width: auto;
   }
 }
