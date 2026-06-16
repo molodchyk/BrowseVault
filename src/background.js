@@ -23,6 +23,7 @@ import {
 import { restoreSession } from "./platform/chrome/sessions.js";
 import { activateTab, createTab } from "./platform/chrome/tabs.js";
 import { focusWindow } from "./platform/chrome/windows.js";
+import { createChromeHistoryRemovalReconciler } from "./features/background-runtime/background/chrome-history-removal.js";
 import { createChromeHistorySync } from "./features/background-runtime/background/chrome-history-sync.js";
 import { createBackgroundMessageRouter } from "./features/background-runtime/background/message-router.js";
 
@@ -45,6 +46,13 @@ const chromeHistorySync = createChromeHistorySync({
   searchHistory,
   setMeta,
   syncChromeHistoryItems
+}, {
+  now
+});
+
+const chromeHistoryRemoval = createChromeHistoryRemovalReconciler({
+  markChromeDeletedByUrls,
+  setMeta
 }, {
   now
 });
@@ -80,16 +88,7 @@ onHistoryVisited(async (item) => {
 });
 
 onHistoryVisitRemoved(async (removed) => {
-  if (removed.allHistory) {
-    await setMeta("lastNativeHistoryClear", {
-      clearedAt: now()
-    });
-    return;
-  }
-
-  if (removed.urls?.length) {
-    await markChromeDeletedByUrls(removed.urls, now());
-  }
+  await chromeHistoryRemoval.reconcileHistoryRemoval(removed);
 });
 
 onRuntimeMessage(createBackgroundMessageRouter({
