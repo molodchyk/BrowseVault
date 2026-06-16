@@ -15,6 +15,7 @@ import {
 } from "./storage.js";
 import { searchBrowserMemory } from "./browser-memory.js";
 import { visitsToCsv, visitsToHtml } from "./export-format.js";
+import { renderImportPreview as renderImportPreviewUi } from "./features/backup-import/ui/render-import-preview.js";
 import {
   DEFAULT_PREFERENCES,
   MAX_RESULT_LIMIT,
@@ -474,6 +475,20 @@ function archiveFromFileText(file, text) {
   return JSON.parse(text);
 }
 
+function importPreviewElements() {
+  return {
+    importPreview: elements.importPreview,
+    importPreviewTitle: elements.importPreviewTitle,
+    importValid: elements.importValid,
+    importNew: elements.importNew,
+    importExisting: elements.importExisting,
+    importDuplicates: elements.importDuplicates,
+    importHealth: elements.importHealth,
+    importPreviewNote: elements.importPreviewNote,
+    confirmImport: elements.confirmImport
+  };
+}
+
 async function selectedResults() {
   return getVisitsByIds([...selectedIds]);
 }
@@ -924,72 +939,8 @@ async function importFromFile(file) {
   setStatus("Review import preview");
 }
 
-function importHealthState(analysis, integrity) {
-  if (integrity.checked && !integrity.ok) {
-    return {
-      className: "is-warning",
-      text: "Checksum mismatch. This archive changed after export; import only if you trust this file.",
-      buttonText: "Import Anyway"
-    };
-  }
-
-  if (integrity.checked && integrity.ok) {
-    return {
-      className: "is-ok",
-      text: `Restore check passed. ${analysis.newVisits} new record${analysis.newVisits === 1 ? "" : "s"} and ${analysis.existingVisits} existing record${analysis.existingVisits === 1 ? "" : "s"} detected.`,
-      buttonText: "Import Now"
-    };
-  }
-
-  if (analysis.validRows === 0 && analysis.rules > 0) {
-    return {
-      className: "is-warning",
-      text: "Rules-only import. No history records were found in this file.",
-      buttonText: "Import Rules"
-    };
-  }
-
-  return {
-    className: "is-warning",
-    text: "Restore check limited. This archive has no checksum, so BrowseVault can preview rows but cannot prove the file is unchanged.",
-    buttonText: "Import Now"
-  };
-}
-
 function renderImportPreview() {
-  if (!stagedImport) {
-    elements.importPreview.hidden = true;
-    elements.confirmImport.textContent = "Import Now";
-    elements.importHealth.className = "import-health";
-    elements.importHealth.textContent = "Archive not checked";
-    return;
-  }
-
-  const { analysis, fileName, integrity } = stagedImport;
-  const health = importHealthState(analysis, integrity);
-  const checksum = integrity.checked
-    ? integrity.ok
-      ? "Checksum verified."
-      : "Checksum mismatch. Import only if you trust this file."
-    : "No checksum included.";
-
-  elements.importPreviewTitle.textContent = `${fileName} from ${analysis.sourceApp}`;
-  elements.importValid.textContent = String(analysis.validRows);
-  elements.importNew.textContent = String(analysis.newVisits);
-  elements.importExisting.textContent = String(analysis.existingVisits);
-  elements.importDuplicates.textContent = String(analysis.duplicateRows);
-  elements.importHealth.className = `import-health ${health.className}`;
-  elements.importHealth.textContent = health.text;
-  elements.confirmImport.textContent = health.buttonText;
-  elements.importPreviewNote.textContent = [
-    `${analysis.rows} rows scanned.`,
-    analysis.invalidRows ? `${analysis.invalidRows} rows without URLs will be skipped.` : "",
-    analysis.rules ? `${analysis.rules} domain rules will be imported or updated.` : "",
-    checksum
-  ]
-    .filter(Boolean)
-    .join(" ");
-  elements.importPreview.hidden = false;
+  renderImportPreviewUi(importPreviewElements(), stagedImport);
 }
 
 function cancelStagedImport() {

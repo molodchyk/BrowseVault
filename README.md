@@ -80,6 +80,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 │   ├── browser-memory.js
 │   ├── export-format.js
 │   ├── features/
+│   │   ├── backup-import/
 │   │   ├── display-preferences/
 │   │   ├── history-export/
 │   │   └── history-results/
