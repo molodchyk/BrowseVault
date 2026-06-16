@@ -202,5 +202,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
 
+  if (message?.type === "browseVault.openUrls") {
+    const urls = [...new Set(message.urls || [])].filter(Boolean);
+    Promise.all(urls.map((url) => chrome.tabs.create({ url })))
+      .then(() => sendResponse({ ok: true, opened: urls.length }))
+      .catch((error) => sendResponse({ ok: false, error: error.message }));
+    return true;
+  }
+
   return false;
 });

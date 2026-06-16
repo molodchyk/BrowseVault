@@ -589,7 +589,8 @@ code {
 
   #delete-vault,
   #delete-chrome,
-  #load-more {
+  #load-more,
+  #open-selected {
     grid-column: 1 / -1;
   }
 

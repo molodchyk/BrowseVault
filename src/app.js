@@ -23,6 +23,7 @@ const DEFAULT_PREFERENCES = {
   defaultLimit: 500
 };
 const MAX_RESULT_LIMIT = 50000;
+const OPEN_SELECTED_LIMIT = 25;
 
 const elements = {
   tabs: [...document.querySelectorAll(".tab")],
@@ -49,6 +50,7 @@ const elements = {
   confirmImport: document.querySelector("#confirm-import"),
   cancelImport: document.querySelector("#cancel-import"),
   resetVault: document.querySelector("#reset-vault"),
+  openSelected: document.querySelector("#open-selected"),
   exportSelected: document.querySelector("#export-selected"),
   deleteVault: document.querySelector("#delete-vault"),
   deleteChrome: document.querySelector("#delete-chrome"),
@@ -596,6 +598,42 @@ async function performQuickAction(item) {
   setStatus(`${action.type === "activate-tab" ? "Switched to" : "Opened"} ${item.title || item.url}`);
 }
 
+async function openSelected() {
+  const items = await selectedResults();
+  if (!items.length) {
+    setStatus("Select records first");
+    return;
+  }
+
+  const urls = [...new Set(items.map((item) => item.url).filter(Boolean))];
+  if (!urls.length) {
+    setStatus("Selected records have no URLs to open");
+    return;
+  }
+
+  const urlsToOpen = urls.slice(0, OPEN_SELECTED_LIMIT);
+  const overflow = urls.length - urlsToOpen.length;
+  const message = overflow
+    ? `Open the first ${urlsToOpen.length} selected URLs? ${overflow} additional selected URLs will be left unopened to avoid flooding tabs.`
+    : `Open ${urlsToOpen.length} selected URL${urlsToOpen.length === 1 ? "" : "s"}?`;
+
+  if (!confirm(message)) {
+    setStatus("Open canceled");
+    return;
+  }
+
+  const response = await chrome.runtime.sendMessage({
+    type: "browseVault.openUrls",
+    urls: urlsToOpen
+  });
+
+  if (!response?.ok) {
+    throw new Error(response?.error || "Open selected failed.");
+  }
+
+  setStatus(`Opened ${response.opened} selected URL${response.opened === 1 ? "" : "s"}`);
+}
+
 async function runQuickSearch() {
   setStatus("Searching browser sources");
   const { results, total, warnings } = await searchBrowserMemory(getSearchText(), {
@@ -973,6 +1011,7 @@ function bindEvents() {
   elements.exportJson.addEventListener("click", () => exportAll().catch((error) => setStatus(error.message)));
   elements.exportCsv.addEventListener("click", () => exportCsv().catch((error) => setStatus(error.message)));
   elements.exportHtml.addEventListener("click", () => exportHtml().catch((error) => setStatus(error.message)));
+  elements.openSelected.addEventListener("click", () => openSelected().catch((error) => setStatus(error.message)));
   elements.exportSelected.addEventListener("click", () => exportSelected().catch((error) => setStatus(error.message)));
   elements.deleteVault.addEventListener("click", () => deleteFromVault().catch((error) => setStatus(error.message)));
   elements.deleteChrome.addEventListener("click", () => deleteFromChrome().catch((error) => setStatus(error.message)));
