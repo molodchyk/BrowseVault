@@ -9,6 +9,8 @@ export function parseQuery(input = "") {
     url: [],
     after: null,
     before: null,
+    dateStart: null,
+    dateEnd: null,
     regex: null
   };
 
@@ -35,6 +37,15 @@ export function parseQuery(input = "") {
 
     if (value && field === "url") {
       query.url.push(value);
+      continue;
+    }
+
+    if (value && ["date", "day", "on"].includes(field)) {
+      const range = parseLocalDayRange(value);
+      if (range) {
+        query.dateStart = range.start;
+        query.dateEnd = range.end;
+      }
       continue;
     }
 
@@ -68,6 +79,32 @@ export function parseQuery(input = "") {
   return query;
 }
 
+function parseLocalDayRange(value) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+  if (!match) {
+    return null;
+  }
+
+  const [, yearText, monthText, dayText] = match;
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const day = Number(dayText);
+  const start = new Date(year, month - 1, day);
+
+  if (
+    start.getFullYear() !== year ||
+    start.getMonth() !== month - 1 ||
+    start.getDate() !== day
+  ) {
+    return null;
+  }
+
+  return {
+    start: start.getTime(),
+    end: new Date(year, month - 1, day + 1).getTime() - 1
+  };
+}
+
 function includesAll(text, tokens) {
   return tokens.every((token) => text.includes(token));
 }
@@ -83,6 +120,14 @@ export function matchesVisitQuery(visit, query) {
   }
 
   if (query.before && visit.visitTime > query.before + 86400000 - 1) {
+    return false;
+  }
+
+  if (query.dateStart !== null && visit.visitTime < query.dateStart) {
+    return false;
+  }
+
+  if (query.dateEnd !== null && visit.visitTime > query.dateEnd) {
     return false;
   }
 
@@ -116,4 +161,3 @@ export function matchesVisitQuery(visit, query) {
 
   return true;
 }
-

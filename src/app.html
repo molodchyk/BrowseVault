@@ -56,6 +56,10 @@
             <summary>Filters and syntax</summary>
             <div class="filters">
               <label>
+                Day
+                <input id="on-date" type="text" inputmode="numeric" placeholder="YYYY-MM-DD">
+              </label>
+              <label>
                 After
                 <input id="after" type="text" inputmode="numeric" placeholder="YYYY-MM-DD">
               </label>
@@ -68,7 +72,7 @@
                 <input id="limit" type="number" min="25" max="50000" step="100" value="500">
               </label>
             </div>
-            <p class="hint">Syntax: <code>site:</code>, <code>title:</code>, <code>url:</code>, <code>after:</code>, <code>before:</code>, <code>-exclude</code>, quoted phrases, and <code>regex:</code>.</p>
+            <p class="hint">Syntax: <code>site:</code>, <code>title:</code>, <code>url:</code>, <code>date:</code>, <code>after:</code>, <code>before:</code>, <code>-exclude</code>, quoted phrases, and <code>regex:</code>.</p>
           </details>
         </section>
 
@@ -107,7 +111,7 @@
             </div>
             <button id="quick-search" type="button">Search Sources</button>
           </div>
-          <p class="hint">Uses the same query text and ISO date filters as the History tab. Results here are read-only and never affected by vault cleanup.</p>
+          <p class="hint">Uses the same query text and ISO day/date filters as the History tab. Results here are read-only and never affected by vault cleanup.</p>
           <ol id="quick-results" class="quick-results"></ol>
         </section>
       </section>

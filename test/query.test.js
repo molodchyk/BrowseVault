@@ -30,6 +30,13 @@ describe("parseQuery", () => {
     assert.equal(query.before, Date.parse("2026-06-30"));
     assert.equal(query.regex, null);
   });
+
+  it("parses exact day aliases as local calendar ranges", () => {
+    const query = parseQuery("date:2026-06-10 day:2026-06-11 on:not-a-date");
+
+    assert.equal(query.dateStart, new Date(2026, 5, 11).getTime());
+    assert.equal(query.dateEnd, new Date(2026, 5, 12).getTime() - 1);
+  });
 });
 
 describe("matchesVisitQuery", () => {
@@ -50,6 +57,20 @@ describe("matchesVisitQuery", () => {
     assert.equal(matchesVisitQuery(visit, parseQuery("after:2026-06-11")), false);
   });
 
+  it("matches exact local calendar days", () => {
+    const morningVisit = {
+      ...visit,
+      visitTime: new Date(2026, 5, 10, 8, 30).getTime()
+    };
+    const nextDayVisit = {
+      ...visit,
+      visitTime: new Date(2026, 5, 11, 0, 1).getTime()
+    };
+
+    assert.equal(matchesVisitQuery(morningVisit, parseQuery("date:2026-06-10")), true);
+    assert.equal(matchesVisitQuery(nextDayVisit, parseQuery("date:2026-06-10")), false);
+  });
+
   it("supports CJK substring matching", () => {
     const cjkVisit = {
       ...visit,
@@ -63,4 +84,3 @@ describe("matchesVisitQuery", () => {
     assert.equal(matchesVisitQuery(cjkVisit, parseQuery("历史")), true);
   });
 });
-

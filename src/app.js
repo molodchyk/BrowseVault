@@ -33,6 +33,7 @@ const elements = {
   tabs: [...document.querySelectorAll(".tab")],
   panels: [...document.querySelectorAll(".tab-panel")],
   query: document.querySelector("#query"),
+  onDate: document.querySelector("#on-date"),
   after: document.querySelector("#after"),
   before: document.querySelector("#before"),
   limit: document.querySelector("#limit"),
@@ -269,13 +270,20 @@ function switchTab(tabName) {
 
 function getSearchText() {
   const parts = [elements.query.value.trim()];
+  const onDate = elements.onDate.value.trim();
+  const after = elements.after.value.trim();
+  const before = elements.before.value.trim();
 
-  if (elements.after.value) {
-    parts.push(`after:${elements.after.value}`);
+  if (onDate) {
+    parts.push(`date:${onDate}`);
   }
 
-  if (elements.before.value) {
-    parts.push(`before:${elements.before.value}`);
+  if (after) {
+    parts.push(`after:${after}`);
+  }
+
+  if (before) {
+    parts.push(`before:${before}`);
   }
 
   return parts.filter(Boolean).join(" ");
@@ -1195,6 +1203,7 @@ function bindEvents() {
   elements.quickSearch.addEventListener("click", () => runQuickSearch().catch((error) => setStatus(error.message)));
   elements.clearSearch.addEventListener("click", () => {
     elements.query.value = "";
+    elements.onDate.value = "";
     elements.after.value = "";
     elements.before.value = "";
     runSearch();
