@@ -9,7 +9,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `src/storage.js` owns IndexedDB vault records, import normalization, backup metadata, rules, and vault mutations.
 - `src/browser-memory.js` owns read-only search over tabs, bookmarks, downloads, and recently closed sessions.
 - `src/query.js` owns search parsing and matching.
-- `src/features/app-shell/` owns extension-page shell event wiring and shared shell UI behavior.
+- `src/features/app-shell/` owns extension-page shell element collection, event wiring, and shared shell UI behavior.
 - `src/features/backup-import/` owns archive file parsing plus import-preview display state and rendering for restore flows.
 - `src/features/background-runtime/` owns background message routing, payload validation, privileged action dispatch, Chrome history bootstrap, archive filtering, live-visit capture, and native Chrome history removal reconciliation.
 - `src/features/display-preferences/core/preferences.js` owns pure preference normalization, result-limit clamping, date/count formatting, and backup status summaries.
@@ -21,7 +21,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 
 ## Next Split Candidates
 
-- Move extension-page element collection and shell state out of `src/app.js` into app-shell modules.
+- Move extension-page shell state out of `src/app.js` into app-shell modules.
 - Move backup action orchestration out of `src/app.js` into backup-owned modules.
 
 ## Rules For Future Edits
