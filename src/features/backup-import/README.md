@@ -1,5 +1,5 @@
 # Backup Import
 
-Owns import-preview display state and rendering for BrowseVault archive restore flows.
+Owns BrowseVault archive import/export actions, integrity metadata, import-preview display state, and restore-flow rendering.
 
-File reading, archive parsing, integrity hashing, and IndexedDB writes remain owned by the extension page and storage layer while this feature is being split out.
+The feature coordinates archive downloads, archive file reading, import preview staging, checksum verification, and backup metadata updates through injected services. IndexedDB storage primitives remain owned by the storage layer.

@@ -1,20 +1,15 @@
 import {
   addDomainRule,
-  analyzeImportArchive,
   clearVaultData,
-  exportArchive,
   getRules,
   getVisitsByIds,
   getStats,
-  importArchive,
   markDeletedByIds,
   removeRule,
   restoreDeletedByIds,
-  searchVisits,
-  setMeta
+  searchVisits
 } from "./storage.js";
 import { searchBrowserMemory } from "./browser-memory.js";
-import { visitsToCsv, visitsToHtml } from "./export-format.js";
 import {
   clearSearchDebounce as clearAppSearchDebounce,
   createAppShellState,
@@ -26,8 +21,7 @@ import {
 } from "./features/app-shell/core/state.js";
 import { collectAppElements } from "./features/app-shell/ui/elements.js";
 import { bindAppEvents } from "./features/app-shell/ui/events.js";
-import { archiveFromFileText } from "./features/backup-import/core/archive-parser.js";
-import { renderImportPreview as renderImportPreviewUi } from "./features/backup-import/ui/render-import-preview.js";
+import { createBackupActions } from "./features/backup-import/ui/actions.js";
 import { BACKGROUND_MESSAGE_TYPES } from "./features/background-runtime/core/messages.js";
 import {
   DEFAULT_PREFERENCES,
@@ -207,74 +201,6 @@ function updateLoadMoreButton() {
   }
 }
 
-function downloadJson(filename, data) {
-  const blob = new Blob([JSON.stringify(data, null, 2)], {
-    type: "application/json"
-  });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-
-  anchor.href = url;
-  anchor.download = filename;
-  anchor.click();
-
-  URL.revokeObjectURL(url);
-}
-
-async function sha256(text) {
-  const bytes = new TextEncoder().encode(text);
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
-function integrityPayload(archive) {
-  return JSON.stringify({
-    schemaVersion: archive.schemaVersion || 1,
-    rules: archive.rules || [],
-    visits: archive.visits || archive.items || []
-  });
-}
-
-async function attachIntegrity(archive) {
-  return {
-    ...archive,
-    integrity: {
-      algorithm: "SHA-256",
-      scope: "schemaVersion,rules,visits",
-      sha256: await sha256(integrityPayload(archive))
-    }
-  };
-}
-
-async function verifyArchiveIntegrity(archive) {
-  if (!archive?.integrity?.sha256) {
-    return {
-      checked: false,
-      ok: true
-    };
-  }
-
-  const actual = await sha256(integrityPayload(archive));
-  return {
-    checked: true,
-    ok: actual === archive.integrity.sha256,
-    expected: archive.integrity.sha256,
-    actual
-  };
-}
-
-function downloadText(filename, mimeType, text) {
-  const blob = new Blob([text], { type: mimeType });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-
-  anchor.href = url;
-  anchor.download = filename;
-  anchor.click();
-
-  URL.revokeObjectURL(url);
-}
-
 async function copyText(text) {
   if (!text) {
     throw new Error("Nothing to copy.");
@@ -311,23 +237,20 @@ async function copyText(text) {
   }
 }
 
-function importPreviewElements() {
-  return {
-    importPreview: elements.importPreview,
-    importPreviewTitle: elements.importPreviewTitle,
-    importValid: elements.importValid,
-    importNew: elements.importNew,
-    importExisting: elements.importExisting,
-    importDuplicates: elements.importDuplicates,
-    importHealth: elements.importHealth,
-    importPreviewNote: elements.importPreviewNote,
-    confirmImport: elements.confirmImport
-  };
-}
-
 async function selectedResults() {
   return getVisitsByIds([...appState.selectedIds]);
 }
+
+const backupActions = createBackupActions({
+  appState,
+  elements,
+  refreshStats,
+  renderRules,
+  runSearch,
+  selectedResults,
+  setStatus,
+  switchTab
+});
 
 function applyResultSelection({ selectedIds: nextSelectedIds, lastCheckedIndex: nextLastCheckedIndex, shouldRerender }) {
   appState.selectedIds = nextSelectedIds;
@@ -663,159 +586,6 @@ async function syncChromeHistory() {
   setStatus(`Synced ${response.result.stored} records`);
 }
 
-async function exportAll() {
-  setStatus("Preparing archive");
-  const archive = await attachIntegrity(await exportArchive());
-  downloadJson(`browsevault-archive-${archive.exportedAt.slice(0, 10)}.json`, archive);
-  await setMeta("lastBackup", {
-    exportedAt: archive.exportedAt,
-    format: "json",
-    records: archive.counts.visits,
-    sha256: archive.integrity.sha256
-  });
-  await refreshStats();
-  setStatus("Exported archive");
-}
-
-async function exportCsv() {
-  setStatus("Preparing CSV");
-  const archive = await exportArchive();
-  downloadText(
-    `browsevault-history-${archive.exportedAt.slice(0, 10)}.csv`,
-    "text/csv",
-    visitsToCsv(archive.visits)
-  );
-  await setMeta("lastBackup", {
-    exportedAt: archive.exportedAt,
-    format: "csv",
-    records: archive.counts.visits
-  });
-  await refreshStats();
-  setStatus("Exported CSV");
-}
-
-async function exportHtml() {
-  setStatus("Preparing HTML");
-  const archive = await exportArchive();
-  downloadText(
-    `browsevault-history-${archive.exportedAt.slice(0, 10)}.html`,
-    "text/html",
-    visitsToHtml(archive.visits, archive.exportedAt)
-  );
-  await setMeta("lastBackup", {
-    exportedAt: archive.exportedAt,
-    format: "html",
-    records: archive.counts.visits
-  });
-  await refreshStats();
-  setStatus("Exported HTML");
-}
-
-async function exportSelected() {
-  const items = await selectedResults();
-  if (!items.length) {
-    setStatus("Select records first");
-    return;
-  }
-
-  const archive = await attachIntegrity(await exportArchive(items));
-  downloadJson(`browsevault-selected-${archive.exportedAt.slice(0, 10)}.json`, archive);
-  setStatus(`Exported ${items.length} selected records as JSON`);
-}
-
-async function exportSelectedCsv() {
-  const items = await selectedResults();
-  if (!items.length) {
-    setStatus("Select records first");
-    return;
-  }
-
-  const exportedAt = new Date().toISOString();
-  downloadText(
-    `browsevault-selected-${exportedAt.slice(0, 10)}.csv`,
-    "text/csv",
-    visitsToCsv(items)
-  );
-  setStatus(`Exported ${items.length} selected records as CSV`);
-}
-
-async function exportSelectedHtml() {
-  const items = await selectedResults();
-  if (!items.length) {
-    setStatus("Select records first");
-    return;
-  }
-
-  const exportedAt = new Date().toISOString();
-  downloadText(
-    `browsevault-selected-${exportedAt.slice(0, 10)}.html`,
-    "text/html",
-    visitsToHtml(items, exportedAt)
-  );
-  setStatus(`Exported ${items.length} selected records as HTML`);
-}
-
-async function importFromFile(file) {
-  setStatus("Reading archive");
-  const text = await file.text();
-  const archive = archiveFromFileText(file, text);
-  const integrity = await verifyArchiveIntegrity(archive);
-  const analysis = await analyzeImportArchive(archive);
-
-  if (!analysis.validRows && !analysis.rules) {
-    setStatus("No importable history records or rules found");
-    return;
-  }
-
-  appState.stagedImport = {
-    archive,
-    analysis,
-    fileName: file.name,
-    integrity
-  };
-  renderImportPreview();
-  switchTab("backup");
-  setStatus("Review import preview");
-}
-
-function renderImportPreview() {
-  renderImportPreviewUi(importPreviewElements(), appState.stagedImport);
-}
-
-function cancelStagedImport() {
-  appState.stagedImport = null;
-  renderImportPreview();
-  setStatus("Import canceled");
-}
-
-async function confirmStagedImport() {
-  if (!appState.stagedImport) {
-    setStatus("Choose an archive first");
-    return;
-  }
-
-  const { archive, integrity } = appState.stagedImport;
-  if (integrity.checked && !integrity.ok && !confirm("This archive checksum does not match. Import anyway?")) {
-    setStatus("Import canceled");
-    return;
-  }
-
-  setStatus("Importing archive");
-  const result = await importArchive(archive);
-  appState.stagedImport = null;
-  renderImportPreview();
-  await refreshStats();
-  await renderRules();
-  await runSearch();
-  const integrityLabel = integrity.checked
-    ? integrity.ok
-      ? " with verified checksum"
-      : " after checksum warning"
-    : "";
-  const ruleLabel = result.rules ? ` and ${result.rules} rule${result.rules === 1 ? "" : "s"}` : "";
-  setStatus(`Imported ${result.visits} records${ruleLabel}${integrityLabel}`);
-}
-
 async function deleteFromVault() {
   const ids = [...appState.selectedIds];
   if (!ids.length) {
@@ -941,20 +711,20 @@ function bindEvents() {
       addBlacklistRule: () => addRule("blacklist"),
       addWhitelistRule: () => addRule("whitelist"),
       blacklistSelectedDomains,
-      cancelStagedImport,
+      cancelStagedImport: backupActions.cancelStagedImport,
       clearSelection: clearVisibleSelection,
-      confirmStagedImport,
+      confirmStagedImport: backupActions.confirmStagedImport,
       copySelectedUrls,
       deleteFromChrome,
       deleteFromVault,
-      exportAll,
-      exportCsv,
-      exportHtml,
-      exportSelected,
-      exportSelectedCsv,
-      exportSelectedHtml,
+      exportAll: backupActions.exportAll,
+      exportCsv: backupActions.exportCsv,
+      exportHtml: backupActions.exportHtml,
+      exportSelected: backupActions.exportSelected,
+      exportSelectedCsv: backupActions.exportSelectedCsv,
+      exportSelectedHtml: backupActions.exportSelectedHtml,
       focusSearchInput,
-      importFromFile,
+      importFromFile: backupActions.importFromFile,
       invertVisibleSelection,
       loadMoreResults,
       openSelected,
