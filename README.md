@@ -22,6 +22,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 
 - a loadable Chrome extension shell;
 - a full-page BrowseVault app;
+- a tabbed interface that keeps History results first and moves secondary tools out of the scroll path;
 - local IndexedDB archive storage;
 - background capture for new Chrome history visits;
 - manual sync from currently available Chrome history, expanded to individual visits where Chrome exposes them;
@@ -41,6 +42,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - optional URL-level deletion from Chrome history for selected records;
 - full local BrowseVault data reset without touching Chrome history;
 - domain blacklist and whitelist rules;
+- local display preferences for system/light/dark theme, accent color, date format, and default result limit;
 - local-first privacy documentation;
 - generated PNG extension icons;
 - deterministic local ZIP packaging;
@@ -110,6 +112,8 @@ regex:github|gitlab
 ```
 
 The main vault search is used for archived history management. Quick Open uses the same query text to search current browser sources such as open tabs, bookmarks, downloads, and recently closed tabs. Quick Open results are read-only and are not affected by vault delete/export actions.
+
+Date filters use `YYYY-MM-DD` text fields to avoid browser-specific date input formatting. Displayed dates can be switched between system locale, ISO, day/month/year, month/day/year, and year/month/day in Settings.
 
 ## GitHub Description
 

@@ -9,123 +9,188 @@
   <body>
     <main class="shell">
       <header class="header">
-        <div>
+        <div class="brand">
           <p class="eyebrow">BrowseVault</p>
           <h1>History Search & Backup</h1>
-          <p class="lede">Local-first browser memory with search, backup, import, export, and precise cleanup.</p>
         </div>
-        <div class="header-actions">
-          <button id="sync-chrome" type="button">Sync Chrome History</button>
-          <button id="export-json" type="button">Export JSON</button>
-          <button id="export-csv" type="button">Export CSV</button>
-          <button id="export-html" type="button">Export HTML</button>
-          <label class="file-button" for="import-archive">Import Archive</label>
-          <input id="import-archive" class="visually-hidden" type="file" accept=".json,.csv,.tsv,application/json,text/csv,text/tab-separated-values">
-          <button id="reset-vault" class="danger" type="button">Reset Vault</button>
-        </div>
+        <section class="stats-grid compact" aria-label="Vault stats">
+          <div class="stat">
+            <span id="stat-visits">0</span>
+            <p>records</p>
+          </div>
+          <div class="stat">
+            <span id="stat-domains">0</span>
+            <p>domains</p>
+          </div>
+          <div class="stat">
+            <span id="stat-newest">No visits</span>
+            <p>newest</p>
+          </div>
+          <div class="stat">
+            <span id="stat-backup">Never</span>
+            <p>backup</p>
+          </div>
+        </section>
       </header>
 
-      <section class="stats-grid" aria-label="Vault stats">
-        <div class="stat">
-          <span id="stat-visits">0</span>
-          <p>vault records</p>
-        </div>
-        <div class="stat">
-          <span id="stat-domains">0</span>
-          <p>domains</p>
-        </div>
-        <div class="stat">
-          <span id="stat-newest">No visits yet</span>
-          <p>newest visit</p>
-        </div>
-        <div class="stat">
-          <span id="stat-backup">Never</span>
-          <p>last backup</p>
-        </div>
-      </section>
+      <nav class="tabs" aria-label="BrowseVault sections">
+        <button class="tab is-active" type="button" data-tab="history">History</button>
+        <button class="tab" type="button" data-tab="quick">Quick Open</button>
+        <button class="tab" type="button" data-tab="backup">Backup</button>
+        <button class="tab" type="button" data-tab="rules">Rules</button>
+        <button class="tab" type="button" data-tab="settings">Settings</button>
+      </nav>
 
-      <section class="panel search-panel" aria-label="History search">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Search</p>
-            <h2>Find history in the local vault</h2>
+      <section id="tab-history" class="tab-panel" data-panel="history">
+        <section class="panel search-panel sticky-panel" aria-label="History search">
+          <div class="search-line">
+            <label class="query-wrap" for="query">
+              <span>Search history</span>
+              <input id="query" type="search" placeholder='docs site:github.com -ads after:2026-01-01 "exact phrase"'>
+            </label>
+            <button id="search" type="button">Search</button>
+            <button id="clear-search" class="ghost" type="button">Clear</button>
           </div>
-          <button id="clear-search" class="ghost" type="button">Clear</button>
-        </div>
 
-        <label for="query">Query</label>
-        <div class="search-row">
-          <input id="query" type="search" placeholder='docs site:github.com -ads after:2026-01-01 "exact phrase"'>
-          <button id="search" type="button">Search</button>
-        </div>
+          <details class="advanced">
+            <summary>Filters and syntax</summary>
+            <div class="filters">
+              <label>
+                After
+                <input id="after" type="text" inputmode="numeric" placeholder="YYYY-MM-DD">
+              </label>
+              <label>
+                Before
+                <input id="before" type="text" inputmode="numeric" placeholder="YYYY-MM-DD">
+              </label>
+              <label>
+                Limit
+                <input id="limit" type="number" min="25" max="50000" step="100" value="500">
+              </label>
+            </div>
+            <p class="hint">Syntax: <code>site:</code>, <code>title:</code>, <code>url:</code>, <code>after:</code>, <code>before:</code>, <code>-exclude</code>, quoted phrases, and <code>regex:</code>.</p>
+          </details>
+        </section>
 
-        <div class="filters">
-          <label>
-            After
-            <input id="after" type="date">
-          </label>
-          <label>
-            Before
-            <input id="before" type="date">
-          </label>
-          <label>
-            Limit
-            <input id="limit" type="number" min="25" max="5000" step="25" value="500">
-          </label>
-        </div>
-
-        <p class="hint">Supported syntax: <code>site:</code>, <code>title:</code>, <code>url:</code>, <code>after:</code>, <code>before:</code>, <code>-exclude</code>, quoted phrases, and <code>regex:</code>.</p>
-      </section>
-
-      <section class="panel quick-panel" aria-label="Quick open">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Quick Open</p>
-            <h2>Search tabs, bookmarks, downloads, and closed tabs</h2>
+        <section class="bulkbar" aria-label="Bulk actions">
+          <div class="result-state">
+            <strong id="result-count">0 results</strong>
+            <span id="selected-count">0 selected</span>
           </div>
-          <button id="quick-search" type="button">Search Sources</button>
-        </div>
-        <p class="hint">Uses the same query text and date filters as the vault search. Results here are read-only and never affected by vault cleanup.</p>
-        <ol id="quick-results" class="quick-results"></ol>
-      </section>
-
-      <section class="panel rules-panel" aria-label="Domain rules">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Rules</p>
-            <h2>Control what gets archived</h2>
+          <div class="bulk-actions">
+            <button id="select-visible" class="ghost" type="button">Select Visible</button>
+            <button id="select-filtered" class="ghost" type="button">Select All Results</button>
+            <button id="clear-selection" class="ghost" type="button">Clear</button>
+            <button id="export-selected" type="button">Export Selected</button>
+            <button id="delete-vault" class="danger" type="button">Delete From Vault</button>
+            <button id="delete-chrome" class="danger" type="button">Delete URLs From Chrome</button>
+            <button id="undo-delete" class="ghost" type="button">Undo</button>
           </div>
-        </div>
+        </section>
 
-        <div class="rule-row">
-          <input id="rule-domain" type="text" placeholder="example.com">
-          <button id="add-blacklist" type="button">Blacklist</button>
-          <button id="add-whitelist" class="ghost" type="button">Whitelist</button>
-        </div>
-        <ul id="rules-list" class="rules-list"></ul>
+        <section class="summary" aria-live="polite">
+          <span id="status">Ready</span>
+        </section>
+
+        <ol id="results" class="results"></ol>
       </section>
 
-      <section class="bulkbar" aria-label="Bulk actions">
-        <div>
-          <strong id="result-count">0 results</strong>
-          <span id="selected-count">0 selected</span>
-        </div>
-        <div class="bulk-actions">
-          <button id="select-visible" class="ghost" type="button">Select Visible</button>
-          <button id="select-filtered" class="ghost" type="button">Select All Results</button>
-          <button id="clear-selection" class="ghost" type="button">Clear Selection</button>
-          <button id="export-selected" type="button">Export Selected</button>
-          <button id="delete-vault" class="danger" type="button">Delete From Vault</button>
-          <button id="delete-chrome" class="danger" type="button">Delete URLs From Chrome</button>
-          <button id="undo-delete" class="ghost" type="button">Undo Vault Delete</button>
-        </div>
+      <section id="tab-quick" class="tab-panel" data-panel="quick" hidden>
+        <section class="panel quick-panel" aria-label="Quick open">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Quick Open</p>
+              <h2>Search tabs, bookmarks, downloads, and closed tabs</h2>
+            </div>
+            <button id="quick-search" type="button">Search Sources</button>
+          </div>
+          <p class="hint">Uses the same query text and ISO date filters as the History tab. Results here are read-only and never affected by vault cleanup.</p>
+          <ol id="quick-results" class="quick-results"></ol>
+        </section>
       </section>
 
-      <section class="summary" aria-live="polite">
-        <span id="status">Ready</span>
+      <section id="tab-backup" class="tab-panel" data-panel="backup" hidden>
+        <section class="panel backup-panel" aria-label="Backup and import">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Backup</p>
+              <h2>Import, export, and sync</h2>
+            </div>
+            <button id="sync-chrome" type="button">Sync Chrome History</button>
+          </div>
+          <div class="backup-actions">
+            <button id="export-json" type="button">Export JSON</button>
+            <button id="export-csv" type="button">Export CSV</button>
+            <button id="export-html" type="button">Export HTML</button>
+            <label class="file-button" for="import-archive">Import Archive</label>
+            <input id="import-archive" class="visually-hidden" type="file" accept=".json,.csv,.tsv,application/json,text/csv,text/tab-separated-values">
+            <button id="reset-vault" class="danger" type="button">Reset Vault</button>
+          </div>
+        </section>
       </section>
 
-      <ol id="results" class="results"></ol>
+      <section id="tab-rules" class="tab-panel" data-panel="rules" hidden>
+        <section class="panel rules-panel" aria-label="Domain rules">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Rules</p>
+              <h2>Control what gets archived</h2>
+            </div>
+          </div>
+          <div class="rule-row">
+            <input id="rule-domain" type="text" placeholder="example.com">
+            <button id="add-blacklist" type="button">Blacklist</button>
+            <button id="add-whitelist" class="ghost" type="button">Whitelist</button>
+          </div>
+          <ul id="rules-list" class="rules-list"></ul>
+        </section>
+      </section>
+
+      <section id="tab-settings" class="tab-panel" data-panel="settings" hidden>
+        <section class="panel settings-panel" aria-label="Display settings">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Settings</p>
+              <h2>Display and search defaults</h2>
+            </div>
+            <button id="save-preferences" type="button">Save Settings</button>
+          </div>
+          <div class="settings-grid">
+            <label>
+              Theme
+              <select id="pref-theme">
+                <option value="system">System</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
+            </label>
+            <label>
+              Accent
+              <select id="pref-accent">
+                <option value="teal">Teal</option>
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="purple">Purple</option>
+                <option value="slate">Slate</option>
+              </select>
+            </label>
+            <label>
+              Date display
+              <select id="pref-date-format">
+                <option value="system">System locale</option>
+                <option value="iso">ISO 2026-06-16</option>
+                <option value="dmy">16/06/2026</option>
+                <option value="mdy">06/16/2026</option>
+                <option value="ymd">2026/06/16</option>
+              </select>
+            </label>
+            <label>
+              Default result limit
+              <input id="pref-limit" type="number" min="25" max="50000" step="100">
+            </label>
+          </div>
+        </section>
+      </section>
     </main>
 
     <template id="result-template">

@@ -14,7 +14,17 @@ import {
 } from "./storage.js";
 import { searchBrowserMemory } from "./browser-memory.js";
 
+const PREFERENCES_KEY = "browseVault.preferences";
+const DEFAULT_PREFERENCES = {
+  theme: "system",
+  accent: "teal",
+  dateFormat: "system",
+  defaultLimit: 500
+};
+
 const elements = {
+  tabs: [...document.querySelectorAll(".tab")],
+  panels: [...document.querySelectorAll(".tab-panel")],
   query: document.querySelector("#query"),
   after: document.querySelector("#after"),
   before: document.querySelector("#before"),
@@ -49,20 +59,37 @@ const elements = {
   ruleDomain: document.querySelector("#rule-domain"),
   addBlacklist: document.querySelector("#add-blacklist"),
   addWhitelist: document.querySelector("#add-whitelist"),
-  rulesList: document.querySelector("#rules-list")
+  rulesList: document.querySelector("#rules-list"),
+  prefTheme: document.querySelector("#pref-theme"),
+  prefAccent: document.querySelector("#pref-accent"),
+  prefDateFormat: document.querySelector("#pref-date-format"),
+  prefLimit: document.querySelector("#pref-limit"),
+  savePreferences: document.querySelector("#save-preferences")
 };
 
 let currentResults = [];
 let currentTotal = 0;
 let selectedIds = new Set();
 let lastCheckedIndex = null;
+let preferences = { ...DEFAULT_PREFERENCES };
 
 function formatDate(value) {
   if (!value) {
     return "Unknown time";
   }
 
-  return new Date(value).toLocaleString();
+  const date = new Date(value);
+  if (preferences.dateFormat === "iso") {
+    return `${date.toISOString().slice(0, 10)} ${date.toTimeString().slice(0, 5)}`;
+  }
+
+  const datePart = formatShortDate(value);
+  const timePart = new Intl.DateTimeFormat(undefined, {
+    hour: "2-digit",
+    minute: "2-digit"
+  }).format(date);
+
+  return `${datePart}, ${timePart}`;
 }
 
 function formatShortDate(value) {
@@ -70,11 +97,94 @@ function formatShortDate(value) {
     return "No visits yet";
   }
 
-  return new Date(value).toLocaleDateString();
+  const date = new Date(value);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  if (preferences.dateFormat === "iso") {
+    return `${year}-${month}-${day}`;
+  }
+
+  if (preferences.dateFormat === "dmy") {
+    return `${day}/${month}/${year}`;
+  }
+
+  if (preferences.dateFormat === "mdy") {
+    return `${month}/${day}/${year}`;
+  }
+
+  if (preferences.dateFormat === "ymd") {
+    return `${year}/${month}/${day}`;
+  }
+
+  return new Intl.DateTimeFormat(undefined).format(date);
 }
 
 function setStatus(message) {
   elements.status.textContent = message;
+}
+
+function clampLimit(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return DEFAULT_PREFERENCES.defaultLimit;
+  }
+
+  return Math.min(50000, Math.max(25, Math.round(parsed)));
+}
+
+async function loadPreferences() {
+  const result = await chrome.storage.local.get(PREFERENCES_KEY);
+  preferences = {
+    ...DEFAULT_PREFERENCES,
+    ...(result[PREFERENCES_KEY] || {})
+  };
+  preferences.defaultLimit = clampLimit(preferences.defaultLimit);
+  applyPreferences();
+}
+
+async function savePreferences() {
+  preferences = {
+    theme: elements.prefTheme.value,
+    accent: elements.prefAccent.value,
+    dateFormat: elements.prefDateFormat.value,
+    defaultLimit: clampLimit(elements.prefLimit.value)
+  };
+
+  await chrome.storage.local.set({
+    [PREFERENCES_KEY]: preferences
+  });
+  elements.limit.value = String(preferences.defaultLimit);
+  applyPreferences();
+  await refreshStats();
+  await runSearch();
+  setStatus("Settings saved");
+}
+
+function applyPreferences() {
+  const root = document.documentElement;
+  root.dataset.theme = preferences.theme === "system" ? "" : preferences.theme;
+  root.dataset.accent = preferences.accent;
+
+  elements.prefTheme.value = preferences.theme;
+  elements.prefAccent.value = preferences.accent;
+  elements.prefDateFormat.value = preferences.dateFormat;
+  elements.prefLimit.value = String(preferences.defaultLimit);
+
+  if (!elements.limit.value || Number(elements.limit.value) === DEFAULT_PREFERENCES.defaultLimit) {
+    elements.limit.value = String(preferences.defaultLimit);
+  }
+}
+
+function switchTab(tabName) {
+  for (const tab of elements.tabs) {
+    tab.classList.toggle("is-active", tab.dataset.tab === tabName);
+  }
+
+  for (const panel of elements.panels) {
+    panel.hidden = panel.dataset.panel !== tabName;
+  }
 }
 
 function getSearchText() {
@@ -728,6 +838,16 @@ async function resetVault() {
 }
 
 function bindEvents() {
+  for (const tab of elements.tabs) {
+    tab.addEventListener("click", () => switchTab(tab.dataset.tab));
+  }
+  elements.prefTheme.addEventListener("change", () => {
+    document.documentElement.dataset.theme = elements.prefTheme.value === "system" ? "" : elements.prefTheme.value;
+  });
+  elements.prefAccent.addEventListener("change", () => {
+    document.documentElement.dataset.accent = elements.prefAccent.value;
+  });
+  elements.savePreferences.addEventListener("click", () => savePreferences().catch((error) => setStatus(error.message)));
   elements.search.addEventListener("click", runSearch);
   elements.quickSearch.addEventListener("click", () => runQuickSearch().catch((error) => setStatus(error.message)));
   elements.clearSearch.addEventListener("click", () => {
@@ -772,6 +892,7 @@ function bindEvents() {
 }
 
 async function init() {
+  await loadPreferences();
   bindEvents();
   elements.query.focus();
   await refreshStats();

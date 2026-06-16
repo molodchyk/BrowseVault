@@ -11,6 +11,7 @@ Current extension behavior:
 - Imports JSON, CSV, TSV, and Google Takeout-style files only when the user chooses a local file.
 - Exports JSON, CSV, or HTML only when the user clicks an export button.
 - Adds a local SHA-256 checksum to JSON backups so later imports can warn about changed archive payloads.
+- Stores display preferences locally in Chrome extension storage.
 - Does not automatically read page contents.
 - Does not take screenshots.
 - Does not make remote network requests.
