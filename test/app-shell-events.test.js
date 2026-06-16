@@ -87,6 +87,7 @@ function createHandlers(calls) {
     "addWhitelistRule",
     "blacklistSelectedDomains",
     "cancelStagedImport",
+    "clearSearchFields",
     "clearSelection",
     "confirmStagedImport",
     "copySelectedUrls",
@@ -142,11 +143,20 @@ test("bindAppEvents wires tabs, theme previews, search clearing, and keyboard fo
   const elements = createElements();
   const document = fakeDocument();
   const root = { dataset: {} };
+  const handlers = createHandlers(calls);
+  handlers.clearSearchFields = () => {
+    calls.push(["clearSearchFields"]);
+    elements.query.value = "";
+    elements.onDate.value = "";
+    elements.after.value = "";
+    elements.before.value = "";
+  };
+
   bindAppEvents({
     elements,
     document,
     root,
-    handlers: createHandlers(calls)
+    handlers
   });
 
   elements.tabs[1].dispatch("click");
@@ -192,6 +202,7 @@ test("bindAppEvents wires tabs, theme previews, search clearing, and keyboard fo
   assert.equal(elements.before.value, "");
   assert.deepEqual(calls, [
     ["switchTab", "backup"],
+    ["clearSearchFields"],
     ["runSearchesNow"],
     ["runSearchesNow"],
     ["preventDefault", "ctrl-k"],

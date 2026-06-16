@@ -26,6 +26,7 @@ import {
 import { createHistoryBulkActions } from "./features/history-results/ui/bulk-actions.js";
 import { createHistoryResultsController } from "./features/history-results/ui/results-controller.js";
 import { createHistorySearchActions } from "./features/history-results/ui/search-actions.js";
+import { createHistorySearchForm } from "./features/history-results/ui/search-form.js";
 import { getLocalStorage, setLocalStorage } from "./platform/chrome/storage.js";
 import { createVaultManagementActions } from "./features/vault-management/ui/actions.js";
 
@@ -131,27 +132,6 @@ function scheduleSearches() {
   }, SEARCH_DEBOUNCE_MS);
 }
 
-function getSearchText() {
-  const parts = [elements.query.value.trim()];
-  const onDate = elements.onDate.value.trim();
-  const after = elements.after.value.trim();
-  const before = elements.before.value.trim();
-
-  if (onDate) {
-    parts.push(`date:${onDate}`);
-  }
-
-  if (after) {
-    parts.push(`after:${after}`);
-  }
-
-  if (before) {
-    parts.push(`before:${before}`);
-  }
-
-  return parts.filter(Boolean).join(" ");
-}
-
 async function copyText(text) {
   if (!text) {
     throw new Error("Nothing to copy.");
@@ -192,18 +172,22 @@ async function selectedResults() {
   return getVisitsByIds([...appState.selectedIds]);
 }
 
+const historySearchForm = createHistorySearchForm({
+  elements
+});
+
 const historyResults = createHistoryResultsController({
   appState,
   elements,
   getDateFormat: () => appState.preferences.dateFormat,
-  getSearchText,
+  getSearchText: historySearchForm.getSearchText,
   maxResultLimit: MAX_RESULT_LIMIT,
   requestedResultLimit
 });
 
 const historySearchActions = createHistorySearchActions({
   appState,
-  getSearchText,
+  getSearchText: historySearchForm.getSearchText,
   maxResultLimit: MAX_RESULT_LIMIT,
   renderResults: historyResults.renderResults,
   requestedResultLimit,
@@ -237,7 +221,7 @@ const quickOpenActions = createQuickOpenActions({
   copyText,
   elements,
   getDateFormat: () => appState.preferences.dateFormat,
-  getSearchText,
+  getSearchText: historySearchForm.getSearchText,
   quickResultLimit,
   setStatus
 });
@@ -245,7 +229,7 @@ const quickOpenActions = createQuickOpenActions({
 const bulkActions = createHistoryBulkActions({
   appState,
   copyText,
-  getSearchText,
+  getSearchText: historySearchForm.getSearchText,
   renderResults: historyResults.renderResults,
   searchVisits,
   selectedResults,
@@ -279,6 +263,7 @@ function bindEvents() {
       addWhitelistRule: () => vaultActions.addRule("whitelist"),
       blacklistSelectedDomains: vaultActions.blacklistSelectedDomains,
       cancelStagedImport: backupActions.cancelStagedImport,
+      clearSearchFields: historySearchForm.clearSearchFields,
       clearSelection: bulkActions.clearVisibleSelection,
       confirmStagedImport: backupActions.confirmStagedImport,
       copySelectedUrls: bulkActions.copySelectedUrls,

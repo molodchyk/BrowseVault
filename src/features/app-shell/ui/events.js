@@ -41,10 +41,7 @@ export function bindAppEvents({ elements, document, root, handlers }) {
   bindAsync(elements.quickSearch, "click", handlers.runQuickSearch, setStatus);
 
   elements.clearSearch.addEventListener("click", () => {
-    elements.query.value = "";
-    elements.onDate.value = "";
-    elements.after.value = "";
-    elements.before.value = "";
+    handlers.clearSearchFields();
     runHandler(handlers.runSearchesNow, setStatus);
   });
 
