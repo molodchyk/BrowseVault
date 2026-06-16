@@ -15,6 +15,7 @@ import {
 } from "./storage.js";
 import { searchBrowserMemory } from "./browser-memory.js";
 import { visitsToCsv, visitsToHtml } from "./export-format.js";
+import { bindAppEvents } from "./features/app-shell/ui/events.js";
 import { archiveFromFileText } from "./features/backup-import/core/archive-parser.js";
 import { renderImportPreview as renderImportPreviewUi } from "./features/backup-import/ui/render-import-preview.js";
 import { BACKGROUND_MESSAGE_TYPES } from "./features/background-runtime/core/messages.js";
@@ -210,10 +211,6 @@ function focusSearchInput() {
   switchTab("history");
   elements.query.focus();
   elements.query.select();
-}
-
-function isEditableTarget(target) {
-  return ["INPUT", "SELECT", "TEXTAREA"].includes(target?.tagName || "");
 }
 
 function clearSearchDebounce() {
@@ -978,6 +975,16 @@ function invertVisibleSelection() {
   setStatus(`Inverted ${currentResults.length} visible results`);
 }
 
+function selectVisibleResults() {
+  selectedIds = selectedIdsForResults(currentResults);
+  renderResults(currentResults, currentTotal);
+}
+
+function clearVisibleSelection() {
+  selectedIds.clear();
+  renderResults(currentResults, currentTotal);
+}
+
 async function resetVault() {
   if (!confirm("Erase all BrowseVault local archive data, rules, and backup metadata? This will not delete Chrome history.")) {
     return;
@@ -995,82 +1002,44 @@ async function resetVault() {
 }
 
 function bindEvents() {
-  for (const tab of elements.tabs) {
-    tab.addEventListener("click", () => switchTab(tab.dataset.tab));
-  }
-  elements.prefTheme.addEventListener("change", () => {
-    document.documentElement.dataset.theme = elements.prefTheme.value === "system" ? "" : elements.prefTheme.value;
-  });
-  elements.prefAccent.addEventListener("change", () => {
-    document.documentElement.dataset.accent = elements.prefAccent.value;
-  });
-  elements.savePreferences.addEventListener("click", () => savePreferences().catch((error) => setStatus(error.message)));
-  elements.search.addEventListener("click", () => runSearchesNow().catch((error) => setStatus(error.message)));
-  elements.quickSearch.addEventListener("click", () => runQuickSearch().catch((error) => setStatus(error.message)));
-  elements.clearSearch.addEventListener("click", () => {
-    elements.query.value = "";
-    elements.onDate.value = "";
-    elements.after.value = "";
-    elements.before.value = "";
-    runSearchesNow().catch((error) => setStatus(error.message));
-  });
-  for (const input of [elements.query, elements.onDate, elements.after, elements.before, elements.limit]) {
-    input.addEventListener("input", scheduleSearches);
-  }
-  elements.query.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      runSearchesNow().catch((error) => setStatus(error.message));
+  bindAppEvents({
+    elements,
+    document,
+    root: document.documentElement,
+    handlers: {
+      addBlacklistRule: () => addRule("blacklist"),
+      addWhitelistRule: () => addRule("whitelist"),
+      blacklistSelectedDomains,
+      cancelStagedImport,
+      clearSelection: clearVisibleSelection,
+      confirmStagedImport,
+      copySelectedUrls,
+      deleteFromChrome,
+      deleteFromVault,
+      exportAll,
+      exportCsv,
+      exportHtml,
+      exportSelected,
+      exportSelectedCsv,
+      exportSelectedHtml,
+      focusSearchInput,
+      importFromFile,
+      invertVisibleSelection,
+      loadMoreResults,
+      openSelected,
+      resetVault,
+      runQuickSearch,
+      runSearchesNow,
+      savePreferences,
+      scheduleSearches,
+      selectAllFiltered,
+      selectVisible: selectVisibleResults,
+      setStatus,
+      switchTab,
+      syncChromeHistory,
+      undoVaultDelete
     }
   });
-  document.addEventListener("keydown", (event) => {
-    const key = event.key.toLowerCase();
-    if ((event.ctrlKey || event.metaKey) && key === "k") {
-      event.preventDefault();
-      focusSearchInput();
-      return;
-    }
-
-    if (event.key === "/" && !event.altKey && !event.ctrlKey && !event.metaKey && !isEditableTarget(event.target)) {
-      event.preventDefault();
-      focusSearchInput();
-    }
-  });
-  elements.syncChrome.addEventListener("click", () => syncChromeHistory().catch((error) => setStatus(error.message)));
-  elements.exportJson.addEventListener("click", () => exportAll().catch((error) => setStatus(error.message)));
-  elements.exportCsv.addEventListener("click", () => exportCsv().catch((error) => setStatus(error.message)));
-  elements.exportHtml.addEventListener("click", () => exportHtml().catch((error) => setStatus(error.message)));
-  elements.openSelected.addEventListener("click", () => openSelected().catch((error) => setStatus(error.message)));
-  elements.copySelected.addEventListener("click", () => copySelectedUrls().catch((error) => setStatus(error.message)));
-  elements.exportSelected.addEventListener("click", () => exportSelected().catch((error) => setStatus(error.message)));
-  elements.exportSelectedCsv.addEventListener("click", () => exportSelectedCsv().catch((error) => setStatus(error.message)));
-  elements.exportSelectedHtml.addEventListener("click", () => exportSelectedHtml().catch((error) => setStatus(error.message)));
-  elements.blacklistSelected.addEventListener("click", () => blacklistSelectedDomains().catch((error) => setStatus(error.message)));
-  elements.deleteVault.addEventListener("click", () => deleteFromVault().catch((error) => setStatus(error.message)));
-  elements.deleteChrome.addEventListener("click", () => deleteFromChrome().catch((error) => setStatus(error.message)));
-  elements.undoDelete.addEventListener("click", () => undoVaultDelete().catch((error) => setStatus(error.message)));
-  elements.selectVisible.addEventListener("click", () => {
-    selectedIds = selectedIdsForResults(currentResults);
-    renderResults(currentResults, currentTotal);
-  });
-  elements.invertVisible.addEventListener("click", invertVisibleSelection);
-  elements.selectFiltered.addEventListener("click", () => selectAllFiltered().catch((error) => setStatus(error.message)));
-  elements.loadMore.addEventListener("click", () => loadMoreResults().catch((error) => setStatus(error.message)));
-  elements.clearSelection.addEventListener("click", () => {
-    selectedIds.clear();
-    renderResults(currentResults, currentTotal);
-  });
-  elements.importArchive.addEventListener("change", (event) => {
-    const [file] = event.target.files || [];
-    if (file) {
-      importFromFile(file).catch((error) => setStatus(error.message));
-    }
-    event.target.value = "";
-  });
-  elements.confirmImport.addEventListener("click", () => confirmStagedImport().catch((error) => setStatus(error.message)));
-  elements.cancelImport.addEventListener("click", cancelStagedImport);
-  elements.addBlacklist.addEventListener("click", () => addRule("blacklist").catch((error) => setStatus(error.message)));
-  elements.addWhitelist.addEventListener("click", () => addRule("whitelist").catch((error) => setStatus(error.message)));
-  elements.resetVault.addEventListener("click", () => resetVault().catch((error) => setStatus(error.message)));
 }
 
 async function init() {
