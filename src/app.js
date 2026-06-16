@@ -20,6 +20,7 @@ import { createHistoryBulkActions } from "./features/history-results/ui/bulk-act
 import { createHistoryResultsController } from "./features/history-results/ui/results-controller.js";
 import { createHistorySearchActions } from "./features/history-results/ui/search-actions.js";
 import { createHistorySearchForm } from "./features/history-results/ui/search-form.js";
+import { copyText } from "./platform/clipboard.js";
 import { createVaultManagementActions } from "./features/vault-management/ui/actions.js";
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -29,42 +30,6 @@ const appState = createAppShellState(DEFAULT_PREFERENCES);
 
 function setStatus(message) {
   elements.status.textContent = message;
-}
-
-async function copyText(text) {
-  if (!text) {
-    throw new Error("Nothing to copy.");
-  }
-
-  if (navigator.clipboard?.writeText) {
-    try {
-      await navigator.clipboard.writeText(text);
-      return;
-    } catch {
-      // Fall through to the local selection-based copy path.
-    }
-  }
-
-  const selection = document.getSelection();
-  const selectedRange = selection?.rangeCount ? selection.getRangeAt(0) : null;
-  const textArea = document.createElement("textarea");
-  textArea.value = text;
-  textArea.setAttribute("readonly", "");
-  textArea.style.position = "fixed";
-  textArea.style.top = "-1000px";
-  document.body.append(textArea);
-  textArea.select();
-  const copied = document.execCommand("copy");
-  textArea.remove();
-
-  if (selectedRange) {
-    selection.removeAllRanges();
-    selection.addRange(selectedRange);
-  }
-
-  if (!copied) {
-    throw new Error("Copy failed.");
-  }
 }
 
 async function selectedResults() {
