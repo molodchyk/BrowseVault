@@ -14,7 +14,7 @@ import {
   setMeta
 } from "./storage.js";
 import { searchBrowserMemory } from "./browser-memory.js";
-import { visitsToCsv } from "./export-format.js";
+import { visitsToCsv, visitsToHtml } from "./export-format.js";
 import { parseQuery } from "./query.js";
 
 const PREFERENCES_KEY = "browseVault.preferences";
@@ -61,6 +61,8 @@ const elements = {
   openSelected: document.querySelector("#open-selected"),
   copySelected: document.querySelector("#copy-selected"),
   exportSelected: document.querySelector("#export-selected"),
+  exportSelectedCsv: document.querySelector("#export-selected-csv"),
+  exportSelectedHtml: document.querySelector("#export-selected-html"),
   blacklistSelected: document.querySelector("#blacklist-selected"),
   deleteVault: document.querySelector("#delete-vault"),
   deleteChrome: document.querySelector("#delete-chrome"),
@@ -487,47 +489,6 @@ function domainForItem(item) {
 
 function uniqueDomainsForItems(items) {
   return [...new Set(items.map(domainForItem).filter(Boolean))];
-}
-
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
-}
-
-function visitsToHtml(visits, exportedAt) {
-  const rows = visits
-    .map(
-      (visit) => `<tr><td>${escapeHtml(new Date(visit.visitTime).toLocaleString())}</td><td>${escapeHtml(visit.domain)}</td><td><a href="${escapeHtml(visit.url)}">${escapeHtml(visit.title || visit.url)}</a></td><td>${escapeHtml(visit.source)}</td></tr>`
-    )
-    .join("\n");
-
-  return `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>BrowseVault Export</title>
-  <style>
-    body { font-family: system-ui, sans-serif; margin: 24px; }
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
-    th { background: #f6f8fa; }
-    a { color: #0969da; }
-  </style>
-</head>
-<body>
-  <h1>BrowseVault Export</h1>
-  <p>Exported ${escapeHtml(exportedAt)} with ${visits.length} records.</p>
-  <table>
-    <thead><tr><th>Visited</th><th>Domain</th><th>Page</th><th>Source</th></tr></thead>
-    <tbody>
-${rows}
-    </tbody>
-  </table>
-</body>
-</html>`;
 }
 
 function parseDelimitedRows(text, delimiter) {
@@ -1177,7 +1138,39 @@ async function exportSelected() {
 
   const archive = await attachIntegrity(await exportArchive(items));
   downloadJson(`browsevault-selected-${archive.exportedAt.slice(0, 10)}.json`, archive);
-  setStatus(`Exported ${items.length} selected records`);
+  setStatus(`Exported ${items.length} selected records as JSON`);
+}
+
+async function exportSelectedCsv() {
+  const items = await selectedResults();
+  if (!items.length) {
+    setStatus("Select records first");
+    return;
+  }
+
+  const exportedAt = new Date().toISOString();
+  downloadText(
+    `browsevault-selected-${exportedAt.slice(0, 10)}.csv`,
+    "text/csv",
+    visitsToCsv(items)
+  );
+  setStatus(`Exported ${items.length} selected records as CSV`);
+}
+
+async function exportSelectedHtml() {
+  const items = await selectedResults();
+  if (!items.length) {
+    setStatus("Select records first");
+    return;
+  }
+
+  const exportedAt = new Date().toISOString();
+  downloadText(
+    `browsevault-selected-${exportedAt.slice(0, 10)}.html`,
+    "text/html",
+    visitsToHtml(items, exportedAt)
+  );
+  setStatus(`Exported ${items.length} selected records as HTML`);
 }
 
 async function importFromFile(file) {
@@ -1465,6 +1458,8 @@ function bindEvents() {
   elements.openSelected.addEventListener("click", () => openSelected().catch((error) => setStatus(error.message)));
   elements.copySelected.addEventListener("click", () => copySelectedUrls().catch((error) => setStatus(error.message)));
   elements.exportSelected.addEventListener("click", () => exportSelected().catch((error) => setStatus(error.message)));
+  elements.exportSelectedCsv.addEventListener("click", () => exportSelectedCsv().catch((error) => setStatus(error.message)));
+  elements.exportSelectedHtml.addEventListener("click", () => exportSelectedHtml().catch((error) => setStatus(error.message)));
   elements.blacklistSelected.addEventListener("click", () => blacklistSelectedDomains().catch((error) => setStatus(error.message)));
   elements.deleteVault.addEventListener("click", () => deleteFromVault().catch((error) => setStatus(error.message)));
   elements.deleteChrome.addEventListener("click", () => deleteFromChrome().catch((error) => setStatus(error.message)));

@@ -39,7 +39,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - SHA-256 integrity metadata for JSON backups;
 - staged import preview with valid row, duplicate row, existing visit, new visit, rule, and restore-check health status;
 - JSON, CSV, TSV, and Google Takeout-style import handling;
-- selected-record export;
+- selected-record JSON, CSV, and HTML export;
 - selected-record URL copy;
 - selected-record batch opening with a tab-flood safety cap;
 - bulk deletion from the BrowseVault vault;
@@ -64,6 +64,8 @@ This repository contains a working Manifest V3 extension implementation. It incl
 ```text
 .
 ├── docs/
+│   ├── code-structure.md
+│   └── extension-modularization-playbook.md
 ├── assets/
 │   └── icons/
 ├── scripts/
@@ -75,6 +77,11 @@ This repository contains a working Manifest V3 extension implementation. It incl
 │   ├── app.html
 │   ├── app.js
 │   ├── background.js
+│   ├── browser-memory.js
+│   ├── export-format.js
+│   ├── features/
+│   │   └── history-export/
+│   ├── query.js
 │   └── storage.js
 ├── store/
 │   └── listing.md

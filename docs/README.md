@@ -8,6 +8,8 @@ This folder captures the critical market research, user feedback, product direct
 - `user-feedback-taxonomy.md` - grouped complaints, user needs, and positive demand signals.
 - `product-blueprint.md` - proposed better product, MVP scope, differentiators, prioritization, and positioning.
 - `implementation-notes.md` - Chrome extension constraints, architecture, storage/search/backup design, and testing risks.
+- `extension-modularization-playbook.md` - reusable extension modularization rules copied from Defense against Distractions.
+- `code-structure.md` - BrowseVault-specific ownership map and next split candidates.
 - `source-inventory.md` - index of raw source snapshots and how they map to the research notes.
 - `raw-sources/` - preserved Chrome Web Store listing/review text snapshots used as evidence.
 
