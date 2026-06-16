@@ -14,7 +14,7 @@ import { collectAppElements } from "./features/app-shell/ui/elements.js";
 import { bindAppEvents } from "./features/app-shell/ui/events.js";
 import { createBackupActions } from "./features/backup-import/ui/actions.js";
 import { createQuickOpenActions } from "./features/browser-memory/ui/quick-open-actions.js";
-import { BACKGROUND_MESSAGE_TYPES } from "./features/background-runtime/core/messages.js";
+import { createChromeHistorySyncAction } from "./features/background-runtime/ui/chrome-history-sync-action.js";
 import {
   DEFAULT_PREFERENCES,
   MAX_RESULT_LIMIT,
@@ -32,7 +32,6 @@ import {
 } from "./features/history-results/core/results.js";
 import { createHistoryBulkActions } from "./features/history-results/ui/bulk-actions.js";
 import { renderHistoryResults } from "./features/history-results/ui/render-results.js";
-import { sendRuntimeMessage } from "./platform/chrome/runtime.js";
 import { getLocalStorage, setLocalStorage } from "./platform/chrome/storage.js";
 import { createVaultManagementActions } from "./features/vault-management/ui/actions.js";
 
@@ -263,6 +262,12 @@ const bulkActions = createHistoryBulkActions({
   setStatus
 });
 
+const syncChromeHistory = createChromeHistorySyncAction({
+  refreshStats,
+  runSearch,
+  setStatus
+});
+
 function applyResultSelection({ selectedIds: nextSelectedIds, lastCheckedIndex: nextLastCheckedIndex, shouldRerender }) {
   appState.selectedIds = nextSelectedIds;
   appState.lastCheckedIndex = nextLastCheckedIndex;
@@ -360,21 +365,6 @@ async function loadMoreResults() {
 
   renderResults(results, total);
   setStatus(`Showing ${results.length} of ${total} results`);
-}
-
-async function syncChromeHistory() {
-  setStatus("Syncing Chrome history");
-  const response = await sendRuntimeMessage({
-    type: BACKGROUND_MESSAGE_TYPES.BOOTSTRAP_CHROME_HISTORY
-  });
-
-  if (!response?.ok) {
-    throw new Error(response?.error || "Chrome history sync failed.");
-  }
-
-  await refreshStats();
-  await runSearch();
-  setStatus(`Synced ${response.result.stored} records`);
 }
 
 function bindEvents() {
