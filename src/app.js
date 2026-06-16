@@ -15,18 +15,23 @@ import {
 } from "./storage.js";
 import { searchBrowserMemory } from "./browser-memory.js";
 import { visitsToCsv, visitsToHtml } from "./export-format.js";
+import {
+  DEFAULT_PREFERENCES,
+  MAX_RESULT_LIMIT,
+  PREFERENCES_KEY,
+  backupStatusDetails,
+  clampResultLimit,
+  formatCount,
+  formatDate,
+  formatDayHeading,
+  formatShortDate,
+  localDayKey,
+  normalizePreferences,
+  themeDatasetValue
+} from "./features/display-preferences/core/preferences.js";
 import { parseQuery } from "./query.js";
 
-const PREFERENCES_KEY = "browseVault.preferences";
-const DEFAULT_PREFERENCES = {
-  theme: "system",
-  accent: "teal",
-  dateFormat: "system",
-  defaultLimit: 500
-};
-const MAX_RESULT_LIMIT = 50000;
 const OPEN_SELECTED_LIMIT = 25;
-const BACKUP_STALE_DAYS = 30;
 const MAX_HIGHLIGHT_TOKENS = 12;
 const MAX_HIGHLIGHT_RANGES = 80;
 const SEARCH_DEBOUNCE_MS = 300;
@@ -111,131 +116,26 @@ let searchDebounceTimer = null;
 let historySearchRequestId = 0;
 let quickSearchRequestId = 0;
 
-function formatDate(value) {
-  if (!value) {
-    return "Unknown time";
-  }
-
-  const date = new Date(value);
-  if (preferences.dateFormat === "iso") {
-    return `${date.toISOString().slice(0, 10)} ${date.toTimeString().slice(0, 5)}`;
-  }
-
-  const datePart = formatShortDate(value);
-  const timePart = new Intl.DateTimeFormat(undefined, {
-    hour: "2-digit",
-    minute: "2-digit"
-  }).format(date);
-
-  return `${datePart}, ${timePart}`;
-}
-
-function formatShortDate(value) {
-  if (!value) {
-    return "No visits yet";
-  }
-
-  const date = new Date(value);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  if (preferences.dateFormat === "iso") {
-    return `${year}-${month}-${day}`;
-  }
-
-  if (preferences.dateFormat === "dmy") {
-    return `${day}/${month}/${year}`;
-  }
-
-  if (preferences.dateFormat === "mdy") {
-    return `${month}/${day}/${year}`;
-  }
-
-  if (preferences.dateFormat === "ymd") {
-    return `${year}/${month}/${day}`;
-  }
-
-  return new Intl.DateTimeFormat(undefined).format(date);
-}
-
-function localDayKey(value) {
-  const date = new Date(value);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function formatDayHeading(value) {
-  const weekday = new Intl.DateTimeFormat(undefined, { weekday: "long" }).format(new Date(value));
-  return `${weekday} · ${formatShortDate(value)}`;
-}
-
-function formatCount(value) {
-  const count = Number(value);
-  return Number.isFinite(count) ? count.toLocaleString() : "0";
-}
-
-function formatChecksum(value) {
-  if (!value) {
-    return "Not available";
-  }
-
-  return value.length > 24 ? `${value.slice(0, 12)}...${value.slice(-8)}` : value;
-}
-
-function backupTimestamp(backup) {
-  if (!backup?.exportedAt) {
-    return 0;
-  }
-
-  const timestamp = Date.parse(backup.exportedAt);
-  return Number.isFinite(timestamp) ? timestamp : 0;
-}
-
 function renderBackupStatus(backup) {
-  const timestamp = backupTimestamp(backup);
+  const status = backupStatusDetails(backup, {
+    dateFormat: preferences.dateFormat
+  });
 
-  if (!timestamp) {
-    elements.backupHealth.textContent = "No backup yet";
-    elements.backupHealth.classList.add("is-warning");
-    elements.backupHealth.classList.remove("is-ok");
-    elements.backupLast.textContent = "Never";
-    elements.backupFormat.textContent = "-";
-    elements.backupRecords.textContent = "0";
-    elements.backupChecksum.textContent = "Not available";
-    return;
-  }
-
-  const ageDays = Math.floor((Date.now() - timestamp) / 86400000);
-  const isStale = ageDays > BACKUP_STALE_DAYS;
-  elements.backupHealth.textContent = isStale
-    ? `Backup older than ${BACKUP_STALE_DAYS} days`
-    : "Backup current";
-  elements.backupHealth.classList.toggle("is-warning", isStale);
-  elements.backupHealth.classList.toggle("is-ok", !isStale);
-  elements.backupLast.textContent = formatDate(timestamp);
-  elements.backupFormat.textContent = String(backup.format || "unknown").toUpperCase();
-  elements.backupRecords.textContent = formatCount(backup.records);
-  elements.backupChecksum.textContent = formatChecksum(backup.sha256);
+  elements.backupHealth.textContent = status.healthText;
+  elements.backupHealth.classList.toggle("is-warning", status.isWarning);
+  elements.backupHealth.classList.toggle("is-ok", status.isOk);
+  elements.backupLast.textContent = status.lastText;
+  elements.backupFormat.textContent = status.formatText;
+  elements.backupRecords.textContent = status.recordsText;
+  elements.backupChecksum.textContent = status.checksumText;
 }
 
 function setStatus(message) {
   elements.status.textContent = message;
 }
 
-function clampLimit(value) {
-  const parsed = Number(value);
-  if (!Number.isFinite(parsed)) {
-    return DEFAULT_PREFERENCES.defaultLimit;
-  }
-
-  return Math.min(MAX_RESULT_LIMIT, Math.max(25, Math.round(parsed)));
-}
-
 function requestedResultLimit() {
-  return clampLimit(elements.limit.value || preferences.defaultLimit);
+  return clampResultLimit(elements.limit.value || preferences.defaultLimit);
 }
 
 function quickResultLimit() {
@@ -244,21 +144,17 @@ function quickResultLimit() {
 
 async function loadPreferences() {
   const result = await chrome.storage.local.get(PREFERENCES_KEY);
-  preferences = {
-    ...DEFAULT_PREFERENCES,
-    ...(result[PREFERENCES_KEY] || {})
-  };
-  preferences.defaultLimit = clampLimit(preferences.defaultLimit);
+  preferences = normalizePreferences(result[PREFERENCES_KEY]);
   applyPreferences();
 }
 
 async function savePreferences() {
-  preferences = {
+  preferences = normalizePreferences({
     theme: elements.prefTheme.value,
     accent: elements.prefAccent.value,
     dateFormat: elements.prefDateFormat.value,
-    defaultLimit: clampLimit(elements.prefLimit.value)
-  };
+    defaultLimit: elements.prefLimit.value
+  });
 
   await chrome.storage.local.set({
     [PREFERENCES_KEY]: preferences
@@ -272,7 +168,7 @@ async function savePreferences() {
 
 function applyPreferences() {
   const root = document.documentElement;
-  root.dataset.theme = preferences.theme === "system" ? "" : preferences.theme;
+  root.dataset.theme = themeDatasetValue(preferences.theme);
   root.dataset.accent = preferences.accent;
 
   elements.prefTheme.value = preferences.theme;
@@ -717,10 +613,10 @@ function renderResults(results, total) {
     if (itemDayKey !== currentDayKey) {
       const day = document.createElement("li");
       day.className = "result-day";
-      day.setAttribute("aria-label", `Results for ${formatDayHeading(item.visitTime)}`);
+      day.setAttribute("aria-label", `Results for ${formatDayHeading(item.visitTime, preferences.dateFormat)}`);
 
       const label = document.createElement("span");
-      label.textContent = formatDayHeading(item.visitTime);
+      label.textContent = formatDayHeading(item.visitTime, preferences.dateFormat);
 
       const count = document.createElement("span");
       const dayCount = dayCounts.get(itemDayKey) || 0;
@@ -773,7 +669,7 @@ function renderResults(results, total) {
     appendHighlightedText(url, item.url, urlTokens, query.regex);
     appendHighlightedText(
       meta,
-      `${item.domain || "unknown domain"} · ${formatDate(item.visitTime)} · ${item.visitCount || 0} visits · ${item.source}`,
+      `${item.domain || "unknown domain"} · ${formatDate(item.visitTime, preferences.dateFormat)} · ${item.visitCount || 0} visits · ${item.source}`,
       metaTokens,
       query.regex
     );
@@ -815,7 +711,7 @@ function renderQuickResults(results, total, warnings = []) {
     title.href = item.url;
     appendHighlightedText(title, item.title || item.url, titleTokens, query.regex);
     appendHighlightedText(url, item.url, urlTokens, query.regex);
-    appendHighlightedText(meta, `${item.detail} · ${item.domain || "unknown domain"} · ${formatDate(item.visitTime)}`, metaTokens, query.regex);
+    appendHighlightedText(meta, `${item.detail} · ${item.domain || "unknown domain"} · ${formatDate(item.visitTime, preferences.dateFormat)}`, metaTokens, query.regex);
     action.textContent = item.action?.type === "activate-tab"
       ? "Switch"
       : item.action?.type === "restore-session"
@@ -973,9 +869,9 @@ async function refreshStats() {
   const stats = await getStats();
   elements.statVisits.textContent = String(stats.visits);
   elements.statDomains.textContent = String(stats.domains);
-  elements.statNewest.textContent = formatShortDate(stats.newestVisitTime);
+  elements.statNewest.textContent = formatShortDate(stats.newestVisitTime, preferences.dateFormat);
   elements.statBackup.textContent = stats.meta.lastBackup?.exportedAt
-    ? formatShortDate(Date.parse(stats.meta.lastBackup.exportedAt))
+    ? formatShortDate(Date.parse(stats.meta.lastBackup.exportedAt), preferences.dateFormat)
     : "Never";
   renderBackupStatus(stats.meta.lastBackup);
 }
