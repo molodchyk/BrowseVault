@@ -3,13 +3,10 @@ import {
   getStats,
   searchVisits
 } from "./storage.js";
-import {
-  clearSearchDebounce as clearAppSearchDebounce,
-  createAppShellState,
-  scheduleSearchDebounce as scheduleAppSearchDebounce
-} from "./features/app-shell/core/state.js";
+import { createAppShellState } from "./features/app-shell/core/state.js";
 import { collectAppElements } from "./features/app-shell/ui/elements.js";
 import { bindAppEvents } from "./features/app-shell/ui/events.js";
+import { createSearchCoordinator } from "./features/app-shell/ui/search-coordinator.js";
 import { createBackupActions } from "./features/backup-import/ui/actions.js";
 import { createQuickOpenActions } from "./features/browser-memory/ui/quick-open-actions.js";
 import { createChromeHistorySyncAction } from "./features/background-runtime/ui/chrome-history-sync-action.js";
@@ -81,7 +78,7 @@ async function savePreferences() {
   elements.limit.value = String(appState.preferences.defaultLimit);
   applyPreferences();
   await refreshStats();
-  await runSearchesNow();
+  await searchCoordinator.runSearchesNow();
   setStatus("Settings saved");
 }
 
@@ -114,22 +111,6 @@ function focusSearchInput() {
   switchTab("history");
   elements.query.focus();
   elements.query.select();
-}
-
-function clearSearchDebounce() {
-  clearAppSearchDebounce(appState);
-}
-
-async function runSearchesNow() {
-  clearSearchDebounce();
-  await historySearchActions.runSearch();
-  await quickOpenActions.runQuickSearch();
-}
-
-function scheduleSearches() {
-  scheduleAppSearchDebounce(appState, () => {
-    runSearchesNow().catch((error) => setStatus(error.message));
-  }, SEARCH_DEBOUNCE_MS);
 }
 
 async function copyText(text) {
@@ -226,6 +207,14 @@ const quickOpenActions = createQuickOpenActions({
   setStatus
 });
 
+const searchCoordinator = createSearchCoordinator({
+  appState,
+  delayMs: SEARCH_DEBOUNCE_MS,
+  runHistorySearch: historySearchActions.runSearch,
+  runQuickSearch: quickOpenActions.runQuickSearch,
+  setStatus
+});
+
 const bulkActions = createHistoryBulkActions({
   appState,
   copyText,
@@ -282,9 +271,9 @@ function bindEvents() {
       openSelected: bulkActions.openSelected,
       resetVault: vaultActions.resetVault,
       runQuickSearch: quickOpenActions.runQuickSearch,
-      runSearchesNow,
+      runSearchesNow: searchCoordinator.runSearchesNow,
       savePreferences,
-      scheduleSearches,
+      scheduleSearches: searchCoordinator.scheduleSearches,
       selectAllFiltered: bulkActions.selectAllFiltered,
       selectVisible: bulkActions.selectVisibleResults,
       setStatus,
