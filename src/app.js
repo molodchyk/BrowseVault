@@ -61,6 +61,7 @@ const elements = {
   openSelected: document.querySelector("#open-selected"),
   copySelected: document.querySelector("#copy-selected"),
   exportSelected: document.querySelector("#export-selected"),
+  blacklistSelected: document.querySelector("#blacklist-selected"),
   deleteVault: document.querySelector("#delete-vault"),
   deleteChrome: document.querySelector("#delete-chrome"),
   undoDelete: document.querySelector("#undo-delete"),
@@ -470,6 +471,22 @@ async function copyText(text) {
 
 function uniqueUrlsForItems(items) {
   return [...new Set(items.map((item) => item.url).filter(Boolean))];
+}
+
+function domainForItem(item) {
+  if (item.domain) {
+    return item.domain.toLowerCase().replace(/^www\./, "");
+  }
+
+  try {
+    return new URL(item.url).hostname.toLowerCase().replace(/^www\./, "");
+  } catch {
+    return "";
+  }
+}
+
+function uniqueDomainsForItems(items) {
+  return [...new Set(items.map(domainForItem).filter(Boolean))];
 }
 
 function escapeHtml(value) {
@@ -940,6 +957,36 @@ async function copySelectedUrls() {
 
   await copyText(urls.join("\n"));
   setStatus(`Copied ${urls.length} selected URL${urls.length === 1 ? "" : "s"}`);
+}
+
+async function blacklistSelectedDomains() {
+  const items = await selectedResults();
+  if (!items.length) {
+    setStatus("Select records first");
+    return;
+  }
+
+  const domains = uniqueDomainsForItems(items);
+  if (!domains.length) {
+    setStatus("Selected records have no domains to blacklist");
+    return;
+  }
+
+  const message = `Blacklist ${domains.length} selected domain${domains.length === 1 ? "" : "s"} for future archiving? Existing vault records will stay until you delete them.`;
+  if (!confirm(message)) {
+    setStatus("Blacklist canceled");
+    return;
+  }
+
+  const existingRules = await getRules();
+  const movedFromWhitelist = domains.filter((domain) => existingRules.whitelist.includes(domain)).length;
+  await Promise.all(domains.map((domain) => addDomainRule("blacklist", domain)));
+  await renderRules();
+
+  const movedLabel = movedFromWhitelist
+    ? ` ${movedFromWhitelist} moved from whitelist.`
+    : "";
+  setStatus(`Blacklisted ${domains.length} domain${domains.length === 1 ? "" : "s"} for future archiving.${movedLabel}`);
 }
 
 async function runQuickSearch() {
@@ -1418,6 +1465,7 @@ function bindEvents() {
   elements.openSelected.addEventListener("click", () => openSelected().catch((error) => setStatus(error.message)));
   elements.copySelected.addEventListener("click", () => copySelectedUrls().catch((error) => setStatus(error.message)));
   elements.exportSelected.addEventListener("click", () => exportSelected().catch((error) => setStatus(error.message)));
+  elements.blacklistSelected.addEventListener("click", () => blacklistSelectedDomains().catch((error) => setStatus(error.message)));
   elements.deleteVault.addEventListener("click", () => deleteFromVault().catch((error) => setStatus(error.message)));
   elements.deleteChrome.addEventListener("click", () => deleteFromChrome().catch((error) => setStatus(error.message)));
   elements.undoDelete.addEventListener("click", () => undoVaultDelete().catch((error) => setStatus(error.message)));

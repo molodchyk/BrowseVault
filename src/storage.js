@@ -237,11 +237,16 @@ export async function getRules() {
 }
 
 export async function addDomainRule(type, value) {
+  if (!["blacklist", "whitelist"].includes(type)) {
+    throw new Error("Unsupported domain rule type.");
+  }
+
   const normalized = normalizeRuleValue(value);
   if (!normalized) {
     throw new Error("Enter a domain first.");
   }
 
+  const oppositeType = type === "blacklist" ? "whitelist" : "blacklist";
   const record = {
     id: `${type}:${normalized}`,
     type,
@@ -249,7 +254,17 @@ export async function addDomainRule(type, value) {
     createdAt: new Date().toISOString()
   };
 
-  await putMany(RULE_STORE, [record]);
+  const db = await openVaultDb();
+  const tx = db.transaction(RULE_STORE, "readwrite");
+  const store = tx.objectStore(RULE_STORE);
+  store.delete(`${oppositeType}:${normalized}`);
+  store.put(record);
+  await new Promise((resolve, reject) => {
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+
   return record;
 }
 
