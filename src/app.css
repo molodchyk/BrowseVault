@@ -188,13 +188,19 @@ code {
 }
 
 .header h1,
-.section-heading h2 {
+.section-heading h2,
+.section-heading h3 {
   margin: 0;
 }
 
 .header h1 {
   font-size: 24px;
   line-height: 1.15;
+}
+
+.section-heading h3 {
+  font-size: 18px;
+  line-height: 1.2;
 }
 
 .eyebrow {
@@ -235,6 +241,7 @@ code {
 .bulkbar,
 .summary,
 .stat,
+.preview-stat,
 .result,
 .quick-result,
 .rule-item {
@@ -269,6 +276,7 @@ code {
 .quick-panel,
 .rules-panel,
 .backup-panel,
+.import-preview,
 .settings-panel {
   display: grid;
   gap: 12px;
@@ -346,12 +354,20 @@ code {
   min-width: 0;
 }
 
-.stat {
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.stat,
+.preview-stat {
   min-width: 0;
   padding: 10px;
 }
 
-.stat span {
+.stat span,
+.preview-stat span {
   display: block;
   min-width: 0;
   overflow: hidden;
@@ -362,7 +378,8 @@ code {
   white-space: nowrap;
 }
 
-.stat p {
+.stat p,
+.preview-stat p {
   margin: 2px 0 0;
   color: var(--muted);
   font-size: 12px;
@@ -480,6 +497,7 @@ code {
   }
 
   .stats-grid,
+  .preview-grid,
   .filters,
   .settings-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

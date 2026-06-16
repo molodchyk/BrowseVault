@@ -1,5 +1,6 @@
 import {
   addDomainRule,
+  analyzeImportArchive,
   clearVaultData,
   exportArchive,
   getRules,
@@ -37,6 +38,15 @@ const elements = {
   exportCsv: document.querySelector("#export-csv"),
   exportHtml: document.querySelector("#export-html"),
   importArchive: document.querySelector("#import-archive"),
+  importPreview: document.querySelector("#import-preview"),
+  importPreviewTitle: document.querySelector("#import-preview-title"),
+  importValid: document.querySelector("#import-valid"),
+  importNew: document.querySelector("#import-new"),
+  importExisting: document.querySelector("#import-existing"),
+  importDuplicates: document.querySelector("#import-duplicates"),
+  importPreviewNote: document.querySelector("#import-preview-note"),
+  confirmImport: document.querySelector("#confirm-import"),
+  cancelImport: document.querySelector("#cancel-import"),
   resetVault: document.querySelector("#reset-vault"),
   exportSelected: document.querySelector("#export-selected"),
   deleteVault: document.querySelector("#delete-vault"),
@@ -73,6 +83,7 @@ let currentTotal = 0;
 let selectedIds = new Set();
 let lastCheckedIndex = null;
 let preferences = { ...DEFAULT_PREFERENCES };
+let stagedImport = null;
 
 function formatDate(value) {
   if (!value) {
@@ -715,29 +726,79 @@ async function exportSelected() {
 }
 
 async function importFromFile(file) {
-  setStatus("Importing archive");
+  setStatus("Reading archive");
   const text = await file.text();
   const archive = archiveFromFileText(file, text);
   const integrity = await verifyArchiveIntegrity(archive);
-  const visitCount = Array.isArray(archive?.visits)
-    ? archive.visits.length
-    : Array.isArray(archive?.items)
-      ? archive.items.length
-      : Array.isArray(archive?.["Browser History"])
-        ? archive["Browser History"].length
-      : 0;
+  const analysis = await analyzeImportArchive(archive);
 
+  if (!analysis.validRows && !analysis.rules) {
+    setStatus("No importable history records or rules found");
+    return;
+  }
+
+  stagedImport = {
+    archive,
+    analysis,
+    fileName: file.name,
+    integrity
+  };
+  renderImportPreview();
+  switchTab("backup");
+  setStatus("Review import preview");
+}
+
+function renderImportPreview() {
+  if (!stagedImport) {
+    elements.importPreview.hidden = true;
+    return;
+  }
+
+  const { analysis, fileName, integrity } = stagedImport;
+  const checksum = integrity.checked
+    ? integrity.ok
+      ? "Checksum verified."
+      : "Checksum mismatch. Import only if you trust this file."
+    : "No checksum included.";
+
+  elements.importPreviewTitle.textContent = `${fileName} from ${analysis.sourceApp}`;
+  elements.importValid.textContent = String(analysis.validRows);
+  elements.importNew.textContent = String(analysis.newVisits);
+  elements.importExisting.textContent = String(analysis.existingVisits);
+  elements.importDuplicates.textContent = String(analysis.duplicateRows);
+  elements.importPreviewNote.textContent = [
+    `${analysis.rows} rows scanned.`,
+    analysis.invalidRows ? `${analysis.invalidRows} rows without URLs will be skipped.` : "",
+    analysis.rules ? `${analysis.rules} domain rules will be imported or updated.` : "",
+    checksum
+  ]
+    .filter(Boolean)
+    .join(" ");
+  elements.importPreview.hidden = false;
+}
+
+function cancelStagedImport() {
+  stagedImport = null;
+  renderImportPreview();
+  setStatus("Import canceled");
+}
+
+async function confirmStagedImport() {
+  if (!stagedImport) {
+    setStatus("Choose an archive first");
+    return;
+  }
+
+  const { archive, integrity } = stagedImport;
   if (integrity.checked && !integrity.ok && !confirm("This archive checksum does not match. Import anyway?")) {
     setStatus("Import canceled");
     return;
   }
 
-  if (!confirm(`Import ${visitCount} records from ${archive?.app || "this archive"}?`)) {
-    setStatus("Import canceled");
-    return;
-  }
-
+  setStatus("Importing archive");
   const result = await importArchive(archive);
+  stagedImport = null;
+  renderImportPreview();
   await refreshStats();
   await renderRules();
   await runSearch();
@@ -746,7 +807,8 @@ async function importFromFile(file) {
       ? " with verified checksum"
       : " after checksum warning"
     : "";
-  setStatus(`Imported ${result.visits} records${integrityLabel}`);
+  const ruleLabel = result.rules ? ` and ${result.rules} rule${result.rules === 1 ? "" : "s"}` : "";
+  setStatus(`Imported ${result.visits} records${ruleLabel}${integrityLabel}`);
 }
 
 async function deleteFromVault() {
@@ -892,6 +954,8 @@ function bindEvents() {
     }
     event.target.value = "";
   });
+  elements.confirmImport.addEventListener("click", () => confirmStagedImport().catch((error) => setStatus(error.message)));
+  elements.cancelImport.addEventListener("click", cancelStagedImport);
   elements.addBlacklist.addEventListener("click", () => addRule("blacklist").catch((error) => setStatus(error.message)));
   elements.addWhitelist.addEventListener("click", () => addRule("whitelist").catch((error) => setStatus(error.message)));
   elements.resetVault.addEventListener("click", () => resetVault().catch((error) => setStatus(error.message)));

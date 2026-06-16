@@ -357,11 +357,10 @@ export async function exportArchive(items = null) {
   };
 }
 
-export async function importArchive(archive) {
-  const importedAt = new Date().toISOString();
+function normalizeImportVisits(archive) {
   const visits = extractImportVisits(archive);
 
-  const normalized = visits
+  return visits
     .filter((visit) => visit?.url)
     .map((visit) =>
       normalizeHistoryItem(
@@ -375,38 +374,81 @@ export async function importArchive(archive) {
         }
       )
     );
+}
+
+function normalizeImportRules(archive, importedAt = new Date().toISOString()) {
+  if (!Array.isArray(archive?.rules)) {
+    return [];
+  }
+
+  return archive.rules
+    .filter((rule) => ["blacklist", "whitelist"].includes(rule?.type))
+    .map((rule) => {
+      const value = normalizeRuleValue(rule.value);
+      return value
+        ? {
+            id: `${rule.type}:${value}`,
+            type: rule.type,
+            value,
+            createdAt: rule.createdAt || importedAt
+          }
+        : null;
+    })
+    .filter(Boolean);
+}
+
+export function summarizeImportArchive(archive, existingVisitIds = []) {
+  const rawVisits = extractImportVisits(archive);
+  const normalized = normalizeImportVisits(archive);
+  const uniqueIds = new Set(normalized.map((visit) => visit.id));
+  const existingIds = new Set(existingVisitIds);
+  let existingVisits = 0;
+
+  for (const id of uniqueIds) {
+    if (existingIds.has(id)) {
+      existingVisits += 1;
+    }
+  }
+
+  return {
+    sourceApp: archive?.app || "unknown",
+    schemaVersion: archive?.schemaVersion || null,
+    rows: rawVisits.length,
+    validRows: normalized.length,
+    invalidRows: rawVisits.length - normalized.length,
+    uniqueVisits: uniqueIds.size,
+    duplicateRows: normalized.length - uniqueIds.size,
+    existingVisits,
+    newVisits: uniqueIds.size - existingVisits,
+    rules: normalizeImportRules(archive).length
+  };
+}
+
+export async function analyzeImportArchive(archive) {
+  const existingVisitIds = (await getAllVisits({ includeDeleted: true })).map((visit) => visit.id);
+  return summarizeImportArchive(archive, existingVisitIds);
+}
+
+export async function importArchive(archive) {
+  const importedAt = new Date().toISOString();
+  const normalized = normalizeImportVisits(archive);
+  const rules = normalizeImportRules(archive, importedAt);
 
   await putMany(VISIT_STORE, normalized);
-
-  if (Array.isArray(archive?.rules)) {
-    const rules = archive.rules
-      .filter((rule) => ["blacklist", "whitelist"].includes(rule?.type))
-      .map((rule) => {
-        const value = normalizeRuleValue(rule.value);
-        return value
-          ? {
-              id: `${rule.type}:${value}`,
-              type: rule.type,
-              value,
-              createdAt: rule.createdAt || importedAt
-            }
-          : null;
-      })
-      .filter(Boolean);
-
-    await putMany(RULE_STORE, rules);
-  }
+  await putMany(RULE_STORE, rules);
 
   await setMeta("lastImport", {
     importedAt,
     sourceApp: archive?.app || "unknown",
     schemaVersion: archive?.schemaVersion || null,
-    visits: normalized.length
+    visits: normalized.length,
+    rules: rules.length
   });
 
   return {
     importedAt,
-    visits: normalized.length
+    visits: normalized.length,
+    rules: rules.length
   };
 }
 

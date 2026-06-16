@@ -126,6 +126,35 @@
             <input id="import-archive" class="visually-hidden" type="file" accept=".json,.csv,.tsv,application/json,text/csv,text/tab-separated-values">
             <button id="reset-vault" class="danger" type="button">Reset Vault</button>
           </div>
+          <section id="import-preview" class="import-preview" aria-label="Import preview" hidden>
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Import Preview</p>
+                <h3 id="import-preview-title">Review archive before importing</h3>
+              </div>
+              <button id="cancel-import" class="ghost" type="button">Cancel</button>
+            </div>
+            <div class="preview-grid">
+              <div class="preview-stat">
+                <span id="import-valid">0</span>
+                <p>valid rows</p>
+              </div>
+              <div class="preview-stat">
+                <span id="import-new">0</span>
+                <p>new visits</p>
+              </div>
+              <div class="preview-stat">
+                <span id="import-existing">0</span>
+                <p>already saved</p>
+              </div>
+              <div class="preview-stat">
+                <span id="import-duplicates">0</span>
+                <p>file duplicates</p>
+              </div>
+            </div>
+            <p id="import-preview-note" class="hint"></p>
+            <button id="confirm-import" type="button">Import Now</button>
+          </section>
         </section>
       </section>
 
