@@ -6,6 +6,7 @@ import {
 import { createAppShellState } from "./features/app-shell/core/state.js";
 import { collectAppElements } from "./features/app-shell/ui/elements.js";
 import { bindAppEvents } from "./features/app-shell/ui/events.js";
+import { createAppNavigation } from "./features/app-shell/ui/navigation.js";
 import { createSearchCoordinator } from "./features/app-shell/ui/search-coordinator.js";
 import { createBackupActions } from "./features/backup-import/ui/actions.js";
 import { createQuickOpenActions } from "./features/browser-memory/ui/quick-open-actions.js";
@@ -28,22 +29,6 @@ const appState = createAppShellState(DEFAULT_PREFERENCES);
 
 function setStatus(message) {
   elements.status.textContent = message;
-}
-
-function switchTab(tabName) {
-  for (const tab of elements.tabs) {
-    tab.classList.toggle("is-active", tab.dataset.tab === tabName);
-  }
-
-  for (const panel of elements.panels) {
-    panel.hidden = panel.dataset.panel !== tabName;
-  }
-}
-
-function focusSearchInput() {
-  switchTab("history");
-  elements.query.focus();
-  elements.query.select();
 }
 
 async function copyText(text) {
@@ -87,6 +72,10 @@ async function selectedResults() {
 }
 
 const historySearchForm = createHistorySearchForm({
+  elements
+});
+
+const appNavigation = createAppNavigation({
   elements
 });
 
@@ -136,7 +125,7 @@ const backupActions = createBackupActions({
   runSearch: historySearchActions.runSearch,
   selectedResults,
   setStatus,
-  switchTab
+  switchTab: appNavigation.switchTab
 });
 
 const quickOpenActions = createQuickOpenActions({
@@ -195,7 +184,7 @@ function bindEvents() {
       exportSelected: backupActions.exportSelected,
       exportSelectedCsv: backupActions.exportSelectedCsv,
       exportSelectedHtml: backupActions.exportSelectedHtml,
-      focusSearchInput,
+      focusSearchInput: appNavigation.focusSearchInput,
       importFromFile: backupActions.importFromFile,
       invertVisibleSelection: bulkActions.invertVisibleSelection,
       loadMoreResults: historySearchActions.loadMoreResults,
@@ -208,7 +197,7 @@ function bindEvents() {
       selectAllFiltered: bulkActions.selectAllFiltered,
       selectVisible: bulkActions.selectVisibleResults,
       setStatus,
-      switchTab,
+      switchTab: appNavigation.switchTab,
       syncChromeHistory,
       undoVaultDelete: vaultActions.undoVaultDelete
     }
@@ -218,7 +207,7 @@ function bindEvents() {
 async function init() {
   await displayPreferences.loadPreferences();
   bindEvents();
-  elements.query.focus();
+  appNavigation.focusSearchInput();
   await displayPreferences.refreshStats();
   await vaultActions.renderRules();
   await historySearchActions.runSearch();
