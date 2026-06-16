@@ -16,7 +16,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `src/features/display-preferences/core/preferences.js` owns pure preference normalization, result-limit clamping, date/count formatting, and backup status summaries.
 - `src/features/history-export/core/export-format.js` owns pure CSV and HTML export formatting.
 - `src/features/history-results/core/results.js` owns pure result selection, URL/domain extraction, grouping, count labels, and load-more state.
-- `src/features/history-results/ui/` owns history result DOM rendering, search-hit highlighting, and selected-result bulk actions.
+- `src/features/history-results/ui/` owns history result DOM rendering, rendering orchestration, search-hit highlighting, and selected-result bulk actions.
 - `src/features/vault-management/` owns extension-page vault deletion, Chrome-history deletion requests, undo, reset, and domain-rule actions.
 - `src/platform/chrome/` owns explicit wrappers around Chrome extension APIs as they are extracted from runtime and feature modules.
 - `src/export-format.js` is a compatibility barrel for existing import paths.
@@ -24,7 +24,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 ## Next Split Candidates
 
 - Move search-page orchestration out of `src/app.js` into app-shell/history-results modules.
-- Move result-list rendering orchestration out of `src/app.js` into history-results modules.
+- Move local history search/load-more orchestration out of `src/app.js` into history-results modules.
 
 ## Rules For Future Edits
 

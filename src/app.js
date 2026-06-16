@@ -26,12 +26,10 @@ import {
   themeDatasetValue
 } from "./features/display-preferences/core/preferences.js";
 import {
-  loadMoreState,
-  reconcileSelectedIds,
-  selectedCountLabel
+  reconcileSelectedIds
 } from "./features/history-results/core/results.js";
 import { createHistoryBulkActions } from "./features/history-results/ui/bulk-actions.js";
-import { renderHistoryResults } from "./features/history-results/ui/render-results.js";
+import { createHistoryResultsController } from "./features/history-results/ui/results-controller.js";
 import { getLocalStorage, setLocalStorage } from "./platform/chrome/storage.js";
 import { createVaultManagementActions } from "./features/vault-management/ui/actions.js";
 
@@ -158,30 +156,6 @@ function getSearchText() {
   return parts.filter(Boolean).join(" ");
 }
 
-function updateSelectionCount() {
-  elements.selectedCount.textContent = selectedCountLabel(appState.selectedIds.size);
-
-  const hasSelection = appState.selectedIds.size > 0;
-  for (const action of elements.selectionActions) {
-    action.hidden = !hasSelection;
-  }
-}
-
-function updateLoadMoreButton() {
-  const shown = appState.currentResults.length;
-  const state = loadMoreState({
-    total: appState.currentTotal,
-    shown,
-    step: requestedResultLimit(),
-    max: MAX_RESULT_LIMIT
-  });
-
-  elements.loadMore.hidden = !state.canLoadMore;
-  if (state.canLoadMore) {
-    elements.loadMore.textContent = `Load ${state.nextCount} More`;
-  }
-}
-
 async function copyText(text) {
   if (!text) {
     throw new Error("Nothing to copy.");
@@ -252,11 +226,20 @@ const quickOpenActions = createQuickOpenActions({
   setStatus
 });
 
+const historyResults = createHistoryResultsController({
+  appState,
+  elements,
+  getDateFormat: () => appState.preferences.dateFormat,
+  getSearchText,
+  maxResultLimit: MAX_RESULT_LIMIT,
+  requestedResultLimit
+});
+
 const bulkActions = createHistoryBulkActions({
   appState,
   copyText,
   getSearchText,
-  renderResults,
+  renderResults: historyResults.renderResults,
   searchVisits,
   selectedResults,
   setStatus
@@ -267,44 +250,6 @@ const syncChromeHistory = createChromeHistorySyncAction({
   runSearch,
   setStatus
 });
-
-function applyResultSelection({ selectedIds: nextSelectedIds, lastCheckedIndex: nextLastCheckedIndex, shouldRerender }) {
-  appState.selectedIds = nextSelectedIds;
-  appState.lastCheckedIndex = nextLastCheckedIndex;
-
-  if (shouldRerender) {
-    renderResults(appState.currentResults, appState.currentTotal);
-    return;
-  }
-
-  updateSelectionCount();
-}
-
-function renderResults(results, total) {
-  appState.currentResults = results;
-  appState.currentTotal = total;
-
-  renderHistoryResults({
-    results,
-    total,
-    queryText: getSearchText(),
-    selectedIds: appState.selectedIds,
-    dateFormat: appState.preferences.dateFormat,
-    elements: {
-      resultCount: elements.resultCount,
-      results: elements.results,
-      resultTemplate: elements.resultTemplate
-    },
-    getSelectionState: () => ({
-      selectedIds: appState.selectedIds,
-      lastCheckedIndex: appState.lastCheckedIndex
-    }),
-    onSelectionChange: applyResultSelection
-  });
-
-  updateSelectionCount();
-  updateLoadMoreButton();
-}
 
 async function refreshStats() {
   const stats = await getStats();
@@ -334,7 +279,7 @@ async function runSearch() {
     }
 
     appState.selectedIds = reconcileSelectedIds(appState.selectedIds, results);
-    renderResults(results, total);
+    historyResults.renderResults(results, total);
     setStatus("Ready");
   } catch (error) {
     if (isCurrentHistorySearchRequestId(appState, requestId)) {
@@ -346,7 +291,7 @@ async function runSearch() {
 async function loadMoreResults() {
   if (appState.currentResults.length >= appState.currentTotal || appState.currentResults.length >= MAX_RESULT_LIMIT) {
     setStatus("All loaded results are visible");
-    updateLoadMoreButton();
+    historyResults.updateLoadMoreButton();
     return;
   }
 
@@ -363,7 +308,7 @@ async function loadMoreResults() {
     return;
   }
 
-  renderResults(results, total);
+  historyResults.renderResults(results, total);
   setStatus(`Showing ${results.length} of ${total} results`);
 }
 
