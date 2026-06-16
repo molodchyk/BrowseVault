@@ -14,6 +14,7 @@ import {
   setMeta
 } from "./storage.js";
 import { searchBrowserMemory } from "./browser-memory.js";
+import { parseQuery } from "./query.js";
 
 const PREFERENCES_KEY = "browseVault.preferences";
 const DEFAULT_PREFERENCES = {
@@ -25,6 +26,8 @@ const DEFAULT_PREFERENCES = {
 const MAX_RESULT_LIMIT = 50000;
 const OPEN_SELECTED_LIMIT = 25;
 const BACKUP_STALE_DAYS = 30;
+const MAX_HIGHLIGHT_TOKENS = 12;
+const MAX_HIGHLIGHT_RANGES = 80;
 
 const elements = {
   tabs: [...document.querySelectorAll(".tab")],
@@ -532,9 +535,120 @@ async function selectedResults() {
   return getVisitsByIds([...selectedIds]);
 }
 
+function highlightTokensForScope(query, scope) {
+  const shared = [...query.terms, ...query.phrases];
+  const scoped = scope === "title"
+    ? query.title
+    : scope === "url"
+      ? [...query.url, ...query.site]
+      : query.site;
+
+  return [...new Set([...shared, ...scoped]
+    .map((token) => token.trim().toLowerCase())
+    .filter(Boolean))]
+    .sort((left, right) => right.length - left.length)
+    .slice(0, MAX_HIGHLIGHT_TOKENS);
+}
+
+function regexHighlightRanges(text, regex) {
+  if (!regex) {
+    return [];
+  }
+
+  try {
+    const flags = regex.flags.includes("g") ? regex.flags : `${regex.flags}g`;
+    const matcher = new RegExp(regex.source, flags);
+    const ranges = [];
+    let match = matcher.exec(text);
+
+    while (match && ranges.length < MAX_HIGHLIGHT_RANGES) {
+      if (match[0].length) {
+        ranges.push([match.index, match.index + match[0].length]);
+      } else {
+        matcher.lastIndex += 1;
+      }
+      match = matcher.exec(text);
+    }
+
+    return ranges;
+  } catch {
+    return [];
+  }
+}
+
+function highlightRanges(text, tokens, regex) {
+  const lowerText = text.toLowerCase();
+  const ranges = regexHighlightRanges(text, regex);
+
+  for (const token of tokens) {
+    let cursor = 0;
+    while (ranges.length < MAX_HIGHLIGHT_RANGES) {
+      const index = lowerText.indexOf(token, cursor);
+      if (index === -1) {
+        break;
+      }
+      ranges.push([index, index + token.length]);
+      cursor = index + Math.max(token.length, 1);
+    }
+  }
+
+  if (!ranges.length) {
+    return [];
+  }
+
+  ranges.sort((left, right) => left[0] - right[0] || right[1] - left[1]);
+  const merged = [];
+  for (const [start, end] of ranges) {
+    const previous = merged[merged.length - 1];
+    if (previous && start <= previous[1]) {
+      previous[1] = Math.max(previous[1], end);
+    } else {
+      merged.push([start, end]);
+    }
+  }
+  return merged;
+}
+
+function appendHighlightedText(target, value, tokens, regex) {
+  const text = String(value || "");
+  target.replaceChildren();
+
+  if (!text || (!tokens.length && !regex)) {
+    target.textContent = text;
+    return;
+  }
+
+  const ranges = highlightRanges(text, tokens, regex);
+  if (!ranges.length) {
+    target.textContent = text;
+    return;
+  }
+
+  let cursor = 0;
+  for (const [start, end] of ranges) {
+    if (start > cursor) {
+      target.append(document.createTextNode(text.slice(cursor, start)));
+    }
+
+    const mark = document.createElement("mark");
+    mark.className = "search-hit";
+    mark.textContent = text.slice(start, end);
+    target.append(mark);
+    cursor = end;
+  }
+
+  if (cursor < text.length) {
+    target.append(document.createTextNode(text.slice(cursor)));
+  }
+}
+
 function renderResults(results, total) {
   currentResults = results;
   currentTotal = total;
+  const query = parseQuery(getSearchText());
+  const titleTokens = highlightTokensForScope(query, "title");
+  const urlTokens = highlightTokensForScope(query, "url");
+  const metaTokens = highlightTokensForScope(query, "meta");
   elements.resultCount.textContent = `${total} result${total === 1 ? "" : "s"} (${results.length} shown)`;
   elements.results.replaceChildren();
 
@@ -577,9 +691,14 @@ function renderResults(results, total) {
     });
 
     title.href = item.url;
-    title.textContent = item.title || item.url;
-    url.textContent = item.url;
-    meta.textContent = `${item.domain || "unknown domain"} · ${formatDate(item.visitTime)} · ${item.visitCount || 0} visits · ${item.source}`;
+    appendHighlightedText(title, item.title || item.url, titleTokens, query.regex);
+    appendHighlightedText(url, item.url, urlTokens, query.regex);
+    appendHighlightedText(
+      meta,
+      `${item.domain || "unknown domain"} · ${formatDate(item.visitTime)} · ${item.visitCount || 0} visits · ${item.source}`,
+      metaTokens,
+      query.regex
+    );
 
     elements.results.append(fragment);
   });
@@ -590,6 +709,10 @@ function renderResults(results, total) {
 
 function renderQuickResults(results, total, warnings = []) {
   elements.quickResults.replaceChildren();
+  const query = parseQuery(getSearchText());
+  const titleTokens = highlightTokensForScope(query, "title");
+  const urlTokens = highlightTokensForScope(query, "url");
+  const metaTokens = highlightTokensForScope(query, "meta");
 
   if (!results.length) {
     const empty = document.createElement("li");
@@ -611,9 +734,9 @@ function renderQuickResults(results, total, warnings = []) {
 
     source.textContent = item.type;
     title.href = item.url;
-    title.textContent = item.title || item.url;
-    url.textContent = item.url;
-    meta.textContent = `${item.detail} · ${item.domain || "unknown domain"} · ${formatDate(item.visitTime)}`;
+    appendHighlightedText(title, item.title || item.url, titleTokens, query.regex);
+    appendHighlightedText(url, item.url, urlTokens, query.regex);
+    appendHighlightedText(meta, `${item.detail} · ${item.domain || "unknown domain"} · ${formatDate(item.visitTime)}`, metaTokens, query.regex);
     action.textContent = item.action?.type === "activate-tab"
       ? "Switch"
       : item.action?.type === "restore-session"

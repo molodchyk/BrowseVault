@@ -511,6 +511,13 @@ code {
   text-decoration: underline;
 }
 
+.search-hit {
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--accent-soft), #f4c542 45%);
+  color: var(--text);
+  padding: 0 2px;
+}
+
 .rule-item {
   display: flex;
   align-items: center;
