@@ -6,8 +6,6 @@ import {
 import {
   clearSearchDebounce as clearAppSearchDebounce,
   createAppShellState,
-  isCurrentHistorySearchRequestId,
-  nextHistorySearchRequestId,
   scheduleSearchDebounce as scheduleAppSearchDebounce
 } from "./features/app-shell/core/state.js";
 import { collectAppElements } from "./features/app-shell/ui/elements.js";
@@ -25,11 +23,9 @@ import {
   normalizePreferences,
   themeDatasetValue
 } from "./features/display-preferences/core/preferences.js";
-import {
-  reconcileSelectedIds
-} from "./features/history-results/core/results.js";
 import { createHistoryBulkActions } from "./features/history-results/ui/bulk-actions.js";
 import { createHistoryResultsController } from "./features/history-results/ui/results-controller.js";
+import { createHistorySearchActions } from "./features/history-results/ui/search-actions.js";
 import { getLocalStorage, setLocalStorage } from "./platform/chrome/storage.js";
 import { createVaultManagementActions } from "./features/vault-management/ui/actions.js";
 
@@ -125,7 +121,7 @@ function clearSearchDebounce() {
 
 async function runSearchesNow() {
   clearSearchDebounce();
-  await runSearch();
+  await historySearchActions.runSearch();
   await quickOpenActions.runQuickSearch();
 }
 
@@ -196,11 +192,31 @@ async function selectedResults() {
   return getVisitsByIds([...appState.selectedIds]);
 }
 
+const historyResults = createHistoryResultsController({
+  appState,
+  elements,
+  getDateFormat: () => appState.preferences.dateFormat,
+  getSearchText,
+  maxResultLimit: MAX_RESULT_LIMIT,
+  requestedResultLimit
+});
+
+const historySearchActions = createHistorySearchActions({
+  appState,
+  getSearchText,
+  maxResultLimit: MAX_RESULT_LIMIT,
+  renderResults: historyResults.renderResults,
+  requestedResultLimit,
+  searchVisits,
+  setStatus,
+  updateLoadMoreButton: historyResults.updateLoadMoreButton
+});
+
 const vaultActions = createVaultManagementActions({
   appState,
   elements,
   refreshStats,
-  runSearch,
+  runSearch: historySearchActions.runSearch,
   selectedResults,
   setStatus
 });
@@ -210,7 +226,7 @@ const backupActions = createBackupActions({
   elements,
   refreshStats,
   renderRules: vaultActions.renderRules,
-  runSearch,
+  runSearch: historySearchActions.runSearch,
   selectedResults,
   setStatus,
   switchTab
@@ -226,15 +242,6 @@ const quickOpenActions = createQuickOpenActions({
   setStatus
 });
 
-const historyResults = createHistoryResultsController({
-  appState,
-  elements,
-  getDateFormat: () => appState.preferences.dateFormat,
-  getSearchText,
-  maxResultLimit: MAX_RESULT_LIMIT,
-  requestedResultLimit
-});
-
 const bulkActions = createHistoryBulkActions({
   appState,
   copyText,
@@ -247,7 +254,7 @@ const bulkActions = createHistoryBulkActions({
 
 const syncChromeHistory = createChromeHistorySyncAction({
   refreshStats,
-  runSearch,
+  runSearch: historySearchActions.runSearch,
   setStatus
 });
 
@@ -260,56 +267,6 @@ async function refreshStats() {
     ? formatShortDate(Date.parse(stats.meta.lastBackup.exportedAt), appState.preferences.dateFormat)
     : "Never";
   renderBackupStatus(stats.meta.lastBackup);
-}
-
-async function runSearch() {
-  const requestId = nextHistorySearchRequestId(appState);
-  setStatus("Searching local vault");
-  appState.currentShownLimit = requestedResultLimit();
-  const searchText = getSearchText();
-  const limit = appState.currentShownLimit;
-
-  try {
-    const { results, total } = await searchVisits(searchText, {
-      limit
-    });
-
-    if (!isCurrentHistorySearchRequestId(appState, requestId)) {
-      return;
-    }
-
-    appState.selectedIds = reconcileSelectedIds(appState.selectedIds, results);
-    historyResults.renderResults(results, total);
-    setStatus("Ready");
-  } catch (error) {
-    if (isCurrentHistorySearchRequestId(appState, requestId)) {
-      setStatus(error.message);
-    }
-  }
-}
-
-async function loadMoreResults() {
-  if (appState.currentResults.length >= appState.currentTotal || appState.currentResults.length >= MAX_RESULT_LIMIT) {
-    setStatus("All loaded results are visible");
-    historyResults.updateLoadMoreButton();
-    return;
-  }
-
-  const step = requestedResultLimit();
-  appState.currentShownLimit = Math.min(appState.currentResults.length + step, appState.currentTotal, MAX_RESULT_LIMIT);
-  setStatus("Loading more results");
-  const requestId = nextHistorySearchRequestId(appState);
-
-  const { results, total } = await searchVisits(getSearchText(), {
-    limit: appState.currentShownLimit
-  });
-
-  if (!isCurrentHistorySearchRequestId(appState, requestId)) {
-    return;
-  }
-
-  historyResults.renderResults(results, total);
-  setStatus(`Showing ${results.length} of ${total} results`);
 }
 
 function bindEvents() {
@@ -336,7 +293,7 @@ function bindEvents() {
       focusSearchInput,
       importFromFile: backupActions.importFromFile,
       invertVisibleSelection: bulkActions.invertVisibleSelection,
-      loadMoreResults,
+      loadMoreResults: historySearchActions.loadMoreResults,
       openSelected: bulkActions.openSelected,
       resetVault: vaultActions.resetVault,
       runQuickSearch: quickOpenActions.runQuickSearch,
@@ -359,7 +316,7 @@ async function init() {
   elements.query.focus();
   await refreshStats();
   await vaultActions.renderRules();
-  await runSearch();
+  await historySearchActions.runSearch();
   await quickOpenActions.runQuickSearch();
 }
 
