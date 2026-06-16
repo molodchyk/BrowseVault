@@ -81,7 +81,8 @@ This repository contains a working Manifest V3 extension implementation. It incl
 │   ├── export-format.js
 │   ├── features/
 │   │   ├── display-preferences/
-│   │   └── history-export/
+│   │   ├── history-export/
+│   │   └── history-results/
 │   ├── query.js
 │   └── storage.js
 ├── store/

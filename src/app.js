@@ -29,6 +29,19 @@ import {
   normalizePreferences,
   themeDatasetValue
 } from "./features/display-preferences/core/preferences.js";
+import {
+  countResultsByKey,
+  invertSelectionForResults,
+  loadMoreState,
+  reconcileSelectedIds,
+  resultCountLabel,
+  selectRangeByIndex,
+  selectedCountLabel,
+  selectedIdsForResults,
+  toggleSelectedId,
+  uniqueDomainsForItems,
+  uniqueUrlsForItems
+} from "./features/history-results/core/results.js";
 import { parseQuery } from "./query.js";
 
 const OPEN_SELECTED_LIMIT = 25;
@@ -244,7 +257,7 @@ function getSearchText() {
 }
 
 function updateSelectionCount() {
-  elements.selectedCount.textContent = `${selectedIds.size} selected`;
+  elements.selectedCount.textContent = selectedCountLabel(selectedIds.size);
 
   const hasSelection = selectedIds.size > 0;
   for (const action of elements.selectionActions) {
@@ -254,12 +267,16 @@ function updateSelectionCount() {
 
 function updateLoadMoreButton() {
   const shown = currentResults.length;
-  const canLoadMore = currentTotal > shown && shown < MAX_RESULT_LIMIT;
-  elements.loadMore.hidden = !canLoadMore;
+  const state = loadMoreState({
+    total: currentTotal,
+    shown,
+    step: requestedResultLimit(),
+    max: MAX_RESULT_LIMIT
+  });
 
-  if (canLoadMore) {
-    const nextCount = Math.min(requestedResultLimit(), currentTotal - shown, MAX_RESULT_LIMIT - shown);
-    elements.loadMore.textContent = `Load ${nextCount} More`;
+  elements.loadMore.hidden = !state.canLoadMore;
+  if (state.canLoadMore) {
+    elements.loadMore.textContent = `Load ${state.nextCount} More`;
   }
 }
 
@@ -365,26 +382,6 @@ async function copyText(text) {
   if (!copied) {
     throw new Error("Copy failed.");
   }
-}
-
-function uniqueUrlsForItems(items) {
-  return [...new Set(items.map((item) => item.url).filter(Boolean))];
-}
-
-function domainForItem(item) {
-  if (item.domain) {
-    return item.domain.toLowerCase().replace(/^www\./, "");
-  }
-
-  try {
-    return new URL(item.url).hostname.toLowerCase().replace(/^www\./, "");
-  } catch {
-    return "";
-  }
-}
-
-function uniqueDomainsForItems(items) {
-  return [...new Set(items.map(domainForItem).filter(Boolean))];
 }
 
 function parseDelimitedRows(text, delimiter) {
@@ -598,14 +595,10 @@ function renderResults(results, total) {
   const titleTokens = highlightTokensForScope(query, "title");
   const urlTokens = highlightTokensForScope(query, "url");
   const metaTokens = highlightTokensForScope(query, "meta");
-  const dayCounts = new Map();
-  for (const result of results) {
-    const key = localDayKey(result.visitTime);
-    dayCounts.set(key, (dayCounts.get(key) || 0) + 1);
-  }
+  const dayCounts = countResultsByKey(results, (result) => localDayKey(result.visitTime));
   let currentDayKey = "";
 
-  elements.resultCount.textContent = `${total} result${total === 1 ? "" : "s"} (${results.length} shown)`;
+  elements.resultCount.textContent = resultCountLabel(total, results.length);
   elements.results.replaceChildren();
 
   results.forEach((item, index) => {
@@ -638,29 +631,14 @@ function renderResults(results, total) {
     checkbox.checked = selectedIds.has(item.id);
     checkbox.addEventListener("click", (event) => {
       if (event.shiftKey && lastCheckedIndex !== null) {
-        const start = Math.min(lastCheckedIndex, index);
-        const end = Math.max(lastCheckedIndex, index);
-        const shouldSelect = checkbox.checked;
-
-        for (const resultItem of results.slice(start, end + 1)) {
-          if (shouldSelect) {
-            selectedIds.add(resultItem.id);
-          } else {
-            selectedIds.delete(resultItem.id);
-          }
-        }
-
+        selectedIds = selectRangeByIndex(selectedIds, results, lastCheckedIndex, index, checkbox.checked);
         renderResults(currentResults, total);
         updateSelectionCount();
         return;
       }
 
       lastCheckedIndex = index;
-      if (checkbox.checked) {
-        selectedIds.add(item.id);
-      } else {
-        selectedIds.delete(item.id);
-      }
+      selectedIds = toggleSelectedId(selectedIds, item.id, checkbox.checked);
       updateSelectionCount();
     });
 
@@ -928,7 +906,7 @@ async function runSearch() {
       return;
     }
 
-    selectedIds = new Set([...selectedIds].filter((id) => results.some((result) => result.id === id)));
+    selectedIds = reconcileSelectedIds(selectedIds, results);
     renderResults(results, total);
     setStatus("Ready");
   } catch (error) {
@@ -1219,7 +1197,7 @@ async function deleteFromChrome() {
     return;
   }
 
-  const urls = [...new Set(items.map((item) => item.url))];
+  const urls = uniqueUrlsForItems(items);
 
   if (!confirm(`Delete ${urls.length} selected URL${urls.length === 1 ? "" : "s"} from Chrome history and ${items.length} selected record${items.length === 1 ? "" : "s"} from BrowseVault? Chrome deletion removes history by URL.`)) {
     return;
@@ -1267,7 +1245,7 @@ async function selectAllFiltered() {
   const { results, total } = await searchVisits(getSearchText(), {
     limit: "all"
   });
-  selectedIds = new Set(results.map((result) => result.id));
+  selectedIds = selectedIdsForResults(results);
   renderResults(currentResults, currentTotal);
   setStatus(`Selected ${total} matching vault records`);
 }
@@ -1278,13 +1256,7 @@ function invertVisibleSelection() {
     return;
   }
 
-  for (const result of currentResults) {
-    if (selectedIds.has(result.id)) {
-      selectedIds.delete(result.id);
-    } else {
-      selectedIds.add(result.id);
-    }
-  }
+  selectedIds = invertSelectionForResults(selectedIds, currentResults);
 
   renderResults(currentResults, currentTotal);
   setStatus(`Inverted ${currentResults.length} visible results`);
@@ -1361,7 +1333,7 @@ function bindEvents() {
   elements.deleteChrome.addEventListener("click", () => deleteFromChrome().catch((error) => setStatus(error.message)));
   elements.undoDelete.addEventListener("click", () => undoVaultDelete().catch((error) => setStatus(error.message)));
   elements.selectVisible.addEventListener("click", () => {
-    selectedIds = new Set(currentResults.map((result) => result.id));
+    selectedIds = selectedIdsForResults(currentResults);
     renderResults(currentResults, currentTotal);
   });
   elements.invertVisible.addEventListener("click", invertVisibleSelection);
