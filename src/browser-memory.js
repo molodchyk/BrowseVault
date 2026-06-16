@@ -28,6 +28,7 @@ function memoryRecord({ id, type, title, url, visitTime = Date.now(), detail = "
     normalizedUrl: normalizeUrl(url).toLowerCase(),
     domain: domainFromUrl(url),
     visitTime,
+    source: type,
     detail,
     action
   };

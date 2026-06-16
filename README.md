@@ -26,7 +26,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - local IndexedDB archive storage;
 - background capture for new Chrome history visits;
 - manual sync from currently available Chrome history, expanded to individual visits where Chrome exposes them;
-- query syntax for domain, title, URL, exact-day/date ranges, exclusions, phrases, and regex;
+- query syntax for site/host/domain, title, URL, source, transition, visit count, exact-day/date ranges, exclusions, phrases, and regex;
 - highlighted matches in vault and Quick Open search results;
 - keyboard-first search with autofocus, global query focus, Enter search, and debounced live refresh;
 - local-date grouped vault results for easier timeline scanning;
@@ -118,8 +118,10 @@ Examples:
 
 ```text
 github site:github.com
+host:www.github.com source:chrome-history
 title:invoice after:2026-01-01
 date:2026-06-16
+visits:>=10 transition:typed
 url:docs -youtube
 "exact phrase"
 regex:github|gitlab
@@ -127,7 +129,7 @@ regex:github|gitlab
 
 The main vault search is used for archived history management. Quick Open uses the same query text to search current browser sources such as open tabs, bookmarks, downloads, and recently closed tabs. Quick Open results are read-only and are not affected by vault delete/export actions.
 
-Date filters use `YYYY-MM-DD` text fields to avoid browser-specific date input formatting. Use `date:`, `day:`, or `on:` for one local calendar day, and `after:` / `before:` for ranges. Displayed dates can be switched between system locale, ISO, day/month/year, month/day/year, and year/month/day in Settings.
+Date filters use `YYYY-MM-DD` text fields to avoid browser-specific date input formatting. Use `date:`, `day:`, or `on:` for one local calendar day, and `after:` / `before:` for ranges. Domain filters accept `site:`, `host:`, or `domain:`. Visit count filters accept exact values, comparisons such as `visits:>=10`, ranges such as `count:5..12`, and minimum shorthand such as `visits:7+`. Displayed dates can be switched between system locale, ISO, day/month/year, month/day/year, and year/month/day in Settings.
 
 ## GitHub Description
 

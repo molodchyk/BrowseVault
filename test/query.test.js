@@ -8,19 +8,36 @@ const visit = {
   url: "https://docs.github.com/en/apps",
   normalizedUrl: "https://docs.github.com/en/apps",
   domain: "docs.github.com",
-  visitTime: Date.parse("2026-06-10T12:00:00Z")
+  visitTime: Date.parse("2026-06-10T12:00:00Z"),
+  visitCount: 12,
+  transition: "typed",
+  source: "chrome-history-live"
 };
 
 describe("parseQuery", () => {
   it("extracts fields, phrases, exclusions, and terms", () => {
-    const query = parseQuery('history site:github.com title:extension url:docs -ads "exact phrase"');
+    const query = parseQuery('history site:github.com title:extension url:docs source:chrome -ads "exact phrase"');
 
     assert.deepEqual(query.site, ["github.com"]);
     assert.deepEqual(query.title, ["extension"]);
     assert.deepEqual(query.url, ["docs"]);
+    assert.deepEqual(query.source, ["chrome"]);
     assert.deepEqual(query.negatives, ["ads"]);
     assert.deepEqual(query.phrases, ["exact phrase"]);
     assert.deepEqual(query.terms, ["history"]);
+  });
+
+  it("normalizes host and domain filters", () => {
+    assert.deepEqual(parseQuery("host:www.github.com").site, ["github.com"]);
+    assert.deepEqual(parseQuery("domain:https://docs.github.com/en/apps").site, ["docs.github.com"]);
+  });
+
+  it("parses visit count filters", () => {
+    assert.deepEqual(parseQuery("visits:>=10").visitCount, { min: 10, max: null });
+    assert.deepEqual(parseQuery("count:<3").visitCount, { min: null, max: 2 });
+    assert.deepEqual(parseQuery("visitcount:5..12").visitCount, { min: 5, max: 12 });
+    assert.deepEqual(parseQuery("visits:7+").visitCount, { min: 7, max: null });
+    assert.deepEqual(parseQuery("visits:4").visitCount, { min: 4, max: 4 });
   });
 
   it("parses date filters and invalid regex safely", () => {
@@ -42,7 +59,18 @@ describe("parseQuery", () => {
 describe("matchesVisitQuery", () => {
   it("matches keyword and site filters", () => {
     assert.equal(matchesVisitQuery(visit, parseQuery("history site:github.com")), true);
+    assert.equal(matchesVisitQuery(visit, parseQuery("history host:www.github.com")), true);
+    assert.equal(matchesVisitQuery(visit, parseQuery("history domain:docs.github.com")), true);
     assert.equal(matchesVisitQuery(visit, parseQuery("history site:example.com")), false);
+  });
+
+  it("matches source, transition, and visit count filters", () => {
+    assert.equal(matchesVisitQuery(visit, parseQuery("source:live transition:typed visits:>=10")), true);
+    assert.equal(matchesVisitQuery(visit, parseQuery("source:import")), false);
+    assert.equal(matchesVisitQuery(visit, parseQuery("transition:reload")), false);
+    assert.equal(matchesVisitQuery(visit, parseQuery("visits:13+")), false);
+    assert.equal(matchesVisitQuery(visit, parseQuery("count:10..12")), true);
+    assert.equal(matchesVisitQuery(visit, parseQuery("visitcount:12")), true);
   });
 
   it("matches title, url, phrase, exclusion, and regex filters", () => {

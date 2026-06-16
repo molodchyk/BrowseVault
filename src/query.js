@@ -7,6 +7,12 @@ export function parseQuery(input = "") {
     site: [],
     title: [],
     url: [],
+    source: [],
+    transition: [],
+    visitCount: {
+      min: null,
+      max: null
+    },
     after: null,
     before: null,
     dateStart: null,
@@ -26,7 +32,7 @@ export function parseQuery(input = "") {
     const value = rest.join(":");
 
     if (value && ["site", "domain", "host"].includes(field)) {
-      query.site.push(value.replace(/^www\./, ""));
+      query.site.push(normalizeSiteFilter(value));
       continue;
     }
 
@@ -37,6 +43,21 @@ export function parseQuery(input = "") {
 
     if (value && field === "url") {
       query.url.push(value);
+      continue;
+    }
+
+    if (value && field === "source") {
+      query.source.push(value);
+      continue;
+    }
+
+    if (value && field === "transition") {
+      query.transition.push(value);
+      continue;
+    }
+
+    if (value && ["visits", "visitcount", "count"].includes(field)) {
+      applyVisitCountConstraint(query.visitCount, parseVisitCountConstraint(value));
       continue;
     }
 
@@ -105,14 +126,83 @@ function parseLocalDayRange(value) {
   };
 }
 
+function normalizeSiteFilter(value) {
+  const trimmed = value.trim().toLowerCase();
+  try {
+    const scheme = "https" + "://";
+    const url = new URL(trimmed.includes("://") ? trimmed : `${scheme}${trimmed}`);
+    return url.hostname.replace(/^www\./, "");
+  } catch {
+    return trimmed.replace(/^www\./, "").replace(/\/+$/, "");
+  }
+}
+
 function includesAll(text, tokens) {
   return tokens.every((token) => text.includes(token));
+}
+
+function parseVisitCountConstraint(value) {
+  const trimmed = value.trim();
+  const range = /^(\d+)(?:\.\.|-)(\d+)$/.exec(trimmed);
+  if (range) {
+    const first = Number(range[1]);
+    const second = Number(range[2]);
+    return {
+      min: Math.min(first, second),
+      max: Math.max(first, second)
+    };
+  }
+
+  const comparator = /^(>=|<=|>|<)(\d+)$/.exec(trimmed);
+  if (comparator) {
+    const count = Number(comparator[2]);
+    if (comparator[1] === ">=") {
+      return { min: count, max: null };
+    }
+    if (comparator[1] === ">") {
+      return { min: count + 1, max: null };
+    }
+    if (comparator[1] === "<=") {
+      return { min: null, max: count };
+    }
+    return { min: null, max: count - 1 };
+  }
+
+  const plus = /^(\d+)\+$/.exec(trimmed);
+  if (plus) {
+    return { min: Number(plus[1]), max: null };
+  }
+
+  const exact = /^(\d+)$/.exec(trimmed);
+  if (exact) {
+    const count = Number(exact[1]);
+    return { min: count, max: count };
+  }
+
+  return null;
+}
+
+function applyVisitCountConstraint(target, constraint) {
+  if (!constraint) {
+    return;
+  }
+
+  if (constraint.min !== null) {
+    target.min = target.min === null ? constraint.min : Math.max(target.min, constraint.min);
+  }
+
+  if (constraint.max !== null) {
+    target.max = target.max === null ? constraint.max : Math.min(target.max, constraint.max);
+  }
 }
 
 export function matchesVisitQuery(visit, query) {
   const title = visit.normalizedTitle || visit.title?.toLowerCase() || "";
   const url = visit.normalizedUrl || visit.url?.toLowerCase() || "";
-  const domain = visit.domain || "";
+  const domain = (visit.domain || "").toLowerCase();
+  const source = (visit.source || "").toLowerCase();
+  const transition = (visit.transition || "").toLowerCase();
+  const visitCount = Number(visit.visitCount || 0);
   const haystack = `${title} ${url} ${domain}`;
 
   if (query.after && visit.visitTime < query.after) {
@@ -140,6 +230,22 @@ export function matchesVisitQuery(visit, query) {
   }
 
   if (query.url.length && !includesAll(url, query.url)) {
+    return false;
+  }
+
+  if (query.source.length && !query.source.some((token) => source.includes(token))) {
+    return false;
+  }
+
+  if (query.transition.length && !query.transition.some((token) => transition.includes(token))) {
+    return false;
+  }
+
+  if (query.visitCount.min !== null && visitCount < query.visitCount.min) {
+    return false;
+  }
+
+  if (query.visitCount.max !== null && visitCount > query.visitCount.max) {
     return false;
   }
 
