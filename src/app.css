@@ -490,7 +490,16 @@ code {
   text-transform: uppercase;
 }
 
-.quick-action {
+.quick-actions {
+  display: flex;
+  align-self: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.quick-action,
+.quick-copy {
   align-self: center;
 }
 
@@ -652,7 +661,7 @@ code {
   }
 
   .source-pill,
-  .quick-action {
+  .quick-actions {
     justify-self: start;
   }
 }

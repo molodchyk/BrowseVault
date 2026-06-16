@@ -58,6 +58,7 @@ const elements = {
   cancelImport: document.querySelector("#cancel-import"),
   resetVault: document.querySelector("#reset-vault"),
   openSelected: document.querySelector("#open-selected"),
+  copySelected: document.querySelector("#copy-selected"),
   exportSelected: document.querySelector("#export-selected"),
   deleteVault: document.querySelector("#delete-vault"),
   deleteChrome: document.querySelector("#delete-chrome"),
@@ -430,6 +431,46 @@ function downloadText(filename, mimeType, text) {
   URL.revokeObjectURL(url);
 }
 
+async function copyText(text) {
+  if (!text) {
+    throw new Error("Nothing to copy.");
+  }
+
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch {
+      // Fall through to the local selection-based copy path.
+    }
+  }
+
+  const selection = document.getSelection();
+  const selectedRange = selection?.rangeCount ? selection.getRangeAt(0) : null;
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.setAttribute("readonly", "");
+  textArea.style.position = "fixed";
+  textArea.style.top = "-1000px";
+  document.body.append(textArea);
+  textArea.select();
+  const copied = document.execCommand("copy");
+  textArea.remove();
+
+  if (selectedRange) {
+    selection.removeAllRanges();
+    selection.addRange(selectedRange);
+  }
+
+  if (!copied) {
+    throw new Error("Copy failed.");
+  }
+}
+
+function uniqueUrlsForItems(items) {
+  return [...new Set(items.map((item) => item.url).filter(Boolean))];
+}
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -789,6 +830,7 @@ function renderQuickResults(results, total, warnings = []) {
     const url = fragment.querySelector(".url");
     const meta = fragment.querySelector(".meta");
     const action = fragment.querySelector(".quick-action");
+    const copy = fragment.querySelector(".quick-copy");
 
     source.textContent = item.type;
     title.href = item.url;
@@ -801,6 +843,7 @@ function renderQuickResults(results, total, warnings = []) {
         ? "Restore"
         : "Open";
     action.addEventListener("click", () => performQuickAction(item).catch((error) => setStatus(error.message)));
+    copy.addEventListener("click", () => copyQuickUrl(item).catch((error) => setStatus(error.message)));
 
     elements.quickResults.append(fragment);
   }
@@ -835,6 +878,16 @@ async function performQuickAction(item) {
   setStatus(`${action.type === "activate-tab" ? "Switched to" : "Opened"} ${item.title || item.url}`);
 }
 
+async function copyQuickUrl(item) {
+  if (!item.url) {
+    setStatus("No URL to copy");
+    return;
+  }
+
+  await copyText(item.url);
+  setStatus(`Copied URL for ${item.title || item.url}`);
+}
+
 async function openSelected() {
   const items = await selectedResults();
   if (!items.length) {
@@ -842,7 +895,7 @@ async function openSelected() {
     return;
   }
 
-  const urls = [...new Set(items.map((item) => item.url).filter(Boolean))];
+  const urls = uniqueUrlsForItems(items);
   if (!urls.length) {
     setStatus("Selected records have no URLs to open");
     return;
@@ -869,6 +922,23 @@ async function openSelected() {
   }
 
   setStatus(`Opened ${response.opened} selected URL${response.opened === 1 ? "" : "s"}`);
+}
+
+async function copySelectedUrls() {
+  const items = await selectedResults();
+  if (!items.length) {
+    setStatus("Select records first");
+    return;
+  }
+
+  const urls = uniqueUrlsForItems(items);
+  if (!urls.length) {
+    setStatus("Selected records have no URLs to copy");
+    return;
+  }
+
+  await copyText(urls.join("\n"));
+  setStatus(`Copied ${urls.length} selected URL${urls.length === 1 ? "" : "s"}`);
 }
 
 async function runQuickSearch() {
@@ -1306,6 +1376,7 @@ function bindEvents() {
   elements.exportCsv.addEventListener("click", () => exportCsv().catch((error) => setStatus(error.message)));
   elements.exportHtml.addEventListener("click", () => exportHtml().catch((error) => setStatus(error.message)));
   elements.openSelected.addEventListener("click", () => openSelected().catch((error) => setStatus(error.message)));
+  elements.copySelected.addEventListener("click", () => copySelectedUrls().catch((error) => setStatus(error.message)));
   elements.exportSelected.addEventListener("click", () => exportSelected().catch((error) => setStatus(error.message)));
   elements.deleteVault.addEventListener("click", () => deleteFromVault().catch((error) => setStatus(error.message)));
   elements.deleteChrome.addEventListener("click", () => deleteFromChrome().catch((error) => setStatus(error.message)));

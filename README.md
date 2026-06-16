@@ -40,6 +40,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - staged import preview with valid row, duplicate row, existing visit, new visit, rule, and checksum status;
 - JSON, CSV, TSV, and Google Takeout-style import handling;
 - selected-record export;
+- selected-record URL copy;
 - selected-record batch opening with a tab-flood safety cap;
 - bulk deletion from the BrowseVault vault;
 - select visible, invert visible, or select all filtered vault results;
