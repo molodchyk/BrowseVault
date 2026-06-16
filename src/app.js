@@ -26,19 +26,16 @@ import {
   themeDatasetValue
 } from "./features/display-preferences/core/preferences.js";
 import {
-  invertSelectionForResults,
   loadMoreState,
   reconcileSelectedIds,
-  selectedCountLabel,
-  selectedIdsForResults,
-  uniqueUrlsForItems
+  selectedCountLabel
 } from "./features/history-results/core/results.js";
+import { createHistoryBulkActions } from "./features/history-results/ui/bulk-actions.js";
 import { renderHistoryResults } from "./features/history-results/ui/render-results.js";
 import { sendRuntimeMessage } from "./platform/chrome/runtime.js";
 import { getLocalStorage, setLocalStorage } from "./platform/chrome/storage.js";
 import { createVaultManagementActions } from "./features/vault-management/ui/actions.js";
 
-const OPEN_SELECTED_LIMIT = 25;
 const SEARCH_DEBOUNCE_MS = 300;
 
 const elements = collectAppElements(document);
@@ -256,6 +253,16 @@ const quickOpenActions = createQuickOpenActions({
   setStatus
 });
 
+const bulkActions = createHistoryBulkActions({
+  appState,
+  copyText,
+  getSearchText,
+  renderResults,
+  searchVisits,
+  selectedResults,
+  setStatus
+});
+
 function applyResultSelection({ selectedIds: nextSelectedIds, lastCheckedIndex: nextLastCheckedIndex, shouldRerender }) {
   appState.selectedIds = nextSelectedIds;
   appState.lastCheckedIndex = nextLastCheckedIndex;
@@ -292,59 +299,6 @@ function renderResults(results, total) {
 
   updateSelectionCount();
   updateLoadMoreButton();
-}
-
-async function openSelected() {
-  const items = await selectedResults();
-  if (!items.length) {
-    setStatus("Select records first");
-    return;
-  }
-
-  const urls = uniqueUrlsForItems(items);
-  if (!urls.length) {
-    setStatus("Selected records have no URLs to open");
-    return;
-  }
-
-  const urlsToOpen = urls.slice(0, OPEN_SELECTED_LIMIT);
-  const overflow = urls.length - urlsToOpen.length;
-  const message = overflow
-    ? `Open the first ${urlsToOpen.length} selected URLs? ${overflow} additional selected URLs will be left unopened to avoid flooding tabs.`
-    : `Open ${urlsToOpen.length} selected URL${urlsToOpen.length === 1 ? "" : "s"}?`;
-
-  if (!confirm(message)) {
-    setStatus("Open canceled");
-    return;
-  }
-
-  const response = await sendRuntimeMessage({
-    type: BACKGROUND_MESSAGE_TYPES.OPEN_URLS,
-    urls: urlsToOpen
-  });
-
-  if (!response?.ok) {
-    throw new Error(response?.error || "Open selected failed.");
-  }
-
-  setStatus(`Opened ${response.opened} selected URL${response.opened === 1 ? "" : "s"}`);
-}
-
-async function copySelectedUrls() {
-  const items = await selectedResults();
-  if (!items.length) {
-    setStatus("Select records first");
-    return;
-  }
-
-  const urls = uniqueUrlsForItems(items);
-  if (!urls.length) {
-    setStatus("Selected records have no URLs to copy");
-    return;
-  }
-
-  await copyText(urls.join("\n"));
-  setStatus(`Copied ${urls.length} selected URL${urls.length === 1 ? "" : "s"}`);
 }
 
 async function refreshStats() {
@@ -423,37 +377,6 @@ async function syncChromeHistory() {
   setStatus(`Synced ${response.result.stored} records`);
 }
 
-async function selectAllFiltered() {
-  const { results, total } = await searchVisits(getSearchText(), {
-    limit: "all"
-  });
-  appState.selectedIds = selectedIdsForResults(results);
-  renderResults(appState.currentResults, appState.currentTotal);
-  setStatus(`Selected ${total} matching vault records`);
-}
-
-function invertVisibleSelection() {
-  if (!appState.currentResults.length) {
-    setStatus("No visible results to invert");
-    return;
-  }
-
-  appState.selectedIds = invertSelectionForResults(appState.selectedIds, appState.currentResults);
-
-  renderResults(appState.currentResults, appState.currentTotal);
-  setStatus(`Inverted ${appState.currentResults.length} visible results`);
-}
-
-function selectVisibleResults() {
-  appState.selectedIds = selectedIdsForResults(appState.currentResults);
-  renderResults(appState.currentResults, appState.currentTotal);
-}
-
-function clearVisibleSelection() {
-  appState.selectedIds.clear();
-  renderResults(appState.currentResults, appState.currentTotal);
-}
-
 function bindEvents() {
   bindAppEvents({
     elements,
@@ -464,9 +387,9 @@ function bindEvents() {
       addWhitelistRule: () => vaultActions.addRule("whitelist"),
       blacklistSelectedDomains: vaultActions.blacklistSelectedDomains,
       cancelStagedImport: backupActions.cancelStagedImport,
-      clearSelection: clearVisibleSelection,
+      clearSelection: bulkActions.clearVisibleSelection,
       confirmStagedImport: backupActions.confirmStagedImport,
-      copySelectedUrls,
+      copySelectedUrls: bulkActions.copySelectedUrls,
       deleteFromChrome: vaultActions.deleteFromChrome,
       deleteFromVault: vaultActions.deleteFromVault,
       exportAll: backupActions.exportAll,
@@ -477,16 +400,16 @@ function bindEvents() {
       exportSelectedHtml: backupActions.exportSelectedHtml,
       focusSearchInput,
       importFromFile: backupActions.importFromFile,
-      invertVisibleSelection,
+      invertVisibleSelection: bulkActions.invertVisibleSelection,
       loadMoreResults,
-      openSelected,
+      openSelected: bulkActions.openSelected,
       resetVault: vaultActions.resetVault,
       runQuickSearch: quickOpenActions.runQuickSearch,
       runSearchesNow,
       savePreferences,
       scheduleSearches,
-      selectAllFiltered,
-      selectVisible: selectVisibleResults,
+      selectAllFiltered: bulkActions.selectAllFiltered,
+      selectVisible: bulkActions.selectVisibleResults,
       setStatus,
       switchTab,
       syncChromeHistory,
