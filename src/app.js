@@ -56,6 +56,7 @@ const elements = {
   deleteChrome: document.querySelector("#delete-chrome"),
   undoDelete: document.querySelector("#undo-delete"),
   selectVisible: document.querySelector("#select-visible"),
+  invertVisible: document.querySelector("#invert-visible"),
   selectFiltered: document.querySelector("#select-filtered"),
   loadMore: document.querySelector("#load-more"),
   clearSelection: document.querySelector("#clear-selection"),
@@ -966,6 +967,24 @@ async function selectAllFiltered() {
   setStatus(`Selected ${total} matching vault records`);
 }
 
+function invertVisibleSelection() {
+  if (!currentResults.length) {
+    setStatus("No visible results to invert");
+    return;
+  }
+
+  for (const result of currentResults) {
+    if (selectedIds.has(result.id)) {
+      selectedIds.delete(result.id);
+    } else {
+      selectedIds.add(result.id);
+    }
+  }
+
+  renderResults(currentResults, currentTotal);
+  setStatus(`Inverted ${currentResults.length} visible results`);
+}
+
 async function resetVault() {
   if (!confirm("Erase all BrowseVault local archive data, rules, and backup metadata? This will not delete Chrome history.")) {
     return;
@@ -1020,6 +1039,7 @@ function bindEvents() {
     selectedIds = new Set(currentResults.map((result) => result.id));
     renderResults(currentResults, currentTotal);
   });
+  elements.invertVisible.addEventListener("click", invertVisibleSelection);
   elements.selectFiltered.addEventListener("click", () => selectAllFiltered().catch((error) => setStatus(error.message)));
   elements.loadMore.addEventListener("click", () => loadMoreResults().catch((error) => setStatus(error.message)));
   elements.clearSelection.addEventListener("click", () => {
