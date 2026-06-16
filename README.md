@@ -28,6 +28,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - manual sync from currently available Chrome history, expanded to individual visits where Chrome exposes them;
 - query syntax for domain, title, URL, exact-day/date ranges, exclusions, phrases, and regex;
 - highlighted matches in vault and Quick Open search results;
+- local-date grouped vault results for easier timeline scanning;
 - Quick Open search across open tabs, bookmarks, downloads, and recently closed tabs, with source-aware switch/open/restore actions;
 - a keyboard command for opening BrowseVault;
 - JSON backup export and import;
@@ -52,6 +53,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - deterministic local ZIP packaging;
 - copied research and product docs in [`docs/`](docs/);
 - Chrome Web Store listing notes in [`store/listing.md`](store/listing.md);
+- StorePilot-ready Chrome Web Store import files in [`store-listing/chrome-web-store/`](store-listing/chrome-web-store/);
 - repository description and topic/tag metadata in [`package.json`](package.json).
 
 ## Project Structure
@@ -73,6 +75,12 @@ This repository contains a working Manifest V3 extension implementation. It incl
 │   └── storage.js
 ├── store/
 │   └── listing.md
+├── store-listing/
+│   └── chrome-web-store/
+│       ├── listing/
+│       │   └── en.md
+│       └── media/
+│           └── icon-128.png
 ├── manifest.json
 ├── package.json
 ├── PRIVACY.md

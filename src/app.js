@@ -150,6 +150,19 @@ function formatShortDate(value) {
   return new Intl.DateTimeFormat(undefined).format(date);
 }
 
+function localDayKey(value) {
+  const date = new Date(value);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatDayHeading(value) {
+  const weekday = new Intl.DateTimeFormat(undefined, { weekday: "long" }).format(new Date(value));
+  return `${weekday} · ${formatShortDate(value)}`;
+}
+
 function formatCount(value) {
   const count = Number(value);
   return Number.isFinite(count) ? count.toLocaleString() : "0";
@@ -630,10 +643,35 @@ function renderResults(results, total) {
   const titleTokens = highlightTokensForScope(query, "title");
   const urlTokens = highlightTokensForScope(query, "url");
   const metaTokens = highlightTokensForScope(query, "meta");
+  const dayCounts = new Map();
+  for (const result of results) {
+    const key = localDayKey(result.visitTime);
+    dayCounts.set(key, (dayCounts.get(key) || 0) + 1);
+  }
+  let currentDayKey = "";
+
   elements.resultCount.textContent = `${total} result${total === 1 ? "" : "s"} (${results.length} shown)`;
   elements.results.replaceChildren();
 
   results.forEach((item, index) => {
+    const itemDayKey = localDayKey(item.visitTime);
+    if (itemDayKey !== currentDayKey) {
+      const day = document.createElement("li");
+      day.className = "result-day";
+      day.setAttribute("aria-label", `Results for ${formatDayHeading(item.visitTime)}`);
+
+      const label = document.createElement("span");
+      label.textContent = formatDayHeading(item.visitTime);
+
+      const count = document.createElement("span");
+      const dayCount = dayCounts.get(itemDayKey) || 0;
+      count.textContent = `${dayCount} record${dayCount === 1 ? "" : "s"} shown`;
+
+      day.append(label, " ", count);
+      elements.results.append(day);
+      currentDayKey = itemDayKey;
+    }
+
     const fragment = elements.resultTemplate.content.cloneNode(true);
     const result = fragment.querySelector(".result");
     const checkbox = fragment.querySelector(".result-check");

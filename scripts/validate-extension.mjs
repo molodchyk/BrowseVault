@@ -15,7 +15,13 @@ const requiredFiles = [
   "src/app.css",
   "src/app.js",
   "store/listing.md",
+  "store-listing/chrome-web-store/README.md",
+  "store-listing/chrome-web-store/listing/en.md",
+  "store-listing/chrome-web-store/media/icon-128.png",
   "docs/README.md",
+  "docs/chrome-web-store-additional-fields.md",
+  "docs/chrome-web-store-category.md",
+  "docs/chrome-web-store-privacy-form.md",
   "assets/icons/icon16.png",
   "assets/icons/icon32.png",
   "assets/icons/icon48.png",
@@ -65,6 +71,32 @@ for (const size of [16, 32, 48, 128]) {
   const icon = fs.readFileSync(path.join(root, "assets", "icons", `icon${size}.png`));
   assert(icon[0] === 137 && icon[1] === 80 && icon[2] === 78 && icon[3] === 71, `Icon ${size} is not a PNG.`);
   assert(icon.readUInt32BE(16) === size && icon.readUInt32BE(20) === size, `Icon ${size} has wrong dimensions.`);
+}
+
+const storePilotIcon = fs.readFileSync(path.join(root, "store-listing", "chrome-web-store", "media", "icon-128.png"));
+assert(
+  storePilotIcon[0] === 137 && storePilotIcon[1] === 80 && storePilotIcon[2] === 78 && storePilotIcon[3] === 71,
+  "StorePilot icon is not a PNG."
+);
+assert(
+  storePilotIcon.readUInt32BE(16) === 128 && storePilotIcon.readUInt32BE(20) === 128,
+  "StorePilot icon must be 128 x 128."
+);
+
+const storePilotListing = fs.readFileSync(path.join(root, "store-listing", "chrome-web-store", "listing", "en.md"), "utf8").trim();
+assert(storePilotListing.length > 0, "StorePilot English detailed description cannot be empty.");
+assert(!/^#/m.test(storePilotListing), "StorePilot listing/en.md should not include Markdown headings.");
+assert(
+  !/^\s*(Name|Summary|Short Description|Description|Detailed Description)\s*:/im.test(storePilotListing),
+  "StorePilot listing/en.md should not include dashboard field labels."
+);
+
+const storePilotCategory = fs.readFileSync(path.join(root, "docs", "chrome-web-store-category.md"), "utf8");
+assert(/Selected category:\s*\S/i.test(storePilotCategory), "Chrome Web Store category document needs a selected category.");
+
+const storePilotPrivacy = fs.readFileSync(path.join(root, "docs", "chrome-web-store-privacy-form.md"), "utf8");
+for (const key of ["single_purpose", "remote_code", "host_permission", "permission.history", "permission.storage"]) {
+  assert(storePilotPrivacy.includes(`${key}:`), `Missing StorePilot privacy key: ${key}`);
 }
 
 const appHtml = fs.readFileSync(path.join(root, "src/app.html"), "utf8");

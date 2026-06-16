@@ -449,6 +449,30 @@ code {
   padding: 12px;
 }
 
+.result-day {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  padding: 8px 2px 4px;
+  text-transform: uppercase;
+}
+
+.result-day span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.result-day span:last-child {
+  flex: 0 0 auto;
+  font-weight: 750;
+}
+
 .quick-result {
   grid-template-columns: auto minmax(0, 1fr) auto;
 }
