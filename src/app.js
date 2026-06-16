@@ -29,6 +29,7 @@ const OPEN_SELECTED_LIMIT = 25;
 const BACKUP_STALE_DAYS = 30;
 const MAX_HIGHLIGHT_TOKENS = 12;
 const MAX_HIGHLIGHT_RANGES = 80;
+const SEARCH_DEBOUNCE_MS = 300;
 
 const elements = {
   tabs: [...document.querySelectorAll(".tab")],
@@ -101,6 +102,9 @@ let selectedIds = new Set();
 let lastCheckedIndex = null;
 let preferences = { ...DEFAULT_PREFERENCES };
 let stagedImport = null;
+let searchDebounceTimer = null;
+let historySearchRequestId = 0;
+let quickSearchRequestId = 0;
 
 function formatDate(value) {
   if (!value) {
@@ -229,6 +233,10 @@ function requestedResultLimit() {
   return clampLimit(elements.limit.value || preferences.defaultLimit);
 }
 
+function quickResultLimit() {
+  return Math.min(requestedResultLimit(), 100);
+}
+
 async function loadPreferences() {
   const result = await chrome.storage.local.get(PREFERENCES_KEY);
   preferences = {
@@ -253,7 +261,7 @@ async function savePreferences() {
   elements.limit.value = String(preferences.defaultLimit);
   applyPreferences();
   await refreshStats();
-  await runSearch();
+  await runSearchesNow();
   setStatus("Settings saved");
 }
 
@@ -280,6 +288,37 @@ function switchTab(tabName) {
   for (const panel of elements.panels) {
     panel.hidden = panel.dataset.panel !== tabName;
   }
+}
+
+function focusSearchInput() {
+  switchTab("history");
+  elements.query.focus();
+  elements.query.select();
+}
+
+function isEditableTarget(target) {
+  return ["INPUT", "SELECT", "TEXTAREA"].includes(target?.tagName || "");
+}
+
+function clearSearchDebounce() {
+  if (searchDebounceTimer !== null) {
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = null;
+  }
+}
+
+async function runSearchesNow() {
+  clearSearchDebounce();
+  await runSearch();
+  await runQuickSearch();
+}
+
+function scheduleSearches() {
+  clearSearchDebounce();
+  searchDebounceTimer = setTimeout(() => {
+    searchDebounceTimer = null;
+    runSearchesNow().catch((error) => setStatus(error.message));
+  }, SEARCH_DEBOUNCE_MS);
 }
 
 function getSearchText() {
@@ -833,10 +872,18 @@ async function openSelected() {
 }
 
 async function runQuickSearch() {
+  const requestId = ++quickSearchRequestId;
+  const searchText = getSearchText();
+  const limit = quickResultLimit();
   setStatus("Searching browser sources");
-  const { results, total, warnings } = await searchBrowserMemory(getSearchText(), {
-    limit: Math.min(Number(elements.limit.value || 500), 100)
+  const { results, total, warnings } = await searchBrowserMemory(searchText, {
+    limit
   });
+
+  if (requestId !== quickSearchRequestId) {
+    return;
+  }
+
   renderQuickResults(results, total, warnings);
   if (!warnings.length) {
     setStatus(`${total} source result${total === 1 ? "" : "s"}`);
@@ -891,19 +938,28 @@ async function renderRules() {
 }
 
 async function runSearch() {
+  const requestId = ++historySearchRequestId;
   setStatus("Searching local vault");
   currentShownLimit = requestedResultLimit();
+  const searchText = getSearchText();
+  const limit = currentShownLimit;
 
   try {
-    const { results, total } = await searchVisits(getSearchText(), {
-      limit: currentShownLimit
+    const { results, total } = await searchVisits(searchText, {
+      limit
     });
+
+    if (requestId !== historySearchRequestId) {
+      return;
+    }
 
     selectedIds = new Set([...selectedIds].filter((id) => results.some((result) => result.id === id)));
     renderResults(results, total);
     setStatus("Ready");
   } catch (error) {
-    setStatus(error.message);
+    if (requestId === historySearchRequestId) {
+      setStatus(error.message);
+    }
   }
 }
 
@@ -917,10 +973,15 @@ async function loadMoreResults() {
   const step = requestedResultLimit();
   currentShownLimit = Math.min(currentResults.length + step, currentTotal, MAX_RESULT_LIMIT);
   setStatus("Loading more results");
+  const requestId = ++historySearchRequestId;
 
   const { results, total } = await searchVisits(getSearchText(), {
     limit: currentShownLimit
   });
+
+  if (requestId !== historySearchRequestId) {
+    return;
+  }
 
   renderResults(results, total);
   setStatus(`Showing ${results.length} of ${total} results`);
@@ -1210,19 +1271,34 @@ function bindEvents() {
     document.documentElement.dataset.accent = elements.prefAccent.value;
   });
   elements.savePreferences.addEventListener("click", () => savePreferences().catch((error) => setStatus(error.message)));
-  elements.search.addEventListener("click", runSearch);
+  elements.search.addEventListener("click", () => runSearchesNow().catch((error) => setStatus(error.message)));
   elements.quickSearch.addEventListener("click", () => runQuickSearch().catch((error) => setStatus(error.message)));
   elements.clearSearch.addEventListener("click", () => {
     elements.query.value = "";
     elements.onDate.value = "";
     elements.after.value = "";
     elements.before.value = "";
-    runSearch();
+    runSearchesNow().catch((error) => setStatus(error.message));
   });
+  for (const input of [elements.query, elements.onDate, elements.after, elements.before, elements.limit]) {
+    input.addEventListener("input", scheduleSearches);
+  }
   elements.query.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
-      runSearch();
-      runQuickSearch().catch((error) => setStatus(error.message));
+      runSearchesNow().catch((error) => setStatus(error.message));
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    const key = event.key.toLowerCase();
+    if ((event.ctrlKey || event.metaKey) && key === "k") {
+      event.preventDefault();
+      focusSearchInput();
+      return;
+    }
+
+    if (event.key === "/" && !event.altKey && !event.ctrlKey && !event.metaKey && !isEditableTarget(event.target)) {
+      event.preventDefault();
+      focusSearchInput();
     }
   });
   elements.syncChrome.addEventListener("click", () => syncChromeHistory().catch((error) => setStatus(error.message)));

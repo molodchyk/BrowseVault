@@ -28,6 +28,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - manual sync from currently available Chrome history, expanded to individual visits where Chrome exposes them;
 - query syntax for domain, title, URL, exact-day/date ranges, exclusions, phrases, and regex;
 - highlighted matches in vault and Quick Open search results;
+- keyboard-first search with autofocus, global query focus, Enter search, and debounced live refresh;
 - local-date grouped vault results for easier timeline scanning;
 - Quick Open search across open tabs, bookmarks, downloads, and recently closed tabs, with source-aware switch/open/restore actions;
 - a keyboard command for opening BrowseVault;
