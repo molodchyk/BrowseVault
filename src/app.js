@@ -15,6 +15,15 @@ import {
 } from "./storage.js";
 import { searchBrowserMemory } from "./browser-memory.js";
 import { visitsToCsv, visitsToHtml } from "./export-format.js";
+import {
+  clearSearchDebounce as clearAppSearchDebounce,
+  createAppShellState,
+  isCurrentHistorySearchRequestId,
+  isCurrentQuickSearchRequestId,
+  nextHistorySearchRequestId,
+  nextQuickSearchRequestId,
+  scheduleSearchDebounce as scheduleAppSearchDebounce
+} from "./features/app-shell/core/state.js";
 import { collectAppElements } from "./features/app-shell/ui/elements.js";
 import { bindAppEvents } from "./features/app-shell/ui/events.js";
 import { archiveFromFileText } from "./features/backup-import/core/archive-parser.js";
@@ -54,21 +63,11 @@ const OPEN_SELECTED_LIMIT = 25;
 const SEARCH_DEBOUNCE_MS = 300;
 
 const elements = collectAppElements(document);
-
-let currentResults = [];
-let currentTotal = 0;
-let currentShownLimit = DEFAULT_PREFERENCES.defaultLimit;
-let selectedIds = new Set();
-let lastCheckedIndex = null;
-let preferences = { ...DEFAULT_PREFERENCES };
-let stagedImport = null;
-let searchDebounceTimer = null;
-let historySearchRequestId = 0;
-let quickSearchRequestId = 0;
+const appState = createAppShellState(DEFAULT_PREFERENCES);
 
 function renderBackupStatus(backup) {
   const status = backupStatusDetails(backup, {
-    dateFormat: preferences.dateFormat
+    dateFormat: appState.preferences.dateFormat
   });
 
   elements.backupHealth.textContent = status.healthText;
@@ -85,7 +84,7 @@ function setStatus(message) {
 }
 
 function requestedResultLimit() {
-  return clampResultLimit(elements.limit.value || preferences.defaultLimit);
+  return clampResultLimit(elements.limit.value || appState.preferences.defaultLimit);
 }
 
 function quickResultLimit() {
@@ -94,12 +93,12 @@ function quickResultLimit() {
 
 async function loadPreferences() {
   const result = await getLocalStorage(PREFERENCES_KEY);
-  preferences = normalizePreferences(result[PREFERENCES_KEY]);
+  appState.preferences = normalizePreferences(result[PREFERENCES_KEY]);
   applyPreferences();
 }
 
 async function savePreferences() {
-  preferences = normalizePreferences({
+  appState.preferences = normalizePreferences({
     theme: elements.prefTheme.value,
     accent: elements.prefAccent.value,
     dateFormat: elements.prefDateFormat.value,
@@ -107,9 +106,9 @@ async function savePreferences() {
   });
 
   await setLocalStorage({
-    [PREFERENCES_KEY]: preferences
+    [PREFERENCES_KEY]: appState.preferences
   });
-  elements.limit.value = String(preferences.defaultLimit);
+  elements.limit.value = String(appState.preferences.defaultLimit);
   applyPreferences();
   await refreshStats();
   await runSearchesNow();
@@ -118,16 +117,16 @@ async function savePreferences() {
 
 function applyPreferences() {
   const root = document.documentElement;
-  root.dataset.theme = themeDatasetValue(preferences.theme);
-  root.dataset.accent = preferences.accent;
+  root.dataset.theme = themeDatasetValue(appState.preferences.theme);
+  root.dataset.accent = appState.preferences.accent;
 
-  elements.prefTheme.value = preferences.theme;
-  elements.prefAccent.value = preferences.accent;
-  elements.prefDateFormat.value = preferences.dateFormat;
-  elements.prefLimit.value = String(preferences.defaultLimit);
+  elements.prefTheme.value = appState.preferences.theme;
+  elements.prefAccent.value = appState.preferences.accent;
+  elements.prefDateFormat.value = appState.preferences.dateFormat;
+  elements.prefLimit.value = String(appState.preferences.defaultLimit);
 
   if (!elements.limit.value || Number(elements.limit.value) === DEFAULT_PREFERENCES.defaultLimit) {
-    elements.limit.value = String(preferences.defaultLimit);
+    elements.limit.value = String(appState.preferences.defaultLimit);
   }
 }
 
@@ -148,10 +147,7 @@ function focusSearchInput() {
 }
 
 function clearSearchDebounce() {
-  if (searchDebounceTimer !== null) {
-    clearTimeout(searchDebounceTimer);
-    searchDebounceTimer = null;
-  }
+  clearAppSearchDebounce(appState);
 }
 
 async function runSearchesNow() {
@@ -161,9 +157,7 @@ async function runSearchesNow() {
 }
 
 function scheduleSearches() {
-  clearSearchDebounce();
-  searchDebounceTimer = setTimeout(() => {
-    searchDebounceTimer = null;
+  scheduleAppSearchDebounce(appState, () => {
     runSearchesNow().catch((error) => setStatus(error.message));
   }, SEARCH_DEBOUNCE_MS);
 }
@@ -190,18 +184,18 @@ function getSearchText() {
 }
 
 function updateSelectionCount() {
-  elements.selectedCount.textContent = selectedCountLabel(selectedIds.size);
+  elements.selectedCount.textContent = selectedCountLabel(appState.selectedIds.size);
 
-  const hasSelection = selectedIds.size > 0;
+  const hasSelection = appState.selectedIds.size > 0;
   for (const action of elements.selectionActions) {
     action.hidden = !hasSelection;
   }
 }
 
 function updateLoadMoreButton() {
-  const shown = currentResults.length;
+  const shown = appState.currentResults.length;
   const state = loadMoreState({
-    total: currentTotal,
+    total: appState.currentTotal,
     shown,
     step: requestedResultLimit(),
     max: MAX_RESULT_LIMIT
@@ -332,15 +326,15 @@ function importPreviewElements() {
 }
 
 async function selectedResults() {
-  return getVisitsByIds([...selectedIds]);
+  return getVisitsByIds([...appState.selectedIds]);
 }
 
 function applyResultSelection({ selectedIds: nextSelectedIds, lastCheckedIndex: nextLastCheckedIndex, shouldRerender }) {
-  selectedIds = nextSelectedIds;
-  lastCheckedIndex = nextLastCheckedIndex;
+  appState.selectedIds = nextSelectedIds;
+  appState.lastCheckedIndex = nextLastCheckedIndex;
 
   if (shouldRerender) {
-    renderResults(currentResults, currentTotal);
+    renderResults(appState.currentResults, appState.currentTotal);
     return;
   }
 
@@ -348,21 +342,24 @@ function applyResultSelection({ selectedIds: nextSelectedIds, lastCheckedIndex: 
 }
 
 function renderResults(results, total) {
-  currentResults = results;
-  currentTotal = total;
+  appState.currentResults = results;
+  appState.currentTotal = total;
 
   renderHistoryResults({
     results,
     total,
     queryText: getSearchText(),
-    selectedIds,
-    dateFormat: preferences.dateFormat,
+    selectedIds: appState.selectedIds,
+    dateFormat: appState.preferences.dateFormat,
     elements: {
       resultCount: elements.resultCount,
       results: elements.results,
       resultTemplate: elements.resultTemplate
     },
-    getSelectionState: () => ({ selectedIds, lastCheckedIndex }),
+    getSelectionState: () => ({
+      selectedIds: appState.selectedIds,
+      lastCheckedIndex: appState.lastCheckedIndex
+    }),
     onSelectionChange: applyResultSelection
   });
 
@@ -400,7 +397,7 @@ function renderQuickResults(results, total, warnings = []) {
     title.href = item.url;
     appendHighlightedText(title, item.title || item.url, titleTokens, query.regex);
     appendHighlightedText(url, item.url, urlTokens, query.regex);
-    appendHighlightedText(meta, `${item.detail} · ${item.domain || "unknown domain"} · ${formatDate(item.visitTime, preferences.dateFormat)}`, metaTokens, query.regex);
+    appendHighlightedText(meta, `${item.detail} · ${item.domain || "unknown domain"} · ${formatDate(item.visitTime, appState.preferences.dateFormat)}`, metaTokens, query.regex);
     action.textContent = item.action?.type === "activate-tab"
       ? "Switch"
       : item.action?.type === "restore-session"
@@ -536,7 +533,7 @@ async function blacklistSelectedDomains() {
 }
 
 async function runQuickSearch() {
-  const requestId = ++quickSearchRequestId;
+  const requestId = nextQuickSearchRequestId(appState);
   const searchText = getSearchText();
   const limit = quickResultLimit();
   setStatus("Searching browser sources");
@@ -544,7 +541,7 @@ async function runQuickSearch() {
     limit
   });
 
-  if (requestId !== quickSearchRequestId) {
+  if (!isCurrentQuickSearchRequestId(appState, requestId)) {
     return;
   }
 
@@ -558,9 +555,9 @@ async function refreshStats() {
   const stats = await getStats();
   elements.statVisits.textContent = String(stats.visits);
   elements.statDomains.textContent = String(stats.domains);
-  elements.statNewest.textContent = formatShortDate(stats.newestVisitTime, preferences.dateFormat);
+  elements.statNewest.textContent = formatShortDate(stats.newestVisitTime, appState.preferences.dateFormat);
   elements.statBackup.textContent = stats.meta.lastBackup?.exportedAt
-    ? formatShortDate(Date.parse(stats.meta.lastBackup.exportedAt), preferences.dateFormat)
+    ? formatShortDate(Date.parse(stats.meta.lastBackup.exportedAt), appState.preferences.dateFormat)
     : "Never";
   renderBackupStatus(stats.meta.lastBackup);
 }
@@ -602,48 +599,48 @@ async function renderRules() {
 }
 
 async function runSearch() {
-  const requestId = ++historySearchRequestId;
+  const requestId = nextHistorySearchRequestId(appState);
   setStatus("Searching local vault");
-  currentShownLimit = requestedResultLimit();
+  appState.currentShownLimit = requestedResultLimit();
   const searchText = getSearchText();
-  const limit = currentShownLimit;
+  const limit = appState.currentShownLimit;
 
   try {
     const { results, total } = await searchVisits(searchText, {
       limit
     });
 
-    if (requestId !== historySearchRequestId) {
+    if (!isCurrentHistorySearchRequestId(appState, requestId)) {
       return;
     }
 
-    selectedIds = reconcileSelectedIds(selectedIds, results);
+    appState.selectedIds = reconcileSelectedIds(appState.selectedIds, results);
     renderResults(results, total);
     setStatus("Ready");
   } catch (error) {
-    if (requestId === historySearchRequestId) {
+    if (isCurrentHistorySearchRequestId(appState, requestId)) {
       setStatus(error.message);
     }
   }
 }
 
 async function loadMoreResults() {
-  if (currentResults.length >= currentTotal || currentResults.length >= MAX_RESULT_LIMIT) {
+  if (appState.currentResults.length >= appState.currentTotal || appState.currentResults.length >= MAX_RESULT_LIMIT) {
     setStatus("All loaded results are visible");
     updateLoadMoreButton();
     return;
   }
 
   const step = requestedResultLimit();
-  currentShownLimit = Math.min(currentResults.length + step, currentTotal, MAX_RESULT_LIMIT);
+  appState.currentShownLimit = Math.min(appState.currentResults.length + step, appState.currentTotal, MAX_RESULT_LIMIT);
   setStatus("Loading more results");
-  const requestId = ++historySearchRequestId;
+  const requestId = nextHistorySearchRequestId(appState);
 
   const { results, total } = await searchVisits(getSearchText(), {
-    limit: currentShownLimit
+    limit: appState.currentShownLimit
   });
 
-  if (requestId !== historySearchRequestId) {
+  if (!isCurrentHistorySearchRequestId(appState, requestId)) {
     return;
   }
 
@@ -770,7 +767,7 @@ async function importFromFile(file) {
     return;
   }
 
-  stagedImport = {
+  appState.stagedImport = {
     archive,
     analysis,
     fileName: file.name,
@@ -782,22 +779,22 @@ async function importFromFile(file) {
 }
 
 function renderImportPreview() {
-  renderImportPreviewUi(importPreviewElements(), stagedImport);
+  renderImportPreviewUi(importPreviewElements(), appState.stagedImport);
 }
 
 function cancelStagedImport() {
-  stagedImport = null;
+  appState.stagedImport = null;
   renderImportPreview();
   setStatus("Import canceled");
 }
 
 async function confirmStagedImport() {
-  if (!stagedImport) {
+  if (!appState.stagedImport) {
     setStatus("Choose an archive first");
     return;
   }
 
-  const { archive, integrity } = stagedImport;
+  const { archive, integrity } = appState.stagedImport;
   if (integrity.checked && !integrity.ok && !confirm("This archive checksum does not match. Import anyway?")) {
     setStatus("Import canceled");
     return;
@@ -805,7 +802,7 @@ async function confirmStagedImport() {
 
   setStatus("Importing archive");
   const result = await importArchive(archive);
-  stagedImport = null;
+  appState.stagedImport = null;
   renderImportPreview();
   await refreshStats();
   await renderRules();
@@ -820,7 +817,7 @@ async function confirmStagedImport() {
 }
 
 async function deleteFromVault() {
-  const ids = [...selectedIds];
+  const ids = [...appState.selectedIds];
   if (!ids.length) {
     setStatus("Select records first");
     return;
@@ -831,7 +828,7 @@ async function deleteFromVault() {
   }
 
   const deleted = await markDeletedByIds(ids);
-  selectedIds.clear();
+  appState.selectedIds.clear();
   await refreshStats();
   await runSearch();
   setStatus(`Deleted ${deleted} records from vault`);
@@ -860,7 +857,7 @@ async function deleteFromChrome() {
   }
 
   const deleted = await markDeletedByIds(items.map((item) => item.id));
-  selectedIds.clear();
+  appState.selectedIds.clear();
   await refreshStats();
   await runSearch();
   setStatus(`Deleted ${deleted} records from Chrome and vault`);
@@ -892,31 +889,31 @@ async function selectAllFiltered() {
   const { results, total } = await searchVisits(getSearchText(), {
     limit: "all"
   });
-  selectedIds = selectedIdsForResults(results);
-  renderResults(currentResults, currentTotal);
+  appState.selectedIds = selectedIdsForResults(results);
+  renderResults(appState.currentResults, appState.currentTotal);
   setStatus(`Selected ${total} matching vault records`);
 }
 
 function invertVisibleSelection() {
-  if (!currentResults.length) {
+  if (!appState.currentResults.length) {
     setStatus("No visible results to invert");
     return;
   }
 
-  selectedIds = invertSelectionForResults(selectedIds, currentResults);
+  appState.selectedIds = invertSelectionForResults(appState.selectedIds, appState.currentResults);
 
-  renderResults(currentResults, currentTotal);
-  setStatus(`Inverted ${currentResults.length} visible results`);
+  renderResults(appState.currentResults, appState.currentTotal);
+  setStatus(`Inverted ${appState.currentResults.length} visible results`);
 }
 
 function selectVisibleResults() {
-  selectedIds = selectedIdsForResults(currentResults);
-  renderResults(currentResults, currentTotal);
+  appState.selectedIds = selectedIdsForResults(appState.currentResults);
+  renderResults(appState.currentResults, appState.currentTotal);
 }
 
 function clearVisibleSelection() {
-  selectedIds.clear();
-  renderResults(currentResults, currentTotal);
+  appState.selectedIds.clear();
+  renderResults(appState.currentResults, appState.currentTotal);
 }
 
 async function resetVault() {
@@ -925,9 +922,9 @@ async function resetVault() {
   }
 
   await clearVaultData();
-  currentResults = [];
-  currentTotal = 0;
-  selectedIds.clear();
+  appState.currentResults = [];
+  appState.currentTotal = 0;
+  appState.selectedIds.clear();
   elements.quickResults.replaceChildren();
   await refreshStats();
   await renderRules();
