@@ -9,7 +9,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `src/storage.js` owns IndexedDB vault records, import normalization, backup metadata, rules, and vault mutations.
 - `src/browser-memory.js` owns read-only search over tabs, bookmarks, downloads, and recently closed sessions.
 - `src/query.js` owns search parsing and matching.
-- `src/features/backup-import/` owns import-preview display state and rendering for archive restore flows.
+- `src/features/backup-import/` owns archive file parsing plus import-preview display state and rendering for restore flows.
 - `src/features/display-preferences/core/preferences.js` owns pure preference normalization, result-limit clamping, date/count formatting, and backup status summaries.
 - `src/features/history-export/core/export-format.js` owns pure CSV and HTML export formatting.
 - `src/features/history-results/core/results.js` owns pure result selection, URL/domain extraction, grouping, count labels, and load-more state.
@@ -18,7 +18,6 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 
 ## Next Split Candidates
 
-- Move archive parsing/import file detection from `src/app.js` into the backup-import feature.
 - Add platform wrappers before adding more direct `chrome.*` calls.
 
 ## Rules For Future Edits

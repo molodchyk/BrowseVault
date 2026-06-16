@@ -46,7 +46,7 @@ function pluralize(count, singular, plural = `${singular}s`) {
 
 export function importPreviewNote(analysis, integrity) {
   return [
-    `${analysis.rows} rows scanned.`,
+    `${pluralize(analysis.rows, "row")} scanned.`,
     analysis.invalidRows ? `${pluralize(analysis.invalidRows, "row")} without URLs will be skipped.` : "",
     analysis.rules ? `${pluralize(analysis.rules, "domain rule")} will be imported or updated.` : "",
     importChecksumNote(integrity)

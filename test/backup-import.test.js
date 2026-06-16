@@ -53,6 +53,11 @@ test("import preview notes summarize skipped rows, rules, and checksum state", (
   );
 
   assert.equal(
+    importPreviewNote({ ...baseAnalysis, rows: 1, invalidRows: 0, rules: 1 }, { checked: false, ok: true }),
+    "1 row scanned. 1 domain rule will be imported or updated. No checksum included."
+  );
+
+  assert.equal(
     importPreviewNote({ ...baseAnalysis, invalidRows: 2, rules: 1 }, { checked: false, ok: true }),
     "4 rows scanned. 2 rows without URLs will be skipped. 1 domain rule will be imported or updated. No checksum included."
   );

@@ -40,7 +40,7 @@ src/
       index.js
       messageRouter.js
     content/
-      index.global.js
+      index.js
       manifestScripts.js
     popup/
       popup.html
@@ -67,8 +67,8 @@ src/
         runtime.js
         messages.js
       content/
-        adapter.global.js
-        effects.global.js
+        adapter.js
+        effects.js
         effects.css
       ui/
         FeaturePanel.js
@@ -107,9 +107,50 @@ src/
     migration/
       oldStorageKeys.js
       oldSettings.js
+
+dist/
+  chrome/
+    manifest.json
+    background.js
+    content.js
+    popup.html
+    options.html
 ```
 
 This is a target shape, not a required first commit. Existing projects can keep their current paths while moving toward the boundaries.
+
+## Module And Build Target
+
+Author source as ES modules by default.
+
+Best-practice target:
+
+- `src` is human-authored source.
+- `dist` is generated extension output.
+- Feature code uses static ES imports and exports.
+- Runtime entries import feature modules and wire them.
+- Content-script source is still modular; the build emits manifest-loadable content bundles.
+- Extension pages use module scripts.
+- The background service worker uses `"type": "module"` and static imports.
+- Build output is audited before release.
+
+The build step is not the architecture. The architecture is feature ownership and explicit boundaries. The build step exists to preserve that architecture while satisfying browser-extension loading rules.
+
+Tooling should support:
+
+- ES module source;
+- local-only bundled executable code;
+- manifest path generation or validation;
+- source maps for debugging;
+- import resolution checks;
+- package audit for remote-code risks;
+- deterministic release artifacts.
+
+Avoid dynamic import in MV3 extension service workers. Use static imports or have the build step compile the dependency graph into valid extension output.
+
+Avoid remote executable code. Dependencies may be bundled, but executable JavaScript and WebAssembly used by the extension must be included in the extension package.
+
+TypeScript is a strong candidate when the extension has growing schemas, runtime messages, storage records, and cross-surface contracts. It is not required for the architecture, but the best mature design should either use TypeScript or maintain equivalent schema validation and tests.
 
 ## Runtime Entry Rules
 
@@ -136,7 +177,7 @@ Good feature ownership examples:
 
 - `plans/core/model.js` owns plan normalization and validation.
 - `schedules/core/time.js` owns schedule recurrence and active-window logic.
-- `ui-blocking/content/matcher.global.js` owns page element matching.
+- `ui-blocking/content/matcher.js` owns page element matching.
 - `intent/core/scoring.js` owns coherence scoring.
 - `pomodoro/background/runtime.js` owns alarm/runtime reconciliation.
 - `plans/options/PlanSchedule.css` owns plan-schedule styling if that styling changes with the plan-schedule UI.
@@ -200,7 +241,7 @@ Browser extension content scripts have special constraints:
 - they can read and change page DOM;
 - they have limited extension API access;
 - they often load through manifest order;
-- classic content scripts cannot import ES modules unless a build step or module strategy exists.
+- manifest-loaded content-script output may need to be bundled from modular source.
 
 Rules:
 
@@ -213,7 +254,7 @@ Rules:
 
 Useful naming:
 
-- `.global.js` for classic manifest-loaded scripts.
+- `.entry.js` for source files that compile into manifest-loaded output.
 - `controller.js` for thin content controllers.
 - `effects.js`, `style.js`, `theme.js`, `messages.js`, `dom.js`, `matcher.js` for focused sub-responsibilities.
 
@@ -226,7 +267,7 @@ Rules:
 - Treat memory as cache only.
 - Persist state needed after restart.
 - Make initialization idempotent.
-- Avoid dynamic imports in extension service workers unless a build step compiles them.
+- Use static imports in extension service workers.
 - Keep alarm registration, listener registration, and storage reconciliation in focused modules.
 
 Test target:
@@ -519,6 +560,7 @@ The DaD repository uses these script concepts, which are reusable in other exten
 - `verify:manifest`: checks that manifest-referenced files exist.
 - `verify:imports`: checks that relative ES-module imports resolve.
 - `verify:locales`: checks locale message coverage.
+- `verify:package`: checks generated extension output for remote executable code, missing files, sourcemap policy, and manifest/package consistency.
 - `verify:release`: runs release-specific packaging and policy checks.
 
 When porting to another extension, copy the concept before copying exact thresholds. A small extension can use stricter budgets; a migrated legacy extension may need temporary warnings before hard failures.
@@ -536,6 +578,7 @@ Browser extensions add constraints that ordinary web apps do not have:
 - Remote hosted code is prohibited in Chrome Web Store MV3 extensions.
 - Content-script messages need validation because page-adjacent code is less trusted than background code.
 - Extension pages, popups, and content scripts often need different UI/state boundaries.
+- Build output, not only source, is what users and stores run.
 
 Any modularization plan that ignores these constraints is cosmetic.
 
@@ -553,7 +596,7 @@ Avoid:
 - content scripts that own core business rules;
 - background handlers that trust content-script messages;
 - large path moves mixed with behavior changes;
-- adding a bundler only because the folder tree looks old.
+- unreviewed generated output.
 
 ## Healthy End State
 
@@ -568,6 +611,7 @@ A healthy extension codebase has:
 - bounded diagnostics;
 - feature-owned tests;
 - import and manifest checks;
+- package-output checks;
 - file-size and folder-density audits;
 - architecture docs that match the current tree.
 
