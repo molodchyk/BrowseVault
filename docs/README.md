@@ -8,6 +8,8 @@ This folder captures the critical market research, user feedback, product direct
 - `user-feedback-taxonomy.md` - grouped complaints, user needs, and positive demand signals.
 - `product-blueprint.md` - proposed better product, MVP scope, differentiators, prioritization, and positioning.
 - `implementation-notes.md` - Chrome extension constraints, architecture, storage/search/backup design, and testing risks.
+- `source-inventory.md` - index of raw source snapshots and how they map to the research notes.
+- `raw-sources/` - preserved Chrome Web Store listing/review text snapshots used as evidence.
 
 ## Core Insight
 
@@ -26,4 +28,3 @@ Users are not mainly asking for more charts or decorative UI. They want a trustw
 Build a local-first "browser memory manager" rather than a simple history page replacement.
 
 The winning product should feel boringly reliable for data preservation and sharply powerful for search. Trust, speed, and backup integrity matter more than visual novelty.
-

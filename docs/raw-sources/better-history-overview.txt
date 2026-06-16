@@ -1,0 +1,267 @@
+Skip to main content
+Chrome Web Store logo
+Chrome Web Store
+Search extensions and themes
+
+Discover
+
+Extensions
+
+Themes
+Item logo image for Better History | Manage, Export, and Delete History
+Better History | Manage, Export, and Delete History
+betterhistory.io
+Featured
+4.7
+(1.5k ratings)
+Extension
+Workflow and planning
+100,000 users
+Item media 1 (screenshot) for Better History | Manage, Export, and Delete History
+Item media 2 (screenshot) for Better History | Manage, Export, and Delete History
+Overview
+leek History Manager: Powerful search, bulk export, delete custom selections, filter by day/hour, and block domains from history.
+
+BetterHistory makes managing your browsing history simple and efficient. Quickly find past visits with advanced search tools, including keywords and RegEx. Export history as CSV or HTML, block specific domains for privacy, and sync tabs across devices. Use the Date Selector to jump to any day or hour, and delete individual entries or full days with ease. Enjoy smooth navigation with light/dark modes and enhanced tools.
+
+Stay in control with Smart Auto Cleanup, which automatically manages your browsing history by clearing it based on your preferred schedule and retention duration. Preserve important activity with Whitelist Domains, allowing you to exclude trusted sites from cleanup operations.
+
+⭐ Key Features
+
+(1) Efficient History Search with Advanced Search Tools
+(2) Comprehensive History Deletion Options
+(3) Smart Auto Cleanup
+(4) Whitelist Domains (Exclude from History Cleanup)
+(5) Export History in Multiple Formats
+(6) Domain Blacklist for Better Privacy
+(7) Enhanced Context Menu Tools
+(8) Unified View of Browsing and Downloads
+(9) Sync Across Devices for Seamless Browsing
+(10) Dark Mode for a Better Experience
+
+⭐ Features Detailed explanations
+
+(1) Efficient History Search with Advanced Search Tools
+Easily explore your browsing history using the intuitive Date Selector, which lets you jump to any specific date or hour with just a click. Your history is neatly organized by hours and days, making it simple to find the exact moment you need. Whether revisiting a webpage from last week or a few hours ago, BetterHistory ensures seamless access.
+
+Additionally, locate specific details with ease using simple keywords or advanced Regular Expressions (RegEx). Whether it's a page title, URL, or visit timestamp, BetterHistory’s powerful search tools deliver precise and refined results effortlessly.
+
+(2) Comprehensive History Deletion Options
+Delete your browsing history with ease and precision:
+• Remove history for a specific date or hour.
+• Delete all visits to a specific domain or individual web pages.
+• Filter history by keywords to remove only what’s necessary.
+
+These options ensure you maintain control over your digital footprint with minimal effort.
+
+(3) Smart Auto Cleanup
+Keep your browser clean and your history private—automatically. With Smart Auto Cleanup, you can schedule regular cleanups and define how long your history should be retained. Whether it's clearing history daily, weekly, or after a custom duration, this feature ensures your browsing data is managed without manual effort.
+
+(4) Whitelist Domains
+Maintain important records while cleaning the rest. Whitelist Domains allows you to protect specific websites from being deleted during automated cleanups. It’s ideal for preserving access to frequently visited or trusted sites—ensuring your essential history stays intact while everything else is wiped.
+
+(5) Export History in Multiple Formats
+Export your browsing history with full flexibility to meet your needs:
+
+• CSV Format: Ideal for creating spreadsheets, analyzing your history, or keeping detailed logs.
+• HTML Format: Perfect for viewing or sharing your browsing history in a web-friendly format.
+
+You can choose to export history for a complete day, a specific hour, or custom-selected history items, giving you total control over what gets exported.
+
+(6) Domain Blacklist for Better Privacy
+Block specific domains from being recorded in your history with the new Blacklist feature.
+
+• Add or remove domains directly from the extension settings or instantly from the context menu while browsing.
+• Protect your privacy by ensuring certain websites are never logged in your browser history again, making this feature perfect for sensitive browsing.
+
+(7) Enhanced Context Menu Tools
+Take advantage of the enhanced right-click options for quick actions:
+
+• Search History: Instantly search your browsing history for selected keywords or a specific domain.
+• Blacklist Domains: Quickly blacklist any domain without leaving the website you're on.
+• Delete History: Remove specific pages, entire domains, or keyword-related history directly from the context menu.
+
+This feature provides unmatched convenience, allowing you to manage your history without interrupting your browsing experience.
+
+(8) Unified View of Browsing and Downloads
+Access your browsing history and download logs in a single, unified interface.
+This combined view eliminates the need to switch between multiple tabs or tools, saving time and enhancing productivity.
+
+(9) Sync Across Devices for Seamless Browsing
+View open tabs and manage browsing activity from all your synced devices, including desktops, mobile phones, and tablets.
+BetterHistory ensures you never lose track of important tabs or browsing sessions, no matter which device you’re using.
+
+(10) Dark Mode for a Better Experience
+The user-friendly dark interface also enhances readability and minimizes glare, providing a more comfortable browsing experience.
+
+⭐ Version Updates
+==============================
+Version 7.0.0 || OCT 1, 2025
+==============================
+- Introduced Smart Auto Cleanup to schedule automatic history cleanup with custom retention settings.
+- Added Whitelist Domains feature to exclude selected websites from deletion.
+
+==============================
+Version 6.0.3 || March 27, 2025
+==============================
+- Added support for Shift + Click to select a range of entries.
+- Fixed a minor bug in history export.
+
+==============================
+Version 6.0.2 || March 18, 2025
+==============================
+- Performance upgrade
+- Miner UI fixes
+
+==============================
+Version 6.0.1 || March 3, 2025
+==============================
+- Fixed a deletion bug in search queries.
+- Added an option to export the entire history, including a date range selector for - custom date selection and downloads.
+-Fixed the blacklisted domain functionality, which now supports *.example.com.
+-Improved Context Menu Tools with new shortcuts:
+  • Quickly view all visits to the current domain.
+  • Delete an individual URL from history.
+  • Delete all visits from the current domain.
+  • Blacklist a domain to prevent it from being recorded in history.
+
+==============================
+Version 6.0.0 || January 17, 2025
+==============================
+- Added Export History feature with support for CSV and HTML formats.
+- Introduced Domain Blacklist to block specific domains from being recorded in history.
+- Implemented Date Selector for quickly jumping to any date or hour in browsing history.
+- Enhanced Context Menu Tools with options to:
+  • Search history for selected keywords or specific domains.
+  • Blacklist domains directly from the context menu.
+  • Delete specific pages, entire domains, or keyword-related history.
+- Improved Advanced Search Capabilities with support for Regular Expressions (RegEx).
+- Introduced Dark Mode for a more comfortable browsing experience.
+- Improved Light Mode for better visibility and aesthetics.
+- Added ability to delete a single date from browsing history.
+- Fixed bug where the date slider now aligns with the infinity scroll position.
+- Search input now automatically gains focus when history is opened.
+- Optimized navigation with highlighted search results for quick reference.
+
+==============================
+Version 5.0.1 || May 31, 2024
+==============================
+- Fixed 24-Hour Selection Issue
+- Title Case Adjustment in Window Title
+- Minor Fixes
+
+==============================
+Version 5.0.0 || May 29, 2024
+==============================
+- Light Mode UI Color Change
+- Custom Date Format
+- Feedback Button
+- Recent Visits Popup
+- UI Size Styles
+
+Bug Fixes:
+- XSS Vulnerability in Titles
+- Minor UI Issues
+
+Improvements:
+- Migration to Manifest v3
+
+==============================
+Version 4.0.3 || January 04, 2022
+==============================
+- Added "open link" in right-click or middle click
+- Added focus to the search input
+- Added HH:MM:SS format
+- Added details on hover
+- Open all button in Devices
+
+==============================
+Version 4.0.2 || December 09, 2021
+==============================
+- Removed item delete's animation
+- Fixed Hours and date selection section, now it will always remain (stick) at top
+- Added options in settings to select 12-hours and 24-hours clock
+- Added options in settings to disable infinite scroll feature
+- Added option in settings to change Toolbar icon according to your light and dark theme
+
+==============================
+Version 4.0.1 || November 29, 2021
+==============================
+- Removed "Confirmation popup" to delete single item from the history
+
+==============================
+Version 4.0.0 || November 26, 2021
+==============================
+- New clean UI implemented
+- Infinite scroll added
+- The code was optimized
+- Other Minor bugs fixed
+↪ For more changelogs, please visit: https://betterhistory.io/changelog/
+
+⭐ Active Support Center
+We value our users and constantly work to improve BetterHistory with new features and updates. Have a suggestion or need assistance? Share your request, and we’ll be happy to help!
+↪ Feature Request: https://betterhistory.io/contact/?reason=feature
+
+⭐ Privacy Policy
+• We do not track your data, browsing history, or website usage.
+• No data is transferred to third-party servers or the internet.
+• Your data is stored locally in your browser, and we never access or see it.
+• We use Google Analytics only to anonymously track code errors for improving the extension.
+
+Have questions about data privacy? We’re here to help!
+↪ Contact us: https://https://betterhistory.io/contact/?reason=general
+
+See less
+4.7 out of 5
+1.5k ratingsGoogle doesn't verify reviews. Learn more about results and reviews.
+Details
+Version
+7.0.0
+Updated
+24 October 2025
+Flag concern
+Size
+1.38MiB
+Languages
+18 languages
+Developer
+Website
+Email
+Non-trader
+This developer has not identified itself as a trader. For consumers in the European Union, please note that consumer rights do not apply to contracts between you and this developer.
+Privacy
+The developer has disclosed that it will not collect or use your data. To learn more, see the developer's privacy policy.
+This developer declares that your data is
+Not being sold to third parties, outside of the approved use cases
+Not being used or transferred for purposes that are unrelated to the item's core functionality
+Not being used or transferred to determine creditworthiness or for lending purposes
+Support
+For help with questions, suggestions or problems, visit the developer's support site
+
+Related
+
+Recent History
+
+4.2
+This extension displays your recent history, recently closed tabs, most visited pages and recent bookmarks in a one click pop-up.
+
+
+History by Date
+
+4.3
+Browse your history by date, instead of infinite scroll. This extension is open source. It respects your privacy, and doesn't track…
+
+
+View Chrome History
+
+3.8
+You can easily delete, edit your history on Chrome browser
+
+
+History Trends Unlimited
+
+4.5
+Search and analyze your unlimited history.
+
+About Chrome Web StoreDeveloper DashboardPrivacy PolicyTerms of ServiceHelp
+Better History | Manage, Export, and Delete History - Chrome Web Store

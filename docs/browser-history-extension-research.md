@@ -6,15 +6,7 @@ Source basis: user-provided Chrome Web Store listing/review text from attachment
 
 ## Source Inventory
 
-Attached source files:
-
-- `C:\Users\molod\.codex\attachments\efbb4093-f838-46ed-923e-b833720f7ae3\pasted-text.txt`
-- `C:\Users\molod\.codex\attachments\88b671eb-1037-455a-ae29-fb25d7ba0a4d\pasted-text.txt`
-- `C:\Users\molod\.codex\attachments\34f61ce7-2a19-482a-b5fc-6ea4cf0f7d3b\pasted-text.txt`
-- `C:\Users\molod\.codex\attachments\76ed848d-45e2-4b84-afd8-e133aaa551e7\pasted-text.txt`
-- `C:\Users\molod\.codex\attachments\1c66c343-15b1-4057-b2ec-100de86022d3\pasted-text.txt`
-- `C:\Users\molod\.codex\attachments\f872aa64-cb8f-4eab-8de0-cda9f5b6b2fe\pasted-text.txt`
-- `C:\Users\molod\.codex\attachments\dbc92d6f-d0cb-4fcc-ba6f-b9f8c76010c0\pasted-text.txt`
+Raw source snapshots are preserved in [`raw-sources/`](raw-sources/) and indexed in [`source-inventory.md`](source-inventory.md).
 
 ## Competitor Snapshot
 
@@ -184,4 +176,3 @@ The gap is a product that combines these without breaking trust:
 - precise bulk cleanup;
 - no ads, no hidden behavior, no surprise hijacking;
 - transparent import/export and migration.
-

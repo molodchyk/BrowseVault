@@ -1,0 +1,508 @@
+Skip to main content
+Chrome Web Store logo
+Chrome Web Store
+Search extensions and themes
+
+Discover
+
+Extensions
+
+Themes
+Item logo image for History Plus
+History Plus
+Featured
+4.3
+(62 ratings)
+Extension
+Tools
+8,000 users
+4.3 out of 5
+62 ratingsGoogle doesn't verify reviews. Learn more about results and reviews.
+Filter byFilter by
+All reviews
+Sort bySort by
+Recent
+LanguageLanguage
+All languages
+Review's profile picture
+Miguel blox
+2 Apr 2026
+Muito bom vai fazer a infancia
+
+Was this helpful?
+Review's profile picture
+Chris Johnson
+5 Jan 2026
+Meh. Works, but the one tab limitation really kills it. It should not matter how many tabs you have it previously opened in.
+
+Was this helpful?
+Review's profile picture
+Core T
+11 Nov 2025
+很好用
+1. 但有時一些網址title(不是特定網址)會被記錄成"untitle"，刪掉瀏覽紀錄、重啟History Plus、chrome、電腦都沒用，只有重新安裝History Plus才能再正確顯示title【找到問題了，資料庫中相同的網址都共用一個名稱】
+
+2. 90天後的有些資料icon都會不見
+
+3. 我匯入9萬筆資料，會有約2萬筆是"untitle"，在「Past 90 Days」後會大量發生，【找到問題了，在import.js】
+
+4. 我希望History Plus能夠準確記下過去網址的title，或是固定經過一段時間的title，而不是網址相同就用同一個title，例如:
+我偶爾會聽YT的歌title「貝多芬......」，某天頻道突然把影片轉為私人，我下次打開，所有這網址的title就可能會變為「此為私人影片」，我如果沒記下名稱就永遠失去這首歌的名字了
+
+1 person found this review to be helpful
+Review's profile picture
+Earth Light
+25 Oct 2025
+非常棒的插件，要是能直接替换浏览器默认的历史记录页面就完美了
+
+Was this helpful?
+Review's profile picture
+Clay Kim
+21 Sept 2025
+randomly decided to implode and delete all my history
+oh and none of the recent back ups work
+
+1 person found this review to be helpful
+Review's profile picture
+Cristiane Machado
+21 Jul 2025
+Very good and intuitive, but it only exports to TSV format! It's a useless file because it doesn't display the date or time!
+
+Was this helpful?
+Review's profile picture
+S Entropy
+16 Jul 2025
+非常好用的插件，功能明确，简洁高效，这个软件一看就是精心设计出来并且与市面上各类对比过的，对中文支持相当不错
+
+Was this helpful?
+Review's profile picture
+zl s
+11 Jul 2025
+edge历史记录只能三个月，可以说是一坨大芬。
+
+Was this helpful?
+Review's profile picture
+Ahnor Chansur
+5 Jul 2025
+如果能直接替换chrom历史记录会方便很多
+
+2 out of 2 found this helpful
+Review's profile picture
+Doug Meredith
+8 Jun 2025
+Seems like a nice app if analysis is your goal, but unless I'm doing something wrong, import is rather useless. Imported history shows up within the extension, but Chrome itself seems to have no knowledge of it.
+
+Was this helpful?
+Review's profile picture
+shuan wu
+8 Mar 2025
+nice app
+
+Was this helpful?
+Review's profile picture
+Jos Af
+27 Feb 2025
+Great Extension. Very Usefull
+
+Was this helpful?
+Review's profile picture
+Patton James
+25 Feb 2025
+简单直接，要的就是这种类型，能无限存历史记录，能用中文检索，其他的都是锦上添花
+
+Was this helpful?
+Review's profile picture
+Bob F
+24 Feb 2025
+would be nice to be able to load some of the history pages.
+
+Was this helpful?
+Review's profile picture
+Paul Birch
+24 Jan 2025
+this thing is awesome - many thanks makers 😍
+
+Was this helpful?
+Review's profile picture
+应广驰
+7 Jan 2025
+挺好用，就是自动分类有时候不太准确，如果可以自定义规则，并且自己创建分类就更好了
+
+Was this helpful?
+Review's profile picture
+Ryan King
+19 Dec 2024
+非常不错，要是能选择是弹出还是整个页面就好了！
+
+Was this helpful?
+Review's profile picture
+Ömer Yılmaz
+2 Dec 2024
+Can you add a feature that allows us to see our window history as well. A setting that shows closed windows in which window has which tabs.
+
+1 person found this review to be helpful
+Review's profile picture
+高潮
+30 Nov 2024
+基于Chromium 102的浏览器安装不了。manifest 3照说88就行的，其他很多扩展都能装起码有低版本能装，这个不行网上也没找到能装的版本，Chromium 109的倒是装上了
+
+Was this helpful?
+Review's profile picture
+top reviews
+28 Nov 2024
+VEry useful I need something like this for a long time
+
+Was this helpful?
+Review's profile picture
+gf s (i彧L)
+25 Nov 2024
+希望能适配安卓页面，还有增加过滤功能，跳转回来会有重复记录
+
+Was this helpful?
+Review's profile picture
+gg gg
+21 Nov 2024
+非常好用！想到的、没想到的功能都有~
+左侧的分类功能貌似是搜索特定内容的快捷方式，免去了在搜索框打字的步骤。以前没用过这功能，只想出了这么一个用途。
+尝试了下，之前用网页查看过QQ邮件，第一反应是去”邮件“里找，发现自带的分类将QQ邮件划分在“新闻”一栏。
+不知道后续会不会添加自定义分类的功能，比如自定义分类的类别、每个类别下包含的内容。
+
+2024年12月15日
+现在的搜索功能是“输入内容+回车”，两步出现搜索结果。是否可以像默认的历史记录那样，仅“输入内容”，自动出现搜索结果？
+
+Was this helpful?
+Review's profile picture
+Thomas Hübner
+14 Nov 2024
+perfect
+
+Was this helpful?
+Review's profile picture
+嘿嘿
+29 Oct 2024
+希望增加点击Chrome历史记录可以跳转到History+(Better History这个插件就可以实现，但官方不支持中文，自己汉化更新就替换很烦)
+希望增加跳转历史记录分页的功能，目前只能一页一页的翻
+
+Was this helpful?
+Replier's profile picture
+Tom Zenho
+Developer
+7 Nov 2024
+谢谢评论，你要的页面跳转已经好了！
+
+Review's profile picture
+Richard Marc Fernandez
+27 Oct 2024
+export file is .tsv so you can use it on other browsers
+
+0 out of 2 found this helpful
+Replier's profile picture
+Tom Zenho
+Developer
+3 Nov 2024
+You have two ways to export a .tsv fille:
+Option 1: On the top left, click the gear icon to the settings page. Uncheck "Export to a .zip file"
+Option 2: If you got zip file, unzip it to a .tsv file 
+
+Review's profile picture
+阿发
+24 Oct 2024
+挺好用的，从History Trends Unlimited转用这个扩展，提几个建议供参考：
+1、希望添加一个History Trends Unlimited扩展中的按照“最新”“最老”两种排序方式。
+2、希望添加一个日历视图，可以快速的按照日期定位历史记录。
+
+Was this helpful?
+Review's profile picture
+Roger Tsai
+18 Oct 2024
+我發現Google最近開始簡化活動記錄的詳細程度了，還好有這個很棒的擴充功能幫了我
+有個問題想問：我把備份時間設定成每天都備份後，每天打開擴充功能時就會出現另存新檔的視窗。這讓我很疑惑
+到底自動備份的功能是指擴充功能自行將歷史紀錄備份到電腦某處？還是我必須要儲存每次另存新檔視窗要我儲存的檔案？
+
+Was this helpful?
+Replier's profile picture
+Tom Zenho
+Developer
+22 Oct 2024
+感謝您喜歡！ 回答您的問題：如果開啓每天增量的備份，它就把昨天備份以後的備份，保存到下載目錄，你不用每次自己手動保存；如果覺得每天備份的文件太多，你可以定期全部備份導出;
+
+Review's profile picture
+木鹿鹿
+18 Oct 2024
+能否添加一个页数跳转呢，搜索结果页数多了一直点下一页有点慢，还有评论区的那些比如删不删除本体记录和替换默认历史页可以加个开关让用户选择吗，我更倾向于替换默认历史页，至于webdav 如果能轻松实现的话请添加这个功能
+
+Was this helpful?
+Replier's profile picture
+Tom Zenho
+Developer
+22 Oct 2024
+感谢你的反馈！
+1. 页数跳转，记下了，以后加上；
+2. 很好的建议，删除不删除可以加到配置里面去，以后版本考虑加上； 替换默认历史页由于是浏览器系统级的，不能加到配置项；
+3. webdav部分我会考虑一下
+
+Review's profile picture
+KR
+23 Sept 2024
+整体算中等偏上的功能。发现这款应用是，因为“History Trends Unlimited”对搜索中文标题的分词有很多问题，这款应用还好解决了这个问题，这是很好的地方。
+但是从安装之后，chrome的历史记录就开始出现一些奇怪的现象，我不确定是不是这款应用或其他原因引起。问题是：
+1、chrome的历史记录功能会会中断，也就是中间有些记录没有记录，History Plus里也没有。
+2、在History Plus里删除某个记录，chrome的历史记录也会被删除。这是我之前没有想到的。我对这款应用的期待（包含其他类似的History应用），它是可以存储超过90天（无限）、便捷定位查阅记录以及一些统计分析的应用。而不是要去修改和删除Chrome本身的数据。
+
+2 out of 2 found this helpful
+Replier's profile picture
+Tom Zenho
+Developer
+23 Sept 2024
+谢谢您的评论；我回复一下你的疑问：
+1. History Plus读取Chrome history的数据，如果本身就中断了，History Plus也是没有的。我确定不是History Plus造成的
+
+2. 同时删除Chrome历史记录的功能，是两个用户提出的要求，在最新的版本里面交付的，如果绝大多数人认为不要删除，我会在新的版本里面复原；
+
+Review's profile picture
+Hazel Smith
+3 Sept 2024
+Really cool extension but the data I have imported is only titled "untitle"? The domain is correct and the data had titles before, but on exporting and importing they lack titles. Also wish I could import my mobile csv history!
+
+2 out of 2 found this helpful
+Review's profile picture
+Jason Cheng
+21 Aug 2024
+好用，這邊許願一下能否增加dark mode，白底太亮有點刺眼，謝謝!
+
+Was this helpful?
+Replier's profile picture
+Tom Zenho
+Developer
+22 Oct 2024
+感谢反馈！dark mode从version 1.9.8开始就有了
+
+Review's profile picture
+茅场晶彦
+24 Jul 2024
+非常好,之前用的History Trends Unlimited 搜索基本不可用.这个有中文支持而且兼容 History Trends Unlimited的记录.
+挺不错的。
+然后反馈一个BUG，在目前2024/7/24时，搜索一个关键字，结果较多，例如翻到了第7页，然后更换关键字后结果只有3页时就会异常，无法上一页当前的结果也不对（如果搜索结果页多余当前页时不影响）（建议是检测到更换关键词后自动回到第一页）
+
+Was this helpful?
+Replier's profile picture
+Tom Zenho
+Developer
+22 Oct 2024
+谢谢反馈！我没有重现这个问题，能再详细一点吗？
+
+Review's profile picture
+Diablo
+19 Jul 2024
+WARNING!!!! COMPLETELY USELESS - READ THIS BEFORE INSTALLING
+
+I just installed this extension and at first I thought it was very good. But... I started doing lots of cleanup in my history and things SEEMS to be doing very well. This, until I did a checkup by disabling it to revert to the original history from Chrome... E.V.E.R.Y.T.H.I.N.G. I've deleted was still there.
+
+The description in the app store says: "Permissions:  Read and change your browsing history on all your signed-in devices". ... Show more
+
+2 out of 3 found this helpful
+Replier's profile picture
+Tom Zenho
+Developer
+15 Aug 2024
+Thanks for your feedback. Let me add this feature to the roadmap.
+
+-- update on 9/23/2024 --
+It deletes browser history when you delete from version 1.6.8 since 9/22/2024. Thanks for your patience! 
+
+Review's profile picture
+WTracks GPX editor
+4 Jun 2024
+Looks good! Would be even better as open source ;)
+Is the extended history stored by history+ used by the automatic search in the URL bar? I cannot test before 90 days.
+
+3 out of 3 found this helpful
+Review's profile picture
+storm
+3 Jun 2024
+因为better history的作者添加的新功能不给选项开关，被迫让我发现了这款好插件，要是能加上同款的日期选择菜单和多设备区分就更完美了！左侧的侧边栏如果可以自定义的话更好，作者加油！
+
+Was this helpful?
+Replier's profile picture
+Tom Zenho
+Developer
+22 Oct 2024
+感谢反馈！日期选择在v1.7.8已经加上; 自定义分类我先记录下来，需要的人多了，我再加
+
+Review's profile picture
+sky sun
+29 May 2024
+非常好用，功能全面。希望在页面直接添加一个日期选择功能。比如日历表的形式，可以直接点选具体日期。日历表位置建议放在左侧导航栏的“全部”项上面
+
+Was this helpful?
+Replier's profile picture
+Tom Zenho
+Developer
+1 Oct 2024
+Thanks for your feedback! There is a quick time span filtering and pickers since version 1.7.8. Please give it a try!
+
+Review's profile picture
+陈亮
+5 May 2024
+要是有个日期选择的功能就好了，好像不会替换默认的历史记录页啊
+
+Was this helpful?
+Replier's profile picture
+Tom Zenho
+Developer
+6 May 2024
+感谢喜欢！你提了两个问题，我分开回答：
+1. 日期选择：目前高级搜索里面可以选日期范围，是不是不够直接？你想直接有个日期条让你直接点击，是吗？
+-- update on 9/30/2024 ---
+新版本加了日期快速选择和两个时间选择框，希望你喜欢！
+
+2. 本来v1.2.8改成了默认历史记录页，但是好几个用户过来吐槽，所以v1.5.8又改回去了，等用户到2000以后看有多少人还需要这个功能
+
+Review's profile picture
+Edward Millen
+2 May 2024
+It's suddenly started taking over from the normal Chrome History page (i.e. if I press Ctrl + H or the History option in the main Chrome menu), which it didn't do before and I don't want it to. I can't find any setting for (or explanation of) this behaviour, so there seems to be no way of accessing the standard Chrome history page now, other than by actually disabling this extension (which I obviously don't want to do either, as I still want my history saved in some way beyond 90 days)
+
+4 out of 5 found this helpful
+Replier's profile picture
+Tom Zenho
+Developer
+2 May 2024
+--- Update on 5/3/2024 ---
+Already rollbacked the feature. Please update to v1.5.8:
+Method 1: Manual update. Go to the Chrome extension manager, clicking the Developer mode toggle, clicking the Update button, and then clicking the Developer mode again to disable it;
+Method 2: Just wait for Chrome's auto update in a few days.
+-------------------
+Replacing default history was requested by some users. You can find the review on 2/3/2024. I did request voting on this feature request. Looks like 3 out of 4 said they want it. This behavior cannot change on settings of extensions. Sorry for the inconvenience!  If anybody doesn't want this feature, please thumb up this review. I will update in next release.
+
+Review's profile picture
+Estrela S
+8 Apr 2024
+Really needs a more robust search function, I migrated from History Trends because of the database corruption problem, but not being able to do regex searches with url / page titles or filter by date is really a pain
+Edit: Thank you for the advanced search function, it's a really nice addition
+
+Was this helpful?
+Replier's profile picture
+Tom Zenho
+Developer
+18 Apr 2024
+Thanks for the feedback! I just added an advanced search feature to address some of the issues you raised. Please check it out and let me know what you think. Also, if you have any other suggestions, please let me know.
+
+Review's profile picture
+Alexey Ryzhkov
+29 Mar 2024
+Hi, good idea. It looks mostly as a backup. 
+But it could be much mode. Here are categories... but what logic behind these buttons (left side) with categories?
+I can't find a way to export only filtered items.  Can I select with ctrl and shift some range of filtered items?
+How to select all filtered items at once at least?
+What if I need to export only specific items? Is there a button to export selected list of items? 
+Here are some really needed features in my point of view. Hope it could b... Show more
+
+Was this helpful?
+Replier's profile picture
+Tom Zenho
+Developer
+18 Apr 2024
+Thank you for the feedback. I just added the export feature on the current result set. Please check it out and let me know what you think. Also, if you have any other suggestions, please let me know.
+
+Review's profile picture
+n ascentt
+1 Mar 2024
+Incredible.  Not only an automatic incremental local history backup, not only a local database of your whole history to search (in a world where chrome deletes your history a=every few months) but also smart categorisation and organisation.
+Wish I discovered it a long time ago.
+
+3 out of 3 found this helpful
+Review's profile picture
+P C Shinde
+26 Feb 2024
+Love this.
+
+1 person found this review to be unhelpful
+Review's profile picture
+Jean-Baptiste ALLAIN
+19 Feb 2024
+Je suis entièrement satisfait de cette extension, qui selon moi est la meilleure dans sa catégorie d'extension 
+
+Qualité du Produit
+La robustesse et la fiabilité de History Plus sont incontestées. Grâce à son interface intuitive et sa compatibilité étendue, il offre une expérience utilisateur fluide et sans accroc.
+
+Fonctionnalités et Avantages
+Les fonctionnalités clés incluent la sauvegarde de l'historique, l'exportation/importation, le filtrage rapide, et la catégorisation automatique des v... Show more
+
+Was this helpful?
+Review's profile picture
+Graham Victor
+10 Feb 2024
+非常好,之前用的History Trends Unlimited 因为使用sql语句搜索.使得搜索基本不可用.自己修改后用了几个月又碰上chrome 修改websql 就用不了了.正好就碰到这个了.看源码非常相似.且兼容 History Trends Unlimited的记录.
+手动修改源码添加备份到webdav 就非常好用.
+so. pls add webdav support!
+
+Was this helpful?
+Replier's profile picture
+Tom Zenho
+Developer
+6 May 2024
+您一般是用自己的WebDav，还是用其他公司的WebDav？是哪一个？
+
+Review's profile picture
+John Anderson
+3 Feb 2024
+Could be really good, you need it so it replaces the default history button, having to click extensions and then history plus is just too much effort.
+
+5 out of 8 found this helpful
+Replier's profile picture
+Tom Zenho
+Developer
+2 Mar 2024
+--- Update on 2024-5-3 ---
+Got a lot of complaints for replacing default history page in v1.3.8. So I changed it back. Wait for more feedback then.
+--------------------
+
+Let's vote on this feature request to replace the default history button: Please click thumb up if you support and thumb down if you don't support. If we can get 30 votes with more thumb up, I will do it in next version. 
+
+Review's profile picture
+2shi huatuo
+18 Jan 2024
+希望添加一个能选择日期的功能，选择那天之后我就能看到那天的浏览记录了
+
+1 person found this review to be helpful
+Replier's profile picture
+Tom Zenho
+Developer
+6 May 2024
+关于日期选择，新版本的高级搜索里面可以选日期范围，你再看看
+-- update on 9/30/2024 ---
+新版本加了日期快速选择和两个时间选择框，希望你喜欢！
+
+Review's profile picture
+IURII VANSOVYCH
+14 Jan 2024
+Fine!
+
+1 person found this review to be unhelpful
+Review's profile picture
+twm
+27 Nov 2023
+Horizonal scrollbars should not exist with my 1440p.
+
+1 person found this review to be helpful
+Replier's profile picture
+Tom Zenho
+Developer
+25 Apr 2024
+Thank you for your feedback on History Plus. We take your suggestions seriously and are always working to improve the app. We just released a new version that includes UI/UX optimization and a more modern style. Please take a look at the new version and let us know what you think. Your feedback is valuable to us, and we appreciate you taking the time to let us know what you think. 
+
+Review's profile picture
+Heath Brown
+25 Nov 2023
+Just needs to be open-source and available on GitHub. Other than that, it's perfect.
+
+5 out of 5 found this helpful
+Review's profile picture
+Alex Bjornstad
+17 Oct 2023
+Glad to see that there's a another choice to keep history forever in chromium base browers. Thanks !
+
+2 out of 2 found this helpful
+About Chrome Web StoreDeveloper DashboardPrivacy PolicyTerms of ServiceHelp
+Reviews: History Plus

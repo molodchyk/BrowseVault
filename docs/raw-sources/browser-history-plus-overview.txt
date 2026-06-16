@@ -1,0 +1,99 @@
+Skip to main content
+Chrome Web Store logo
+Chrome Web Store
+Search extensions and themes
+
+Discover
+
+Extensions
+
+Themes
+Item logo image for Browser History Plus
+Browser History Plus
+https://browserhistory.net/
+Featured
+4.2
+(57 ratings)
+Extension
+Privacy & Security
+60,000 users
+Item media 1 (screenshot) for Browser History Plus
+Item media 2 (screenshot) for Browser History Plus
+Overview
+Browser history plus replaces the default browser history and offers additional controls to manage and browse history with ease.
+
+Browser History Plus is designed to improve the way users browse and manage their browsing history. It replaces the default browser history and offers additional controls to manage and browse history with ease. The extension is designed to cater to users who have a lot of browsing history and find it difficult to navigate through it.
+
+Our extension offers a calendar view that allows users to see their browsing history in a more intuitive way. Users can select a date and view all the websites they visited during that day. The calendar view is a great way to quickly navigate through history and find the websites you visited on a specific day.
+
+Browser History Plus also offers a section to clean cache, history, downloads, cookies, and other Chrome browsing data. Users can quickly delete their browsing data without having to navigate through different menus and options. The section also offers customizable cleaning options, allowing users to delete only the data they want.
+
+The extension also offers an advanced search feature that allows users to search their browsing history using keywords. Users can search for a specific website or a keyword and quickly find relevant results. The search feature makes it easy to find websites that you visited a long time ago.
+
+Browser History Plus is a comprehensive tool that offers more control and customization options to manage and browse your browsing history. With its calendar view, advanced search, cleaning options, and categorization features, the extension makes it easy to navigate through your browsing history and find the websites you visited a long time ago.
+
+There are several reasons why users should occasionally clean cache, history, downloads, cookies, and other Chrome browsing data:
+
+1. Free up disk space: As you browse the internet, your browser stores various types of data such as cache files, cookies, and browsing history. Over time, these files can accumulate and take up a significant amount of disk space on your computer. By cleaning these files, you can free up space on your hard drive, which can help improve your computer's performance.
+
+2. Protect privacy: When you browse the internet, your browser stores information about the websites you visit, your search history, and other data. If you share your computer with others or use a public computer, this information can be accessed by others. By regularly cleaning your browsing data, you can protect your privacy and prevent others from accessing your sensitive information.
+
+3. Fix website issues: Sometimes, website issues can occur due to cached data or other browsing data stored in your browser. By clearing your cache and other browsing data, you can fix issues such as pages not loading correctly or broken links.
+
+4. Improve browser performance: Over time, your browser can become slower due to the accumulation of browsing data. By clearing your cache and other browsing data, you can improve your browser's performance and speed up page loading times.
+
+5. Remove malware: Malware can sometimes be stored in your browser's cache or other browsing data. By cleaning these files, you can remove any potential malware from your computer and protect yourself from security threats.
+
+In summary, cleaning cache, history, downloads, cookies, and other Chrome browsing data can help free up disk space, protect privacy, fix website issues, improve browser performance, and remove potential malware. It's a good idea to regularly clean your browsing data to keep your computer running smoothly and protect your sensitive information.
+
+See less
+4.2 out of 5
+57 ratingsGoogle doesn't verify reviews. Learn more about results and reviews.
+Details
+Version
+1.0.6
+Updated
+4 November 2025
+Flag concern
+Size
+471KiB
+Languages
+18 languages
+Developer
+Website
+Email
+Non-trader
+This developer has not identified itself as a trader. For consumers in the European Union, please note that consumer rights do not apply to contracts between you and this developer.
+Privacy
+The developer has disclosed that it will not collect or use your data. To learn more, see the developer's privacy policy.
+This developer declares that your data is
+Not being sold to third parties, outside of the approved use cases
+Not being used or transferred for purposes that are unrelated to the item's core functionality
+Not being used or transferred to determine creditworthiness or for lending purposes
+Related
+
+Simple History Manager
+
+4.1
+A simple Chrome history manager.
+
+
+Better History | Manage, Export, and Delete History
+
+4.7
+leek History Manager: Powerful search, bulk export, delete custom selections, filter by day/hour, and block domains from history.
+
+
+History Plus
+
+4.3
+A better browsing history. Save more history beyond 90 days, advanced search, autobackup and import/export.
+
+
+Recent Tabs and History (Wrona History Menu)
+
+4.8
+Restore, filter or remove recently closed tabs, windows and history including those from other devices.
+
+About Chrome Web StoreDeveloper DashboardPrivacy PolicyTerms of ServiceHelp
+Browser History Plus - Chrome Web Store
