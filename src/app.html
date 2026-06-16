@@ -80,10 +80,10 @@
           <div class="bulk-actions">
             <button id="select-visible" class="ghost" type="button">Select Visible</button>
             <button id="select-filtered" class="ghost" type="button">Select All Results</button>
-            <button id="clear-selection" class="ghost" type="button">Clear</button>
-            <button id="export-selected" type="button">Export Selected</button>
-            <button id="delete-vault" class="danger" type="button">Delete From Vault</button>
-            <button id="delete-chrome" class="danger" type="button">Delete URLs From Chrome</button>
+            <button id="clear-selection" class="ghost requires-selection" type="button" hidden>Clear</button>
+            <button id="export-selected" class="requires-selection" type="button" hidden>Export Selected</button>
+            <button id="delete-vault" class="danger requires-selection" type="button" hidden>Delete From Vault</button>
+            <button id="delete-chrome" class="danger requires-selection" type="button" hidden>Delete URLs From Chrome</button>
             <button id="undo-delete" class="ghost" type="button">Undo</button>
           </div>
         </section>

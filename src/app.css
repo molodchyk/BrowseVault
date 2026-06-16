@@ -93,6 +93,10 @@ select {
   font: inherit;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 button,
 .file-button {
   display: inline-flex;
@@ -508,14 +512,33 @@ code {
 
   .rule-row,
   .filters,
-  .settings-grid,
-  .stats-grid {
+  .settings-grid {
     grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .stat {
+    padding: 8px 10px;
+  }
+
+  .stat span {
+    font-size: 17px;
+  }
+
+  .stat p {
+    font-size: 11px;
+  }
+
+  .bulk-actions {
+    gap: 6px;
   }
 
   .backup-actions button,
   .backup-actions .file-button,
-  .bulk-actions button,
   .search-line button {
     width: 100%;
   }
@@ -527,5 +550,11 @@ code {
   .source-pill,
   .quick-action {
     justify-self: start;
+  }
+}
+
+@media (max-width: 480px) {
+  .bulk-actions button {
+    width: 100%;
   }
 }

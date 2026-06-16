@@ -45,6 +45,7 @@ const elements = {
   selectVisible: document.querySelector("#select-visible"),
   selectFiltered: document.querySelector("#select-filtered"),
   clearSelection: document.querySelector("#clear-selection"),
+  selectionActions: [...document.querySelectorAll(".requires-selection")],
   resultCount: document.querySelector("#result-count"),
   selectedCount: document.querySelector("#selected-count"),
   status: document.querySelector("#status"),
@@ -203,6 +204,11 @@ function getSearchText() {
 
 function updateSelectionCount() {
   elements.selectedCount.textContent = `${selectedIds.size} selected`;
+
+  const hasSelection = selectedIds.size > 0;
+  for (const action of elements.selectionActions) {
+    action.hidden = !hasSelection;
+  }
 }
 
 function downloadJson(filename, data) {
