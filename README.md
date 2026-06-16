@@ -31,7 +31,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - a keyboard command for opening BrowseVault;
 - JSON backup export and import;
 - CSV and HTML exports;
-- visible last-backup status;
+- visible backup status with freshness, format, record count, and checksum details;
 - SHA-256 integrity metadata for JSON backups;
 - staged import preview with valid row, duplicate row, existing visit, new visit, rule, and checksum status;
 - JSON, CSV, TSV, and Google Takeout-style import handling;

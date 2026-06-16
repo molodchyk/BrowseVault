@@ -24,6 +24,7 @@ const DEFAULT_PREFERENCES = {
 };
 const MAX_RESULT_LIMIT = 50000;
 const OPEN_SELECTED_LIMIT = 25;
+const BACKUP_STALE_DAYS = 30;
 
 const elements = {
   tabs: [...document.querySelectorAll(".tab")],
@@ -72,6 +73,11 @@ const elements = {
   statDomains: document.querySelector("#stat-domains"),
   statNewest: document.querySelector("#stat-newest"),
   statBackup: document.querySelector("#stat-backup"),
+  backupHealth: document.querySelector("#backup-health"),
+  backupLast: document.querySelector("#backup-last"),
+  backupFormat: document.querySelector("#backup-format"),
+  backupRecords: document.querySelector("#backup-records"),
+  backupChecksum: document.querySelector("#backup-checksum"),
   ruleDomain: document.querySelector("#rule-domain"),
   addBlacklist: document.querySelector("#add-blacklist"),
   addWhitelist: document.querySelector("#add-whitelist"),
@@ -137,6 +143,55 @@ function formatShortDate(value) {
   }
 
   return new Intl.DateTimeFormat(undefined).format(date);
+}
+
+function formatCount(value) {
+  const count = Number(value);
+  return Number.isFinite(count) ? count.toLocaleString() : "0";
+}
+
+function formatChecksum(value) {
+  if (!value) {
+    return "Not available";
+  }
+
+  return value.length > 24 ? `${value.slice(0, 12)}...${value.slice(-8)}` : value;
+}
+
+function backupTimestamp(backup) {
+  if (!backup?.exportedAt) {
+    return 0;
+  }
+
+  const timestamp = Date.parse(backup.exportedAt);
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function renderBackupStatus(backup) {
+  const timestamp = backupTimestamp(backup);
+
+  if (!timestamp) {
+    elements.backupHealth.textContent = "No backup yet";
+    elements.backupHealth.classList.add("is-warning");
+    elements.backupHealth.classList.remove("is-ok");
+    elements.backupLast.textContent = "Never";
+    elements.backupFormat.textContent = "-";
+    elements.backupRecords.textContent = "0";
+    elements.backupChecksum.textContent = "Not available";
+    return;
+  }
+
+  const ageDays = Math.floor((Date.now() - timestamp) / 86400000);
+  const isStale = ageDays > BACKUP_STALE_DAYS;
+  elements.backupHealth.textContent = isStale
+    ? `Backup older than ${BACKUP_STALE_DAYS} days`
+    : "Backup current";
+  elements.backupHealth.classList.toggle("is-warning", isStale);
+  elements.backupHealth.classList.toggle("is-ok", !isStale);
+  elements.backupLast.textContent = formatDate(timestamp);
+  elements.backupFormat.textContent = String(backup.format || "unknown").toUpperCase();
+  elements.backupRecords.textContent = formatCount(backup.records);
+  elements.backupChecksum.textContent = formatChecksum(backup.sha256);
 }
 
 function setStatus(message) {
@@ -654,6 +709,7 @@ async function refreshStats() {
   elements.statBackup.textContent = stats.meta.lastBackup?.exportedAt
     ? formatShortDate(Date.parse(stats.meta.lastBackup.exportedAt))
     : "Never";
+  renderBackupStatus(stats.meta.lastBackup);
 }
 
 async function renderRules() {

@@ -121,6 +121,27 @@
             </div>
             <button id="sync-chrome" type="button">Sync Chrome History</button>
           </div>
+          <section class="backup-status" aria-label="Backup status">
+            <div id="backup-health" class="backup-health" aria-live="polite">No backup yet</div>
+            <dl class="backup-meta">
+              <div>
+                <dt>Last backup</dt>
+                <dd id="backup-last">Never</dd>
+              </div>
+              <div>
+                <dt>Format</dt>
+                <dd id="backup-format">-</dd>
+              </div>
+              <div>
+                <dt>Records</dt>
+                <dd id="backup-records">0</dd>
+              </div>
+              <div>
+                <dt>Checksum</dt>
+                <dd id="backup-checksum">Not available</dd>
+              </div>
+            </dl>
+          </section>
           <div class="backup-actions">
             <button id="export-json" type="button">Export JSON</button>
             <button id="export-csv" type="button">Export CSV</button>
