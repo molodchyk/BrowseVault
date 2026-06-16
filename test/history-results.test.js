@@ -14,6 +14,10 @@ import {
   uniqueDomainsForItems,
   uniqueUrlsForItems
 } from "../src/features/history-results/core/results.js";
+import {
+  highlightRanges,
+  highlightTokensForScope
+} from "../src/features/history-results/ui/text-highlighting.js";
 
 const results = [
   { id: "a", url: "https://www.example.com/a", domain: "example.com", day: "2026-06-16" },
@@ -69,4 +73,21 @@ test("result labels, grouping, and load-more state are deterministic", () => {
     canLoadMore: false,
     nextCount: 0
   });
+});
+
+test("highlight helpers choose scoped tokens and merge overlapping ranges", () => {
+  const query = {
+    terms: ["alpha"],
+    phrases: ["beta docs"],
+    title: ["report"],
+    url: ["example"],
+    site: ["docs.example.com"]
+  };
+
+  assert.deepEqual(highlightTokensForScope(query, "title"), ["beta docs", "report", "alpha"]);
+  assert.deepEqual(highlightTokensForScope(query, "url"), ["docs.example.com", "beta docs", "example", "alpha"]);
+  assert.deepEqual(highlightRanges("Alpha beta docs report", ["alpha", "beta docs"], /docs report/), [
+    [0, 5],
+    [6, 22]
+  ]);
 });

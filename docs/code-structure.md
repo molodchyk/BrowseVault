@@ -12,11 +12,11 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `src/features/display-preferences/core/preferences.js` owns pure preference normalization, result-limit clamping, date/count formatting, and backup status summaries.
 - `src/features/history-export/core/export-format.js` owns pure CSV and HTML export formatting.
 - `src/features/history-results/core/results.js` owns pure result selection, URL/domain extraction, grouping, count labels, and load-more state.
+- `src/features/history-results/ui/` owns history result DOM rendering and search-hit highlighting.
 - `src/export-format.js` is a compatibility barrel for existing import paths.
 
 ## Next Split Candidates
 
-- Move result DOM rendering from `src/app.js` into the history-results feature.
 - Move import preview rendering from `src/app.js` into a backup/import feature.
 - Add platform wrappers before adding more direct `chrome.*` calls.
 
