@@ -1,5 +1,5 @@
 # Display Preferences
 
-Owns pure display settings, result-limit normalization, date formatting, count formatting, and backup status summaries.
+Owns display settings, result-limit normalization, date formatting, count formatting, backup status summaries, settings persistence orchestration, and extension-page preference/stat rendering.
 
-The extension page still owns DOM binding and Chrome storage access. Keep this feature free of `chrome`, `window`, and `document` dependencies.
+Core modules stay free of `chrome`, `window`, and `document` dependencies. UI modules coordinate extension-page elements and storage through injected services or platform wrappers so they remain testable outside the browser.

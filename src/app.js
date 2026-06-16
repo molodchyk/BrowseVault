@@ -12,19 +12,13 @@ import { createQuickOpenActions } from "./features/browser-memory/ui/quick-open-
 import { createChromeHistorySyncAction } from "./features/background-runtime/ui/chrome-history-sync-action.js";
 import {
   DEFAULT_PREFERENCES,
-  MAX_RESULT_LIMIT,
-  PREFERENCES_KEY,
-  backupStatusDetails,
-  clampResultLimit,
-  formatShortDate,
-  normalizePreferences,
-  themeDatasetValue
+  MAX_RESULT_LIMIT
 } from "./features/display-preferences/core/preferences.js";
+import { createDisplayPreferencesController } from "./features/display-preferences/ui/preferences-controller.js";
 import { createHistoryBulkActions } from "./features/history-results/ui/bulk-actions.js";
 import { createHistoryResultsController } from "./features/history-results/ui/results-controller.js";
 import { createHistorySearchActions } from "./features/history-results/ui/search-actions.js";
 import { createHistorySearchForm } from "./features/history-results/ui/search-form.js";
-import { getLocalStorage, setLocalStorage } from "./platform/chrome/storage.js";
 import { createVaultManagementActions } from "./features/vault-management/ui/actions.js";
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -32,69 +26,8 @@ const SEARCH_DEBOUNCE_MS = 300;
 const elements = collectAppElements(document);
 const appState = createAppShellState(DEFAULT_PREFERENCES);
 
-function renderBackupStatus(backup) {
-  const status = backupStatusDetails(backup, {
-    dateFormat: appState.preferences.dateFormat
-  });
-
-  elements.backupHealth.textContent = status.healthText;
-  elements.backupHealth.classList.toggle("is-warning", status.isWarning);
-  elements.backupHealth.classList.toggle("is-ok", status.isOk);
-  elements.backupLast.textContent = status.lastText;
-  elements.backupFormat.textContent = status.formatText;
-  elements.backupRecords.textContent = status.recordsText;
-  elements.backupChecksum.textContent = status.checksumText;
-}
-
 function setStatus(message) {
   elements.status.textContent = message;
-}
-
-function requestedResultLimit() {
-  return clampResultLimit(elements.limit.value || appState.preferences.defaultLimit);
-}
-
-function quickResultLimit() {
-  return Math.min(requestedResultLimit(), 100);
-}
-
-async function loadPreferences() {
-  const result = await getLocalStorage(PREFERENCES_KEY);
-  appState.preferences = normalizePreferences(result[PREFERENCES_KEY]);
-  applyPreferences();
-}
-
-async function savePreferences() {
-  appState.preferences = normalizePreferences({
-    theme: elements.prefTheme.value,
-    accent: elements.prefAccent.value,
-    dateFormat: elements.prefDateFormat.value,
-    defaultLimit: elements.prefLimit.value
-  });
-
-  await setLocalStorage({
-    [PREFERENCES_KEY]: appState.preferences
-  });
-  elements.limit.value = String(appState.preferences.defaultLimit);
-  applyPreferences();
-  await refreshStats();
-  await searchCoordinator.runSearchesNow();
-  setStatus("Settings saved");
-}
-
-function applyPreferences() {
-  const root = document.documentElement;
-  root.dataset.theme = themeDatasetValue(appState.preferences.theme);
-  root.dataset.accent = appState.preferences.accent;
-
-  elements.prefTheme.value = appState.preferences.theme;
-  elements.prefAccent.value = appState.preferences.accent;
-  elements.prefDateFormat.value = appState.preferences.dateFormat;
-  elements.prefLimit.value = String(appState.preferences.defaultLimit);
-
-  if (!elements.limit.value || Number(elements.limit.value) === DEFAULT_PREFERENCES.defaultLimit) {
-    elements.limit.value = String(appState.preferences.defaultLimit);
-  }
 }
 
 function switchTab(tabName) {
@@ -157,13 +90,22 @@ const historySearchForm = createHistorySearchForm({
   elements
 });
 
+const displayPreferences = createDisplayPreferencesController({
+  appState,
+  elements,
+  getStats,
+  refreshAfterSave: () => searchCoordinator.runSearchesNow(),
+  root: document.documentElement,
+  setStatus
+});
+
 const historyResults = createHistoryResultsController({
   appState,
   elements,
   getDateFormat: () => appState.preferences.dateFormat,
   getSearchText: historySearchForm.getSearchText,
   maxResultLimit: MAX_RESULT_LIMIT,
-  requestedResultLimit
+  requestedResultLimit: displayPreferences.requestedResultLimit
 });
 
 const historySearchActions = createHistorySearchActions({
@@ -171,7 +113,7 @@ const historySearchActions = createHistorySearchActions({
   getSearchText: historySearchForm.getSearchText,
   maxResultLimit: MAX_RESULT_LIMIT,
   renderResults: historyResults.renderResults,
-  requestedResultLimit,
+  requestedResultLimit: displayPreferences.requestedResultLimit,
   searchVisits,
   setStatus,
   updateLoadMoreButton: historyResults.updateLoadMoreButton
@@ -180,7 +122,7 @@ const historySearchActions = createHistorySearchActions({
 const vaultActions = createVaultManagementActions({
   appState,
   elements,
-  refreshStats,
+  refreshStats: displayPreferences.refreshStats,
   runSearch: historySearchActions.runSearch,
   selectedResults,
   setStatus
@@ -189,7 +131,7 @@ const vaultActions = createVaultManagementActions({
 const backupActions = createBackupActions({
   appState,
   elements,
-  refreshStats,
+  refreshStats: displayPreferences.refreshStats,
   renderRules: vaultActions.renderRules,
   runSearch: historySearchActions.runSearch,
   selectedResults,
@@ -203,7 +145,7 @@ const quickOpenActions = createQuickOpenActions({
   elements,
   getDateFormat: () => appState.preferences.dateFormat,
   getSearchText: historySearchForm.getSearchText,
-  quickResultLimit,
+  quickResultLimit: displayPreferences.quickResultLimit,
   setStatus
 });
 
@@ -226,21 +168,10 @@ const bulkActions = createHistoryBulkActions({
 });
 
 const syncChromeHistory = createChromeHistorySyncAction({
-  refreshStats,
+  refreshStats: displayPreferences.refreshStats,
   runSearch: historySearchActions.runSearch,
   setStatus
 });
-
-async function refreshStats() {
-  const stats = await getStats();
-  elements.statVisits.textContent = String(stats.visits);
-  elements.statDomains.textContent = String(stats.domains);
-  elements.statNewest.textContent = formatShortDate(stats.newestVisitTime, appState.preferences.dateFormat);
-  elements.statBackup.textContent = stats.meta.lastBackup?.exportedAt
-    ? formatShortDate(Date.parse(stats.meta.lastBackup.exportedAt), appState.preferences.dateFormat)
-    : "Never";
-  renderBackupStatus(stats.meta.lastBackup);
-}
 
 function bindEvents() {
   bindAppEvents({
@@ -272,7 +203,7 @@ function bindEvents() {
       resetVault: vaultActions.resetVault,
       runQuickSearch: quickOpenActions.runQuickSearch,
       runSearchesNow: searchCoordinator.runSearchesNow,
-      savePreferences,
+      savePreferences: displayPreferences.savePreferences,
       scheduleSearches: searchCoordinator.scheduleSearches,
       selectAllFiltered: bulkActions.selectAllFiltered,
       selectVisible: bulkActions.selectVisibleResults,
@@ -285,10 +216,10 @@ function bindEvents() {
 }
 
 async function init() {
-  await loadPreferences();
+  await displayPreferences.loadPreferences();
   bindEvents();
   elements.query.focus();
-  await refreshStats();
+  await displayPreferences.refreshStats();
   await vaultActions.renderRules();
   await historySearchActions.runSearch();
   await quickOpenActions.runQuickSearch();
