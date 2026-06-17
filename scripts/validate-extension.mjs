@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { validatePlaybookCompliance } from "./playbook/validate-playbook-compliance.mjs";
 
 const root = process.cwd();
 const requiredFiles = [
@@ -33,7 +34,7 @@ const requiredFiles = [
   "store-listing/chrome-web-store/media/screenshots/05-settings-privacy.jpg",
   "docs/README.md", "docs/architecture/code-structure.md", "docs/architecture/extension-modularization-playbook.md",
   "docs/project/decision-records.md", "docs/project/repository-metadata.md", "docs/release/reviewer-notes.md",
-  "docs/release/release-qa.md", "docs/release/release-notes.md", "docs/research/source-inventory.md",
+  "docs/release/browser-extension-playbook-compliance.md", "docs/release/release-qa.md", "docs/release/release-notes.md", "docs/research/source-inventory.md",
   "docs/storepilot-project-structure.md",
   "docs/chrome-web-store-additional-fields.md",
   "docs/chrome-web-store-category.md",
@@ -52,6 +53,7 @@ const requiredFiles = [
   "scripts/generate-icons.mjs",
   "scripts/media/generate-store-media.py",
   "scripts/package-extension.mjs",
+  "scripts/playbook/validate-playbook-compliance.mjs",
   "scripts/verify-package.mjs",
   "scripts/zip-utils.mjs"
 ];
@@ -257,30 +259,7 @@ const license = fs.readFileSync(path.join(root, "LICENSE"), "utf8");
 assert(/GNU GENERAL PUBLIC LICENSE/.test(license), "LICENSE must contain the GPLv3 text.");
 assert(/Version 3, 29 June 2007/.test(license), "LICENSE must be GPL version 3.");
 
-const readme = fs.readFileSync(path.join(root, "README.md"), "utf8");
-for (const expected of [
-  "PRIVACY.md",
-  "Open source under the GPL-3.0 license:",
-  "https://github.com/molodchyk/BrowseVault",
-  "Buy Me a Coffee",
-  "https://buymeacoffee.com/molodchyk",
-  "Patreon",
-  "https://www.patreon.com/OMolodchyk"
-]) {
-  assert(readme.includes(expected), `README missing playbook-required text: ${expected}`);
-}
-
-const privacy = fs.readFileSync(path.join(root, "PRIVACY.md"), "utf8");
-assert(privacy.includes("Chrome local extension storage"), "Privacy policy must name the storage area used for settings.");
-for (const expected of [
-  "content scripts",
-  "remote code",
-  "Does not sell, share, transfer, upload, review, or collect",
-  "`downloads`: searches download URLs and filenames in Quick Open and can show Chrome's Save As prompt",
-  "`tabs`: lists open tabs for Quick Open"
-]) {
-  assert(privacy.includes(expected), `Privacy policy missing playbook-required detail: ${expected}`);
-}
+validatePlaybookCompliance(root, assert);
 
 for (const size of [16, 32, 48, 128]) {
   const icon = fs.readFileSync(path.join(root, "assets", "icons", `icon${size}.png`));
@@ -345,11 +324,6 @@ for (const expected of [
   "`tabs`"
 ]) {
   assert(reviewerNotes.includes(expected), `Reviewer notes missing: ${expected}`);
-}
-
-const docsReadme = fs.readFileSync(path.join(root, "docs", "README.md"), "utf8");
-for (const expected of ["release/release-notes.md", "release/release-qa.md", "project/decision-records.md", "project/repository-metadata.md", "research/source-inventory.md", "architecture/code-structure.md", "Browser Extension Playbook", "StorePilot Project Reference"]) {
-  assert(docsReadme.includes(expected), `Docs README missing playbook reference: ${expected}`);
 }
 
 const extensionModularizationPlaybook = fs.readFileSync(path.join(root, "docs", "architecture", "extension-modularization-playbook.md"), "utf8");

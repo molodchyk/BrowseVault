@@ -11,6 +11,7 @@ This folder captures the critical market research, user feedback, product direct
 - `architecture/extension-modularization-playbook.md` - reusable extension modularization rules copied from Defense against Distractions.
 - `architecture/code-structure.md` - BrowseVault-specific ownership map and next split candidates.
 - `release/reviewer-notes.md` - browser-store reviewer notes for limitations, permissions, package behavior, and user-data handling.
+- `release/browser-extension-playbook-compliance.md` - evidence matrix mapping BrowseVault to the shared browser-extension playbook.
 - `release/release-qa.md` - release verification status and real-browser QA notes.
 - `release/release-notes.md` - docs-level release summary that points to the canonical root changelog.
 - `project/decision-records.md` - product, privacy, packaging, and release decisions to preserve across future edits.
