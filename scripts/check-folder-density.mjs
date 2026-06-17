@@ -2,9 +2,10 @@ import fs from "node:fs";
 import path from "node:path";
 
 const root = process.cwd();
-const auditRoots = ["src", "test", "scripts"];
+const auditRoots = ["src", "test", "scripts", "docs"];
 const runtimeFolderLimit = 12;
 const featureFolderLimit = 15;
+const docsFolderLimit = 12;
 
 function toProjectPath(fullPath) {
   return path.relative(root, fullPath).split(path.sep).join("/");
@@ -15,6 +16,13 @@ function isFeatureFolder(projectPath) {
 }
 
 function budgetFor(projectPath) {
+  if (projectPath === "docs" || projectPath.startsWith("docs/")) {
+    return {
+      maxFiles: docsFolderLimit,
+      label: "documentation folder"
+    };
+  }
+
   if (isFeatureFolder(projectPath)) {
     return {
       maxFiles: featureFolderLimit,
@@ -75,7 +83,7 @@ if (violations.length) {
       `- ${violation.projectPath}: ${violation.fileCount} files, max ${violation.maxFiles} for ${violation.label}.`
     );
   }
-  console.error("Split crowded folders by feature, surface, or responsibility before adding more files.");
+  console.error("Split crowded folders by feature, surface, documentation topic, or responsibility before adding more files.");
   process.exit(1);
 }
 

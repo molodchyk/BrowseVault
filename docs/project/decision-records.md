@@ -33,5 +33,5 @@ BrowseVault tracks the shared browser-extension release playbook and the StorePi
 References:
 
 - [Browser Extension Playbook](../../browser-extension-playbook.md)
-- [Extension Modularization Playbook](extension-modularization-playbook.md)
+- [Extension Modularization Playbook](../architecture/extension-modularization-playbook.md)
 - [StorePilot Project Reference](../../StorePilot/docs/reference.md)

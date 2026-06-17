@@ -27,7 +27,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `scripts/check-manifest-paths.mjs` verifies manifest-owned extension paths such as icons, service workers, popups, options pages, content scripts, and web-accessible resources.
 - `scripts/check-privacy-permissions.mjs` verifies that manifest permissions, `PRIVACY.md`, and the StorePilot privacy form stay aligned.
 - `scripts/check-file-sizes.mjs` audits the file-size budgets from the modularization playbook for `src/`, `test/`, and `scripts/`, reports soft-budget warnings, and caps known hard-limit debt.
-- `scripts/check-folder-density.mjs` enforces the folder-density budgets from the modularization playbook for `src/`, `test/`, and `scripts/`.
+- `scripts/check-folder-density.mjs` enforces folder-density budgets for `src/`, `test/`, `scripts/`, and `docs/`.
 
 ## Next Split Candidates
 
@@ -42,5 +42,5 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - Keep compatibility barrels export-only.
 - Add or update focused tests when pure logic moves.
 - Keep test files grouped by feature or responsibility rather than adding new root-level `test/*.test.js` files.
-- Run `npm run check` after structure changes; it fails when static imports, extension-page module script paths, locale references, manifest-owned paths, or privacy/permission disclosures break, when known file-size debt grows beyond its cap, or when runtime/support folders exceed 12 files or feature/test-feature folders exceed 15 files.
+- Run `npm run check` after structure changes; it fails when static imports, extension-page module script paths, locale references, manifest-owned paths, or privacy/permission disclosures break, when known file-size debt grows beyond its cap, or when runtime/support/docs folders exceed 12 files or feature/test-feature folders exceed 15 files.
 - Update this file when ownership changes.

@@ -4,20 +4,20 @@ This folder captures the critical market research, user feedback, product direct
 
 ## Files
 
-- `browser-history-extension-research.md` - competitor/source inventory, ratings, positioning, strengths, and observed gaps.
-- `user-feedback-taxonomy.md` - grouped complaints, user needs, and positive demand signals.
-- `product-blueprint.md` - proposed better product, MVP scope, differentiators, prioritization, and positioning.
-- `implementation-notes.md` - Chrome extension constraints, architecture, storage/search/backup design, and testing risks.
-- `extension-modularization-playbook.md` - reusable extension modularization rules copied from Defense against Distractions.
-- `code-structure.md` - BrowseVault-specific ownership map and next split candidates.
-- `reviewer-notes.md` - browser-store reviewer notes for limitations, permissions, package behavior, and user-data handling.
-- `release-qa.md` - release verification status and real-browser QA notes.
-- `release-notes.md` - docs-level release summary that points to the canonical root changelog.
-- `decision-records.md` - product, privacy, packaging, and release decisions to preserve across future edits.
-- `repository-metadata.md` - intended GitHub repository description and topic/tag values.
+- `research/browser-history-extension-research.md` - competitor/source inventory, ratings, positioning, strengths, and observed gaps.
+- `research/user-feedback-taxonomy.md` - grouped complaints, user needs, and positive demand signals.
+- `research/product-blueprint.md` - proposed better product, MVP scope, differentiators, prioritization, and positioning.
+- `research/implementation-notes.md` - Chrome extension constraints, architecture, storage/search/backup design, and testing risks.
+- `architecture/extension-modularization-playbook.md` - reusable extension modularization rules copied from Defense against Distractions.
+- `architecture/code-structure.md` - BrowseVault-specific ownership map and next split candidates.
+- `release/reviewer-notes.md` - browser-store reviewer notes for limitations, permissions, package behavior, and user-data handling.
+- `release/release-qa.md` - release verification status and real-browser QA notes.
+- `release/release-notes.md` - docs-level release summary that points to the canonical root changelog.
+- `project/decision-records.md` - product, privacy, packaging, and release decisions to preserve across future edits.
+- `project/repository-metadata.md` - intended GitHub repository description and topic/tag values.
 - `storepilot-project-structure.md` - checklist that maps BrowseVault files to the StorePilot Chrome Web Store import reference.
-- `source-inventory.md` - index of raw source snapshots and how they map to the research notes.
-- `raw-sources/` - preserved Chrome Web Store listing/review text snapshots used as evidence.
+- `research/source-inventory.md` - index of raw source snapshots and how they map to the research notes.
+- `research/raw-sources/` - preserved Chrome Web Store listing/review text snapshots used as evidence.
 
 ## Related Playbooks
 

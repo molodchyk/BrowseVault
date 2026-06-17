@@ -31,14 +31,10 @@ const requiredFiles = [
   "store-listing/chrome-web-store/media/screenshots/03-backup-health.jpg",
   "store-listing/chrome-web-store/media/screenshots/04-rules-cleanup.jpg",
   "store-listing/chrome-web-store/media/screenshots/05-settings-privacy.jpg",
-  "docs/README.md",
-  "docs/reviewer-notes.md",
-  "docs/release-qa.md",
-  "docs/release-notes.md",
-  "docs/decision-records.md",
-  "docs/repository-metadata.md",
+  "docs/README.md", "docs/architecture/code-structure.md", "docs/architecture/extension-modularization-playbook.md",
+  "docs/project/decision-records.md", "docs/project/repository-metadata.md", "docs/release/reviewer-notes.md",
+  "docs/release/release-qa.md", "docs/release/release-notes.md", "docs/research/source-inventory.md",
   "docs/storepilot-project-structure.md",
-  "docs/source-inventory.md",
   "docs/chrome-web-store-additional-fields.md",
   "docs/chrome-web-store-category.md",
   "docs/chrome-web-store-privacy-form.md",
@@ -229,6 +225,11 @@ for (const expected of [
   assert(manifestPathScript.includes(expected), `Manifest-path audit missing guardrail: ${expected}`);
 }
 
+const folderDensityScript = fs.readFileSync(path.join(root, "scripts", "check-folder-density.mjs"), "utf8");
+for (const expected of ["docs", "documentation folder", "docsFolderLimit"]) {
+  assert(folderDensityScript.includes(expected), `Folder-density audit missing docs guardrail: ${expected}`);
+}
+
 const privacyPermissionScript = fs.readFileSync(path.join(root, "scripts", "check-privacy-permissions.mjs"), "utf8");
 for (const expected of [
   "permission.${permission}",
@@ -332,7 +333,7 @@ assert(
   "Human store listing draft must include the open-source footer."
 );
 
-const reviewerNotes = fs.readFileSync(path.join(root, "docs", "reviewer-notes.md"), "utf8");
+const reviewerNotes = fs.readFileSync(path.join(root, "docs", "release", "reviewer-notes.md"), "utf8");
 for (const expected of [
   "cannot recover visits Chrome already deleted",
   "does not replace Chrome's native history page by default",
@@ -345,19 +346,11 @@ for (const expected of [
 }
 
 const docsReadme = fs.readFileSync(path.join(root, "docs", "README.md"), "utf8");
-for (const expected of [
-  "release-notes.md",
-  "release-qa.md",
-  "decision-records.md",
-  "repository-metadata.md",
-  "storepilot-project-structure.md",
-  "Browser Extension Playbook",
-  "StorePilot Project Reference"
-]) {
+for (const expected of ["release/release-notes.md", "release/release-qa.md", "project/decision-records.md", "project/repository-metadata.md", "research/source-inventory.md", "architecture/code-structure.md", "Browser Extension Playbook", "StorePilot Project Reference"]) {
   assert(docsReadme.includes(expected), `Docs README missing playbook reference: ${expected}`);
 }
 
-const extensionModularizationPlaybook = fs.readFileSync(path.join(root, "docs", "extension-modularization-playbook.md"), "utf8");
+const extensionModularizationPlaybook = fs.readFileSync(path.join(root, "docs", "architecture", "extension-modularization-playbook.md"), "utf8");
 for (const expected of [
   "This is a prescriptive target",
   "Treat this playbook as the architecture standard",
@@ -369,13 +362,13 @@ for (const expected of [
   assert(extensionModularizationPlaybook.includes(expected), `Local modularization playbook missing current DaD guidance: ${expected}`);
 }
 
-const codeStructure = fs.readFileSync(path.join(root, "docs", "code-structure.md"), "utf8");
+const codeStructure = fs.readFileSync(path.join(root, "docs", "architecture", "code-structure.md"), "utf8");
 assert(
   codeStructure.includes("it does not redefine the playbook's target architecture"),
   "Code structure doc must not soften the modularization playbook target."
 );
 
-const sourceInventory = fs.readFileSync(path.join(root, "docs", "source-inventory.md"), "utf8");
+const sourceInventory = fs.readFileSync(path.join(root, "docs", "research", "source-inventory.md"), "utf8");
 for (const expected of [
   "tooling-reference snapshots",
   "refreshed from `settings/StorePilot/docs/reference.md`",
@@ -407,7 +400,7 @@ for (const expected of [
   assert(storePilotStructure.includes(expected), `StorePilot structure checklist missing: ${expected}`);
 }
 
-const releaseNotes = fs.readFileSync(path.join(root, "docs", "release-notes.md"), "utf8");
+const releaseNotes = fs.readFileSync(path.join(root, "docs", "release", "release-notes.md"), "utf8");
 for (const expected of [
   "CHANGELOG.md",
   `## ${manifest.version} -`,
@@ -417,7 +410,7 @@ for (const expected of [
   assert(releaseNotes.includes(expected), `Release notes missing: ${expected}`);
 }
 
-const releaseQa = fs.readFileSync(path.join(root, "docs", "release-qa.md"), "utf8");
+const releaseQa = fs.readFileSync(path.join(root, "docs", "release", "release-qa.md"), "utf8");
 for (const expected of [
   "npm run validate",
   "npm run check",
@@ -432,7 +425,7 @@ for (const expected of [
   assert(releaseQa.includes(expected), `Release QA notes missing: ${expected}`);
 }
 
-const decisionRecords = fs.readFileSync(path.join(root, "docs", "decision-records.md"), "utf8");
+const decisionRecords = fs.readFileSync(path.join(root, "docs", "project", "decision-records.md"), "utf8");
 for (const expected of [
   "local-first",
   "Do Not Replace Chrome History By Default",
@@ -442,7 +435,7 @@ for (const expected of [
   assert(decisionRecords.includes(expected), `Decision records missing: ${expected}`);
 }
 
-const repositoryMetadata = fs.readFileSync(path.join(root, "docs", "repository-metadata.md"), "utf8");
+const repositoryMetadata = fs.readFileSync(path.join(root, "docs", "project", "repository-metadata.md"), "utf8");
 for (const expected of [
   packageJson.description,
   "chrome-extension",
@@ -504,7 +497,7 @@ for (const key of [
   assert(storePilotPrivacy.includes(`${key}:`), `Missing StorePilot privacy key: ${key}`);
 }
 
-const storePilotReferenceSnapshot = fs.readFileSync(path.join(root, "docs", "raw-sources", "storepilot-chrome-web-store-reference.txt"), "utf8");
+const storePilotReferenceSnapshot = fs.readFileSync(path.join(root, "docs", "research", "raw-sources", "storepilot-chrome-web-store-reference.txt"), "utf8");
 for (const expected of [
   "Treat collect as data that leaves local-only browser/device processing",
   "StorePilot applies explicit `yes`/`no` values",
