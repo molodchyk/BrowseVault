@@ -17,6 +17,15 @@
   flex: 0 0 auto;
 }
 
+.section-heading > button,
+.rule-actions button,
+.retention-row button,
+.backup-actions button,
+.backup-actions .file-button {
+  width: fit-content;
+  max-width: 100%;
+}
+
 .retention-cleanup {
   display: grid;
   gap: 10px;

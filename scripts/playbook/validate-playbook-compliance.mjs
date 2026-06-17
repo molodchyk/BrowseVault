@@ -138,6 +138,18 @@ export function validatePlaybookCompliance(root, assert) {
     assert(playbookCompliance.includes(expected), `Playbook UI expectations matrix missing: ${expected}`);
   }
 
+  const backupRulesCss = fs.readFileSync(path.join(root, "src", "styles", "backup-rules.css"), "utf8");
+  for (const expected of [
+    ".section-heading > button",
+    ".rule-actions button",
+    ".retention-row button",
+    ".backup-actions button",
+    ".backup-actions .file-button",
+    "width: fit-content"
+  ]) {
+    assert(backupRulesCss.includes(expected), `Action-row CSS missing compact button guardrail: ${expected}`);
+  }
+
   const storeDraft = fs.readFileSync(path.join(root, "store", "listing.md"), "utf8");
   const storePilotListing = fs.readFileSync(path.join(root, "store-listing", "chrome-web-store", "listing", "en.md"), "utf8");
   assert(!/^#/m.test(storePilotListing), "StorePilot listing body must not contain Markdown headings.");
