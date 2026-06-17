@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { visitsToCsv, visitsToHtml } from "../../../src/export-format.js";
+import { visitsToCsv, visitsToCsvAsync, visitsToHtml } from "../../../src/export-format.js";
 
 test("visitsToCsv includes spreadsheet-friendly date/time and identity columns", () => {
   const visitTime = Date.parse("2026-06-16T12:34:56Z");
@@ -70,6 +70,31 @@ test("visitsToCsv neutralizes spreadsheet formulas in exported text", () => {
   assert.match(row, /,'\+example\.com,/);
   assert.match(row, /,"'=HYPERLINK\(""https:\/\/evil\.example"",""open""\)",/);
   assert.match(row, /,'-typed,' @import,'@chrome$/);
+});
+
+test("visitsToCsvAsync preserves CSV output and yields between chunks", async () => {
+  const visits = Array.from({ length: 25 }, (_, index) => ({
+    id: `visit-${index}`,
+    chromeId: `chrome|${index}`,
+    url: `https://example.com/${index}`,
+    title: `Report ${index}`,
+    domain: "example.com",
+    category: index % 2 ? "Research" : "",
+    visitTime: Date.parse("2026-06-16T12:34:56Z") + index,
+    visitCount: index + 1,
+    transition: "link",
+    source: "fixture"
+  }));
+  const yields = [];
+
+  assert.equal(
+    await visitsToCsvAsync(visits, {
+      chunkSize: 10,
+      scheduler: async () => yields.push("yield")
+    }),
+    visitsToCsv(visits)
+  );
+  assert.equal(yields.length, 2);
 });
 
 test("visitsToHtml escapes visit fields", () => {

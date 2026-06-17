@@ -3,6 +3,33 @@ function escapeCsv(value) {
   return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
+const CSV_HEADERS = [
+  "visitId",
+  "visitTimeIso",
+  "visitDate",
+  "visitTimeLocal",
+  "visitTimestampMs",
+  "domain",
+  "category",
+  "title",
+  "url",
+  "visitCount",
+  "transition",
+  "source",
+  "chromeId"
+];
+
+const DEFAULT_CSV_CHUNK_SIZE = 1000;
+
+export function yieldToEventLoop() {
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+function normalizeChunkSize(value) {
+  const chunkSize = Number(value || DEFAULT_CSV_CHUNK_SIZE);
+  return Number.isInteger(chunkSize) && chunkSize > 0 ? chunkSize : DEFAULT_CSV_CHUNK_SIZE;
+}
+
 function neutralizeSpreadsheetFormula(text) {
   return /^[=+\-@\t\r\n]/.test(text) || /^\s+[=+\-@]/.test(text) ? `'${text}` : text;
 }
@@ -115,42 +142,49 @@ function pageCell(visit) {
 }
 
 export function visitsToCsv(visits) {
-  const headers = [
-    "visitId",
-    "visitTimeIso",
-    "visitDate",
-    "visitTimeLocal",
-    "visitTimestampMs",
-    "domain",
-    "category",
-    "title",
-    "url",
-    "visitCount",
-    "transition",
-    "source",
-    "chromeId"
+  return [CSV_HEADERS, ...visits.map(visitToCsvRow)].map(rowToCsvLine).join("\n");
+}
+
+function visitToCsvRow(visit) {
+  const local = localDateParts(visit.visitTime);
+  return [
+    visit.id,
+    isoDateString(visit.visitTime),
+    local.date,
+    local.time,
+    visit.visitTime,
+    visit.domain,
+    visit.category,
+    visit.title,
+    visit.url,
+    visit.visitCount,
+    visit.transition,
+    visit.source,
+    visit.chromeId
   ];
+}
 
-  const rows = visits.map((visit) => {
-    const local = localDateParts(visit.visitTime);
-    return [
-      visit.id,
-      isoDateString(visit.visitTime),
-      local.date,
-      local.time,
-      visit.visitTime,
-      visit.domain,
-      visit.category,
-      visit.title,
-      visit.url,
-      visit.visitCount,
-      visit.transition,
-      visit.source,
-      visit.chromeId
-    ];
-  });
+function rowToCsvLine(row) {
+  return row.map(escapeCsv).join(",");
+}
 
-  return [headers, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\n");
+export async function visitsToCsvAsync(visits, options = {}) {
+  const items = Array.isArray(visits) ? visits : [];
+  const chunkSize = normalizeChunkSize(options.chunkSize);
+  const scheduler = options.scheduler || yieldToEventLoop;
+  const lines = [rowToCsvLine(CSV_HEADERS)];
+
+  for (let start = 0; start < items.length; start += chunkSize) {
+    const end = Math.min(start + chunkSize, items.length);
+    for (let index = start; index < end; index += 1) {
+      lines.push(rowToCsvLine(visitToCsvRow(items[index])));
+    }
+    if (end < items.length) {
+      await scheduler();
+    }
+  }
+
+  return lines.join("\n");
 }
 
 export function visitsToHtml(visits, exportedAt) {

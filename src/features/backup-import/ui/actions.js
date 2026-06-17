@@ -5,7 +5,7 @@ import {
   importArchive,
   setMeta
 } from "../../../storage.js";
-import { visitsToCsv, visitsToHtml } from "../../history-export/core/export-format.js";
+import { visitsToCsvAsync, visitsToHtml } from "../../history-export/core/export-format.js";
 import { archiveFromFileText } from "../core/archive-parser.js";
 import { backupExportFilename } from "../core/backup-filenames.js";
 import { createBackupSelfTest } from "../core/backup-verification.js";
@@ -33,7 +33,7 @@ const defaultServices = {
   setMeta,
   stringifyJson,
   verifyArchiveIntegrity,
-  visitsToCsv,
+  visitsToCsv: visitsToCsvAsync,
   visitsToHtml
 };
 
@@ -222,7 +222,7 @@ export function createBackupActions({
     const sizeBytes = await deps.downloadText(
       exportFilename("history", archive.exportedAt, "csv"),
       "text/csv",
-      deps.visitsToCsv(archive.visits),
+      await deps.visitsToCsv(archive.visits),
       saveOptions()
     );
     await recordActivity({
@@ -283,7 +283,7 @@ export function createBackupActions({
     await deps.downloadText(
       exportFilename("selected", exportedAt, "csv"),
       "text/csv",
-      deps.visitsToCsv(items),
+      await deps.visitsToCsv(items),
       saveOptions()
     );
     await recordActivity({
@@ -350,7 +350,7 @@ export function createBackupActions({
     await deps.downloadText(
       exportFilename("results", exportedAt, "csv"),
       "text/csv",
-      deps.visitsToCsv(items),
+      await deps.visitsToCsv(items),
       saveOptions()
     );
     await recordActivity({
