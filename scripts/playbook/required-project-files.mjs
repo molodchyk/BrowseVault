@@ -60,6 +60,7 @@ export const requiredProjectFiles = [
   "docs/project/repository-metadata.md",
   "docs/release/reviewer-notes.md",
   "docs/release/browser-extension-playbook-compliance.md",
+  "docs/release/manual-browser-qa-checklist.md",
   "docs/release/release-qa.md",
   "docs/release/release-notes.md",
   "docs/research/source-inventory.md",

@@ -33,6 +33,8 @@ The browser-extension playbook requires loading the unpacked extension in the ta
 
 Required: Load the unpacked extension in the target browser before release.
 
+Use [`manual-browser-qa-checklist.md`](manual-browser-qa-checklist.md) to record the manual target-browser evidence.
+
 Current workstation note:
 
 - Automated Chrome/Playwright launches may be closed by local focus-blocking tools such as Cold Turkey or FocusMe before the extension service worker can be inspected.

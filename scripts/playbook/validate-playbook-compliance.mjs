@@ -77,6 +77,7 @@ export function validatePlaybookCompliance(root, assert) {
   const docsReadme = fs.readFileSync(path.join(root, "docs", "README.md"), "utf8");
   for (const expected of [
     "release/browser-extension-playbook-compliance.md",
+    "release/manual-browser-qa-checklist.md",
     "release/release-notes.md",
     "release/release-qa.md",
     "project/decision-records.md",
@@ -212,6 +213,7 @@ export function validatePlaybookCompliance(root, assert) {
   const releaseQa = fs.readFileSync(path.join(root, "docs", "release", "release-qa.md"), "utf8");
   for (const expected of [
     "Load the unpacked extension in the target browser",
+    "manual-browser-qa-checklist.md",
     "npm run validate",
     "npm run check",
     "npm test",
@@ -220,5 +222,21 @@ export function validatePlaybookCompliance(root, assert) {
     "git diff --check"
   ]) {
     assert(releaseQa.includes(expected), `Release QA missing browser-extension playbook check: ${expected}`);
+  }
+
+  const manualBrowserQa = fs.readFileSync(path.join(root, "docs", "release", "manual-browser-qa-checklist.md"), "utf8");
+  for (const expected of [
+    "Load this repository folder unpacked",
+    "Do not use automated Chrome or Playwright runs against a live Chrome profile",
+    "Do not create or target named personal Chrome profiles such as `Your Chrome`",
+    "Toolbar action opens BrowseVault",
+    "Long URLs and titles stay inside the viewport",
+    "creates another BrowseVault tab instead of enforcing one global app tab",
+    "Deleting a vault record in one BrowseVault tab refreshes another open BrowseVault tab",
+    "Theme, accent, contrast, text size, date display, and default result-limit settings save and apply",
+    "JSON backup export completes and reports backup health/self-test status",
+    "Result: Not run"
+  ]) {
+    assert(manualBrowserQa.includes(expected), `Manual browser QA checklist missing required check: ${expected}`);
   }
 }
