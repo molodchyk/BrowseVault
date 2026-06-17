@@ -1,5 +1,4 @@
 import {
-  getVisitsByIds,
   getStats,
   searchVisits
 } from "./storage.js";
@@ -20,6 +19,7 @@ import { createHistoryBulkActions } from "./features/history-results/ui/bulk-act
 import { createHistoryResultsController } from "./features/history-results/ui/results-controller.js";
 import { createHistorySearchActions } from "./features/history-results/ui/search-actions.js";
 import { createHistorySearchForm } from "./features/history-results/ui/search-form.js";
+import { createSelectedResultLookup } from "./features/history-results/ui/selected-results.js";
 import { copyText } from "./platform/clipboard.js";
 import { createVaultManagementActions } from "./features/vault-management/ui/actions.js";
 
@@ -32,12 +32,12 @@ function setStatus(message) {
   elements.status.textContent = message;
 }
 
-async function selectedResults() {
-  return getVisitsByIds([...appState.selectedIds]);
-}
-
 const historySearchForm = createHistorySearchForm({
   elements
+});
+
+const selectedResultLookup = createSelectedResultLookup({
+  appState
 });
 
 const appNavigation = createAppNavigation({
@@ -78,7 +78,7 @@ const vaultActions = createVaultManagementActions({
   elements,
   refreshStats: displayPreferences.refreshStats,
   runSearch: historySearchActions.runSearch,
-  selectedResults,
+  selectedResults: selectedResultLookup.selectedResults,
   setStatus
 });
 
@@ -88,7 +88,7 @@ const backupActions = createBackupActions({
   refreshStats: displayPreferences.refreshStats,
   renderRules: vaultActions.renderRules,
   runSearch: historySearchActions.runSearch,
-  selectedResults,
+  selectedResults: selectedResultLookup.selectedResults,
   setStatus,
   switchTab: appNavigation.switchTab
 });
@@ -117,7 +117,7 @@ const bulkActions = createHistoryBulkActions({
   getSearchText: historySearchForm.getSearchText,
   renderResults: historyResults.renderResults,
   searchVisits,
-  selectedResults,
+  selectedResults: selectedResultLookup.selectedResults,
   setStatus
 });
 
