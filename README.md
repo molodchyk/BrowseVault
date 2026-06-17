@@ -187,6 +187,7 @@ npm run icons
 npm run store:media
 npm run package
 npm run verify:package
+npm run release:ready
 ```
 
 `npm run validate` also enforces the current trust baseline: exact manifest permissions, no host permissions, no optional permission prompts, no content scripts, no web-accessible resources, no external extension messaging surface, no remote source URLs, no source-level network APIs or dynamic code loaders, and no default `chrome_url_overrides` replacement of Chrome history.
@@ -196,6 +197,8 @@ npm run verify:package
 `npm run store:media` regenerates the Chrome Web Store promo PNGs in `store-listing/chrome-web-store/media/promo/`. It uses Python with Pillow as a development-only asset tool; the generated PNGs are committed and are not part of the extension runtime dependency graph.
 
 `npm run package` writes `dist/browsevault-1.0.0.zip` and verifies the final ZIP contents, including packaged manifest paths, locale messages, static import targets, and module script targets.
+
+`npm run release:ready` is a final release gate for the browser-extension playbook's manual target-browser requirement. It intentionally fails until [`docs/release/manual-browser-qa-checklist.md`](docs/release/manual-browser-qa-checklist.md) records a passed load-unpacked check in the target browser.
 
 ## Current Search Syntax
 

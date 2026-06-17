@@ -18,6 +18,12 @@ npm run verify:package
 git diff --check
 ```
 
+After the manual browser QA checklist is complete, run:
+
+```text
+npm run release:ready
+```
+
 Expected results:
 
 - extension validation passes;
@@ -28,6 +34,7 @@ Expected results:
 - package ZIP verification passes, including packaged manifest path, locale message, static import, and module script target checks;
 - package contains runtime extension files, root user-facing docs, and `_locales/en/messages.json`;
 - package excludes repository research, tests, scripts, docs, StorePilot files, and build metadata.
+- release readiness passes only after manual target-browser evidence is recorded in `manual-browser-qa-checklist.md`.
 
 ## Real Browser QA
 
@@ -48,3 +55,4 @@ Current workstation note:
 - Validation scans package scripts, repository scripts, and tests for live Chrome profile automation patterns.
 - Do not treat that process-level closure as a BrowseVault product failure without reproducing it in a normal Chrome session.
 - Manual release check: pause the local focus blockers, open `chrome://extensions`, enable Developer mode, load this repository folder unpacked, then verify the toolbar action opens BrowseVault, a second non-BrowseVault active tab creates another BrowseVault tab, and deleting a vault record in one BrowseVault tab refreshes the other BrowseVault tab.
+- `npm run release:ready` intentionally fails while the manual checklist is still `Not run`.

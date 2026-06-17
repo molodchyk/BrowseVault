@@ -8,6 +8,7 @@
     "validate": "node scripts/validate-extension.mjs",
     "check": "node scripts/check-syntax.mjs && node scripts/check-imports.mjs && node scripts/check-locales.mjs && node scripts/check-manifest-paths.mjs && node scripts/check-privacy-permissions.mjs && node scripts/playbook/check-chrome-qa-safety.mjs && node scripts/check-file-sizes.mjs && node scripts/check-folder-density.mjs",
     "check:chrome-qa-safety": "node scripts/playbook/check-chrome-qa-safety.mjs",
+    "release:ready": "node scripts/playbook/check-release-readiness.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "store:media": "python scripts/media/generate-store-media.py",
     "package": "node scripts/package-extension.mjs && node scripts/verify-package.mjs",

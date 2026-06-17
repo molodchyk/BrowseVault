@@ -16,6 +16,12 @@ https://github.com/molodchyk/BrowseVault
 The full license text is in [\`LICENSE\`](LICENSE).`;
 
 export function validatePlaybookCompliance(root, assert) {
+  const packageJson = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
+  assert(
+    packageJson.scripts["release:ready"]?.includes("check-release-readiness.mjs"),
+    "package.json must expose release:ready for manual browser QA evidence."
+  );
+
   const readme = fs.readFileSync(path.join(root, "README.md"), "utf8");
   for (const expected of [
     "PRIVACY.md",
@@ -30,6 +36,7 @@ export function validatePlaybookCompliance(root, assert) {
     "npm run check",
     "npm test",
     "npm run package",
+    "npm run release:ready",
     "Open source under the GPL-3.0 license:",
     "https://github.com/molodchyk/BrowseVault",
     "Buy Me a Coffee",
@@ -237,7 +244,8 @@ export function validatePlaybookCompliance(root, assert) {
     "Deleting a vault record in one BrowseVault tab refreshes another open BrowseVault tab",
     "Theme, accent, contrast, text size, date display, and default result-limit settings save and apply",
     "JSON backup export completes and reports backup health/self-test status",
-    "Result: Not run"
+    "Result: Not run",
+    "Run `npm run release:ready` after filling this checklist"
   ]) {
     assert(manualBrowserQa.includes(expected), `Manual browser QA checklist missing required check: ${expected}`);
   }
@@ -258,6 +266,7 @@ export function validatePlaybookCompliance(root, assert) {
     "Release package checks",
     "Target-browser load-unpacked check",
     "Manual required",
+    "npm run release:ready",
     "Load the unpacked extension in the target browser",
     "Do not use automated Chrome or Playwright runs against a live Chrome profile",
     "do not create or target named personal Chrome profiles such as `Your Chrome`"

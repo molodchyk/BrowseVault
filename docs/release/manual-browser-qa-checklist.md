@@ -17,6 +17,8 @@ Do not create or target named personal Chrome profiles such as `Your Chrome` for
 - Extension ID:
 - Result: Not run
 
+Set `Result` to `Pass` only after every required flow check is `Pass`.
+
 ## Preflight
 
 - Confirm `npm run store:media`, `npm run validate`, `npm run check`, `npm test`, `npm run package`, `npm run verify:package`, and `git diff --check` passed on the same commit.
@@ -27,7 +29,7 @@ Do not create or target named personal Chrome profiles such as `Your Chrome` for
 
 ## Required Flow Checks
 
-Record Pass, Fail, or Not run plus notes for each item.
+Record `Pass`, `Fail`, or `Not run` plus notes for each item.
 
 | Check | Result | Notes |
 | --- | --- | --- |
@@ -52,3 +54,5 @@ Record Pass, Fail, or Not run plus notes for each item.
 - Blocking issues:
 - Follow-up issues:
 - Screenshots or notes location:
+
+Set `Ship decision` to `Ship` only when the release is ready. Run `npm run release:ready` after filling this checklist.

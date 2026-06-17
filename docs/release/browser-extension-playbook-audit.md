@@ -21,7 +21,7 @@ Status terms:
 | UI expectations | Verified by source/tests | `src/app.html`, `src/styles/`, `test/features/`, `scripts/playbook/validate-playbook-compliance.mjs` |
 | Reviewer notes | Verified | `docs/release/reviewer-notes.md`, `scripts/validate-extension.mjs` |
 | Release package checks | Verified by command gate | `npm run validate`, `npm run check`, `npm test`, `npm run package`, `npm run verify:package`, `git diff --check` |
-| Target-browser load-unpacked check | Manual required | `docs/release/manual-browser-qa-checklist.md` |
+| Target-browser load-unpacked check | Manual required | `docs/release/manual-browser-qa-checklist.md`; `npm run release:ready` fails until evidence is recorded |
 
 ## Requirement Evidence
 
@@ -41,8 +41,8 @@ Status terms:
 | UI uses browser-native vocabulary and explicit destructive actions. | Labels distinguish vault deletion, Chrome URL deletion, native Chrome History, and Reset Vault; tests cover destructive-action guards. | Verified |
 | Reviewer notes document browser-controlled limits. | `docs/release/reviewer-notes.md` covers Chrome retention, imports, incognito, file URLs, URL-level deletion, and native-history behavior. | Verified |
 | Release checks inspect the package users receive. | `scripts/package-extension.mjs` and `scripts/verify-package.mjs` create and inspect a runtime-only ZIP. | Verified |
-| Load the unpacked extension in the target browser. | Manual checklist exists, but no target-browser evidence has been recorded in this environment. | Manual required |
+| Load the unpacked extension in the target browser. | Manual checklist exists, and `npm run release:ready` verifies it is filled out before release. No target-browser evidence has been recorded in this environment. | Manual required |
 
 ## Manual Release Evidence Still Needed
 
-Before calling the full playbook implementation complete, fill out `docs/release/manual-browser-qa-checklist.md` after manually loading this repository folder unpacked in the target browser. Do not use automated Chrome or Playwright runs against a live Chrome profile, and do not create or target named personal Chrome profiles such as `Your Chrome`.
+Before calling the full playbook implementation complete, fill out `docs/release/manual-browser-qa-checklist.md` after manually loading this repository folder unpacked in the target browser, then run `npm run release:ready`. Do not use automated Chrome or Playwright runs against a live Chrome profile, and do not create or target named personal Chrome profiles such as `Your Chrome`.
