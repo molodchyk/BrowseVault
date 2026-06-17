@@ -172,9 +172,9 @@ npm run verify:package
 
 `npm run validate` also enforces the current trust baseline: exact manifest permissions, no host permissions, no optional permission prompts, no content scripts, no web-accessible resources, no external extension messaging surface, no remote source URLs, no source-level network APIs or dynamic code loaders, and no default `chrome_url_overrides` replacement of Chrome history.
 
-`npm run check` verifies JavaScript syntax, static import targets, extension-page module script paths, locale message coverage, file-size budgets, and folder-density budgets so flat runtime/support folders stay at 12 files or fewer, while feature folders and feature test folders stay at 15 files or fewer before being split again. File-size debt is reported as warnings, and known hard-limit debt is capped so it cannot grow unnoticed.
+`npm run check` verifies JavaScript syntax, static import targets, extension-page module script paths, locale message coverage, manifest file paths, file-size budgets, and folder-density budgets so flat runtime/support folders stay at 12 files or fewer, while feature folders and feature test folders stay at 15 files or fewer before being split again. File-size debt is reported as warnings, and known hard-limit debt is capped so it cannot grow unnoticed.
 
-`npm run package` writes `dist/browsevault-1.0.0.zip` and verifies the final ZIP contents, including packaged locale messages, static import targets, and module script targets.
+`npm run package` writes `dist/browsevault-1.0.0.zip` and verifies the final ZIP contents, including packaged manifest paths, locale messages, static import targets, and module script targets.
 
 ## Current Search Syntax
 

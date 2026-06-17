@@ -158,6 +158,78 @@ function collectMessageReferences(value) {
   return [];
 }
 
+function normalizeExtensionPath(value) {
+  return String(value).replace(/^\/+/, "").replaceAll("\\", "/");
+}
+
+function wildcardToRegExp(pattern) {
+  const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&").replaceAll("*", "[^/]*");
+  return new RegExp(`^${escaped}$`);
+}
+
+function addManifestPath(paths, field, value) {
+  if (typeof value === "string" && value.trim()) {
+    paths.push({
+      field,
+      value: normalizeExtensionPath(value.trim())
+    });
+  }
+}
+
+function addManifestIconPaths(paths, field, icons) {
+  if (!icons || typeof icons !== "object") {
+    return;
+  }
+
+  for (const [size, iconPath] of Object.entries(icons)) {
+    addManifestPath(paths, `${field}.${size}`, iconPath);
+  }
+}
+
+function collectManifestPaths(manifestValue) {
+  const paths = [];
+
+  addManifestIconPaths(paths, "icons", manifestValue.icons);
+  addManifestIconPaths(paths, "action.default_icon", manifestValue.action?.default_icon);
+  addManifestPath(paths, "action.default_popup", manifestValue.action?.default_popup);
+  addManifestPath(paths, "background.service_worker", manifestValue.background?.service_worker);
+  addManifestPath(paths, "options_page", manifestValue.options_page);
+  addManifestPath(paths, "devtools_page", manifestValue.devtools_page);
+  addManifestPath(paths, "side_panel.default_path", manifestValue.side_panel?.default_path);
+  addManifestPath(paths, "user_scripts.api_script", manifestValue.user_scripts?.api_script);
+
+  if (manifestValue.chrome_url_overrides) {
+    for (const [page, pagePath] of Object.entries(manifestValue.chrome_url_overrides)) {
+      addManifestPath(paths, `chrome_url_overrides.${page}`, pagePath);
+    }
+  }
+
+  for (const [index, script] of (manifestValue.content_scripts || []).entries()) {
+    for (const [jsIndex, jsPath] of (script.js || []).entries()) {
+      addManifestPath(paths, `content_scripts[${index}].js[${jsIndex}]`, jsPath);
+    }
+    for (const [cssIndex, cssPath] of (script.css || []).entries()) {
+      addManifestPath(paths, `content_scripts[${index}].css[${cssIndex}]`, cssPath);
+    }
+  }
+
+  for (const [index, resource] of (manifestValue.web_accessible_resources || []).entries()) {
+    for (const [resourceIndex, resourcePath] of (resource.resources || []).entries()) {
+      addManifestPath(paths, `web_accessible_resources[${index}].resources[${resourceIndex}]`, resourcePath);
+    }
+  }
+
+  for (const [index, ruleResource] of (manifestValue.declarative_net_request?.rule_resources || []).entries()) {
+    addManifestPath(paths, `declarative_net_request.rule_resources[${index}].path`, ruleResource.path);
+  }
+
+  for (const [index, sandboxPage] of (manifestValue.sandbox?.pages || []).entries()) {
+    addManifestPath(paths, `sandbox.pages[${index}]`, sandboxPage);
+  }
+
+  return paths;
+}
+
 assert(fs.existsSync(packagePath), `Missing package: ${packagePath}`);
 
 const entries = readZipEntries(fs.readFileSync(packagePath));
@@ -192,6 +264,22 @@ assert(packagedManifest.background?.service_worker === "src/background.js", "Pac
 assert(!packagedManifest.host_permissions?.length, "Packaged manifest must not request host permissions.");
 assert(!packagedManifest.content_scripts?.length, "Packaged manifest must not include content scripts.");
 assert(!packagedManifest.chrome_url_overrides, "Packaged manifest must not replace Chrome pages.");
+
+for (const { field, value } of collectManifestPaths(packagedManifest)) {
+  if (/^[a-z][a-z0-9+.-]*:\/\//i.test(value)) {
+    throw new Error(`Package manifest ${field} must not point at a remote URL: ${value}`);
+  }
+  if (value.startsWith("../") || path.posix.isAbsolute(value)) {
+    throw new Error(`Package manifest ${field} escapes package root: ${value}`);
+  }
+
+  if (value.includes("*")) {
+    const pattern = wildcardToRegExp(value);
+    assert(entryNames.some((entryName) => pattern.test(entryName)), `Package manifest ${field} wildcard matches no entries: ${value}`);
+  } else {
+    assert(entrySet.has(value), `Package manifest ${field} references missing entry: ${value}`);
+  }
+}
 
 const localeEntryName = `_locales/${packagedManifest.default_locale}/messages.json`;
 assert(entrySet.has(localeEntryName), `Package missing default locale messages: ${localeEntryName}`);

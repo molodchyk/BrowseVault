@@ -49,6 +49,7 @@ const requiredFiles = [
   "scripts/check-file-sizes.mjs",
   "scripts/check-imports.mjs",
   "scripts/check-locales.mjs",
+  "scripts/check-manifest-paths.mjs",
   "scripts/check-syntax.mjs",
   "scripts/generate-icons.mjs",
   "scripts/package-extension.mjs",
@@ -179,6 +180,7 @@ assert(packageJson.keywords.includes("history-backup"), "Missing history-backup 
 assert(packageJson.scripts.check.includes("check-syntax.mjs"), "Check script must verify JavaScript syntax.");
 assert(packageJson.scripts.check.includes("check-imports.mjs"), "Check script must verify static import resolution.");
 assert(packageJson.scripts.check.includes("check-locales.mjs"), "Check script must verify locale message coverage.");
+assert(packageJson.scripts.check.includes("check-manifest-paths.mjs"), "Check script must verify manifest-referenced file paths.");
 assert(packageJson.scripts.check.includes("check-file-sizes.mjs"), "Check script must enforce file-size budgets.");
 assert(packageJson.scripts.check.includes("check-folder-density.mjs"), "Check script must enforce folder density.");
 assert(packageJson.scripts.icons, "Missing icons script.");
@@ -189,7 +191,9 @@ const verifyPackageScript = fs.readFileSync(path.join(root, "scripts", "verify-p
 for (const expected of [
   "Package import missing target",
   "Package module script missing target",
-  "Packaged extension entry must not use bare imports"
+  "Packaged extension entry must not use bare imports",
+  "Package manifest",
+  "references missing entry"
 ]) {
   assert(verifyPackageScript.includes(expected), `Package verifier missing import-resolution guardrail: ${expected}`);
 }
@@ -215,6 +219,17 @@ for (const expected of [
   "Locale coverage checked"
 ]) {
   assert(localeCheckScript.includes(expected), `Locale audit missing coverage guardrail: ${expected}`);
+}
+
+const manifestPathScript = fs.readFileSync(path.join(root, "scripts", "check-manifest-paths.mjs"), "utf8");
+for (const expected of [
+  "background.service_worker",
+  "action.default_popup",
+  "content_scripts",
+  "web_accessible_resources",
+  "Manifest paths checked"
+]) {
+  assert(manifestPathScript.includes(expected), `Manifest-path audit missing guardrail: ${expected}`);
 }
 
 const changelog = fs.readFileSync(path.join(root, "CHANGELOG.md"), "utf8");
