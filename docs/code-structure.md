@@ -21,6 +21,8 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `src/features/vault-management/` owns extension-page vault deletion, Chrome-history deletion requests, undo, reset, domain-rule actions, retention cleanup, and duplicate cleanup.
 - `src/platform/` owns explicit wrappers around browser/platform APIs, including Chrome extension APIs and clipboard copy behavior.
 - `src/export-format.js` is a compatibility barrel for existing import paths.
+- `test/features/` mirrors feature-owned tests by product area so no single flat test folder becomes a dumping ground.
+- `test/platform/`, `test/query/`, and `test/storage/` own cross-feature platform, query-parser, and storage tests.
 
 ## Next Split Candidates
 
@@ -32,4 +34,5 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - Keep pure logic free of `chrome`, `window`, and `document` access.
 - Keep compatibility barrels export-only.
 - Add or update focused tests when pure logic moves.
+- Keep test files grouped by feature or responsibility rather than adding new root-level `test/*.test.js` files.
 - Update this file when ownership changes.

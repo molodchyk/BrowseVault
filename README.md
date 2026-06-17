@@ -112,7 +112,14 @@ This repository contains a working Manifest V3 extension implementation. It incl
 │       ├── listing/
 │       │   └── en.md
 │       └── media/
-│           └── icon-128.png
+│           ├── icon-128.png
+│           ├── promo/
+│           └── screenshots/
+├── test/
+│   ├── features/
+│   ├── platform/
+│   ├── query/
+│   └── storage/
 ├── manifest.json
 ├── package.json
 ├── PRIVACY.md

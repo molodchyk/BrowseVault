@@ -26,7 +26,7 @@ host_permission:
 No host permissions are requested.
 
 remote_code:
-BrowseVault does not load remote code, remote scripts, remote styles, analytics, ads, or tracking assets. All extension code is packaged locally.
+no
 
 privacy_policy_url:
 https://github.com/molodchyk/BrowseVault/blob/main/PRIVACY.md
