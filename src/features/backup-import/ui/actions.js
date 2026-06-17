@@ -6,6 +6,7 @@ import {
 } from "../../../storage.js";
 import { visitsToCsv, visitsToHtml } from "../../history-export/core/export-format.js";
 import { archiveFromFileText } from "../core/archive-parser.js";
+import { createBackupSelfTest } from "../core/backup-verification.js";
 import {
   attachArchiveIntegrity,
   verifyArchiveIntegrity
@@ -17,6 +18,7 @@ const defaultServices = {
   archiveFromFileText,
   attachArchiveIntegrity,
   confirmAction: (message) => globalThis.confirm(message),
+  createBackupSelfTest,
   downloadJson,
   downloadText,
   exportArchive,
@@ -84,12 +86,19 @@ export function createBackupActions({
   async function exportAll() {
     setStatus("Preparing archive");
     const archive = await deps.attachArchiveIntegrity(await deps.exportArchive());
+    const selfTest = await deps.createBackupSelfTest(archive, deps.verifyArchiveIntegrity, deps.now);
+    if (selfTest.status !== "passed") {
+      setStatus("Backup self-test failed");
+      return;
+    }
+
     const sizeBytes = deps.downloadJson(`browsevault-archive-${archive.exportedAt.slice(0, 10)}.json`, archive);
     await deps.setMeta("lastBackup", {
       exportedAt: archive.exportedAt,
       format: "json",
       records: archive.counts.visits,
       sizeBytes,
+      selfTest,
       sha256: archive.integrity.sha256
     });
     await refreshStats();

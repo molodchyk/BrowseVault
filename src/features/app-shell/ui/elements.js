@@ -58,6 +58,7 @@ export function collectAppElements(document) {
     backupFormat: document.querySelector("#backup-format"),
     backupRecords: document.querySelector("#backup-records"),
     backupSize: document.querySelector("#backup-size"),
+    backupSelfTest: document.querySelector("#backup-self-test"),
     backupChecksum: document.querySelector("#backup-checksum"),
     ruleDomain: document.querySelector("#rule-domain"),
     addBlacklist: document.querySelector("#add-blacklist"),

@@ -57,6 +57,7 @@ export function createDisplayPreferencesController({
     elements.backupFormat.textContent = status.formatText;
     elements.backupRecords.textContent = status.recordsText;
     elements.backupSize.textContent = status.sizeText;
+    elements.backupSelfTest.textContent = status.selfTestText;
     elements.backupChecksum.textContent = status.checksumText;
   }
 

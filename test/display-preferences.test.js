@@ -4,6 +4,7 @@ import {
   backupStatusDetails,
   clampBackupReminderDays,
   clampResultLimit,
+  formatBackupSelfTest,
   formatFileSize,
   formatShortDate,
   localDayKey,
@@ -61,6 +62,15 @@ test("formatFileSize summarizes recorded backup byte counts", () => {
   assert.equal(formatFileSize(5 * 1024 * 1024), "5 MB");
 });
 
+test("formatBackupSelfTest summarizes passed, failed, and missing checks", () => {
+  assert.equal(formatBackupSelfTest(null), "Not tested");
+  assert.equal(formatBackupSelfTest({ status: "passed", records: 1 }), "Passed 1 record");
+  assert.equal(formatBackupSelfTest({ status: "passed", records: 12 }), "Passed 12 records");
+  assert.equal(formatBackupSelfTest({ status: "failed", checksum: "mismatch" }), "Failed checksum");
+  assert.equal(formatBackupSelfTest({ status: "failed", countMatches: false }), "Failed count");
+  assert.equal(formatBackupSelfTest({ status: "failed" }), "Failed");
+});
+
 test("themeDatasetValue leaves system theme to CSS media queries", () => {
   assert.equal(themeDatasetValue("system"), "");
   assert.equal(themeDatasetValue("dark"), "dark");
@@ -76,6 +86,7 @@ test("backupStatusDetails summarizes missing, fresh, and stale backups", () => {
     formatText: "-",
     recordsText: "0",
     sizeText: "-",
+    selfTestText: "-",
     checksumText: "Not available"
   });
 
@@ -86,6 +97,10 @@ test("backupStatusDetails summarizes missing, fresh, and stale backups", () => {
       format: "json",
       records: 12,
       sizeBytes: 1536,
+      selfTest: {
+        records: 12,
+        status: "passed"
+      },
       sha256: "1234567890abcdef1234567890abcdef"
     },
     {
@@ -101,6 +116,7 @@ test("backupStatusDetails summarizes missing, fresh, and stale backups", () => {
   assert.equal(fresh.formatText, "JSON");
   assert.equal(fresh.recordsText, "12");
   assert.equal(fresh.sizeText, "1.5 KB");
+  assert.equal(fresh.selfTestText, "Passed 12 records");
   assert.equal(fresh.checksumText, "1234567890ab...90abcdef");
 
   const stale = backupStatusDetails(

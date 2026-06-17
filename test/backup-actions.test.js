@@ -97,6 +97,14 @@ test("exportAll downloads an integrity-protected archive and records backup meta
         downloaded.push(args);
         return 2048;
       },
+      createBackupSelfTest: async () => ({
+        checkedAt: "2026-06-16T12:00:00.000Z",
+        checksum: "verified",
+        countMatches: true,
+        expectedRecords: 2,
+        records: 2,
+        status: "passed"
+      }),
       exportArchive: async () => archive,
       setMeta: async (...args) => metadata.push(args)
     }
@@ -119,10 +127,51 @@ test("exportAll downloads an integrity-protected archive and records backup meta
       format: "json",
       records: 2,
       sizeBytes: 2048,
+      selfTest: {
+        checkedAt: "2026-06-16T12:00:00.000Z",
+        checksum: "verified",
+        countMatches: true,
+        expectedRecords: 2,
+        records: 2,
+        status: "passed"
+      },
       sha256: "abc123"
     }
   ]]);
   assert.deepEqual(calls, ["refreshStats"]);
+});
+
+test("exportAll stops before download when generated archive self-test fails", async () => {
+  const downloaded = [];
+  const metadata = [];
+  const { actions, calls, statuses } = createHarness({
+    services: {
+      attachArchiveIntegrity: async (input) => ({
+        ...input,
+        integrity: { sha256: "abc123" }
+      }),
+      createBackupSelfTest: async () => ({
+        checksum: "mismatch",
+        countMatches: true,
+        records: 2,
+        status: "failed"
+      }),
+      downloadJson: (...args) => downloaded.push(args),
+      exportArchive: async () => ({
+        exportedAt: "2026-06-16T12:00:00.000Z",
+        counts: { visits: 2 },
+        visits: [{ id: "visit-1" }, { id: "visit-2" }]
+      }),
+      setMeta: async (...args) => metadata.push(args)
+    }
+  });
+
+  await actions.exportAll();
+
+  assert.deepEqual(statuses, ["Preparing archive", "Backup self-test failed"]);
+  assert.deepEqual(downloaded, []);
+  assert.deepEqual(metadata, []);
+  assert.deepEqual(calls, []);
 });
 
 test("selected exports require at least one selected record", async () => {

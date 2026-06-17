@@ -64,6 +64,7 @@ function createHarness({
     backupNext: output(),
     backupRecords: output(),
     backupSize: output(),
+    backupSelfTest: output(),
     limit: input(""),
     prefAccent: input("teal"),
     prefDateFormat: input("system"),
@@ -175,6 +176,10 @@ test("refreshStats renders stat cards and backup health details", async () => {
           format: "json",
           records: 42,
           sizeBytes: 1536,
+          selfTest: {
+            records: 42,
+            status: "passed"
+          },
           sha256: "1234567890abcdef1234567890abcdef"
         }
       }
@@ -192,6 +197,7 @@ test("refreshStats renders stat cards and backup health details", async () => {
   assert.equal(elements.backupFormat.textContent, "JSON");
   assert.equal(elements.backupRecords.textContent, "42");
   assert.equal(elements.backupSize.textContent, "1.5 KB");
+  assert.equal(elements.backupSelfTest.textContent, "Passed 42 records");
   assert.equal(elements.backupChecksum.textContent, "1234567890ab...90abcdef");
   assert.equal(backupHealthClassList.classes.has("is-ok"), true);
   assert.equal(backupHealthClassList.classes.has("is-warning"), false);

@@ -156,6 +156,29 @@ export function formatChecksum(value) {
   return value.length > 24 ? `${value.slice(0, 12)}...${value.slice(-8)}` : value;
 }
 
+export function formatBackupSelfTest(selfTest) {
+  if (!selfTest) {
+    return "Not tested";
+  }
+
+  if (selfTest.status === "passed") {
+    const records = Number(selfTest.records);
+    return Number.isFinite(records)
+      ? `Passed ${formatCount(records)} record${records === 1 ? "" : "s"}`
+      : "Passed";
+  }
+
+  if (selfTest.checksum === "mismatch") {
+    return "Failed checksum";
+  }
+
+  if (selfTest.countMatches === false) {
+    return "Failed count";
+  }
+
+  return "Failed";
+}
+
 export function backupTimestamp(backup) {
   if (!backup?.exportedAt) {
     return 0;
@@ -185,6 +208,7 @@ export function backupStatusDetails(backup, options = {}) {
       formatText: "-",
       recordsText: "0",
       sizeText: "-",
+      selfTestText: "-",
       checksumText: "Not available"
     };
   }
@@ -206,6 +230,7 @@ export function backupStatusDetails(backup, options = {}) {
     formatText: String(backup.format || "unknown").toUpperCase(),
     recordsText: formatCount(backup.records),
     sizeText: formatFileSize(backup.sizeBytes),
+    selfTestText: formatBackupSelfTest(backup.selfTest),
     checksumText: formatChecksum(backup.sha256)
   };
 }
