@@ -165,13 +165,14 @@ npm run check
 npm test
 npm run icons
 npm run package
+npm run verify:package
 ```
 
 `npm run validate` also enforces the current trust baseline: exact manifest permissions, no host permissions, no optional permission prompts, no content scripts, no web-accessible resources, no external extension messaging surface, no remote source URLs, no source-level network APIs or dynamic code loaders, and no default `chrome_url_overrides` replacement of Chrome history.
 
 `npm run check` verifies JavaScript syntax and folder-density budgets so flat runtime/support folders stay at 12 files or fewer, while feature folders and feature test folders stay at 15 files or fewer before being split again.
 
-`npm run package` writes `dist/browsevault-1.0.0.zip`.
+`npm run package` writes `dist/browsevault-1.0.0.zip` and verifies the final ZIP contents.
 
 ## Current Search Syntax
 

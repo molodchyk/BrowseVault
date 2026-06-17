@@ -48,6 +48,7 @@ const requiredFiles = [
   "scripts/check-syntax.mjs",
   "scripts/generate-icons.mjs",
   "scripts/package-extension.mjs",
+  "scripts/verify-package.mjs",
   "scripts/zip-utils.mjs"
 ];
 
@@ -164,7 +165,8 @@ assert(packageJson.keywords.includes("browser-history"), "Missing browser-histor
 assert(packageJson.keywords.includes("history-backup"), "Missing history-backup keyword.");
 assert(packageJson.scripts.check.includes("check-folder-density.mjs"), "Check script must enforce folder density.");
 assert(packageJson.scripts.icons, "Missing icons script.");
-assert(packageJson.scripts.package, "Missing package script.");
+assert(packageJson.scripts.package?.includes("verify-package.mjs"), "Package script must verify the final ZIP output.");
+assert(packageJson.scripts["verify:package"]?.includes("verify-package.mjs"), "Missing verify:package script.");
 
 const changelog = fs.readFileSync(path.join(root, "CHANGELOG.md"), "utf8");
 assert(changelog.includes(`## ${manifest.version} -`), "Changelog must include the current manifest version.");
@@ -312,6 +314,7 @@ for (const expected of [
   "npm run check",
   "npm test",
   "npm run package",
+  "npm run verify:package",
   "git diff --check",
   "load this repository folder unpacked",
   "Cold Turkey",

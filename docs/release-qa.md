@@ -11,6 +11,7 @@ npm run validate
 npm run check
 npm test
 npm run package
+npm run verify:package
 git diff --check
 ```
 
@@ -20,6 +21,7 @@ Expected results:
 - JavaScript syntax and folder-density checks pass;
 - unit tests pass;
 - `dist/browsevault-1.0.0.zip` is produced;
+- package ZIP verification passes;
 - package contains runtime extension files, root user-facing docs, and `_locales/en/messages.json`;
 - package excludes repository research, tests, scripts, docs, StorePilot files, and build metadata.
 
