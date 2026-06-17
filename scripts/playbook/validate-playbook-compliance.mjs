@@ -101,5 +101,19 @@ export function validatePlaybookCompliance(root, assert) {
       !source.text.includes("The current version supports"),
       `${source.label} should not regress to an exhaustive feature-dump sentence.`
     );
+    assert(
+      !/buymeacoffee|patreon/i.test(source.text),
+      `${source.label} must not include donation links by default.`
+    );
+  }
+
+  const reviewerNotes = fs.readFileSync(path.join(root, "docs", "release", "reviewer-notes.md"), "utf8");
+  for (const expected of [
+    "Incognito history is not captured unless the browser allows the extension to run in incognito",
+    "does not request `file://` host access",
+    "Chrome extension APIs generally cannot write arbitrary old imported visits back into Chrome's native history database",
+    "Chrome history deletion uses Chrome's URL-level history API"
+  ]) {
+    assert(reviewerNotes.includes(expected), `Reviewer notes missing browser-store limit detail: ${expected}`);
   }
 }
