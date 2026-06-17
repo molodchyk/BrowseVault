@@ -29,6 +29,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `scripts/check-privacy-permissions.mjs` verifies that manifest permissions, `PRIVACY.md`, and the StorePilot privacy form stay aligned.
 - `scripts/check-file-sizes.mjs` audits the file-size budgets from the modularization playbook for `src/`, `test/`, and `scripts/`, reports soft-budget warnings, and caps known hard-limit debt.
 - `scripts/check-folder-density.mjs` enforces folder-density budgets for `src/`, `test/`, `scripts/`, and `docs/`.
+- `scripts/qa/` is reserved for clone-safe QA helpers and currently documents that browser QA must stay manual or use an explicitly approved disposable profile.
 
 ## Next Split Candidates
 

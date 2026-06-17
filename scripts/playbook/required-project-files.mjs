@@ -86,6 +86,7 @@ export const requiredProjectFiles = [
   "scripts/playbook/validate-chrome-qa-safety.mjs",
   "scripts/playbook/validate-manifest-surface.mjs",
   "scripts/playbook/validate-playbook-compliance.mjs",
+  "scripts/qa/README.md",
   "scripts/verify-package.mjs",
   "scripts/zip-utils.mjs"
 ];

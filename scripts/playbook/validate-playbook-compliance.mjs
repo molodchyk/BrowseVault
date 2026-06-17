@@ -82,6 +82,20 @@ export function validatePlaybookCompliance(root, assert) {
     "Docs README must link the shared localization workflow reference."
   );
 
+  const qaReadme = fs.readFileSync(path.join(root, "scripts", "qa", "README.md"), "utf8");
+  for (const expected of [
+    "Do not add scripts here that launch, attach to, or mutate an active Chrome profile.",
+    "manual",
+    "disposable temporary browser profile",
+    "npm run validate",
+    "npm run check",
+    "npm test",
+    "npm run package",
+    "npm run verify:package"
+  ]) {
+    assert(qaReadme.includes(expected), `QA README missing safety or release-check detail: ${expected}`);
+  }
+
   const playbookCompliance = fs.readFileSync(
     path.join(root, "docs", "release", "browser-extension-playbook-compliance.md"),
     "utf8"
