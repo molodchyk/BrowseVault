@@ -1,4 +1,5 @@
 StorePilot dashboard helper only. The extension's default public privacy policy remains `../PRIVACY.md`.
+Data usage answers describe data collected from users by the developer. BrowseVault handles browser history locally in the user's browser profile, but does not transmit or collect that history from users.
 
 [privacy]
 single_purpose:
@@ -50,7 +51,7 @@ data_usage.location:
 no
 
 data_usage.web_history:
-yes
+no
 
 data_usage.user_activity:
 no
