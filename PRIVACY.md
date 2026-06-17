@@ -15,6 +15,7 @@ Current extension behavior:
 - Stores display preferences and archive metadata in Chrome local extension storage, not sync, session, or managed storage.
 - Does not automatically read page contents.
 - Does not take screenshots.
+- Does not request host permissions or optional permissions.
 - Does not make remote network requests.
 - Does not include analytics, ads, tracking scripts, content scripts, or remote code.
 - Does not sell, share, transfer, upload, review, or collect user browsing history or other user data for the developer or a third party.

@@ -37,4 +37,4 @@ These notes summarize behavior that browser-store reviewers should not need to i
 
 ## Package Review
 
-`npm run validate` checks manifest permissions, missing required files, icon dimensions, store-listing inputs, privacy-form keys, no default Chrome history override, no host permissions, no content scripts, no external messaging surface, no network APIs, no remote URLs, and no dynamic code loaders in extension source. `npm run check` verifies JavaScript syntax, static import resolution, extension-page module script paths, locale coverage, manifest paths, file-size budgets, and folder-density budgets.
+`npm run validate` checks manifest permissions, missing required files, icon dimensions, store-listing inputs, privacy-form keys, no default Chrome history override, no host permissions, no content scripts, no external messaging surface, no network APIs, no remote URLs, and no dynamic code loaders in extension source. `npm run check` verifies JavaScript syntax, static import resolution, extension-page module script paths, locale coverage, manifest paths, privacy/permission disclosure parity, file-size budgets, and folder-density budgets.

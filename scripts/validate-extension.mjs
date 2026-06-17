@@ -50,6 +50,7 @@ const requiredFiles = [
   "scripts/check-imports.mjs",
   "scripts/check-locales.mjs",
   "scripts/check-manifest-paths.mjs",
+  "scripts/check-privacy-permissions.mjs",
   "scripts/check-syntax.mjs",
   "scripts/generate-icons.mjs",
   "scripts/package-extension.mjs",
@@ -181,6 +182,7 @@ assert(packageJson.scripts.check.includes("check-syntax.mjs"), "Check script mus
 assert(packageJson.scripts.check.includes("check-imports.mjs"), "Check script must verify static import resolution.");
 assert(packageJson.scripts.check.includes("check-locales.mjs"), "Check script must verify locale message coverage.");
 assert(packageJson.scripts.check.includes("check-manifest-paths.mjs"), "Check script must verify manifest-referenced file paths.");
+assert(packageJson.scripts.check.includes("check-privacy-permissions.mjs"), "Check script must verify privacy/permission parity.");
 assert(packageJson.scripts.check.includes("check-file-sizes.mjs"), "Check script must enforce file-size budgets.");
 assert(packageJson.scripts.check.includes("check-folder-density.mjs"), "Check script must enforce folder density.");
 assert(packageJson.scripts.icons, "Missing icons script.");
@@ -230,6 +232,17 @@ for (const expected of [
   "Manifest paths checked"
 ]) {
   assert(manifestPathScript.includes(expected), `Manifest-path audit missing guardrail: ${expected}`);
+}
+
+const privacyPermissionScript = fs.readFileSync(path.join(root, "scripts", "check-privacy-permissions.mjs"), "utf8");
+for (const expected of [
+  "permission.${permission}",
+  "data_usage.web_history",
+  "host_permission",
+  "remote_code",
+  "Does not request host permissions or optional permissions"
+]) {
+  assert(privacyPermissionScript.includes(expected), `Privacy/permission audit missing guardrail: ${expected}`);
 }
 
 const changelog = fs.readFileSync(path.join(root, "CHANGELOG.md"), "utf8");
