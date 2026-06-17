@@ -52,6 +52,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - full local BrowseVault data reset without touching Chrome history;
 - domain blacklist and whitelist rules;
 - local preferences for system/light/dark theme, accent color, date format, default result limit, backup reminders, and backup filename prefix;
+- in-app trust, permission, and product-limit disclosures;
 - local-first privacy documentation;
 - generated PNG extension icons;
 - deterministic local ZIP packaging;

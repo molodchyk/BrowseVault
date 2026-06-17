@@ -289,6 +289,47 @@
             </label>
           </div>
         </section>
+
+        <section class="panel trust-panel" aria-label="Trust and limits">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Trust</p>
+              <h2>Permissions and limits</h2>
+            </div>
+          </div>
+          <dl class="trust-list">
+            <div>
+              <dt>History</dt>
+              <dd>Syncs available Chrome history, records new visits, and deletes Chrome URLs only after an explicit delete action.</dd>
+            </div>
+            <div>
+              <dt>Tabs, bookmarks, downloads, sessions</dt>
+              <dd>Power Quick Open search, switching, opening, copying, and recently closed tab restore.</dd>
+            </div>
+            <div>
+              <dt>Storage</dt>
+              <dd>Saves the local vault, rules, backup metadata, and display preferences in this browser profile.</dd>
+            </div>
+            <div>
+              <dt>Network</dt>
+              <dd>No remote code, analytics, ads, tracking, or page-content capture is built into the extension.</dd>
+            </div>
+          </dl>
+          <ul class="limit-list" aria-label="Product limits">
+            <li>
+              <strong>Old history</strong>
+              <span>BrowseVault preserves history from installation onward and can import files, but cannot recover visits Chrome already deleted.</span>
+            </li>
+            <li>
+              <strong>Native Chrome history</strong>
+              <span>Imported records live in BrowseVault; Chrome APIs do not reliably write arbitrary old visits back into Chrome's own history page.</span>
+            </li>
+            <li>
+              <strong>Device history</strong>
+              <span>Mobile, account, or other-device history depends on what Chrome exposes locally or what the user imports.</span>
+            </li>
+          </ul>
+        </section>
       </section>
     </main>
 

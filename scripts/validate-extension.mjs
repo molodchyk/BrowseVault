@@ -114,6 +114,14 @@ const storePilotAdditionalFields = fs.readFileSync(path.join(root, "docs", "chro
 for (const key of ["official_url", "homepage_url", "support_url", "mature_content"]) {
   assert(storePilotAdditionalFields.includes(`${key}:`), `Missing StorePilot additional field key: ${key}`);
 }
+const additionalFieldValue = (key) => {
+  const match = storePilotAdditionalFields.match(new RegExp(`${key}:\\s*\\n([^\\n]+)`, "i"));
+  return match ? match[1].trim() : "";
+};
+assert(additionalFieldValue("official_url") === "https://github.com/molodchyk/BrowseVault", "Unexpected StorePilot official URL.");
+assert(additionalFieldValue("homepage_url") === "https://github.com/molodchyk/BrowseVault", "Unexpected StorePilot homepage URL.");
+assert(additionalFieldValue("support_url") === "https://github.com/molodchyk/BrowseVault/issues", "Unexpected StorePilot support URL.");
+assert(additionalFieldValue("mature_content") === "no", "StorePilot mature content should be no.");
 
 const storePilotPrivacy = fs.readFileSync(path.join(root, "docs", "chrome-web-store-privacy-form.md"), "utf8");
 for (const key of [
@@ -139,6 +147,8 @@ for (const key of [
 
 const appHtml = fs.readFileSync(path.join(root, "src/app.html"), "utf8");
 assert(appHtml.includes('type="module"'), "App script should load as a module.");
+assert(appHtml.includes("Permissions and limits"), "Settings should disclose permissions and product limits.");
+assert(appHtml.includes("cannot recover visits Chrome already deleted"), "Settings should disclose old-history recovery limits.");
 
 const sourceFiles = collectFilesByExtension("src", new Set([".js", ".html", ".css"]));
 for (const file of sourceFiles) {
