@@ -46,10 +46,10 @@ function retentionDaysFromInput(value) {
 
 function ruleDisplayType(rule) {
   if (rule?.type === "blacklist") {
-    return "Block";
+    return "Blacklist";
   }
   if (rule?.type === "whitelist") {
-    return "Keep";
+    return "Whitelist";
   }
   if (rule?.type === "category") {
     return "Category";
@@ -145,13 +145,13 @@ export function createVaultManagementActions({
 
     const domains = deps.uniqueDomainsForItems(items);
     if (!domains.length) {
-      setStatus("Selected records have no domains to block");
+      setStatus("Selected records have no domains to blacklist");
       return;
     }
 
-    const message = `Block ${domains.length} selected domain${domains.length === 1 ? "" : "s"} from future archiving? Existing vault records will stay until you delete them.`;
+    const message = `Blacklist ${domains.length} selected domain${domains.length === 1 ? "" : "s"} for future archiving? Existing vault records will stay until you delete them.`;
     if (!deps.confirmAction(message)) {
-      setStatus("Block canceled");
+      setStatus("Blacklist canceled");
       return;
     }
 
@@ -161,16 +161,16 @@ export function createVaultManagementActions({
     await renderRules();
 
     const movedLabel = movedFromWhitelist
-      ? ` ${movedFromWhitelist} moved from Keep rules.`
+      ? ` ${movedFromWhitelist} moved from whitelist.`
       : "";
     await recordActivity({
       type: "rule",
-      label: "Domains blocked",
+      label: "Domains blacklisted",
       count: domains.length,
-      detail: movedFromWhitelist ? `${movedFromWhitelist} moved from Keep rules` : ""
+      detail: movedFromWhitelist ? `${movedFromWhitelist} moved from whitelist` : ""
     });
     await refreshStats();
-    setStatus(`Blocked ${domains.length} domain${domains.length === 1 ? "" : "s"} from future archiving.${movedLabel}`);
+    setStatus(`Blacklisted ${domains.length} domain${domains.length === 1 ? "" : "s"} for future archiving.${movedLabel}`);
   }
 
   async function deleteFromVault() {
@@ -383,7 +383,7 @@ export function createVaultManagementActions({
       return;
     }
 
-    setStatus(`${candidates.length} vault record${candidates.length === 1 ? "" : "s"} older than ${retentionDays} days can be cleaned up. Domains marked Keep are preserved.`);
+    setStatus(`${candidates.length} vault record${candidates.length === 1 ? "" : "s"} older than ${retentionDays} days can be cleaned up. Whitelisted domains are kept.`);
   }
 
   async function cleanupByRetention() {
@@ -399,7 +399,7 @@ export function createVaultManagementActions({
       return;
     }
 
-    const message = `Move ${candidates.length} vault record${candidates.length === 1 ? "" : "s"} older than ${retentionDays} days to undoable deletion? Domains marked Keep will be preserved.`;
+    const message = `Move ${candidates.length} vault record${candidates.length === 1 ? "" : "s"} older than ${retentionDays} days to undoable deletion? Whitelisted domains will be kept.`;
     if (!deps.confirmAction(message)) {
       setStatus("Retention cleanup canceled");
       return;
@@ -415,7 +415,7 @@ export function createVaultManagementActions({
     appState.selectedIds.clear();
     await refreshStats();
     await runSearch();
-    setStatus(`Cleaned up ${deleted} old vault record${deleted === 1 ? "" : "s"}. Domains marked Keep preserved.`);
+    setStatus(`Cleaned up ${deleted} old vault record${deleted === 1 ? "" : "s"}. Whitelisted domains kept.`);
   }
 
   async function previewDuplicateCleanup() {

@@ -97,7 +97,7 @@ test("renderRules renders empty and removable rule states", async () => {
   assert.equal(item.className, "rule-item rule-item-blacklist");
   assert.equal(item.children[0].className, "rule-label");
   assert.equal(item.children[0].children[0].className, "rule-pill");
-  assert.equal(item.children[0].children[0].textContent, "Block");
+  assert.equal(item.children[0].children[0].textContent, "Blacklist");
   assert.equal(item.children[0].children[1].className, "rule-value");
   assert.equal(item.children[0].children[1].textContent, "example.com");
   assert.equal(item.children[1].textContent, "Remove");
@@ -172,7 +172,7 @@ test("addCategoryRule stores a manual domain category and refreshes visible resu
   }]]);
 });
 
-test("blacklistSelectedDomains adds unique selected domains and reports Keep-rule moves", async () => {
+test("blacklistSelectedDomains adds unique selected domains and reports whitelist moves", async () => {
   const added = [];
   const { actions, statuses } = createHarness({
     selected: [
@@ -196,7 +196,7 @@ test("blacklistSelectedDomains adds unique selected domains and reports Keep-rul
     ["blacklist", "docs.example.com"]
   ]);
   assert.deepEqual(statuses, [
-    "Blocked 2 domains from future archiving. 1 moved from Keep rules."
+    "Blacklisted 2 domains for future archiving. 1 moved from whitelist."
   ]);
 });
 
@@ -447,8 +447,8 @@ test("retention cleanup previews and deletes eligible old records", async () => 
   assert.equal(appState.selectedIds.size, 0);
   assert.deepEqual(calls, ["refreshStats", "runSearch"]);
   assert.deepEqual(statuses, [
-    "2 vault records older than 30 days can be cleaned up. Domains marked Keep are preserved.",
-    "Cleaned up 2 old vault records. Domains marked Keep preserved."
+    "2 vault records older than 30 days can be cleaned up. Whitelisted domains are kept.",
+    "Cleaned up 2 old vault records. Whitelisted domains kept."
   ]);
 });
 

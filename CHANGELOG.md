@@ -29,7 +29,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Import preview and import support for BrowseVault JSON, CSV, TSV, Google Takeout Browser History, Google My Activity, and common competitor history exports.
 - Import commits write visits, rules, and last-import metadata in one IndexedDB transaction to avoid partial restore state.
 - Recent activity log for completed backup, export, import, cleanup, delete, restore, rule, and reset actions, plus vault health checks for malformed rows, tombstones, and duplicate active records.
-- Domain Block, Keep, and manual category rules, selected-domain blocking, manual retention cleanup, duplicate cleanup, and full local vault reset.
+- Domain blacklist, whitelist, and manual category rules, selected-domain blacklisting, manual retention cleanup, duplicate cleanup, and full local vault reset.
 - Current filtered result deletion can target only the BrowseVault vault or, with a separate confirmation, matching URLs in Chrome history plus the related vault records.
 - Settings for system, light, and dark themes, accent color, high contrast, text size, date format, default result limit, backup reminder cadence, backup/export save mode, backup filename prefix, and backup filename template.
 - Feature-owned test folders and StorePilot-ready Chrome Web Store automation documents.

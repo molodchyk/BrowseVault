@@ -12,6 +12,6 @@ Export history in deterministic newest-first order as JSON, formula-safe spreads
 
 Use Quick Open to search tabs, bookmarks, downloads, recently closed tabs, and closed windows from the same interface, then switch, open, open in the background, restore, or copy the result URL. Toolbar and keyboard-command opening creates a new BrowseVault tab unless the current active tab is already BrowseVault, so you can keep separate BrowseVault tabs open for different searches.
 
-Control what gets saved and how it is organized with domain Block, Keep, and manual category rules, selected-domain blocking, manual retention cleanup that preserves domains marked Keep, local display preferences for theme, contrast, text size, dates, and default result limits, plus explicit destructive actions with undo where the vault can support it.
+Control what gets saved and how it is organized with domain blacklist, whitelist, and manual category rules, selected-domain blacklisting, manual retention cleanup that keeps whitelisted domains, local display preferences for theme, contrast, text size, dates, and default result limits, plus explicit destructive actions with undo where the vault can support it.
 
 BrowseVault stores its archive locally in your browser profile. It does not include analytics, ads, tracking scripts, remote code, or automatic page-content capture. It also keeps Chrome's native history page available from Settings instead of silently replacing it.

@@ -61,14 +61,14 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - selected-record URL copy;
 - selected-record batch opening with a tab-flood safety cap;
 - bulk deletion from the BrowseVault vault;
-- selected-domain blocking for future archive capture;
+- selected-domain blacklisting for future archive capture;
 - checkbox, Shift-click, and Shift+Space range selection, plus select visible, invert visible, or select all filtered vault results;
 - sticky result controls with incremental Load More, one-click Show All, and Top/Bottom jumps for large result sets;
 - undo for the last BrowseVault vault deletion;
 - optional URL-level deletion from Chrome history for selected records or the current filtered result set;
 - full local BrowseVault data reset without touching Chrome history;
-- domain Block, Keep, and manual category rules;
-- manual retention cleanup that previews old vault records and preserves domains marked Keep;
+- domain blacklist, whitelist, and manual category rules;
+- manual retention cleanup that previews old vault records and keeps whitelisted domains;
 - duplicate cleanup that previews repeated active vault records and moves extras to undoable deletion;
 - local preferences for system/light/dark theme, accent color, high contrast, text size, date format, default result limit, backup reminders, backup/export save mode, backup filename prefix, and backup filename template;
 - backup reminder status follows the configured reminder interval and warns when the next reminder date is reached;
@@ -187,11 +187,11 @@ Date filters use `YYYY-MM-DD` text fields to avoid browser-specific date input f
 
 ## Rules
 
-The Rules tab supports manual domain categories, Block rules, and Keep rules. Category rules label matching domains and subdomains in search results, can be searched with `category:` or `tag:`, and are included in BrowseVault JSON archives as rules. CSV and HTML history reports include the derived category label when one applies.
+The Rules tab supports manual domain categories, blacklist rules, and whitelist rules. Category rules label matching domains and subdomains in search results, can be searched with `category:` or `tag:`, and are included in BrowseVault JSON archives as rules. CSV and HTML history reports include the derived category label when one applies.
 
 ## Retention Cleanup
 
-The Rules tab supports manual vault retention cleanup. Enter a number of days, preview how many old BrowseVault records would be cleaned up, then confirm the cleanup. Cleanup uses the same undoable vault deletion path as selected-record deletion and skips domains marked Keep.
+The Rules tab supports manual vault retention cleanup. Enter a number of days, preview how many old BrowseVault records would be cleaned up, then confirm the cleanup. Cleanup uses the same undoable vault deletion path as selected-record deletion and skips whitelisted domains.
 
 The Rules tab also supports duplicate cleanup. It finds active vault records with the same URL and visit time, keeps the richest record, and moves extra duplicates to undoable deletion. It does not delete Chrome history.
 
