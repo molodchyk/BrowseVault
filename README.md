@@ -161,7 +161,7 @@ npm run package
 
 `npm run check` verifies JavaScript syntax and folder-density budgets so flat runtime/support folders stay at 12 files or fewer, while feature folders and feature test folders stay at 15 files or fewer before being split again.
 
-`npm run package` writes `dist/browsevault-0.1.0.zip`.
+`npm run package` writes `dist/browsevault-1.0.0.zip`.
 
 ## Current Search Syntax
 

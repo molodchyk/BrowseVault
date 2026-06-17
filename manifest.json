@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "BrowseVault: History Search & Backup",
   "short_name": "BrowseVault",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Search, back up, export, and preserve your browser history locally.",
   "minimum_chrome_version": "114",
   "icons": {

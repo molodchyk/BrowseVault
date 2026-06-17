@@ -4,7 +4,7 @@ All notable BrowseVault changes should be documented here before packaging a rel
 
 The changelog must call out trust-sensitive behavior changes: deletion behavior, backup and restore behavior, Chrome history replacement behavior, permissions, network behavior, and user-data handling.
 
-## 0.1.0 - 2026-06-17
+## 1.0.0 - 2026-06-17
 
 ### Added
 

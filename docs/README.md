@@ -13,6 +13,10 @@ This folder captures the critical market research, user feedback, product direct
 - `source-inventory.md` - index of raw source snapshots and how they map to the research notes.
 - `raw-sources/` - preserved Chrome Web Store listing/review text snapshots used as evidence.
 
+## Related Playbooks
+
+- [Browser Extension Playbook](../../browser-extension-playbook.md) - shared product, release, repository, privacy, store listing, and reviewer standards for browser extensions.
+
 ## Core Insight
 
 Users are not mainly asking for more charts or decorative UI. They want a trustworthy local-first browser memory tool that can:
