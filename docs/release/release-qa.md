@@ -34,5 +34,6 @@ The browser-extension playbook requires loading the unpacked extension in the ta
 Current workstation note:
 
 - Automated Chrome/Playwright launches may be closed by local focus-blocking tools such as Cold Turkey or FocusMe before the extension service worker can be inspected.
+- Do not launch or attach automation to the active user Chrome profile for this QA unless the profile, extension ID, and blocker state are explicitly confirmed for that run.
 - Do not treat that process-level closure as a BrowseVault product failure without reproducing it in a normal Chrome session.
 - Manual release check: pause the local focus blockers, open `chrome://extensions`, enable Developer mode, load this repository folder unpacked, then verify the toolbar action opens BrowseVault, a second non-BrowseVault active tab creates another BrowseVault tab, and deleting a vault record in one BrowseVault tab refreshes the other BrowseVault tab.
