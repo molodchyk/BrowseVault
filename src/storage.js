@@ -88,13 +88,17 @@ async function putMany(storeName, records) {
     store.put(record);
   }
 
-  await new Promise((resolve, reject) => {
+  await transactionDone(tx);
+
+  return records.length;
+}
+
+function transactionDone(tx) {
+  return new Promise((resolve, reject) => {
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
     tx.onabort = () => reject(tx.error);
   });
-
-  return records.length;
 }
 
 function hashString(value) {
@@ -311,11 +315,7 @@ export async function addDomainRule(type, value) {
   const store = tx.objectStore(RULE_STORE);
   store.delete(`${oppositeType}:${normalized}`);
   store.put(record);
-  await new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-    tx.onabort = () => reject(tx.error);
-  });
+  await transactionDone(tx);
 
   return record;
 }
@@ -334,10 +334,7 @@ export async function removeRule(id) {
   const db = await openVaultDb();
   const tx = db.transaction(RULE_STORE, "readwrite");
   tx.objectStore(RULE_STORE).delete(id);
-  await new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
+  await transactionDone(tx);
 }
 
 export async function searchVisits(input = "", options = {}) {
@@ -797,15 +794,19 @@ export async function analyzeImportArchive(archive) {
 
 export async function importArchive(archive) {
   const importedAt = new Date().toISOString();
+  const plan = createImportArchivePlan(archive, await getAllVisits({ includeDeleted: true }), importedAt);
+
+  await writeImportArchivePlan(plan);
+
+  return plan.result;
+}
+
+export function createImportArchivePlan(archive, existingVisits = [], importedAt = new Date().toISOString()) {
   const normalized = normalizeImportVisits(archive);
-  const records = mergeImportedVisits(await getAllVisits({ includeDeleted: true }), normalized);
+  const records = mergeImportedVisits(existingVisits, normalized);
   const duplicateRows = normalized.length - records.length;
   const rules = normalizeImportRules(archive, importedAt);
-
-  await putMany(VISIT_STORE, records);
-  await putMany(RULE_STORE, rules);
-
-  await setMeta("lastImport", {
+  const metadata = {
     importedAt,
     sourceApp: importArchiveSource(archive),
     schemaVersion: archive?.schemaVersion || null,
@@ -813,15 +814,45 @@ export async function importArchive(archive) {
     validRows: normalized.length,
     duplicateRows,
     rules: rules.length
-  });
+  };
 
   return {
-    importedAt,
-    visits: records.length,
-    validRows: normalized.length,
-    duplicateRows,
-    rules: rules.length
+    records,
+    rules,
+    metadata,
+    result: {
+      importedAt,
+      visits: records.length,
+      validRows: normalized.length,
+      duplicateRows,
+      rules: rules.length
+    }
   };
+}
+
+async function writeImportArchivePlan(plan) {
+  const db = await openVaultDb();
+  const tx = db.transaction([VISIT_STORE, RULE_STORE, META_STORE], "readwrite");
+  const visitStore = tx.objectStore(VISIT_STORE);
+  const ruleStore = tx.objectStore(RULE_STORE);
+  const metaStore = tx.objectStore(META_STORE);
+  const updatedAt = plan.metadata.importedAt;
+
+  for (const record of plan.records) {
+    visitStore.put(record);
+  }
+
+  for (const rule of plan.rules) {
+    ruleStore.put(rule);
+  }
+
+  metaStore.put({
+    key: "lastImport",
+    value: plan.metadata,
+    updatedAt
+  });
+
+  await transactionDone(tx);
 }
 
 export async function getStats(options = {}) {
@@ -853,9 +884,5 @@ export async function clearVaultData() {
   tx.objectStore(META_STORE).clear();
   tx.objectStore(RULE_STORE).clear();
 
-  await new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-    tx.onabort = () => reject(tx.error);
-  });
+  await transactionDone(tx);
 }

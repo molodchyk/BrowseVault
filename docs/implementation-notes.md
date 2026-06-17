@@ -98,6 +98,7 @@ Recommended features:
 - dry-run restore into temporary database;
 - duplicate detection;
 - clear warnings for partial imports.
+- atomic commit for visits, rules, and import metadata so failed restores do not leave partial state.
 
 Avoid:
 

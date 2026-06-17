@@ -25,6 +25,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - History result rows expose exact ISO visit timestamps in their time metadata while preserving the selected visible date format.
 - Automated folder-density checks for runtime/support folders and feature/test-feature folders, matching the modularization playbook budgets.
 - Import preview and import support for BrowseVault JSON, CSV, TSV, Google Takeout Browser History, Google My Activity, and common competitor history exports.
+- Import commits write visits, rules, and last-import metadata in one IndexedDB transaction to avoid partial restore state.
 - Recent activity log for completed backup, export, import, cleanup, delete, restore, rule, and reset actions, plus vault health checks for malformed rows, tombstones, and duplicate active records.
 - Domain blacklist and whitelist rules, selected-domain blacklisting, manual retention cleanup, duplicate cleanup, and full local vault reset.
 - Settings for system, light, and dark themes, accent color, high contrast, text size, date format, default result limit, backup reminder cadence, backup filename prefix, and backup filename template.
