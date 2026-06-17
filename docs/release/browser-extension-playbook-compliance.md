@@ -49,6 +49,7 @@ This file maps BrowseVault release evidence to the shared browser-extension play
 | Options/settings expose main preferences immediately. | Settings starts with `Display and search defaults`, `Save Settings`, theme/accent/contrast/text/date/result-limit/backup controls, and the native-history escape hatch. |
 | Browser-native vocabulary is used when Chrome owns behavior. | Labels distinguish `Delete From Vault`, `Delete URLs From Chrome`, `Delete Results From Chrome`, and `Open Chrome History`; reviewer notes document URL-level Chrome deletion. |
 | Destructive actions are explicit and guarded. | `src/features/vault-management/ui/actions.js` uses confirmations, undoable vault deletion where possible, and cross-tab vault-change notifications; tests cover empty/canceled destructive states. |
+| Long URLs and labels stay inside the viewport. | `src/styles/tokens.css` prevents page-level horizontal overflow; `src/styles/results.css` wraps result titles, URLs, metadata, and rule values; `npm run validate` enforces these guardrails. |
 | Dark, light, and blank states are intentional. | Settings includes system/light/dark themes, contrast and text-size preferences; activity/rules/quick-result tests cover empty states. |
 
 ## Privacy And Permissions

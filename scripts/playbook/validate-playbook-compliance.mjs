@@ -150,6 +150,23 @@ export function validatePlaybookCompliance(root, assert) {
     assert(backupRulesCss.includes(expected), `Action-row CSS missing compact button guardrail: ${expected}`);
   }
 
+  const tokensCss = fs.readFileSync(path.join(root, "src", "styles", "tokens.css"), "utf8");
+  for (const expected of ["html,", "body", "max-width: 100%", "overflow-x: clip"]) {
+    assert(tokensCss.includes(expected), `Global CSS missing horizontal overflow guardrail: ${expected}`);
+  }
+
+  const resultsCss = fs.readFileSync(path.join(root, "src", "styles", "results.css"), "utf8");
+  for (const expected of [
+    ".result-title",
+    ".url",
+    ".meta",
+    "overflow-wrap: anywhere",
+    "word-break: break-word",
+    "text-overflow: ellipsis"
+  ]) {
+    assert(resultsCss.includes(expected), `Result CSS missing long-text containment guardrail: ${expected}`);
+  }
+
   const storeDraft = fs.readFileSync(path.join(root, "store", "listing.md"), "utf8");
   const storePilotListing = fs.readFileSync(path.join(root, "store-listing", "chrome-web-store", "listing", "en.md"), "utf8");
   assert(!/^#/m.test(storePilotListing), "StorePilot listing body must not contain Markdown headings.");
