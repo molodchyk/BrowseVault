@@ -125,6 +125,29 @@ export function formatCount(value) {
   return Number.isFinite(count) ? count.toLocaleString() : "0";
 }
 
+export function formatFileSize(bytes) {
+  const value = Number(bytes);
+  if (!Number.isFinite(value) || value < 0) {
+    return "Not recorded";
+  }
+
+  if (value < 1024) {
+    return `${Math.round(value)} B`;
+  }
+
+  const units = ["KB", "MB", "GB"];
+  let size = value / 1024;
+  let unitIndex = 0;
+
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024;
+    unitIndex += 1;
+  }
+
+  const precision = size >= 10 ? 1 : 2;
+  return `${size.toFixed(precision).replace(/\.0+$/, "").replace(/(\.\d)0$/, "$1")} ${units[unitIndex]}`;
+}
+
 export function formatChecksum(value) {
   if (!value) {
     return "Not available";
@@ -161,6 +184,7 @@ export function backupStatusDetails(backup, options = {}) {
       nextText: reminderDays > 0 ? "After first backup" : "Off",
       formatText: "-",
       recordsText: "0",
+      sizeText: "-",
       checksumText: "Not available"
     };
   }
@@ -181,6 +205,7 @@ export function backupStatusDetails(backup, options = {}) {
     nextText: remindersEnabled ? formatDate(nextTimestamp, dateFormat) : "Off",
     formatText: String(backup.format || "unknown").toUpperCase(),
     recordsText: formatCount(backup.records),
+    sizeText: formatFileSize(backup.sizeBytes),
     checksumText: formatChecksum(backup.sha256)
   };
 }

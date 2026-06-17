@@ -4,6 +4,7 @@ import {
   backupStatusDetails,
   clampBackupReminderDays,
   clampResultLimit,
+  formatFileSize,
   formatShortDate,
   localDayKey,
   normalizePreferences,
@@ -52,6 +53,14 @@ test("formatShortDate supports explicit non-US formats", () => {
   assert.equal(localDayKey(timestamp), "2026-06-16");
 });
 
+test("formatFileSize summarizes recorded backup byte counts", () => {
+  assert.equal(formatFileSize(undefined), "Not recorded");
+  assert.equal(formatFileSize(-1), "Not recorded");
+  assert.equal(formatFileSize(512), "512 B");
+  assert.equal(formatFileSize(1536), "1.5 KB");
+  assert.equal(formatFileSize(5 * 1024 * 1024), "5 MB");
+});
+
 test("themeDatasetValue leaves system theme to CSS media queries", () => {
   assert.equal(themeDatasetValue("system"), "");
   assert.equal(themeDatasetValue("dark"), "dark");
@@ -66,6 +75,7 @@ test("backupStatusDetails summarizes missing, fresh, and stale backups", () => {
     nextText: "After first backup",
     formatText: "-",
     recordsText: "0",
+    sizeText: "-",
     checksumText: "Not available"
   });
 
@@ -75,6 +85,7 @@ test("backupStatusDetails summarizes missing, fresh, and stale backups", () => {
       exportedAt,
       format: "json",
       records: 12,
+      sizeBytes: 1536,
       sha256: "1234567890abcdef1234567890abcdef"
     },
     {
@@ -89,6 +100,7 @@ test("backupStatusDetails summarizes missing, fresh, and stale backups", () => {
   assert.match(fresh.nextText, /^2026-07-01 \d{2}:\d{2}$/);
   assert.equal(fresh.formatText, "JSON");
   assert.equal(fresh.recordsText, "12");
+  assert.equal(fresh.sizeText, "1.5 KB");
   assert.equal(fresh.checksumText, "1234567890ab...90abcdef");
 
   const stale = backupStatusDetails(

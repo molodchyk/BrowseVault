@@ -2,7 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   backupImportPreviewElements,
-  createBackupActions
+  createBackupActions,
+  downloadText
 } from "../src/features/backup-import/ui/actions.js";
 
 function previewElements() {
@@ -46,6 +47,38 @@ test("backupImportPreviewElements maps app shell elements for import preview ren
   assert.deepEqual(backupImportPreviewElements(elements), elements);
 });
 
+test("downloadText returns the generated blob size", () => {
+  const clicks = [];
+  const revoked = [];
+  const runtime = {
+    Blob: globalThis.Blob,
+    URL: {
+      createObjectURL: (blob) => {
+        assert.equal(blob.size, 5);
+        return "blob:browsevault-test";
+      },
+      revokeObjectURL: (url) => revoked.push(url)
+    },
+    document: {
+      createElement: (tagName) => {
+        assert.equal(tagName, "a");
+        return {
+          click() {
+            clicks.push({
+              download: this.download,
+              href: this.href
+            });
+          }
+        };
+      }
+    }
+  };
+
+  assert.equal(downloadText("history.txt", "text/plain", "hello", runtime), 5);
+  assert.deepEqual(clicks, [{ download: "history.txt", href: "blob:browsevault-test" }]);
+  assert.deepEqual(revoked, ["blob:browsevault-test"]);
+});
+
 test("exportAll downloads an integrity-protected archive and records backup metadata", async () => {
   const archive = {
     exportedAt: "2026-06-16T12:00:00.000Z",
@@ -60,7 +93,10 @@ test("exportAll downloads an integrity-protected archive and records backup meta
         ...input,
         integrity: { sha256: "abc123" }
       }),
-      downloadJson: (...args) => downloaded.push(args),
+      downloadJson: (...args) => {
+        downloaded.push(args);
+        return 2048;
+      },
       exportArchive: async () => archive,
       setMeta: async (...args) => metadata.push(args)
     }
@@ -82,6 +118,7 @@ test("exportAll downloads an integrity-protected archive and records backup meta
       exportedAt: archive.exportedAt,
       format: "json",
       records: 2,
+      sizeBytes: 2048,
       sha256: "abc123"
     }
   ]]);

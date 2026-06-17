@@ -44,7 +44,7 @@ export function backupImportPreviewElements(elements) {
 }
 
 export function downloadJson(filename, data, runtime = globalThis) {
-  downloadText(filename, "application/json", JSON.stringify(data, null, 2), runtime);
+  return downloadText(filename, "application/json", JSON.stringify(data, null, 2), runtime);
 }
 
 export function downloadText(filename, mimeType, text, runtime = globalThis) {
@@ -57,6 +57,7 @@ export function downloadText(filename, mimeType, text, runtime = globalThis) {
   anchor.click();
 
   runtime.URL.revokeObjectURL(url);
+  return blob.size;
 }
 
 export function createBackupActions({
@@ -83,11 +84,12 @@ export function createBackupActions({
   async function exportAll() {
     setStatus("Preparing archive");
     const archive = await deps.attachArchiveIntegrity(await deps.exportArchive());
-    deps.downloadJson(`browsevault-archive-${archive.exportedAt.slice(0, 10)}.json`, archive);
+    const sizeBytes = deps.downloadJson(`browsevault-archive-${archive.exportedAt.slice(0, 10)}.json`, archive);
     await deps.setMeta("lastBackup", {
       exportedAt: archive.exportedAt,
       format: "json",
       records: archive.counts.visits,
+      sizeBytes,
       sha256: archive.integrity.sha256
     });
     await refreshStats();
@@ -97,7 +99,7 @@ export function createBackupActions({
   async function exportCsv() {
     setStatus("Preparing CSV");
     const archive = await deps.exportArchive();
-    deps.downloadText(
+    const sizeBytes = deps.downloadText(
       `browsevault-history-${archive.exportedAt.slice(0, 10)}.csv`,
       "text/csv",
       deps.visitsToCsv(archive.visits)
@@ -105,7 +107,8 @@ export function createBackupActions({
     await deps.setMeta("lastBackup", {
       exportedAt: archive.exportedAt,
       format: "csv",
-      records: archive.counts.visits
+      records: archive.counts.visits,
+      sizeBytes
     });
     await refreshStats();
     setStatus("Exported CSV");
@@ -114,7 +117,7 @@ export function createBackupActions({
   async function exportHtml() {
     setStatus("Preparing HTML");
     const archive = await deps.exportArchive();
-    deps.downloadText(
+    const sizeBytes = deps.downloadText(
       `browsevault-history-${archive.exportedAt.slice(0, 10)}.html`,
       "text/html",
       deps.visitsToHtml(archive.visits, archive.exportedAt)
@@ -122,7 +125,8 @@ export function createBackupActions({
     await deps.setMeta("lastBackup", {
       exportedAt: archive.exportedAt,
       format: "html",
-      records: archive.counts.visits
+      records: archive.counts.visits,
+      sizeBytes
     });
     await refreshStats();
     setStatus("Exported HTML");

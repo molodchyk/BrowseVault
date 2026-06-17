@@ -57,6 +57,7 @@ const singularSelectors = [
   "backup-next",
   "backup-format",
   "backup-records",
+  "backup-size",
   "backup-checksum",
   "rule-domain",
   "add-blacklist",
@@ -101,6 +102,7 @@ test("collectAppElements queries the app shell selectors", () => {
   assert.equal(elements.importPreviewTitle.selector, "#import-preview-title");
   assert.equal(elements.backupChecksum.selector, "#backup-checksum");
   assert.equal(elements.backupNext.selector, "#backup-next");
+  assert.equal(elements.backupSize.selector, "#backup-size");
   assert.equal(elements.savePreferences.selector, "#save-preferences");
   assert.equal(elements.tabs.length, 2);
   assert.equal(elements.panels.length, 2);

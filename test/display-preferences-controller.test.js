@@ -63,6 +63,7 @@ function createHarness({
     backupLast: output(),
     backupNext: output(),
     backupRecords: output(),
+    backupSize: output(),
     limit: input(""),
     prefAccent: input("teal"),
     prefDateFormat: input("system"),
@@ -173,6 +174,7 @@ test("refreshStats renders stat cards and backup health details", async () => {
           exportedAt,
           format: "json",
           records: 42,
+          sizeBytes: 1536,
           sha256: "1234567890abcdef1234567890abcdef"
         }
       }
@@ -189,6 +191,7 @@ test("refreshStats renders stat cards and backup health details", async () => {
   assert.match(elements.backupNext.textContent, /^2026-07-01 \d{2}:\d{2}$/);
   assert.equal(elements.backupFormat.textContent, "JSON");
   assert.equal(elements.backupRecords.textContent, "42");
+  assert.equal(elements.backupSize.textContent, "1.5 KB");
   assert.equal(elements.backupChecksum.textContent, "1234567890ab...90abcdef");
   assert.equal(backupHealthClassList.classes.has("is-ok"), true);
   assert.equal(backupHealthClassList.classes.has("is-warning"), false);
