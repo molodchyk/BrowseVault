@@ -40,6 +40,13 @@ describe("parseQuery", () => {
     assert.deepEqual(parseQuery("visits:4").visitCount, { min: 4, max: 4 });
   });
 
+  it("parses local hour filters", () => {
+    assert.deepEqual(parseQuery("hour:14").hour, { start: 14, end: 14 });
+    assert.deepEqual(parseQuery("hour:9-17").hour, { start: 9, end: 17 });
+    assert.deepEqual(parseQuery("hour:17..9").hour, { start: 9, end: 17 });
+    assert.deepEqual(parseQuery("hour:24").hour, { start: null, end: null });
+  });
+
   it("parses date filters and invalid regex safely", () => {
     const query = parseQuery("after:2026-06-01 before:2026-06-30 regex:[");
 
@@ -71,6 +78,19 @@ describe("matchesVisitQuery", () => {
     assert.equal(matchesVisitQuery(visit, parseQuery("visits:13+")), false);
     assert.equal(matchesVisitQuery(visit, parseQuery("count:10..12")), true);
     assert.equal(matchesVisitQuery(visit, parseQuery("visitcount:12")), true);
+  });
+
+  it("matches local hour filters", () => {
+    const afternoonVisit = {
+      ...visit,
+      visitTime: new Date(2026, 5, 10, 14, 30).getTime()
+    };
+
+    assert.equal(matchesVisitQuery(afternoonVisit, parseQuery("hour:14")), true);
+    assert.equal(matchesVisitQuery(afternoonVisit, parseQuery("hour:9-14")), true);
+    assert.equal(matchesVisitQuery(afternoonVisit, parseQuery("hour:15")), false);
+    assert.equal(matchesVisitQuery(afternoonVisit, parseQuery("hour:15-20")), false);
+    assert.equal(matchesVisitQuery(afternoonVisit, parseQuery("hour:99")), true);
   });
 
   it("matches title, url, phrase, exclusion, and regex filters", () => {

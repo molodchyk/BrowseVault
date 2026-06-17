@@ -13,6 +13,10 @@ export function parseQuery(input = "") {
       min: null,
       max: null
     },
+    hour: {
+      start: null,
+      end: null
+    },
     after: null,
     before: null,
     dateStart: null,
@@ -61,6 +65,11 @@ export function parseQuery(input = "") {
       continue;
     }
 
+    if (value && field === "hour") {
+      applyHourConstraint(query.hour, parseHourConstraint(value));
+      continue;
+    }
+
     if (value && ["date", "day", "on"].includes(field)) {
       const range = parseLocalDayRange(value);
       if (range) {
@@ -98,6 +107,48 @@ export function parseQuery(input = "") {
   }
 
   return query;
+}
+
+function parseHourConstraint(value) {
+  const trimmed = value.trim();
+  const range = /^(\d{1,2})(?:\.\.|-)(\d{1,2})$/.exec(trimmed);
+  if (range) {
+    const first = Number(range[1]);
+    const second = Number(range[2]);
+    if (isValidHour(first) && isValidHour(second)) {
+      return {
+        start: Math.min(first, second),
+        end: Math.max(first, second)
+      };
+    }
+    return null;
+  }
+
+  const exact = /^(\d{1,2})$/.exec(trimmed);
+  if (exact) {
+    const hour = Number(exact[1]);
+    if (isValidHour(hour)) {
+      return {
+        start: hour,
+        end: hour
+      };
+    }
+  }
+
+  return null;
+}
+
+function isValidHour(hour) {
+  return Number.isInteger(hour) && hour >= 0 && hour <= 23;
+}
+
+function applyHourConstraint(target, constraint) {
+  if (!constraint) {
+    return;
+  }
+
+  target.start = target.start === null ? constraint.start : Math.max(target.start, constraint.start);
+  target.end = target.end === null ? constraint.end : Math.min(target.end, constraint.end);
 }
 
 function parseLocalDayRange(value) {
@@ -247,6 +298,16 @@ export function matchesVisitQuery(visit, query) {
 
   if (query.visitCount.max !== null && visitCount > query.visitCount.max) {
     return false;
+  }
+
+  if (query.hour.start !== null || query.hour.end !== null) {
+    const visitHour = new Date(visit.visitTime).getHours();
+    if (query.hour.start !== null && visitHour < query.hour.start) {
+      return false;
+    }
+    if (query.hour.end !== null && visitHour > query.hour.end) {
+      return false;
+    }
   }
 
   if (query.phrases.length && !includesAll(haystack, query.phrases)) {
