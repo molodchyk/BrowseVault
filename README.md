@@ -96,6 +96,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 │   ├── code-structure.md
 │   ├── decision-records.md
 │   ├── extension-modularization-playbook.md
+│   ├── release-qa.md
 │   ├── release-notes.md
 │   ├── reviewer-notes.md
 │   └── storepilot-project-structure.md

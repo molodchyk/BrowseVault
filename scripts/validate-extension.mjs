@@ -32,6 +32,7 @@ const requiredFiles = [
   "store-listing/chrome-web-store/media/screenshots/05-settings-privacy.jpg",
   "docs/README.md",
   "docs/reviewer-notes.md",
+  "docs/release-qa.md",
   "docs/release-notes.md",
   "docs/decision-records.md",
   "docs/repository-metadata.md",
@@ -262,6 +263,7 @@ for (const expected of [
 const docsReadme = fs.readFileSync(path.join(root, "docs", "README.md"), "utf8");
 for (const expected of [
   "release-notes.md",
+  "release-qa.md",
   "decision-records.md",
   "repository-metadata.md",
   "storepilot-project-structure.md",
@@ -302,6 +304,20 @@ for (const expected of [
   "no default network requests"
 ]) {
   assert(releaseNotes.includes(expected), `Release notes missing: ${expected}`);
+}
+
+const releaseQa = fs.readFileSync(path.join(root, "docs", "release-qa.md"), "utf8");
+for (const expected of [
+  "npm run validate",
+  "npm run check",
+  "npm test",
+  "npm run package",
+  "git diff --check",
+  "load this repository folder unpacked",
+  "Cold Turkey",
+  "FocusMe"
+]) {
+  assert(releaseQa.includes(expected), `Release QA notes missing: ${expected}`);
 }
 
 const decisionRecords = fs.readFileSync(path.join(root, "docs", "decision-records.md"), "utf8");

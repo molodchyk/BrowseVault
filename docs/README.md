@@ -11,6 +11,7 @@ This folder captures the critical market research, user feedback, product direct
 - `extension-modularization-playbook.md` - reusable extension modularization rules copied from Defense against Distractions.
 - `code-structure.md` - BrowseVault-specific ownership map and next split candidates.
 - `reviewer-notes.md` - browser-store reviewer notes for limitations, permissions, package behavior, and user-data handling.
+- `release-qa.md` - release verification status and real-browser QA notes.
 - `release-notes.md` - docs-level release summary that points to the canonical root changelog.
 - `decision-records.md` - product, privacy, packaging, and release decisions to preserve across future edits.
 - `repository-metadata.md` - intended GitHub repository description and topic/tag values.
