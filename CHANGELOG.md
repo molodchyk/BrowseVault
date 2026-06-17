@@ -41,6 +41,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - No host permissions, content scripts, optional permission prompts, remote code, analytics, ads, tracking, or page-content capture are included.
 - No network requests are expected by default; validation blocks source-level network APIs, remote URLs, and dynamic code loaders. Any future network-backed sync, backup destination, or remote feature must be explicit and documented here before release.
 - Manifest permissions are limited to bookmarks, downloads, history, sessions, storage, and tabs for the product workflows described in the README and store-facing privacy form.
+- Packaged extension ZIPs include only runtime extension assets and root user-facing docs; repo research, tests, scripts, StorePilot files, and feature docs are excluded.
 
 ### Known Limits
 

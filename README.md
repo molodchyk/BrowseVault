@@ -69,7 +69,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - local-first privacy documentation;
 - versioned release notes in [`CHANGELOG.md`](CHANGELOG.md), including trust-sensitive behavior changes;
 - generated PNG extension icons;
-- deterministic local ZIP packaging;
+- deterministic runtime-only local ZIP packaging that excludes repo research, tests, scripts, StorePilot files, and feature docs;
 - copied research and product docs in [`docs/`](docs/);
 - Chrome Web Store listing notes in [`store/listing.md`](store/listing.md);
 - StorePilot-ready Chrome Web Store import files in [`store-listing/chrome-web-store/`](store-listing/chrome-web-store/);

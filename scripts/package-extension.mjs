@@ -7,8 +7,24 @@ const manifest = JSON.parse(fs.readFileSync(path.join(root, "manifest.json"), "u
 const distDir = path.join(root, "dist");
 const output = path.join(distDir, `browsevault-${manifest.version}.zip`);
 const includeRoots = ["manifest.json", "src", "assets", "README.md", "PRIVACY.md", "LICENSE"];
+const disallowedZipPathPatterns = [
+  /^docs\//,
+  /^test\//,
+  /^scripts\//,
+  /^store\//,
+  /^store-listing\//,
+  /^dist\//,
+  /\.map$/i,
+  /\.test\.js$/i
+];
 
 fs.mkdirSync(distDir, { recursive: true });
+
+function assert(condition, message) {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
 
 function collectFiles(entry, prefix = "") {
   const fullPath = path.join(root, entry);
@@ -21,6 +37,32 @@ function collectFiles(entry, prefix = "") {
   return fs
     .readdirSync(fullPath)
     .flatMap((child) => collectFiles(path.join(entry, child), path.join(prefix, path.basename(entry))));
+}
+
+function shouldPackage(file) {
+  if (file.zipPath.startsWith("src/") && path.extname(file.zipPath).toLowerCase() === ".md") {
+    return false;
+  }
+
+  return true;
+}
+
+function validatePackageFiles(files) {
+  assert(files.length > 0, "Package cannot be empty.");
+  for (const file of files) {
+    assert(
+      file.zipPath === "manifest.json"
+        || file.zipPath === "README.md"
+        || file.zipPath === "PRIVACY.md"
+        || file.zipPath === "LICENSE"
+        || file.zipPath.startsWith("src/")
+        || file.zipPath.startsWith("assets/"),
+      `Unexpected package entry root: ${file.zipPath}`
+    );
+    for (const pattern of disallowedZipPathPatterns) {
+      assert(!pattern.test(file.zipPath), `Disallowed package entry: ${file.zipPath}`);
+    }
+  }
 }
 
 function dosDateTime(date) {
@@ -94,7 +136,10 @@ function writeZip(files) {
   fs.writeFileSync(output, Buffer.concat([...localParts, centralDirectory, end]));
 }
 
-const files = includeRoots.flatMap((entry) => collectFiles(entry)).sort((a, b) => a.zipPath.localeCompare(b.zipPath));
+const files = includeRoots
+  .flatMap((entry) => collectFiles(entry))
+  .filter(shouldPackage)
+  .sort((a, b) => a.zipPath.localeCompare(b.zipPath));
+validatePackageFiles(files);
 writeZip(files);
 console.log(`Packaged ${files.length} files to ${output}`);
-
