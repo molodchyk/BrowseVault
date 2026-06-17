@@ -85,6 +85,7 @@ export function collectAppElements(document) {
     prefLimit: document.querySelector("#pref-limit"),
     prefBackupReminder: document.querySelector("#pref-backup-reminder"),
     prefBackupPrefix: document.querySelector("#pref-backup-prefix"),
+    openNativeHistory: document.querySelector("#open-native-history"),
     savePreferences: document.querySelector("#save-preferences")
   };
 }

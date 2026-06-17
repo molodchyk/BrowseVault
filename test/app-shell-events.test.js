@@ -87,7 +87,8 @@ function createElements() {
     previewRetention: fakeElement(),
     cleanupRetention: fakeElement(),
     prefTheme: fakeElement(),
-    prefAccent: fakeElement()
+    prefAccent: fakeElement(),
+    openNativeHistory: fakeElement()
   };
 }
 
@@ -120,6 +121,7 @@ function createHandlers(calls) {
     "invertVisibleSelection",
     "loadMoreResults",
     "openSelected",
+    "openNativeChromeHistory",
     "previewRetentionCleanup",
     "resetVault",
     "runQuickSearch",
@@ -292,6 +294,7 @@ test("bindAppEvents wires bulk and rules actions", () => {
   elements.addWhitelist.dispatch("click");
   elements.previewRetention.dispatch("click");
   elements.cleanupRetention.dispatch("click");
+  elements.openNativeHistory.dispatch("click");
   elements.cancelImport.dispatch("click");
 
   assert.deepEqual(calls, [
@@ -306,6 +309,7 @@ test("bindAppEvents wires bulk and rules actions", () => {
     ["addWhitelistRule"],
     ["previewRetentionCleanup"],
     ["cleanupByRetention"],
+    ["openNativeChromeHistory"],
     ["cancelStagedImport"]
   ]);
 });

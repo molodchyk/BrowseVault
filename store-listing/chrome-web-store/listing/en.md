@@ -14,4 +14,4 @@ Use Quick Open to search tabs, bookmarks, downloads, and recently closed pages f
 
 Control what gets saved with domain blacklist and whitelist rules, selected-domain blacklisting, manual retention cleanup that keeps whitelisted domains, local display preferences, default result limits, and explicit destructive actions with undo where the vault can support it.
 
-BrowseVault stores its archive locally in your browser profile. It does not include analytics, ads, tracking scripts, remote code, or automatic page-content capture.
+BrowseVault stores its archive locally in your browser profile. It does not include analytics, ads, tracking scripts, remote code, or automatic page-content capture. It also keeps Chrome's native history page available from Settings instead of silently replacing it.

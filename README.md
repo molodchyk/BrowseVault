@@ -36,6 +36,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - local-date grouped vault results for easier timeline scanning;
 - Quick Open search across open tabs, bookmarks, downloads, and recently closed tabs, with source-aware switch/open/open-in-background/restore actions;
 - toolbar and keyboard-command opening that reuses an already open BrowseVault tab;
+- Settings escape hatch for opening Chrome's native history page without making BrowseVault a default-history override;
 - JSON backup export and import;
 - CSV export with ISO timestamp, local date/time, visit id, and Chrome id fields;
 - HTML exports;

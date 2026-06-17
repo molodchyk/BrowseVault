@@ -111,4 +111,5 @@ export function bindAppEvents({ elements, document, root, handlers }) {
   bindAsync(elements.previewRetention, "click", handlers.previewRetentionCleanup, setStatus);
   bindAsync(elements.cleanupRetention, "click", handlers.cleanupByRetention, setStatus);
   bindAsync(elements.resetVault, "click", handlers.resetVault, setStatus);
+  bindAsync(elements.openNativeHistory, "click", handlers.openNativeChromeHistory, setStatus);
 }

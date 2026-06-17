@@ -13,6 +13,7 @@ import { createSearchCoordinator } from "./features/app-shell/ui/search-coordina
 import { createBackupActions } from "./features/backup-import/ui/actions.js";
 import { createQuickOpenActions } from "./features/browser-memory/ui/quick-open-actions.js";
 import { createChromeHistorySyncAction } from "./features/background-runtime/ui/chrome-history-sync-action.js";
+import { createNativeHistoryAction } from "./features/background-runtime/ui/native-history-action.js";
 import {
   DEFAULT_PREFERENCES,
   MAX_RESULT_LIMIT
@@ -146,6 +147,10 @@ const syncChromeHistory = createChromeHistorySyncAction({
   setStatus
 });
 
+const openNativeChromeHistory = createNativeHistoryAction({
+  setStatus
+});
+
 function bindEvents() {
   bindAppEvents({
     elements,
@@ -179,6 +184,7 @@ function bindEvents() {
       invertVisibleSelection: bulkActions.invertVisibleSelection,
       loadMoreResults: historySearchActions.loadMoreResults,
       openSelected: bulkActions.openSelected,
+      openNativeChromeHistory,
       previewRetentionCleanup: vaultActions.previewRetentionCleanup,
       resetVault: vaultActions.resetVault,
       runQuickSearch: () => {
