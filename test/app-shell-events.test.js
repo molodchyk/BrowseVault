@@ -48,6 +48,10 @@ function createElements() {
     after: fakeElement(),
     before: fakeElement(),
     limit: fakeElement(),
+    dateShortcuts: [
+      fakeElement({ dataset: { dateShortcut: "today" } }),
+      fakeElement({ dataset: { dateShortcut: "last7" } })
+    ],
     savePreferences: fakeElement(),
     search: fakeElement(),
     quickSearch: fakeElement(),
@@ -96,6 +100,7 @@ function createHandlers(calls) {
   const handlerNames = [
     "addBlacklistRule",
     "addWhitelistRule",
+    "applyDateShortcut",
     "applySavedSearch",
     "blacklistSelectedDomains",
     "cleanupByRetention",
@@ -191,6 +196,7 @@ test("bindAppEvents wires tabs, theme previews, search clearing, and keyboard fo
   elements.after.value = "2026-01-01";
   elements.before.value = "2026-12-31";
   elements.clearSearch.dispatch("click");
+  elements.dateShortcuts[1].dispatch("click");
   elements.saveSearch.dispatch("click");
   elements.applySavedSearch.dispatch("click");
   elements.deleteSavedSearch.dispatch("click");
@@ -227,6 +233,8 @@ test("bindAppEvents wires tabs, theme previews, search clearing, and keyboard fo
   assert.deepEqual(calls, [
     ["switchTab", "backup"],
     ["clearSearchFields"],
+    ["runSearchesNow"],
+    ["applyDateShortcut", "last7"],
     ["runSearchesNow"],
     ["saveCurrentSearch"],
     ["applySavedSearch"],

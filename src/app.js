@@ -159,6 +159,7 @@ function bindEvents() {
     handlers: {
       addBlacklistRule: () => vaultActions.addRule("blacklist"),
       addWhitelistRule: () => vaultActions.addRule("whitelist"),
+      applyDateShortcut: historySearchForm.applyDateShortcut,
       applySavedSearch: savedSearchActions.applySelectedSearch,
       blacklistSelectedDomains: vaultActions.blacklistSelectedDomains,
       cleanupByRetention: vaultActions.cleanupByRetention,

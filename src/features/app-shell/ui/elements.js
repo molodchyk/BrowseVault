@@ -7,6 +7,7 @@ export function collectAppElements(document) {
     after: document.querySelector("#after"),
     before: document.querySelector("#before"),
     limit: document.querySelector("#limit"),
+    dateShortcuts: [...document.querySelectorAll("[data-date-shortcut]")],
     search: document.querySelector("#search"),
     quickSearch: document.querySelector("#quick-search"),
     clearSearch: document.querySelector("#clear-search"),

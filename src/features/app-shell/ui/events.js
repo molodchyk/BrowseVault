@@ -48,6 +48,13 @@ export function bindAppEvents({ elements, document, root, handlers }) {
     runHandler(handlers.runSearchesNow, setStatus);
   });
 
+  for (const shortcut of elements.dateShortcuts) {
+    shortcut.addEventListener("click", () => {
+      handlers.applyDateShortcut(shortcut.dataset.dateShortcut);
+      runHandler(handlers.runSearchesNow, setStatus);
+    });
+  }
+
   for (const input of [elements.query, elements.onDate, elements.after, elements.before, elements.limit]) {
     input.addEventListener("input", handlers.scheduleSearches);
   }

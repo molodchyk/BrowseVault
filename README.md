@@ -30,6 +30,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - query syntax for site/host/domain, title, URL, source, transition, visit count, exact-day/date ranges, local-hour filters, exclusions, wildcards, phrases, and regex;
 - bounded typo-tolerant matching for longer plain keyword searches;
 - chunked local search scanning for large vaults, covered by synthetic large-history tests;
+- one-click Today, Yesterday, 7 Days, 30 Days, and All Dates shortcuts that fill ISO-style date filters;
 - saved searches for repeated local history queries and date/limit filter sets;
 - highlighted matches in vault and Quick Open search results;
 - keyboard-first search with autofocus, global query focus, Enter search, and debounced live refresh;

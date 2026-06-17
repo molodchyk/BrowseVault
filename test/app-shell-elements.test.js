@@ -109,13 +109,14 @@ test("collectAppElements queries the app shell selectors", () => {
 
   const elements = collectAppElements(document);
 
-  assert.deepEqual(queriedAll, [".tab", ".tab-panel", ".requires-selection"]);
+  assert.deepEqual(queriedAll, [".tab", ".tab-panel", "[data-date-shortcut]", ".requires-selection"]);
   assert.deepEqual(
     queried,
     singularSelectors.map((id) => `#${id}`)
   );
   assert.equal(elements.query.selector, "#query");
   assert.equal(elements.onDate.selector, "#on-date");
+  assert.equal(elements.dateShortcuts.length, 2);
   assert.equal(elements.quickSearch.selector, "#quick-search");
   assert.equal(elements.savedSearches.selector, "#saved-searches");
   assert.equal(elements.importPreviewTitle.selector, "#import-preview-title");

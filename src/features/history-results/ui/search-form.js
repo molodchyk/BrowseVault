@@ -1,4 +1,7 @@
-import { historySearchTextFromValues } from "../core/search-form.js";
+import {
+  dateShortcutValues,
+  historySearchTextFromValues
+} from "../core/search-form.js";
 
 export function createHistorySearchForm({ elements }) {
   function readSearchValues() {
@@ -28,11 +31,24 @@ export function createHistorySearchForm({ elements }) {
     elements.before.value = "";
   }
 
+  function applyDateShortcut(shortcut, now) {
+    const values = dateShortcutValues(shortcut, now);
+    if (!values) {
+      return false;
+    }
+
+    elements.onDate.value = values.onDate;
+    elements.after.value = values.after;
+    elements.before.value = values.before;
+    return true;
+  }
+
   function getSearchText() {
     return historySearchTextFromValues(readSearchValues());
   }
 
   return {
+    applyDateShortcut,
     clearSearchFields,
     getSearchText,
     readSearchValues,

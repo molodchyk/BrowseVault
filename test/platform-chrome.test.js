@@ -108,6 +108,34 @@ test("read-only platform wrappers delegate to Chrome APIs", async () => {
   ]);
 });
 
+test("storage wrapper falls back when Chrome storage is unavailable", async () => {
+  globalThis.chrome = {};
+
+  await setLocalStorage({
+    browseVaultPreferences: {
+      theme: "light"
+    },
+    otherValue: 7
+  });
+
+  assert.deepEqual(await getLocalStorage("browseVaultPreferences"), {
+    browseVaultPreferences: {
+      theme: "light"
+    }
+  });
+  assert.deepEqual(await getLocalStorage(["browseVaultPreferences", "missing"]), {
+    browseVaultPreferences: {
+      theme: "light"
+    }
+  });
+  assert.deepEqual(await getLocalStorage({ browseVaultPreferences: null, missing: "fallback" }), {
+    browseVaultPreferences: {
+      theme: "light"
+    },
+    missing: "fallback"
+  });
+});
+
 test("background platform wrappers delegate to Chrome APIs and listeners", async () => {
   const calls = [];
   const listener = () => {};

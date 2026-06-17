@@ -297,6 +297,17 @@ code {
   align-items: center;
 }
 
+.date-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.date-shortcuts button {
+  min-height: 32px;
+  padding: 7px 10px;
+}
+
 .query-wrap {
   display: grid;
   gap: 5px;
