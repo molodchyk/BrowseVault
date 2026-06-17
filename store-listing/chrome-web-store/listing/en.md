@@ -6,7 +6,7 @@ Use BrowseVault to search archived history by typo-tolerant keyword, wildcard, s
 
 Scan results by local date with highlighted matches, use sticky Load More, Show All, Top, or Bottom controls when a search has many matches, then open, copy, export the current result set as JSON, CSV, or HTML, export selected records, use checkbox or range selection, or delete the vault records you need.
 
-Back up your vault as JSON with checksum metadata, review restore-check health before import, and import CSV, TSV, Google Takeout Browser History, Google My Activity, or common history-extension export files. BrowseVault also keeps a local recent-activity log and vault health check for completed backup, import, export, cleanup, delete, restore, rule, and reset actions.
+Back up your vault as JSON with checksum metadata, review restore-check health before import, and import CSV, TSV, Google Takeout Browser History, Google My Activity, or common history-extension export files. Backup status is reserved for the restorable JSON archive, while CSV and HTML exports stay in the recent-activity log. BrowseVault also keeps a local vault health check for completed backup, import, export, cleanup, delete, restore, rule, and reset actions.
 
 Export history as JSON, spreadsheet-friendly CSV, or offline HTML reports with summary metrics, exact timestamps, in-file filtering, sortable columns, and safer link handling.
 

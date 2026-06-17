@@ -186,6 +186,8 @@ The History tab also supports direct current-result deletion for targeted cleanu
 
 Backup and export filenames use the configured prefix and template. The default template is `{prefix}-{kind}-{date}`. Templates are filename bases without the extension and can use `{prefix}`, `{kind}`, `{date}`, and `{time}` tokens. Browser download settings still control the destination folder.
 
+Backup status is advanced only by the integrity-checked JSON archive export. CSV and HTML files are portability/report exports and appear in recent activity without replacing the last restorable backup metadata.
+
 ## GitHub Description
 
 ```text

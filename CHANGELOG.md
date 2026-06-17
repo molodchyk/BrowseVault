@@ -38,6 +38,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Imports merge with matching existing vault visits and preserve local vault deletion markers, Chrome-deletion markers, and original creation metadata.
 - Imports merge duplicate archive rows into unique restored records and report duplicate rows in the final import status and activity log.
 - Duplicate cleanup moves repeated active vault records with the same URL and visit time to undoable deletion while keeping the richest record.
+- Backup status is updated only by the integrity-checked JSON archive export; CSV and HTML history exports are tracked as export activity instead of restorable backups.
 
 ### Trust And Permissions
 

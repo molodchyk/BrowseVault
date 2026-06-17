@@ -162,12 +162,13 @@ test("exportAll downloads an integrity-protected archive and records backup meta
   assert.deepEqual(calls, ["refreshStats"]);
 });
 
-test("full CSV and HTML exports use the configured backup filename prefix", async () => {
+test("full CSV and HTML exports use filenames without changing backup metadata", async () => {
   const archive = {
     exportedAt: "2026-06-16T12:00:00.000Z",
     counts: { visits: 1 },
     visits: [{ id: "visit-1" }]
   };
+  const activity = [];
   const downloaded = [];
   const metadata = [];
   const { actions, calls, statuses } = createHarness({
@@ -175,6 +176,7 @@ test("full CSV and HTML exports use the configured backup filename prefix", asyn
       backupFilenamePrefix: "Client Reports"
     },
     services: {
+      appendActivityLog: async (...args) => activity.push(args),
       downloadText: (...args) => {
         downloaded.push(args);
         return 512;
@@ -194,7 +196,23 @@ test("full CSV and HTML exports use the configured backup filename prefix", asyn
     "Client-Reports-history-2026-06-16.csv",
     "Client-Reports-history-2026-06-16.html"
   ]);
-  assert.deepEqual(metadata.map((entry) => entry[1].sizeBytes), [512, 512]);
+  assert.deepEqual(metadata, []);
+  assert.deepEqual(activity, [
+    [{
+      type: "export",
+      label: "Full CSV exported",
+      count: 1,
+      detail: "512 bytes",
+      occurredAt: archive.exportedAt
+    }],
+    [{
+      type: "export",
+      label: "Full HTML exported",
+      count: 1,
+      detail: "512 bytes",
+      occurredAt: archive.exportedAt
+    }]
+  ]);
   assert.deepEqual(calls, ["refreshStats", "refreshStats"]);
 });
 

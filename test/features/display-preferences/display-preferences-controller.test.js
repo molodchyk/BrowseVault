@@ -321,6 +321,44 @@ test("refreshStats applies the configured backup reminder interval", async () =>
   assert.match(elements.backupNext.textContent, /^2026-06-15 \d{2}:\d{2}$/);
 });
 
+test("refreshStats ignores legacy non-JSON backup metadata", async () => {
+  const { backupHealthClassList, controller, elements } = createHarness({
+    preferences: {
+      theme: "system",
+      accent: "teal",
+      contrast: "standard",
+      textSize: "standard",
+      backupFilenamePrefix: "browsevault",
+      backupReminderDays: 14,
+      dateFormat: "iso",
+      defaultLimit: 500
+    },
+    stats: {
+      visits: 42,
+      domains: 7,
+      newestVisitTime: Date.parse("2026-06-16T12:00:00.000Z"),
+      meta: {
+        lastBackup: {
+          exportedAt: "2026-06-15T00:00:00.000Z",
+          format: "html",
+          records: 42,
+          sizeBytes: 1024
+        }
+      }
+    }
+  });
+
+  await controller.refreshStats();
+
+  assert.equal(elements.statBackup.textContent, "Never");
+  assert.equal(elements.backupHealth.textContent, "No backup yet");
+  assert.equal(elements.backupLast.textContent, "Never");
+  assert.equal(elements.backupFormat.textContent, "-");
+  assert.equal(elements.backupRecords.textContent, "0");
+  assert.equal(elements.backupSize.textContent, "-");
+  assert.equal(backupHealthClassList.classes.has("is-warning"), true);
+});
+
 test("requested limits respect current field values and quick-open cap", () => {
   const { controller, elements } = createHarness();
 

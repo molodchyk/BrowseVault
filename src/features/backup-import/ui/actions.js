@@ -150,15 +150,9 @@ export function createBackupActions({
       "text/csv",
       deps.visitsToCsv(archive.visits)
     );
-    await deps.setMeta("lastBackup", {
-      exportedAt: archive.exportedAt,
-      format: "csv",
-      records: archive.counts.visits,
-      sizeBytes
-    });
     await recordActivity({
-      type: "backup",
-      label: "CSV backup exported",
+      type: "export",
+      label: "Full CSV exported",
       count: archive.counts.visits,
       detail: `${sizeBytes} bytes`,
       occurredAt: archive.exportedAt
@@ -174,15 +168,9 @@ export function createBackupActions({
       "text/html",
       deps.visitsToHtml(archive.visits, archive.exportedAt)
     );
-    await deps.setMeta("lastBackup", {
-      exportedAt: archive.exportedAt,
-      format: "html",
-      records: archive.counts.visits,
-      sizeBytes
-    });
     await recordActivity({
-      type: "backup",
-      label: "HTML backup exported",
+      type: "export",
+      label: "Full HTML exported",
       count: archive.counts.visits,
       detail: `${sizeBytes} bytes`,
       occurredAt: archive.exportedAt

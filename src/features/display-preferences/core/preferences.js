@@ -274,6 +274,14 @@ export function backupTimestamp(backup) {
   return Number.isFinite(timestamp) ? timestamp : 0;
 }
 
+export function restorableBackupMetadata(backup) {
+  if (!backup || backup.format !== "json") {
+    return null;
+  }
+
+  return backup;
+}
+
 export function backupStatusDetails(backup, options = {}) {
   const timestamp = backupTimestamp(backup);
   const dateFormat = options.dateFormat || DEFAULT_PREFERENCES.dateFormat;

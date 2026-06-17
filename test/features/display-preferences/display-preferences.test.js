@@ -11,6 +11,7 @@ import {
   formatShortDate,
   localDayKey,
   normalizePreferences,
+  restorableBackupMetadata,
   textSizeDatasetValue,
   themeDatasetValue
 } from "../../../src/features/display-preferences/core/preferences.js";
@@ -80,6 +81,19 @@ test("formatBackupSelfTest summarizes passed, failed, and missing checks", () =>
   assert.equal(formatBackupSelfTest({ status: "failed", checksum: "mismatch" }), "Failed checksum");
   assert.equal(formatBackupSelfTest({ status: "failed", countMatches: false }), "Failed count");
   assert.equal(formatBackupSelfTest({ status: "failed" }), "Failed");
+});
+
+test("restorableBackupMetadata accepts only JSON backup metadata", () => {
+  const jsonBackup = {
+    exportedAt: "2026-06-16T12:00:00.000Z",
+    format: "json"
+  };
+
+  assert.equal(restorableBackupMetadata(jsonBackup), jsonBackup);
+  assert.equal(restorableBackupMetadata({ exportedAt: jsonBackup.exportedAt, format: "csv" }), null);
+  assert.equal(restorableBackupMetadata({ exportedAt: jsonBackup.exportedAt, format: "html" }), null);
+  assert.equal(restorableBackupMetadata({ exportedAt: jsonBackup.exportedAt }), null);
+  assert.equal(restorableBackupMetadata(null), null);
 });
 
 test("themeDatasetValue leaves system theme to CSS media queries", () => {
@@ -209,7 +223,7 @@ test("backupStatusDetails summarizes missing, fresh, and stale backups", () => {
   assert.equal(fresh.checksumText, "1234567890ab...90abcdef");
 
   const due = backupStatusDetails(
-    { exportedAt, format: "csv", records: 1 },
+    { exportedAt, format: "json", records: 1 },
     {
       now: Date.parse("2026-07-01T00:00:00.000Z"),
       staleDays: 30

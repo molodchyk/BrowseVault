@@ -7,6 +7,7 @@ import {
   contrastDatasetValue,
   formatShortDate,
   normalizePreferences,
+  restorableBackupMetadata,
   textSizeDatasetValue,
   themeDatasetValue
 } from "../core/preferences.js";
@@ -25,6 +26,7 @@ const defaultServices = {
   getLocalStorage,
   normalizePreferences,
   renderActivityLog,
+  restorableBackupMetadata,
   setLocalStorage,
   textSizeDatasetValue,
   themeDatasetValue
@@ -119,10 +121,11 @@ export function createDisplayPreferencesController({
     elements.statVisits.textContent = String(stats.visits);
     elements.statDomains.textContent = String(stats.domains);
     elements.statNewest.textContent = deps.formatShortDate(stats.newestVisitTime, appState.preferences.dateFormat);
-    elements.statBackup.textContent = stats.meta.lastBackup?.exportedAt
-      ? deps.formatShortDate(Date.parse(stats.meta.lastBackup.exportedAt), appState.preferences.dateFormat)
+    const backup = deps.restorableBackupMetadata(stats.meta.lastBackup);
+    elements.statBackup.textContent = backup?.exportedAt
+      ? deps.formatShortDate(Date.parse(backup.exportedAt), appState.preferences.dateFormat)
       : "Never";
-    renderBackupStatus(stats.meta.lastBackup);
+    renderBackupStatus(backup);
     renderArchiveHealth(stats.meta);
     deps.renderActivityLog(elements.activityLog, stats.meta.activityLog, {
       formatDate: (timestamp) => deps.formatShortDate(timestamp, appState.preferences.dateFormat)
