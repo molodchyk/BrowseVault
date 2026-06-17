@@ -12,7 +12,7 @@
     "store:media": "python scripts/media/generate-store-media.py",
     "package": "node scripts/package-extension.mjs && node scripts/verify-package.mjs",
     "verify:package": "node scripts/verify-package.mjs",
-    "test": "node --test"
+    "test": "node --test \"test/**/*.test.js\""
   },
   "keywords": [
     "chrome-extension",

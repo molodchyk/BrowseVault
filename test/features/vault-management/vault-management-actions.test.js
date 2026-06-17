@@ -1,89 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createVaultManagementActions } from "../../../src/features/vault-management/ui/actions.js";
-
-function fakeElement(tagName = "div") {
-  return {
-    tagName,
-    children: [],
-    className: "",
-    listeners: {},
-    textContent: "",
-    type: "",
-    append(...children) {
-      this.children.push(...children);
-    },
-    addEventListener(type, handler) {
-      this.listeners[type] = handler;
-    }
-  };
-}
-
-function fakeList() {
-  return {
-    children: [],
-    append(...children) {
-      this.children.push(...children);
-    },
-    replaceChildren(...children) {
-      this.children = [...children];
-    }
-  };
-}
-
-function fakeDocument() {
-  return {
-    createElement: fakeElement
-  };
-}
-
-function createHarness({
-  getSearchText = () => "docs site:example.com",
-  selectedIds = [],
-  selected = [],
-  services = {}
-} = {}) {
-  const statuses = [];
-  const calls = [];
-  const notifications = [];
-  const appState = {
-    currentResults: [{ id: "visible" }],
-    currentTotal: 1,
-    selectedIds: new Set(selectedIds)
-  };
-  const elements = {
-    quickResults: fakeList(),
-    retentionDays: { value: "30" },
-    ruleCategory: { value: "Research" },
-    ruleDomain: { value: "example.com" },
-    rulesList: fakeList()
-  };
-  const actions = createVaultManagementActions({
-    appState,
-    elements,
-    getSearchText,
-    notifyVaultChanged: (reason) => notifications.push(reason),
-    refreshStats: async () => calls.push("refreshStats"),
-    runSearch: async () => calls.push("runSearch"),
-    searchVisits: async () => ({ results: [], total: 0 }),
-    selectedResults: async () => selected,
-    services: {
-      appendActivityLog: async () => {},
-      confirmAction: () => true,
-      document: fakeDocument(),
-      getRules: async () => ({ rules: [], blacklist: [], whitelist: [], categories: [] }),
-      ...services
-    },
-    setStatus: (message) => statuses.push(message)
-  });
-
-  return { actions, appState, calls, elements, notifications, statuses };
-}
+import {
+  createVaultManagementActionsHarness,
+  fakeElement
+} from "./vault-management-actions-harness.js";
 
 test("renderRules renders empty and removable rule states", async () => {
   const removed = [];
   let rules = [{ id: "rule-1", type: "blacklist", value: "example.com" }];
-  const { actions, elements, statuses } = createHarness({
+  const { actions, elements, statuses } = createVaultManagementActionsHarness({
     services: {
       getRules: async () => ({ rules, blacklist: ["example.com"], whitelist: [] }),
       removeRule: async (id) => {
@@ -112,7 +37,7 @@ test("renderRules renders empty and removable rule states", async () => {
 });
 
 test("renderRules renders category rule labels", async () => {
-  const { actions, elements } = createHarness({
+  const { actions, elements } = createVaultManagementActionsHarness({
     services: {
       getRules: async () => ({
         rules: [{ id: "category:example.com", type: "category", value: "example.com", category: "Research" }],
@@ -144,7 +69,7 @@ test("renderRules renders category rule labels", async () => {
 test("addCategoryRule stores a manual domain category and refreshes visible results", async () => {
   const added = [];
   const activity = [];
-  const { actions, calls, elements, statuses } = createHarness({
+  const { actions, calls, elements, statuses } = createVaultManagementActionsHarness({
     services: {
       addCategoryRule: async (...args) => {
         added.push(args);
@@ -176,7 +101,7 @@ test("addCategoryRule stores a manual domain category and refreshes visible resu
 
 test("blacklistSelectedDomains adds unique selected domains and reports whitelist moves", async () => {
   const added = [];
-  const { actions, statuses } = createHarness({
+  const { actions, statuses } = createVaultManagementActionsHarness({
     selected: [
       { domain: "example.com" },
       { domain: "docs.example.com" }
@@ -205,7 +130,7 @@ test("blacklistSelectedDomains adds unique selected domains and reports whitelis
 test("deleteFromChrome requests native deletion and marks selected vault records", async () => {
   const runtimeMessages = [];
   const marked = [];
-  const { actions, appState, calls, notifications, statuses } = createHarness({
+  const { actions, appState, calls, notifications, statuses } = createVaultManagementActionsHarness({
     selected: [
       { id: "visit-1", url: "https://example.com/a" },
       { id: "visit-2", url: "https://example.com/a" },
@@ -240,7 +165,7 @@ test("deleteFromChrome requests native deletion and marks selected vault records
 test("deleteFromVault and undoVaultDelete handle selected and missing states", async () => {
   const activity = [];
   const marked = [];
-  const { actions, appState, calls, notifications, statuses } = createHarness({
+  const { actions, appState, calls, notifications, statuses } = createVaultManagementActionsHarness({
     selectedIds: ["visit-1", "visit-2"],
     services: {
       appendActivityLog: async (...args) => activity.push(args),
@@ -285,7 +210,7 @@ test("deleteFromVault and undoVaultDelete handle selected and missing states", a
 test("deleteCurrentResultsFromVault deletes the current filtered result set", async () => {
   const marked = [];
   const searched = [];
-  const { actions, appState, calls, notifications, statuses } = createHarness({
+  const { actions, appState, calls, notifications, statuses } = createVaultManagementActionsHarness({
     selectedIds: ["visible"],
     services: {
       markDeletedByIds: async (ids) => {
@@ -317,7 +242,7 @@ test("deleteCurrentResultsFromChrome deletes matching Chrome URLs and vault reco
   const marked = [];
   const runtimeMessages = [];
   const searched = [];
-  const { actions, appState, calls, notifications, statuses } = createHarness({
+  const { actions, appState, calls, notifications, statuses } = createVaultManagementActionsHarness({
     selectedIds: ["visible"],
     services: {
       appendActivityLog: async (...args) => activity.push(args),
@@ -364,7 +289,7 @@ test("deleteCurrentResultsFromChrome deletes matching Chrome URLs and vault reco
 });
 
 test("deleteCurrentResultsFromVault guards empty search, no matches, and cancel", async () => {
-  const emptySearch = createHarness({
+  const emptySearch = createVaultManagementActionsHarness({
     getSearchText: () => " "
   });
   await emptySearch.actions.deleteCurrentResultsFromVault();
@@ -372,11 +297,11 @@ test("deleteCurrentResultsFromVault guards empty search, no matches, and cancel"
     "Enter a query or date filter before deleting current results"
   ]);
 
-  const noMatches = createHarness();
+  const noMatches = createVaultManagementActionsHarness();
   await noMatches.actions.deleteCurrentResultsFromVault();
   assert.deepEqual(noMatches.statuses, ["No matching vault records to delete"]);
 
-  const canceled = createHarness({
+  const canceled = createVaultManagementActionsHarness({
     services: {
       confirmAction: () => false,
       searchVisits: async () => ({
@@ -390,7 +315,7 @@ test("deleteCurrentResultsFromVault guards empty search, no matches, and cancel"
 });
 
 test("deleteCurrentResultsFromChrome guards empty search, no URLs, no matches, and cancel", async () => {
-  const emptySearch = createHarness({
+  const emptySearch = createVaultManagementActionsHarness({
     getSearchText: () => " "
   });
   await emptySearch.actions.deleteCurrentResultsFromChrome();
@@ -398,11 +323,11 @@ test("deleteCurrentResultsFromChrome guards empty search, no URLs, no matches, a
     "Enter a query or date filter before deleting current results from Chrome"
   ]);
 
-  const noMatches = createHarness();
+  const noMatches = createVaultManagementActionsHarness();
   await noMatches.actions.deleteCurrentResultsFromChrome();
   assert.deepEqual(noMatches.statuses, ["No matching vault records to delete from Chrome"]);
 
-  const noUrls = createHarness({
+  const noUrls = createVaultManagementActionsHarness({
     services: {
       searchVisits: async () => ({
         total: 1,
@@ -413,7 +338,7 @@ test("deleteCurrentResultsFromChrome guards empty search, no URLs, no matches, a
   await noUrls.actions.deleteCurrentResultsFromChrome();
   assert.deepEqual(noUrls.statuses, ["Matching vault records have no URLs to delete from Chrome"]);
 
-  const canceled = createHarness({
+  const canceled = createVaultManagementActionsHarness({
     services: {
       confirmAction: () => false,
       searchVisits: async () => ({
@@ -432,7 +357,7 @@ test("retention cleanup previews and deletes eligible old records", async () => 
     { id: "old-1" },
     { id: "old-2" }
   ];
-  const { actions, appState, calls, statuses } = createHarness({
+  const { actions, appState, calls, statuses } = createVaultManagementActionsHarness({
     selectedIds: ["visible"],
     services: {
       getRetentionCleanupCandidates: async (days) => {
@@ -465,7 +390,7 @@ test("duplicate cleanup previews and deletes duplicate vault records", async () 
     { id: "duplicate-1" },
     { id: "duplicate-2" }
   ];
-  const { actions, appState, calls, statuses } = createHarness({
+  const { actions, appState, calls, statuses } = createVaultManagementActionsHarness({
     selectedIds: ["visible"],
     services: {
       appendActivityLog: async (...args) => activity.push(args),
@@ -496,7 +421,7 @@ test("duplicate cleanup previews and deletes duplicate vault records", async () 
 });
 
 test("duplicate cleanup handles empty and canceled states", async () => {
-  const empty = createHarness({
+  const empty = createVaultManagementActionsHarness({
     services: {
       getDuplicateCleanupCandidates: async () => []
     }
@@ -508,7 +433,7 @@ test("duplicate cleanup handles empty and canceled states", async () => {
     "No duplicate vault records found"
   ]);
 
-  const canceled = createHarness({
+  const canceled = createVaultManagementActionsHarness({
     services: {
       confirmAction: () => false,
       getDuplicateCleanupCandidates: async () => [{ id: "duplicate-1" }]
@@ -519,7 +444,7 @@ test("duplicate cleanup handles empty and canceled states", async () => {
 });
 
 test("retention cleanup validates input and handles empty previews", async () => {
-  const { actions, elements, statuses } = createHarness({
+  const { actions, elements, statuses } = createVaultManagementActionsHarness({
     services: {
       getRetentionCleanupCandidates: async () => []
     }
@@ -537,7 +462,7 @@ test("retention cleanup validates input and handles empty previews", async () =>
 });
 
 test("resetVault clears app state and quick results", async () => {
-  const { actions, appState, calls, elements, statuses } = createHarness({
+  const { actions, appState, calls, elements, statuses } = createVaultManagementActionsHarness({
     selectedIds: ["visit-1"],
     services: {
       clearVaultData: async () => calls.push("clearVaultData")

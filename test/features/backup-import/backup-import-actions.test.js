@@ -1,0 +1,90 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { createBackupActionsHarness } from "./backup-actions-harness.js";
+
+test("importFromFile stages valid archives and switches to the backup panel", async () => {
+  const archive = { visits: [{ id: "visit-1" }] };
+  const analysis = { validRows: 1, rules: 0 };
+  const integrity = { checked: true, ok: true };
+  const file = {
+    name: "browsevault.json",
+    text: async () => "{\"visits\":[]}"
+  };
+  const { actions, appState, calls, statuses } = createBackupActionsHarness({
+    services: {
+      analyzeImportArchive: async (input) => {
+        assert.equal(input, archive);
+        return analysis;
+      },
+      archiveFromFileText: (inputFile, text) => {
+        assert.equal(inputFile, file);
+        assert.equal(text, "{\"visits\":[]}");
+        return archive;
+      },
+      verifyArchiveIntegrity: async (input) => {
+        assert.equal(input, archive);
+        return integrity;
+      }
+    }
+  });
+
+  await actions.importFromFile(file);
+
+  assert.deepEqual(statuses, ["Reading archive", "Review import preview"]);
+  assert.deepEqual(appState.stagedImport, {
+    archive,
+    analysis,
+    fileName: "browsevault.json",
+    integrity
+  });
+  assert.deepEqual(calls[0][0], "renderImportPreview");
+  assert.equal(calls[0][2], appState.stagedImport);
+  assert.deepEqual(calls[1], ["switchTab", "backup"]);
+});
+
+test("confirmStagedImport imports after checksum confirmation and clears staged state", async () => {
+  const archive = { visits: [{ id: "visit-1" }] };
+  const activity = [];
+  const { actions, appState, calls, notifications, statuses } = createBackupActionsHarness({
+    stagedImport: {
+      archive,
+      integrity: { checked: true, ok: false }
+    },
+    services: {
+      appendActivityLog: async (...args) => activity.push(args),
+      confirmAction: () => true,
+      importArchive: async (input) => {
+        assert.equal(input, archive);
+        return {
+          importedAt: "2026-06-16T12:00:00.000Z",
+          visits: 2,
+          validRows: 3,
+          duplicateRows: 1,
+          rules: 1
+        };
+      }
+    }
+  });
+
+  await actions.confirmStagedImport();
+
+  assert.equal(appState.stagedImport, null);
+  assert.deepEqual(statuses, [
+    "Importing archive",
+    "Imported 2 records and 1 rule after checksum warning; 1 duplicate row merged"
+  ]);
+  assert.deepEqual(calls.map((call) => Array.isArray(call) ? call[0] : call), [
+    "renderImportPreview",
+    "renderRules",
+    "runSearch",
+    "refreshStats"
+  ]);
+  assert.deepEqual(notifications, ["vault-import"]);
+  assert.deepEqual(activity, [[{
+    type: "import",
+    label: "Archive imported",
+    count: 2,
+    detail: "1 rule; 1 duplicate row merged",
+    occurredAt: "2026-06-16T12:00:00.000Z"
+  }]]);
+});

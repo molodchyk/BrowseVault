@@ -2,68 +2,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   backupImportPreviewElements,
-  createBackupActions,
   downloadText
 } from "../../../src/features/backup-import/ui/actions.js";
-
-function previewElements() {
-  return {
-    importPreview: { id: "import-preview" },
-    importPreviewTitle: { id: "import-preview-title" },
-    importValid: { id: "import-valid" },
-    importNew: { id: "import-new" },
-    importExisting: { id: "import-existing" },
-    importDuplicates: { id: "import-duplicates" },
-    importHealth: { id: "import-health" },
-    importPreviewNote: { id: "import-preview-note" },
-    confirmImport: { id: "confirm-import" }
-  };
-}
-
-function createHarness({
-  getSortOrder = () => "newest",
-  getSearchText = () => "docs site:example.com",
-  preferences = {
-    backupSaveMode: "downloads",
-    backupFilenamePrefix: "browsevault"
-  },
-  searchVisits = async () => ({ results: [], total: 0 }),
-  selected = [],
-  stagedImport = null,
-  services = {}
-} = {}) {
-  const statuses = [];
-  const calls = [];
-  const notifications = [];
-  const appState = {
-    preferences: {
-      backupSaveMode: "downloads",
-      ...preferences
-    },
-    stagedImport
-  };
-  const actions = createBackupActions({
-    appState,
-    elements: previewElements(),
-    getSortOrder,
-    getSearchText,
-    notifyVaultChanged: (reason) => notifications.push(reason),
-    refreshStats: async () => calls.push("refreshStats"),
-    renderRules: async () => calls.push("renderRules"),
-    runSearch: async () => calls.push("runSearch"),
-    searchVisits,
-    selectedResults: async () => selected,
-    services: {
-      appendActivityLog: async () => {},
-      renderImportPreview: (...args) => calls.push(["renderImportPreview", ...args]),
-      ...services
-    },
-    setStatus: (message) => statuses.push(message),
-    switchTab: (tabName) => calls.push(["switchTab", tabName])
-  });
-
-  return { actions, appState, calls, notifications, statuses };
-}
+import {
+  createBackupActionsHarness,
+  previewElements
+} from "./backup-actions-harness.js";
 
 test("backupImportPreviewElements maps app shell elements for import preview rendering", () => {
   const elements = previewElements();
@@ -148,7 +92,7 @@ test("exportAll downloads an integrity-protected archive and records backup meta
   const downloaded = [];
   const metadata = [];
   const activity = [];
-  const { actions, calls, statuses } = createHarness({
+  const { actions, calls, statuses } = createBackupActionsHarness({
     services: {
       appendActivityLog: async (...args) => activity.push(args),
       attachArchiveIntegrity: async (input) => ({
@@ -224,7 +168,7 @@ test("full CSV and HTML exports use filenames without changing backup metadata",
   const activity = [];
   const downloaded = [];
   const metadata = [];
-  const { actions, calls, statuses } = createHarness({
+  const { actions, calls, statuses } = createBackupActionsHarness({
     preferences: {
       backupFilenamePrefix: "Client Reports"
     },
@@ -272,7 +216,7 @@ test("full CSV and HTML exports use filenames without changing backup metadata",
 test("exports use the configured backup filename template", async () => {
   const downloaded = [];
   const selected = [{ id: "visit-1" }];
-  const { actions } = createHarness({
+  const { actions } = createBackupActionsHarness({
     preferences: {
       backupFilenamePrefix: "Client Reports",
       backupFilenameTemplate: "{date}-{time}-{prefix}-{kind}"
@@ -294,7 +238,7 @@ test("selected exports use the configured backup filename prefix", async () => {
   const downloadedJson = [];
   const downloadedText = [];
   const selected = [{ id: "visit-1" }];
-  const { actions, statuses } = createHarness({
+  const { actions, statuses } = createBackupActionsHarness({
     preferences: {
       backupFilenamePrefix: "Research Backup"
     },
@@ -342,7 +286,7 @@ test("filtered result exports search all current matches without changing backup
   const downloadedText = [];
   const exportCalls = [];
   const metadata = [];
-  const { actions, statuses } = createHarness({
+  const { actions, statuses } = createBackupActionsHarness({
     preferences: {
       backupFilenamePrefix: "Current Results"
     },
@@ -405,7 +349,7 @@ test("filtered result exports search all current matches without changing backup
 
 test("filtered result export reports empty current matches", async () => {
   const downloaded = [];
-  const { actions, statuses } = createHarness({
+  const { actions, statuses } = createBackupActionsHarness({
     searchVisits: async () => ({ results: [], total: 0 }),
     services: {
       downloadJson: (...args) => downloaded.push(args)
@@ -421,7 +365,7 @@ test("filtered result export reports empty current matches", async () => {
 test("exportAll stops before download when generated archive self-test fails", async () => {
   const downloaded = [];
   const metadata = [];
-  const { actions, calls, statuses } = createHarness({
+  const { actions, calls, statuses } = createBackupActionsHarness({
     services: {
       attachArchiveIntegrity: async (input) => ({
         ...input,
@@ -453,7 +397,7 @@ test("exportAll stops before download when generated archive self-test fails", a
 
 test("selected exports require at least one selected record", async () => {
   const downloaded = [];
-  const { actions, statuses } = createHarness({
+  const { actions, statuses } = createBackupActionsHarness({
     selected: [],
     services: {
       downloadText: (...args) => downloaded.push(args)
@@ -464,91 +408,4 @@ test("selected exports require at least one selected record", async () => {
 
   assert.deepEqual(statuses, ["Select records first"]);
   assert.deepEqual(downloaded, []);
-});
-
-test("importFromFile stages valid archives and switches to the backup panel", async () => {
-  const archive = { visits: [{ id: "visit-1" }] };
-  const analysis = { validRows: 1, rules: 0 };
-  const integrity = { checked: true, ok: true };
-  const file = {
-    name: "browsevault.json",
-    text: async () => "{\"visits\":[]}"
-  };
-  const { actions, appState, calls, notifications, statuses } = createHarness({
-    services: {
-      analyzeImportArchive: async (input) => {
-        assert.equal(input, archive);
-        return analysis;
-      },
-      archiveFromFileText: (inputFile, text) => {
-        assert.equal(inputFile, file);
-        assert.equal(text, "{\"visits\":[]}");
-        return archive;
-      },
-      verifyArchiveIntegrity: async (input) => {
-        assert.equal(input, archive);
-        return integrity;
-      }
-    }
-  });
-
-  await actions.importFromFile(file);
-
-  assert.deepEqual(statuses, ["Reading archive", "Review import preview"]);
-  assert.deepEqual(appState.stagedImport, {
-    archive,
-    analysis,
-    fileName: "browsevault.json",
-    integrity
-  });
-  assert.deepEqual(calls[0][0], "renderImportPreview");
-  assert.equal(calls[0][2], appState.stagedImport);
-  assert.deepEqual(calls[1], ["switchTab", "backup"]);
-});
-
-test("confirmStagedImport imports after checksum confirmation and clears staged state", async () => {
-  const archive = { visits: [{ id: "visit-1" }] };
-  const activity = [];
-  const { actions, appState, calls, notifications, statuses } = createHarness({
-    stagedImport: {
-      archive,
-      integrity: { checked: true, ok: false }
-    },
-    services: {
-      appendActivityLog: async (...args) => activity.push(args),
-      confirmAction: () => true,
-      importArchive: async (input) => {
-        assert.equal(input, archive);
-        return {
-          importedAt: "2026-06-16T12:00:00.000Z",
-          visits: 2,
-          validRows: 3,
-          duplicateRows: 1,
-          rules: 1
-        };
-      }
-    }
-  });
-
-  await actions.confirmStagedImport();
-
-  assert.equal(appState.stagedImport, null);
-  assert.deepEqual(statuses, [
-    "Importing archive",
-    "Imported 2 records and 1 rule after checksum warning; 1 duplicate row merged"
-  ]);
-  assert.deepEqual(calls.map((call) => Array.isArray(call) ? call[0] : call), [
-    "renderImportPreview",
-    "renderRules",
-    "runSearch",
-    "refreshStats"
-  ]);
-  assert.deepEqual(notifications, ["vault-import"]);
-  assert.deepEqual(activity, [[{
-    type: "import",
-    label: "Archive imported",
-    count: 2,
-    detail: "1 rule; 1 duplicate row merged",
-    occurredAt: "2026-06-16T12:00:00.000Z"
-  }]]);
 });
