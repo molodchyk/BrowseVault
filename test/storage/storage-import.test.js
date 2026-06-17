@@ -7,6 +7,7 @@ import {
   mergeImportedVisits,
   normalizeHistoryItem,
   retentionCleanupCandidates,
+  summarizeArchiveInsights,
   summarizeVaultHealth,
   summarizeImportArchive
 } from "../../src/storage.js";
@@ -366,6 +367,65 @@ test("summarizeVaultHealth counts active rows, tombstones, malformed rows, and d
     invalidTimeRecords: 1,
     duplicateActiveRecords: 1,
     issueRecords: 3
+  });
+});
+
+test("summarizeArchiveInsights reports top domains and busiest local days", () => {
+  const dayOne = new Date(2026, 5, 16, 10, 0).getTime();
+  const dayTwo = new Date(2026, 5, 17, 10, 0).getTime();
+  const visits = [
+    {
+      id: "a-1",
+      url: "https://docs.example/page-1",
+      domain: "docs.example",
+      visitTime: dayOne
+    },
+    {
+      id: "a-2",
+      url: "https://docs.example/page-2",
+      domain: "docs.example",
+      visitTime: dayOne + 1
+    },
+    {
+      id: "b-1",
+      url: "https://b.example/page",
+      domain: "b.example",
+      visitTime: dayTwo
+    },
+    {
+      id: "missing-domain",
+      url: "https://fallback.example/page",
+      visitTime: dayTwo + 1
+    },
+    {
+      id: "deleted",
+      url: "https://docs.example/deleted",
+      domain: "docs.example",
+      visitTime: dayTwo + 2,
+      deletedAt: "2026-06-17T00:00:00.000Z"
+    },
+    {
+      id: "bad-time",
+      url: "https://bad.example/page",
+      domain: "bad.example",
+      visitTime: "not-a-date"
+    }
+  ];
+
+  assert.deepEqual(summarizeArchiveInsights(visits, { limit: 2 }), {
+    totalVisits: 4,
+    activeDays: 2,
+    averageVisitsPerActiveDay: 2,
+    oldestVisitTime: dayOne,
+    newestVisitTime: dayTwo + 1,
+    topDomains: [
+      { domain: "docs.example", count: 2 },
+      { domain: "b.example", count: 1 }
+    ],
+    busiestDays: [
+      { day: "2026-06-17", count: 2 },
+      { day: "2026-06-16", count: 2 }
+    ]
   });
 });
 

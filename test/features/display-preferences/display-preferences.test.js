@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  archiveInsightDetails,
   archiveHealthDetails,
   backupStatusDetails,
   clampBackupReminderDays,
@@ -198,6 +199,41 @@ test("archiveHealthDetails warns about vault data issues", () => {
   assert.equal(status.storageText, "Not checked yet");
   assert.equal(status.vaultText, "1 missing URL · 1 bad time · 3 duplicate active");
   assert.equal(status.tombstoneText, "2 deleted tombstones");
+});
+
+test("archiveInsightDetails formats secondary archive summaries", () => {
+  const details = archiveInsightDetails(
+    {
+      activeDays: 2,
+      averageVisitsPerActiveDay: 2.5,
+      oldestVisitTime: new Date(2026, 5, 16, 10, 0).getTime(),
+      newestVisitTime: new Date(2026, 5, 17, 11, 0).getTime(),
+      topDomains: [
+        { domain: "docs.example", count: 3 },
+        { domain: "github.com", count: 2 }
+      ],
+      busiestDays: [
+        { day: "2026-06-17", count: 4 }
+      ]
+    },
+    {
+      dateFormat: "iso"
+    }
+  );
+
+  assert.deepEqual(details, {
+    topDomainsText: "docs.example (3) · github.com (2)",
+    busiestDayText: "2026-06-17 · 4 visits",
+    activeDaysText: "2 days · 2.5 visits/day",
+    dateRangeText: "2026-06-16 to 2026-06-17"
+  });
+
+  assert.deepEqual(archiveInsightDetails({}, { dateFormat: "iso" }), {
+    topDomainsText: "No domains yet",
+    busiestDayText: "No visits yet",
+    activeDaysText: "No active days yet",
+    dateRangeText: "No visits yet"
+  });
 });
 
 test("backupStatusDetails summarizes missing, fresh, and stale backups", () => {

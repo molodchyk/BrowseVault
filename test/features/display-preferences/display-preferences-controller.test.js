@@ -71,6 +71,10 @@ function createHarness({
     archiveSync: output(),
     archiveVault: output(),
     archiveTombstones: output(),
+    archiveTopDomains: output(),
+    archiveBusiestDay: output(),
+    archiveActiveDays: output(),
+    archiveDateRange: output(),
     backupChecksum: output(),
     backupFormat: output(),
     backupHealth: {
@@ -216,6 +220,19 @@ test("refreshStats renders stat cards and backup health details", async () => {
       visits: 42,
       domains: 7,
       newestVisitTime: Date.parse("2026-06-16T12:00:00.000Z"),
+      insights: {
+        activeDays: 2,
+        averageVisitsPerActiveDay: 21,
+        oldestVisitTime: Date.parse("2026-06-15T08:00:00.000Z"),
+        newestVisitTime: Date.parse("2026-06-16T12:00:00.000Z"),
+        topDomains: [
+          { domain: "docs.example.com", count: 20 },
+          { domain: "github.com", count: 12 }
+        ],
+        busiestDays: [
+          { day: "2026-06-16", count: 24 }
+        ]
+      },
       vaultHealth: {
         storedRows: 44,
         activeRecords: 42,
@@ -284,6 +301,10 @@ test("refreshStats renders stat cards and backup health details", async () => {
   assert.match(elements.archiveStorage.textContent, /^Passed 2026-06-16 \d{2}:06$/);
   assert.equal(elements.archiveVault.textContent, "42 active · 44 stored");
   assert.equal(elements.archiveTombstones.textContent, "2 deleted tombstones");
+  assert.equal(elements.archiveTopDomains.textContent, "docs.example.com (20) · github.com (12)");
+  assert.match(elements.archiveBusiestDay.textContent, /^2026-06-16 · 24 visits$/);
+  assert.equal(elements.archiveActiveDays.textContent, "2 days · 21.0 visits/day");
+  assert.equal(elements.archiveDateRange.textContent, "2026-06-15 to 2026-06-16");
   assert.equal(archiveHealthClassList.classes.has("is-ok"), true);
   assert.equal(archiveHealthClassList.classes.has("is-warning"), false);
   assert.equal(renderedActivity.length, 1);

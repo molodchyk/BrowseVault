@@ -465,6 +465,84 @@ export function summarizeVaultHealth(visits) {
   };
 }
 
+function localDayKeyFromTimestamp(value) {
+  const date = new Date(Number(value));
+  if (!Number.isFinite(date.getTime())) {
+    return "";
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function sortedCountEntries(counts, tieBreaker = "ascending") {
+  const compareText = (left, right) => (left < right ? -1 : left > right ? 1 : 0);
+
+  return [...counts.entries()]
+    .sort((left, right) => {
+      const countDelta = right[1] - left[1];
+      if (countDelta) {
+        return countDelta;
+      }
+
+      return tieBreaker === "descending"
+        ? compareText(String(right[0]), String(left[0]))
+        : compareText(String(left[0]), String(right[0]));
+    })
+    .map(([value, count]) => ({ value, count }));
+}
+
+export function summarizeArchiveInsights(visits, options = {}) {
+  const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 3;
+  const activeVisits = (Array.isArray(visits) ? visits : []).filter((visit) => {
+    const visitTime = Number(visit?.visitTime);
+    return visit && !visit.deletedAt && Number.isFinite(visitTime);
+  });
+  const domainCounts = new Map();
+  const dayCounts = new Map();
+  let oldestVisitTime = 0;
+  let newestVisitTime = 0;
+
+  for (const visit of activeVisits) {
+    const visitTime = Number(visit.visitTime);
+    const domain = (visit.domain || normalizeDomain(visit.url || "")).trim().toLowerCase();
+    const day = localDayKeyFromTimestamp(visitTime);
+
+    if (domain) {
+      domainCounts.set(domain, (domainCounts.get(domain) || 0) + 1);
+    }
+
+    if (day) {
+      dayCounts.set(day, (dayCounts.get(day) || 0) + 1);
+    }
+
+    newestVisitTime = newestVisitTime ? Math.max(newestVisitTime, visitTime) : visitTime;
+    oldestVisitTime = oldestVisitTime ? Math.min(oldestVisitTime, visitTime) : visitTime;
+  }
+
+  return {
+    totalVisits: activeVisits.length,
+    activeDays: dayCounts.size,
+    averageVisitsPerActiveDay: dayCounts.size ? activeVisits.length / dayCounts.size : 0,
+    oldestVisitTime,
+    newestVisitTime,
+    topDomains: sortedCountEntries(domainCounts)
+      .slice(0, limit)
+      .map((entry) => ({
+        domain: entry.value,
+        count: entry.count
+      })),
+    busiestDays: sortedCountEntries(dayCounts, "descending")
+      .slice(0, limit)
+      .map((entry) => ({
+        day: entry.value,
+        count: entry.count
+      }))
+  };
+}
+
 export async function getDuplicateCleanupCandidates() {
   return duplicateCleanupCandidates(await getAllVisits());
 }
@@ -761,6 +839,7 @@ export async function getStats(options = {}) {
     domains: domains.size,
     newestVisitTime: visits.reduce((max, visit) => Math.max(max, visit.visitTime || 0), 0),
     oldestVisitTime: visits.reduce((min, visit) => Math.min(min, visit.visitTime || Date.now()), Date.now()),
+    insights: summarizeArchiveInsights(visits),
     vaultHealth: summarizeVaultHealth(allVisits),
     meta
   };

@@ -139,6 +139,13 @@ CSV export should include:
 
 HTML export should produce clickable links, exact timestamps, summary metrics, in-file filtering, sortable columns, and safe handling for unsupported URL schemes.
 
+Secondary archive insights should stay local, compact, and non-decorative:
+
+- top domains by active visit count;
+- busiest local days;
+- active-day count and average visits per active day;
+- oldest-to-newest local date range.
+
 ## Bulk Actions
 
 Bulk actions must be transaction-like:

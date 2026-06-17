@@ -1,6 +1,7 @@
 import {
   DEFAULT_PREFERENCES,
   PREFERENCES_KEY,
+  archiveInsightDetails,
   archiveHealthDetails,
   backupStatusDetails,
   clampResultLimit,
@@ -19,6 +20,7 @@ import { renderActivityLog } from "../../activity-log/ui/render-activity-log.js"
 
 const defaultServices = {
   archiveHealthDetails,
+  archiveInsightDetails,
   backupStatusDetails,
   clampResultLimit,
   contrastDatasetValue,
@@ -89,6 +91,17 @@ export function createDisplayPreferencesController({
     elements.archiveTombstones.textContent = status.tombstoneText;
   }
 
+  function renderArchiveInsights(insights) {
+    const status = deps.archiveInsightDetails(insights, {
+      dateFormat: appState.preferences.dateFormat
+    });
+
+    elements.archiveTopDomains.textContent = status.topDomainsText;
+    elements.archiveBusiestDay.textContent = status.busiestDayText;
+    elements.archiveActiveDays.textContent = status.activeDaysText;
+    elements.archiveDateRange.textContent = status.dateRangeText;
+  }
+
   function applyPreferences() {
     root.dataset.theme = deps.themeDatasetValue(appState.preferences.theme);
     root.dataset.accent = appState.preferences.accent;
@@ -128,6 +141,7 @@ export function createDisplayPreferencesController({
       : "Never";
     renderBackupStatus(backup);
     renderArchiveHealth(stats.meta);
+    renderArchiveInsights(stats.insights);
     deps.renderActivityLog(elements.activityLog, stats.meta.activityLog, {
       formatDate: (timestamp) => deps.formatShortDate(timestamp, appState.preferences.dateFormat)
     });
@@ -162,6 +176,7 @@ export function createDisplayPreferencesController({
     quickResultLimit,
     refreshStats,
     renderArchiveHealth,
+    renderArchiveInsights,
     renderBackupStatus,
     requestedResultLimit,
     savePreferences

@@ -79,6 +79,10 @@ const singularSelectors = [
   "archive-storage",
   "archive-vault",
   "archive-tombstones",
+  "archive-top-domains",
+  "archive-busiest-day",
+  "archive-active-days",
+  "archive-date-range",
   "rule-domain",
   "add-blacklist",
   "add-whitelist",
@@ -138,6 +142,8 @@ test("collectAppElements queries the app shell selectors", () => {
   assert.equal(elements.backupSelfTest.selector, "#backup-self-test");
   assert.equal(elements.archiveHealth.selector, "#archive-health");
   assert.equal(elements.archiveStorage.selector, "#archive-storage");
+  assert.equal(elements.archiveTopDomains.selector, "#archive-top-domains");
+  assert.equal(elements.archiveBusiestDay.selector, "#archive-busiest-day");
   assert.equal(elements.activityLog.selector, "#activity-log");
   assert.equal(elements.exportResults.selector, "#export-results");
   assert.equal(elements.savePreferences.selector, "#save-preferences");

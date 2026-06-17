@@ -275,6 +275,57 @@ export function archiveHealthDetails(meta = {}, options = {}) {
   };
 }
 
+function timestampFromLocalDay(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) {
+    return 0;
+  }
+
+  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])).getTime();
+}
+
+function pluralVisit(count) {
+  const visits = Number(count || 0);
+  return `${formatCount(visits)} visit${visits === 1 ? "" : "s"}`;
+}
+
+export function archiveInsightDetails(insights = {}, options = {}) {
+  const dateFormat = options.dateFormat || DEFAULT_PREFERENCES.dateFormat;
+  const topDomains = Array.isArray(insights.topDomains) ? insights.topDomains : [];
+  const busiestDays = Array.isArray(insights.busiestDays) ? insights.busiestDays : [];
+  const activeDaysValue = Number(insights.activeDays || 0);
+  const averageValue = Number(insights.averageVisitsPerActiveDay || 0);
+  const oldestValue = Number(insights.oldestVisitTime || 0);
+  const newestValue = Number(insights.newestVisitTime || 0);
+  const activeDays = Number.isFinite(activeDaysValue) ? activeDaysValue : 0;
+  const averageVisitsPerActiveDay = Number.isFinite(averageValue) ? averageValue : 0;
+  const oldestVisitTime = Number.isFinite(oldestValue) ? oldestValue : 0;
+  const newestVisitTime = Number.isFinite(newestValue) ? newestValue : 0;
+  const busiest = busiestDays[0];
+
+  const topDomainsText = topDomains.length
+    ? topDomains.map((entry) => `${entry.domain || "unknown"} (${formatCount(entry.count)})`).join(" · ")
+    : "No domains yet";
+  const busiestDayText = busiest
+    ? `${formatShortDate(timestampFromLocalDay(busiest.day), dateFormat)} · ${pluralVisit(busiest.count)}`
+    : "No visits yet";
+  const activeDaysText = activeDays
+    ? `${formatCount(activeDays)} day${activeDays === 1 ? "" : "s"} · ${averageVisitsPerActiveDay.toFixed(1)} visits/day`
+    : "No active days yet";
+  const dateRangeText = oldestVisitTime && newestVisitTime
+    ? oldestVisitTime === newestVisitTime
+      ? formatShortDate(newestVisitTime, dateFormat)
+      : `${formatShortDate(oldestVisitTime, dateFormat)} to ${formatShortDate(newestVisitTime, dateFormat)}`
+    : "No visits yet";
+
+  return {
+    topDomainsText,
+    busiestDayText,
+    activeDaysText,
+    dateRangeText
+  };
+}
+
 export function backupTimestamp(backup) {
   if (!backup?.exportedAt) {
     return 0;
