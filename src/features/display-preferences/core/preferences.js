@@ -1,3 +1,8 @@
+import {
+  DEFAULT_BACKUP_FILENAME_PREFIX,
+  normalizeBackupFilenamePrefix
+} from "../../backup-import/core/backup-filenames.js";
+
 export const PREFERENCES_KEY = "browseVault.preferences";
 export const MAX_RESULT_LIMIT = 50000;
 export const BACKUP_STALE_DAYS = 30;
@@ -7,7 +12,8 @@ export const DEFAULT_PREFERENCES = {
   accent: "teal",
   dateFormat: "system",
   defaultLimit: 500,
-  backupReminderDays: BACKUP_STALE_DAYS
+  backupReminderDays: BACKUP_STALE_DAYS,
+  backupFilenamePrefix: DEFAULT_BACKUP_FILENAME_PREFIX
 };
 
 const THEMES = new Set(["system", "light", "dark"]);
@@ -51,7 +57,8 @@ export function normalizePreferences(input = {}) {
     accent: pickSupported(source.accent, ACCENTS, DEFAULT_PREFERENCES.accent),
     dateFormat: pickSupported(source.dateFormat, DATE_FORMATS, DEFAULT_PREFERENCES.dateFormat),
     defaultLimit: clampResultLimit(source.defaultLimit, DEFAULT_PREFERENCES.defaultLimit),
-    backupReminderDays: clampBackupReminderDays(source.backupReminderDays, DEFAULT_PREFERENCES.backupReminderDays)
+    backupReminderDays: clampBackupReminderDays(source.backupReminderDays, DEFAULT_PREFERENCES.backupReminderDays),
+    backupFilenamePrefix: normalizeBackupFilenamePrefix(source.backupFilenamePrefix, DEFAULT_PREFERENCES.backupFilenamePrefix)
   };
 }
 

@@ -6,6 +6,7 @@ import {
 } from "../../../storage.js";
 import { visitsToCsv, visitsToHtml } from "../../history-export/core/export-format.js";
 import { archiveFromFileText } from "../core/archive-parser.js";
+import { backupExportFilename } from "../core/backup-filenames.js";
 import { createBackupSelfTest } from "../core/backup-verification.js";
 import {
   attachArchiveIntegrity,
@@ -17,6 +18,7 @@ const defaultServices = {
   analyzeImportArchive,
   archiveFromFileText,
   attachArchiveIntegrity,
+  backupExportFilename,
   confirmAction: (message) => globalThis.confirm(message),
   createBackupSelfTest,
   downloadJson,
@@ -83,6 +85,10 @@ export function createBackupActions({
     deps.renderImportPreview(previewElements, appState.stagedImport);
   }
 
+  function exportFilename(kind, exportedAt, extension) {
+    return deps.backupExportFilename(appState.preferences?.backupFilenamePrefix, kind, exportedAt, extension);
+  }
+
   async function exportAll() {
     setStatus("Preparing archive");
     const archive = await deps.attachArchiveIntegrity(await deps.exportArchive());
@@ -92,7 +98,7 @@ export function createBackupActions({
       return;
     }
 
-    const sizeBytes = deps.downloadJson(`browsevault-archive-${archive.exportedAt.slice(0, 10)}.json`, archive);
+    const sizeBytes = deps.downloadJson(exportFilename("archive", archive.exportedAt, "json"), archive);
     await deps.setMeta("lastBackup", {
       exportedAt: archive.exportedAt,
       format: "json",
@@ -109,7 +115,7 @@ export function createBackupActions({
     setStatus("Preparing CSV");
     const archive = await deps.exportArchive();
     const sizeBytes = deps.downloadText(
-      `browsevault-history-${archive.exportedAt.slice(0, 10)}.csv`,
+      exportFilename("history", archive.exportedAt, "csv"),
       "text/csv",
       deps.visitsToCsv(archive.visits)
     );
@@ -127,7 +133,7 @@ export function createBackupActions({
     setStatus("Preparing HTML");
     const archive = await deps.exportArchive();
     const sizeBytes = deps.downloadText(
-      `browsevault-history-${archive.exportedAt.slice(0, 10)}.html`,
+      exportFilename("history", archive.exportedAt, "html"),
       "text/html",
       deps.visitsToHtml(archive.visits, archive.exportedAt)
     );
@@ -149,7 +155,7 @@ export function createBackupActions({
     }
 
     const archive = await deps.attachArchiveIntegrity(await deps.exportArchive(items));
-    deps.downloadJson(`browsevault-selected-${archive.exportedAt.slice(0, 10)}.json`, archive);
+    deps.downloadJson(exportFilename("selected", archive.exportedAt, "json"), archive);
     setStatus(`Exported ${items.length} selected records as JSON`);
   }
 
@@ -162,7 +168,7 @@ export function createBackupActions({
 
     const exportedAt = deps.now().toISOString();
     deps.downloadText(
-      `browsevault-selected-${exportedAt.slice(0, 10)}.csv`,
+      exportFilename("selected", exportedAt, "csv"),
       "text/csv",
       deps.visitsToCsv(items)
     );
@@ -178,7 +184,7 @@ export function createBackupActions({
 
     const exportedAt = deps.now().toISOString();
     deps.downloadText(
-      `browsevault-selected-${exportedAt.slice(0, 10)}.html`,
+      exportFilename("selected", exportedAt, "html"),
       "text/html",
       deps.visitsToHtml(items, exportedAt)
     );

@@ -19,14 +19,16 @@ test("normalizePreferences falls back for unsupported values and clamps limits",
       accent: "blue",
       dateFormat: "dmy",
       defaultLimit: "999999",
-      backupReminderDays: "999"
+      backupReminderDays: "999",
+      backupFilenamePrefix: "Team Backup:/2026"
     }),
     {
       theme: "system",
       accent: "blue",
       dateFormat: "dmy",
       defaultLimit: 50000,
-      backupReminderDays: 365
+      backupReminderDays: 365,
+      backupFilenamePrefix: "Team-Backup-2026"
     }
   );
 });

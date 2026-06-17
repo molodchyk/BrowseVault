@@ -69,6 +69,7 @@ const singularSelectors = [
   "pref-date-format",
   "pref-limit",
   "pref-backup-reminder",
+  "pref-backup-prefix",
   "save-preferences"
 ];
 

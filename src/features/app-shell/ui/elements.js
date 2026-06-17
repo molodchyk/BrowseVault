@@ -69,6 +69,7 @@ export function collectAppElements(document) {
     prefDateFormat: document.querySelector("#pref-date-format"),
     prefLimit: document.querySelector("#pref-limit"),
     prefBackupReminder: document.querySelector("#pref-backup-reminder"),
+    prefBackupPrefix: document.querySelector("#pref-backup-prefix"),
     savePreferences: document.querySelector("#save-preferences")
   };
 }

@@ -43,7 +43,8 @@ function createHarness({
     accent: "teal",
     dateFormat: "system",
     defaultLimit: 500,
-    backupReminderDays: 30
+    backupReminderDays: 30,
+    backupFilenamePrefix: "browsevault"
   }
 } = {}) {
   const storageWrites = [];
@@ -70,6 +71,7 @@ function createHarness({
     prefDateFormat: input("system"),
     prefLimit: input("500"),
     prefBackupReminder: input("30"),
+    prefBackupPrefix: input("browsevault"),
     prefTheme: input("system"),
     statBackup: output(),
     statDomains: output(),
@@ -106,6 +108,7 @@ test("loadPreferences normalizes stored preferences and applies them to UI state
       dateFormat: "dmy",
       defaultLimit: "750",
       backupReminderDays: "14",
+      backupFilenamePrefix: "Team Backup:/2026",
       theme: "dark"
     }
   });
@@ -117,6 +120,7 @@ test("loadPreferences normalizes stored preferences and applies them to UI state
     dateFormat: "dmy",
     defaultLimit: 750,
     backupReminderDays: 14,
+    backupFilenamePrefix: "Team-Backup-2026",
     theme: "dark"
   });
   assert.equal(root.dataset.theme, "dark");
@@ -126,6 +130,7 @@ test("loadPreferences normalizes stored preferences and applies them to UI state
   assert.equal(elements.prefDateFormat.value, "dmy");
   assert.equal(elements.prefLimit.value, "750");
   assert.equal(elements.prefBackupReminder.value, "14");
+  assert.equal(elements.prefBackupPrefix.value, "Team-Backup-2026");
   assert.equal(elements.limit.value, "750");
 });
 
@@ -136,6 +141,7 @@ test("savePreferences persists normalized values, refreshes stats, reruns search
   elements.prefDateFormat.value = "iso";
   elements.prefLimit.value = "999999";
   elements.prefBackupReminder.value = "0";
+  elements.prefBackupPrefix.value = "Client Reports";
 
   await controller.savePreferences();
 
@@ -145,6 +151,7 @@ test("savePreferences persists normalized values, refreshes stats, reruns search
     {
       "browseVault.preferences": {
         accent: "purple",
+        backupFilenamePrefix: "Client-Reports",
         backupReminderDays: 0,
         dateFormat: "iso",
         defaultLimit: 50000,

@@ -20,10 +20,17 @@ function previewElements() {
   };
 }
 
-function createHarness({ selected = [], stagedImport = null, services = {} } = {}) {
+function createHarness({
+  preferences = {
+    backupFilenamePrefix: "browsevault"
+  },
+  selected = [],
+  stagedImport = null,
+  services = {}
+} = {}) {
   const statuses = [];
   const calls = [];
-  const appState = { stagedImport };
+  const appState = { preferences, stagedImport };
   const actions = createBackupActions({
     appState,
     elements: previewElements(),
@@ -139,6 +146,87 @@ test("exportAll downloads an integrity-protected archive and records backup meta
     }
   ]]);
   assert.deepEqual(calls, ["refreshStats"]);
+});
+
+test("full CSV and HTML exports use the configured backup filename prefix", async () => {
+  const archive = {
+    exportedAt: "2026-06-16T12:00:00.000Z",
+    counts: { visits: 1 },
+    visits: [{ id: "visit-1" }]
+  };
+  const downloaded = [];
+  const metadata = [];
+  const { actions, calls, statuses } = createHarness({
+    preferences: {
+      backupFilenamePrefix: "Client Reports"
+    },
+    services: {
+      downloadText: (...args) => {
+        downloaded.push(args);
+        return 512;
+      },
+      exportArchive: async () => archive,
+      setMeta: async (...args) => metadata.push(args),
+      visitsToCsv: () => "csv",
+      visitsToHtml: () => "html"
+    }
+  });
+
+  await actions.exportCsv();
+  await actions.exportHtml();
+
+  assert.deepEqual(statuses, ["Preparing CSV", "Exported CSV", "Preparing HTML", "Exported HTML"]);
+  assert.deepEqual(downloaded.map(([filename]) => filename), [
+    "Client-Reports-history-2026-06-16.csv",
+    "Client-Reports-history-2026-06-16.html"
+  ]);
+  assert.deepEqual(metadata.map((entry) => entry[1].sizeBytes), [512, 512]);
+  assert.deepEqual(calls, ["refreshStats", "refreshStats"]);
+});
+
+test("selected exports use the configured backup filename prefix", async () => {
+  const downloadedJson = [];
+  const downloadedText = [];
+  const selected = [{ id: "visit-1" }];
+  const { actions, statuses } = createHarness({
+    preferences: {
+      backupFilenamePrefix: "Research Backup"
+    },
+    selected,
+    services: {
+      attachArchiveIntegrity: async (input) => ({
+        ...input,
+        integrity: { sha256: "abc123" }
+      }),
+      downloadJson: (...args) => downloadedJson.push(args),
+      downloadText: (...args) => downloadedText.push(args),
+      exportArchive: async (items) => ({
+        exportedAt: "2026-06-16T12:00:00.000Z",
+        counts: { visits: items.length },
+        visits: items
+      }),
+      now: () => new Date("2026-06-16T12:00:00.000Z"),
+      visitsToCsv: () => "csv",
+      visitsToHtml: () => "html"
+    }
+  });
+
+  await actions.exportSelected();
+  await actions.exportSelectedCsv();
+  await actions.exportSelectedHtml();
+
+  assert.deepEqual(statuses, [
+    "Exported 1 selected records as JSON",
+    "Exported 1 selected records as CSV",
+    "Exported 1 selected records as HTML"
+  ]);
+  assert.deepEqual(downloadedJson.map(([filename]) => filename), [
+    "Research-Backup-selected-2026-06-16.json"
+  ]);
+  assert.deepEqual(downloadedText.map(([filename]) => filename), [
+    "Research-Backup-selected-2026-06-16.csv",
+    "Research-Backup-selected-2026-06-16.html"
+  ]);
 });
 
 test("exportAll stops before download when generated archive self-test fails", async () => {
