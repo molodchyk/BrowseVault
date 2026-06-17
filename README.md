@@ -28,6 +28,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - manual sync from currently available Chrome history, expanded to individual visits where Chrome exposes them;
 - visible archive health for startup, Chrome sync, and live capture status;
 - query syntax for site/host/domain, title, URL, source, transition, visit count, exact-day/date ranges, local-hour filters, exclusions, phrases, and regex;
+- bounded typo-tolerant matching for longer plain keyword searches;
 - saved searches for repeated local history queries and date/limit filter sets;
 - highlighted matches in vault and Quick Open search results;
 - keyboard-first search with autofocus, global query focus, Enter search, and debounced live refresh;
@@ -146,7 +147,7 @@ url:docs -youtube
 regex:github|gitlab
 ```
 
-The main vault search is used for archived history management. Quick Open uses the same query text to search current browser sources such as open tabs, bookmarks, downloads, and recently closed tabs. Quick Open results are read-only and are not affected by vault delete/export actions.
+The main vault search is used for archived history management. Quick Open uses the same query text to search current browser sources such as open tabs, bookmarks, downloads, and recently closed tabs. Quick Open results are read-only and are not affected by vault delete/export actions. Longer plain keywords use a bounded fuzzy fallback, so common one-character typos such as `histroy` can still find `history`; short keywords, exclusions, phrases, regex, and structured filters stay exact.
 
 Date filters use `YYYY-MM-DD` text fields to avoid browser-specific date input formatting. Use `date:`, `day:`, or `on:` for one local calendar day, and `after:` / `before:` for ranges. Use `hour:14` for one local hour or `hour:9-17` / `hour:9..17` for an inclusive local-hour range. Domain filters accept `site:`, `host:`, or `domain:`. Visit count filters accept exact values, comparisons such as `visits:>=10`, ranges such as `count:5..12`, and minimum shorthand such as `visits:7+`. Displayed dates can be switched between system locale, ISO, day/month/year, month/day/year, and year/month/day in Settings.
 

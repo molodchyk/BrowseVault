@@ -100,6 +100,19 @@ describe("matchesVisitQuery", () => {
     assert.equal(matchesVisitQuery(visit, parseQuery("regex:chrome.*history")), true);
   });
 
+  it("matches longer keyword typos with bounded fuzzy fallback", () => {
+    assert.equal(matchesVisitQuery(visit, parseQuery("histroy")), true);
+    assert.equal(matchesVisitQuery(visit, parseQuery("githbu")), true);
+    assert.equal(matchesVisitQuery(visit, parseQuery("researh")), true);
+    assert.equal(matchesVisitQuery(visit, parseQuery("chromee")), true);
+  });
+
+  it("keeps short keywords and exclusions exact", () => {
+    assert.equal(matchesVisitQuery(visit, parseQuery("apqs")), false);
+    assert.equal(matchesVisitQuery(visit, parseQuery("histroy -githbu")), true);
+    assert.equal(matchesVisitQuery(visit, parseQuery("histroy -github")), false);
+  });
+
   it("matches inclusive date ranges", () => {
     assert.equal(matchesVisitQuery(visit, parseQuery("after:2026-06-01 before:2026-06-10")), true);
     assert.equal(matchesVisitQuery(visit, parseQuery("after:2026-06-11")), false);
