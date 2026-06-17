@@ -63,6 +63,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - local preferences for system/light/dark theme, accent color, date format, default result limit, backup reminders, and backup filename prefix;
 - in-app trust, permission, and product-limit disclosures;
 - local-first privacy documentation;
+- versioned release notes in [`CHANGELOG.md`](CHANGELOG.md), including trust-sensitive behavior changes;
 - generated PNG extension icons;
 - deterministic local ZIP packaging;
 - copied research and product docs in [`docs/`](docs/);

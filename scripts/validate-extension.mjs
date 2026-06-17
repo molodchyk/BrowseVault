@@ -5,6 +5,7 @@ const root = process.cwd();
 const requiredFiles = [
   "manifest.json",
   "README.md",
+  "CHANGELOG.md",
   "PRIVACY.md",
   "src/background.js",
   "src/storage.js",
@@ -88,10 +89,21 @@ assert(!manifest.web_accessible_resources?.length, "Manifest should not expose w
 assert(manifest.commands?.["open-browsevault"], "Missing open-browsevault command.");
 
 const packageJson = readJson("package.json");
+assert(packageJson.version === manifest.version, "package.json version must match manifest version.");
 assert(packageJson.keywords.includes("browser-history"), "Missing browser-history keyword.");
 assert(packageJson.keywords.includes("history-backup"), "Missing history-backup keyword.");
 assert(packageJson.scripts.icons, "Missing icons script.");
 assert(packageJson.scripts.package, "Missing package script.");
+
+const changelog = fs.readFileSync(path.join(root, "CHANGELOG.md"), "utf8");
+assert(changelog.includes(`## ${manifest.version} -`), "Changelog must include the current manifest version.");
+for (const topic of ["backup", "delete", "Chrome history", "permissions", "network"]) {
+  assert(new RegExp(topic, "i").test(changelog), `Changelog must cover trust-sensitive topic: ${topic}`);
+}
+assert(
+  /No default Chrome history replacement/i.test(changelog),
+  "Changelog must disclose default Chrome history replacement behavior."
+);
 
 for (const size of [16, 32, 48, 128]) {
   const icon = fs.readFileSync(path.join(root, "assets", "icons", `icon${size}.png`));
