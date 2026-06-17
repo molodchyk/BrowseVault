@@ -5,15 +5,35 @@ import {
   normalizeActivityLog
 } from "./features/activity-log/core/activity-log.js";
 import {
-  extractImportVisits,
-  importArchiveSource
-} from "./features/backup-import/core/import-normalization.js";
+  createImportArchivePlan,
+  mergeImportedVisits,
+  summarizeImportArchive
+} from "./features/backup-import/core/archive-import-plan.js";
 import {
   normalizeSavedSearches,
   removeSavedSearch as removeSavedSearchFromList,
   upsertSavedSearch
 } from "./features/history-results/core/saved-searches.js";
 import { searchVisitRecords } from "./features/history-results/core/search-index.js";
+import {
+  hostMatchesRule,
+  normalizeCategoryValue,
+  normalizeRuleValue
+} from "./features/vault-management/core/domain-rules.js";
+import {
+  makeVisitId,
+  normalizeDomain,
+  normalizeHistoryItem
+} from "./features/vault-management/core/history-records.js";
+
+export {
+  createImportArchivePlan,
+  makeVisitId,
+  mergeImportedVisits,
+  normalizeDomain,
+  normalizeHistoryItem,
+  summarizeImportArchive
+};
 
 const DB_NAME = "browsevault";
 const DB_VERSION = 1;
@@ -99,75 +119,6 @@ function transactionDone(tx) {
     tx.onerror = () => reject(tx.error);
     tx.onabort = () => reject(tx.error);
   });
-}
-
-function hashString(value) {
-  let hash = 5381;
-  for (let index = 0; index < value.length; index += 1) {
-    hash = (hash * 33) ^ value.charCodeAt(index);
-  }
-  return (hash >>> 0).toString(36);
-}
-
-export function normalizeDomain(url) {
-  try {
-    return new URL(url).hostname.toLowerCase().replace(/^www\./, "");
-  } catch {
-    return "";
-  }
-}
-
-function normalizeTimestamp(value) {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    if (value > 100000000000000) {
-      return Math.floor(value / 1000);
-    }
-    return value;
-  }
-
-  if (typeof value === "string" && /^\d+$/.test(value.trim())) {
-    return normalizeTimestamp(Number(value.trim()));
-  }
-
-  const parsed = Date.parse(value);
-  return Number.isFinite(parsed) ? parsed : Date.now();
-}
-
-export function makeVisitId(url, visitTime) {
-  return `${Math.round(visitTime)}-${hashString(url || "")}`;
-}
-
-export function normalizeHistoryItem(item, options = {}) {
-  const url = item.url || "";
-  const visitTime = normalizeTimestamp(item.visitTime || item.lastVisitTime || Date.now());
-  const title = item.title || "";
-  const domain = normalizeDomain(url);
-  const hasChromeVisitId = item.id && item.id.includes("|");
-  const hasExplicitChromeId = Object.prototype.hasOwnProperty.call(item, "chromeId");
-
-  return {
-    id: hasChromeVisitId ? item.id : makeVisitId(url, visitTime),
-    chromeId: hasExplicitChromeId ? item.chromeId || "" : item.id || "",
-    url,
-    normalizedUrl: url.toLowerCase(),
-    title,
-    normalizedTitle: title.toLowerCase(),
-    domain,
-    visitTime,
-    lastVisitTime: normalizeTimestamp(item.lastVisitTime || visitTime),
-    visitCount: Number(item.visitCount || 1),
-    typedCount: Number(item.typedCount || 0),
-    transition: item.transition || item.transitionType || "",
-    visitId: item.visitId || "",
-    referringVisitId: item.referringVisitId || "",
-    source: options.source || item.source || "import",
-    sourceReason: options.reason || item.sourceReason || "",
-    importedAt: item.importedAt || null,
-    createdAt: item.createdAt || new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    deletedAt: item.deletedAt || null,
-    chromeDeletedAt: item.chromeDeletedAt || null
-  };
 }
 
 export async function recordChromeVisit(item, options = {}) {
@@ -424,23 +375,6 @@ export async function addCategoryRule(domainValue, categoryValue) {
   return record;
 }
 
-function normalizeRuleValue(value) {
-  return String(value || "")
-    .toLowerCase()
-    .trim()
-    .replace(/^https?:\/\//, "")
-    .replace(/^www\./, "")
-    .split("/")[0]
-    .replace(/[^a-z0-9.-]/g, "");
-}
-
-function normalizeCategoryValue(value) {
-  return String(value || "")
-    .trim()
-    .replace(/\s+/g, " ")
-    .slice(0, 80);
-}
-
 export async function removeRule(id) {
   const db = await openVaultDb();
   const tx = db.transaction(RULE_STORE, "readwrite");
@@ -454,10 +388,6 @@ export async function searchVisits(input = "", options = {}) {
     ...options,
     defaultLimit: DEFAULT_RESULT_LIMIT
   });
-}
-
-function hostMatchesRule(host, rule) {
-  return host === rule || host.endsWith(`.${rule}`);
 }
 
 function normalizedCategoryRules(categories) {
@@ -835,121 +765,6 @@ export async function runStorageSelfCheck(checkedAt = new Date().toISOString()) 
   return stored;
 }
 
-function normalizeImportVisits(archive) {
-  const visits = extractImportVisits(archive);
-
-  return visits
-    .filter((visit) => visit?.url)
-    .map((visit) =>
-      normalizeHistoryItem(
-        {
-          ...visit,
-          visitTime: visit.visitTime || visit.lastVisitTime
-        },
-        {
-          source: visit.source || "import",
-          reason: "archive-import"
-        }
-      )
-    );
-}
-
-export function mergeImportedVisits(existingVisits, importedVisits) {
-  const currentById = new Map((Array.isArray(existingVisits) ? existingVisits : []).map((visit) => [visit.id, visit]));
-  const mergedImportById = new Map();
-  const importedOrder = [];
-
-  for (const record of Array.isArray(importedVisits) ? importedVisits : []) {
-    const previous = currentById.get(record.id);
-    if (!previous) {
-      currentById.set(record.id, record);
-      if (!mergedImportById.has(record.id)) {
-        importedOrder.push(record.id);
-      }
-      mergedImportById.set(record.id, record);
-      continue;
-    }
-
-    const merged = {
-      ...previous,
-      ...record,
-      deletedAt: previous.deletedAt || record.deletedAt || null,
-      chromeDeletedAt: previous.chromeDeletedAt || record.chromeDeletedAt || null
-    };
-    if (previous.createdAt || record.createdAt) {
-      merged.createdAt = previous.createdAt || record.createdAt;
-    }
-    currentById.set(record.id, merged);
-    if (!mergedImportById.has(record.id)) {
-      importedOrder.push(record.id);
-    }
-    mergedImportById.set(record.id, merged);
-  }
-
-  return importedOrder.map((id) => mergedImportById.get(id));
-}
-
-function normalizeImportRules(archive, importedAt = new Date().toISOString()) {
-  if (!Array.isArray(archive?.rules)) {
-    return [];
-  }
-
-  return archive.rules
-    .filter((rule) => ["blacklist", "whitelist", "category"].includes(rule?.type))
-    .map((rule) => {
-      const value = normalizeRuleValue(rule.value);
-      const category = normalizeCategoryValue(rule.category);
-      if (rule.type === "category") {
-        return value && category
-          ? {
-              id: `category:${value}`,
-              type: "category",
-              value,
-              category,
-              createdAt: rule.createdAt || importedAt
-            }
-          : null;
-      }
-
-      return value
-        ? {
-            id: `${rule.type}:${value}`,
-            type: rule.type,
-            value,
-            createdAt: rule.createdAt || importedAt
-          }
-        : null;
-    })
-    .filter(Boolean);
-}
-
-export function summarizeImportArchive(archive, existingVisitIds = []) {
-  const rawVisits = extractImportVisits(archive);
-  const normalized = normalizeImportVisits(archive);
-  const uniqueIds = new Set(normalized.map((visit) => visit.id));
-  const existingIds = new Set(existingVisitIds);
-  let existingVisits = 0;
-
-  for (const id of uniqueIds) {
-    if (existingIds.has(id)) {
-      existingVisits += 1;
-    }
-  }
-
-  return {
-    sourceApp: importArchiveSource(archive),
-    schemaVersion: archive?.schemaVersion || null,
-    rows: rawVisits.length,
-    validRows: normalized.length,
-    invalidRows: rawVisits.length - normalized.length,
-    uniqueVisits: uniqueIds.size,
-    duplicateRows: normalized.length - uniqueIds.size,
-    existingVisits,
-    newVisits: uniqueIds.size - existingVisits,
-    rules: normalizeImportRules(archive).length
-  };
-}
-
 export async function analyzeImportArchive(archive) {
   const existingVisitIds = (await getAllVisits({ includeDeleted: true })).map((visit) => visit.id);
   return summarizeImportArchive(archive, existingVisitIds);
@@ -962,35 +777,6 @@ export async function importArchive(archive) {
   await writeImportArchivePlan(plan);
 
   return plan.result;
-}
-
-export function createImportArchivePlan(archive, existingVisits = [], importedAt = new Date().toISOString()) {
-  const normalized = normalizeImportVisits(archive);
-  const records = mergeImportedVisits(existingVisits, normalized);
-  const duplicateRows = normalized.length - records.length;
-  const rules = normalizeImportRules(archive, importedAt);
-  const metadata = {
-    importedAt,
-    sourceApp: importArchiveSource(archive),
-    schemaVersion: archive?.schemaVersion || null,
-    visits: records.length,
-    validRows: normalized.length,
-    duplicateRows,
-    rules: rules.length
-  };
-
-  return {
-    records,
-    rules,
-    metadata,
-    result: {
-      importedAt,
-      visits: records.length,
-      validRows: normalized.length,
-      duplicateRows,
-      rules: rules.length
-    }
-  };
 }
 
 async function writeImportArchivePlan(plan) {

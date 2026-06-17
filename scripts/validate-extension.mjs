@@ -117,7 +117,6 @@ for (const expected of [
   "knownDebtCaps",
   "soft target",
   "hard max",
-  "src/storage.js",
   "split follow-up expected"
 ]) {
   assert(fileSizeScript.includes(expected), `File-size audit missing modularization guardrail: ${expected}`);

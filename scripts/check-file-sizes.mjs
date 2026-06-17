@@ -5,15 +5,7 @@ const root = process.cwd();
 const auditRoots = ["src", "test", "scripts"];
 const escalationLines = 600;
 const defaultHardLines = 900;
-const knownDebtCaps = new Map([
-  [
-    "src/storage.js",
-    {
-      maxLines: 1051,
-      reason: "IndexedDB storage owner still being split into feature storage models"
-    }
-  ]
-]);
+const knownDebtCaps = new Map();
 
 function toProjectPath(fullPath) {
   return path.relative(root, fullPath).split(path.sep).join("/");

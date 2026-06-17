@@ -7,19 +7,19 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `src/app.html`, `src/app.css`, and `src/app.js` own the extension page runtime shell; `src/app.css` and `src/app.js` are thin entrypoints.
 - `src/styles/` owns surface-level extension page styles split into tokens, layout, backup/rules/trust, results, and responsive layers.
 - `src/background.js` owns MV3 service worker listener wiring, extension-page opening, and startup/install metadata.
-- `src/storage.js` owns IndexedDB vault records, backup metadata, domain/category rules, and vault mutations.
+- `src/storage.js` owns IndexedDB transactions, metadata persistence, rule persistence, vault mutations, and compatibility exports for storage-facing callers.
 - `src/browser-memory.js` owns read-only search over tabs, bookmarks, downloads, and recently closed sessions.
 - `src/query.js` is a compatibility barrel for existing query import paths.
 - `src/features/activity-log/` owns recent activity event normalization and Backup-tab activity rendering for user-visible backup, export, import, cleanup, delete, restore, rule, and reset operations.
 - `src/features/app-shell/` owns extension-page bootstrap composition, shell state, element collection, tab navigation/focus helpers, shared search scheduling, event wiring, static extension-page localization, and shared shell UI behavior.
-- `src/features/backup-import/` owns archive import/export actions, export filename rules, file parsing, import normalization, integrity metadata, import-preview display state, and restore-flow rendering.
+- `src/features/backup-import/` owns archive import/export actions, export filename rules, file parsing, import normalization, import planning, import summary logic, integrity metadata, import-preview display state, and restore-flow rendering.
 - `src/features/background-runtime/` owns background message routing, payload validation, privileged action dispatch, Chrome history bootstrap, archive filtering, live-visit capture, native Chrome history removal reconciliation, localized status strings, and extension-page actions that coordinate with background runtime messages.
 - `src/features/browser-memory/` owns extension-page quick-open rendering and actions for tabs, bookmarks, downloads, and recently closed sessions.
 - `src/features/display-preferences/` owns preference normalization, result-limit clamping, date/count formatting, archive health summaries, backup reminder cadence, backup filename preferences, backup status summaries, settings persistence orchestration, and extension-page preference/stat rendering.
 - `src/features/history-export/core/export-format.js` owns pure CSV and HTML export formatting.
 - `src/features/history-results/core/` owns pure result selection, URL/domain extraction, grouping, count labels, load-more state, saved-search normalization, search form query composition, chunked local search scanning, query parsing, query matching, wildcard text matching, and fuzzy text matching.
 - `src/features/history-results/ui/` owns search form field state, saved-search controls, local history search/load-more/show-all orchestration, selected-record lookup, history result DOM rendering, rendering orchestration, search-hit highlighting, result jump controls, and selected-result bulk actions.
-- `src/features/vault-management/` owns extension-page vault deletion, Chrome-history deletion requests, undo, reset, domain/category-rule actions, retention cleanup, and duplicate cleanup.
+- `src/features/vault-management/` owns extension-page vault deletion, Chrome-history deletion requests, undo, reset, domain/category-rule actions, rule normalization, vault record normalization, retention cleanup, and duplicate cleanup.
 - `src/platform/` owns explicit wrappers around browser/platform APIs, including Chrome extension APIs, Chrome i18n lookup, and clipboard copy behavior.
 - `src/export-format.js` is a compatibility barrel for existing import paths.
 - `test/features/` mirrors feature-owned tests by product area so no single flat test folder becomes a dumping ground.
@@ -32,7 +32,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 
 ## Next Split Candidates
 
-- Split `src/storage.js` into feature storage models and a thinner IndexedDB platform/storage layer; it is capped as current file-size hard-limit debt by `scripts/check-file-sizes.mjs`.
+- Continue splitting `src/storage.js` into feature storage models and a thinner IndexedDB platform/storage layer; it is now below the hard limit, but still above the 600-line split-follow-up threshold.
 
 ## Rules For Future Edits
 
