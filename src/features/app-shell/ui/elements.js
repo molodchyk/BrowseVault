@@ -45,6 +45,7 @@ export function collectAppElements(document) {
     exportResults: document.querySelector("#export-results"),
     exportResultsCsv: document.querySelector("#export-results-csv"),
     exportResultsHtml: document.querySelector("#export-results-html"),
+    deleteResults: document.querySelector("#delete-results"),
     loadMore: document.querySelector("#load-more"),
     clearSelection: document.querySelector("#clear-selection"),
     selectionActions: [...document.querySelectorAll(".requires-selection")],

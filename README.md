@@ -44,6 +44,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - staged import preview with valid row, duplicate row, existing visit, new visit, rule, and restore-check health status;
 - JSON, CSV, TSV, Google Takeout Browser History, Google My Activity, and common competitor-export import handling;
 - current filtered result-set JSON, CSV, and HTML export without manual selection;
+- current filtered result-set vault deletion with confirmation and undo;
 - selected-record JSON, CSV, and HTML export;
 - selected-record URL copy;
 - selected-record batch opening with a tab-flood safety cap;
@@ -156,6 +157,8 @@ Date filters use `YYYY-MM-DD` text fields to avoid browser-specific date input f
 ## Retention Cleanup
 
 The Rules tab supports manual vault retention cleanup. Enter a number of days, preview how many old BrowseVault records would be cleaned up, then confirm the cleanup. Cleanup uses the same undoable vault deletion path as selected-record deletion and skips whitelisted domains.
+
+The History tab also supports direct current-result deletion for targeted cleanup by query, domain, date, or hour. Enter a query or date filter first, then use Delete Results From Vault. This action only removes records from BrowseVault, does not delete Chrome history, and can be undone.
 
 ## GitHub Description
 

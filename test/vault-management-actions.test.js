@@ -38,6 +38,7 @@ function fakeDocument() {
 }
 
 function createHarness({
+  getSearchText = () => "docs site:example.com",
   selectedIds = [],
   selected = [],
   services = {}
@@ -58,8 +59,10 @@ function createHarness({
   const actions = createVaultManagementActions({
     appState,
     elements,
+    getSearchText,
     refreshStats: async () => calls.push("refreshStats"),
     runSearch: async () => calls.push("runSearch"),
+    searchVisits: async () => ({ results: [], total: 0 }),
     selectedResults: async () => selected,
     services: {
       confirmAction: () => true,
@@ -187,8 +190,63 @@ test("deleteFromVault and undoVaultDelete handle selected and missing states", a
   assert.deepEqual(calls, ["refreshStats", "runSearch", "refreshStats", "runSearch"]);
   assert.deepEqual(statuses, [
     "Deleted 2 records from vault",
-    "Restored 1 vault records"
+    "Restored 1 vault record"
   ]);
+});
+
+test("deleteCurrentResultsFromVault deletes the current filtered result set", async () => {
+  const marked = [];
+  const searched = [];
+  const { actions, appState, calls, statuses } = createHarness({
+    selectedIds: ["visible"],
+    services: {
+      markDeletedByIds: async (ids) => {
+        marked.push(ids);
+        return ids.length;
+      },
+      searchVisits: async (query, options) => {
+        searched.push([query, options]);
+        return {
+          total: 2,
+          results: [{ id: "filtered-1" }, { id: "filtered-2" }]
+        };
+      }
+    }
+  });
+
+  await actions.deleteCurrentResultsFromVault();
+
+  assert.deepEqual(searched, [["docs site:example.com", { limit: "all" }]]);
+  assert.deepEqual(marked, [["filtered-1", "filtered-2"]]);
+  assert.equal(appState.selectedIds.size, 0);
+  assert.deepEqual(calls, ["refreshStats", "runSearch"]);
+  assert.deepEqual(statuses, ["Deleted 2 current results from vault"]);
+});
+
+test("deleteCurrentResultsFromVault guards empty search, no matches, and cancel", async () => {
+  const emptySearch = createHarness({
+    getSearchText: () => " "
+  });
+  await emptySearch.actions.deleteCurrentResultsFromVault();
+  assert.deepEqual(emptySearch.statuses, [
+    "Enter a query or date filter before deleting current results"
+  ]);
+
+  const noMatches = createHarness();
+  await noMatches.actions.deleteCurrentResultsFromVault();
+  assert.deepEqual(noMatches.statuses, ["No matching vault records to delete"]);
+
+  const canceled = createHarness({
+    services: {
+      confirmAction: () => false,
+      searchVisits: async () => ({
+        total: 1,
+        results: [{ id: "filtered-1" }]
+      })
+    }
+  });
+  await canceled.actions.deleteCurrentResultsFromVault();
+  assert.deepEqual(canceled.statuses, ["Current result deletion canceled"]);
 });
 
 test("retention cleanup previews and deletes eligible old records", async () => {

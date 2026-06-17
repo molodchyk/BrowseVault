@@ -79,6 +79,7 @@ function createElements() {
     exportResults: fakeElement(),
     exportResultsCsv: fakeElement(),
     exportResultsHtml: fakeElement(),
+    deleteResults: fakeElement(),
     loadMore: fakeElement(),
     clearSelection: fakeElement(),
     addBlacklist: fakeElement(),
@@ -103,6 +104,7 @@ function createHandlers(calls) {
     "confirmStagedImport",
     "copySelectedUrls",
     "deleteFromChrome",
+    "deleteCurrentResultsFromVault",
     "deleteFromVault",
     "exportAll",
     "exportCsv",
@@ -285,6 +287,7 @@ test("bindAppEvents wires bulk and rules actions", () => {
   elements.exportResults.dispatch("click");
   elements.exportResultsCsv.dispatch("click");
   elements.exportResultsHtml.dispatch("click");
+  elements.deleteResults.dispatch("click");
   elements.addBlacklist.dispatch("click");
   elements.addWhitelist.dispatch("click");
   elements.previewRetention.dispatch("click");
@@ -298,6 +301,7 @@ test("bindAppEvents wires bulk and rules actions", () => {
     ["exportFilteredResults"],
     ["exportFilteredResultsCsv"],
     ["exportFilteredResultsHtml"],
+    ["deleteCurrentResultsFromVault"],
     ["addBlacklistRule"],
     ["addWhitelistRule"],
     ["previewRetentionCleanup"],

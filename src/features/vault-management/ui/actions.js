@@ -6,7 +6,8 @@ import {
   getStats,
   markDeletedByIds,
   removeRule,
-  restoreDeletedByIds
+  restoreDeletedByIds,
+  searchVisits
 } from "../../../storage.js";
 import { BACKGROUND_MESSAGE_TYPES } from "../../background-runtime/core/messages.js";
 import {
@@ -26,6 +27,7 @@ const defaultServices = {
   markDeletedByIds,
   removeRule,
   restoreDeletedByIds,
+  searchVisits,
   sendRuntimeMessage,
   uniqueDomainsForItems,
   uniqueUrlsForItems
@@ -39,14 +41,17 @@ function retentionDaysFromInput(value) {
 export function createVaultManagementActions({
   appState,
   elements,
+  getSearchText = () => "",
   refreshStats,
   runSearch,
+  searchVisits: searchVisitRecords = searchVisits,
   selectedResults,
   services = {},
   setStatus
 }) {
   const deps = {
     ...defaultServices,
+    searchVisits: searchVisitRecords,
     ...services
   };
 
@@ -134,6 +139,35 @@ export function createVaultManagementActions({
     setStatus(`Deleted ${deleted} records from vault`);
   }
 
+  async function deleteCurrentResultsFromVault() {
+    const queryText = getSearchText().trim();
+    if (!queryText) {
+      setStatus("Enter a query or date filter before deleting current results");
+      return;
+    }
+
+    const { results, total } = await deps.searchVisits(queryText, {
+      limit: "all"
+    });
+
+    if (!results.length) {
+      setStatus("No matching vault records to delete");
+      return;
+    }
+
+    const message = `Delete ${total} current result${total === 1 ? "" : "s"} from BrowseVault for "${queryText}"? This will not delete Chrome history and can be undone.`;
+    if (!deps.confirmAction(message)) {
+      setStatus("Current result deletion canceled");
+      return;
+    }
+
+    const deleted = await deps.markDeletedByIds(results.map((visit) => visit.id));
+    appState.selectedIds.clear();
+    await refreshStats();
+    await runSearch();
+    setStatus(`Deleted ${deleted} current result${deleted === 1 ? "" : "s"} from vault`);
+  }
+
   async function deleteFromChrome() {
     const items = await selectedResults();
     if (!items.length) {
@@ -175,7 +209,7 @@ export function createVaultManagementActions({
     const restored = await deps.restoreDeletedByIds(ids);
     await refreshStats();
     await runSearch();
-    setStatus(`Restored ${restored} vault records`);
+    setStatus(`Restored ${restored} vault record${restored === 1 ? "" : "s"}`);
   }
 
   async function addRule(type) {
@@ -247,6 +281,7 @@ export function createVaultManagementActions({
     addRule,
     blacklistSelectedDomains,
     cleanupByRetention,
+    deleteCurrentResultsFromVault,
     deleteFromChrome,
     deleteFromVault,
     previewRetentionCleanup,

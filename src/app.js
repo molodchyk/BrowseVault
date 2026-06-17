@@ -80,8 +80,10 @@ const historySearchActions = createHistorySearchActions({
 const vaultActions = createVaultManagementActions({
   appState,
   elements,
+  getSearchText: historySearchForm.getSearchText,
   refreshStats: displayPreferences.refreshStats,
   runSearch: historySearchActions.runSearch,
+  searchVisits,
   selectedResults: selectedResultLookup.selectedResults,
   setStatus
 });
@@ -161,6 +163,7 @@ function bindEvents() {
       confirmStagedImport: backupActions.confirmStagedImport,
       copySelectedUrls: bulkActions.copySelectedUrls,
       deleteFromChrome: vaultActions.deleteFromChrome,
+      deleteCurrentResultsFromVault: vaultActions.deleteCurrentResultsFromVault,
       deleteFromVault: vaultActions.deleteFromVault,
       exportAll: backupActions.exportAll,
       exportCsv: backupActions.exportCsv,

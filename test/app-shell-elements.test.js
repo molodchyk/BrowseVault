@@ -46,6 +46,7 @@ const singularSelectors = [
   "export-results",
   "export-results-csv",
   "export-results-html",
+  "delete-results",
   "load-more",
   "clear-selection",
   "result-count",
