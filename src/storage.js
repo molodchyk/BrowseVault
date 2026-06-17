@@ -4,6 +4,7 @@ import {
   normalizeActivityEvent,
   normalizeActivityLog
 } from "./features/activity-log/core/activity-log.js";
+import { createChromeHistorySyncPlan } from "./features/background-runtime/core/chrome-history-sync-plan.js";
 import {
   createImportArchivePlan,
   mergeImportedVisits,
@@ -16,7 +17,6 @@ import {
 } from "./features/history-results/core/saved-searches.js";
 import { searchVisitRecords } from "./features/history-results/core/search-index.js";
 import {
-  hostMatchesRule,
   normalizeCategoryValue,
   normalizeRuleValue
 } from "./features/vault-management/core/domain-rules.js";
@@ -25,101 +25,47 @@ import {
   normalizeDomain,
   normalizeHistoryItem
 } from "./features/vault-management/core/history-records.js";
+import {
+  archiveVisitsForExport,
+  categoryForVisit,
+  decorateVisitsWithRuleCategories,
+  duplicateCleanupCandidates,
+  retentionCleanupCandidates,
+  summarizeArchiveInsights,
+  summarizeVaultHealth
+} from "./features/vault-management/core/vault-analysis.js";
+import {
+  getAll,
+  META_STORE,
+  openVaultDb,
+  putMany,
+  requestToPromise,
+  RULE_STORE,
+  transactionDone,
+  VISIT_STORE
+} from "./platform/indexed-db/vault-db.js";
 
 export {
+  archiveVisitsForExport,
+  categoryForVisit,
+  createChromeHistorySyncPlan,
   createImportArchivePlan,
+  decorateVisitsWithRuleCategories,
+  duplicateCleanupCandidates,
   makeVisitId,
   mergeImportedVisits,
   normalizeDomain,
   normalizeHistoryItem,
-  summarizeImportArchive
+  openVaultDb,
+  retentionCleanupCandidates,
+  summarizeArchiveInsights,
+  summarizeImportArchive,
+  summarizeVaultHealth
 };
 
-const DB_NAME = "browsevault";
-const DB_VERSION = 1;
-const VISIT_STORE = "visits";
-const META_STORE = "meta";
-const RULE_STORE = "rules";
 const DEFAULT_RESULT_LIMIT = 500;
 const SAVED_SEARCHES_META = "savedSearches";
 const STORAGE_SELF_CHECK_META = "lastStorageSelfCheck";
-const DAY_MS = 86400000;
-
-let dbPromise;
-
-export function openVaultDb() {
-  if (dbPromise) {
-    return dbPromise;
-  }
-
-  dbPromise = new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-    request.onupgradeneeded = () => {
-      const db = request.result;
-
-      if (!db.objectStoreNames.contains(VISIT_STORE)) {
-        const visits = db.createObjectStore(VISIT_STORE, { keyPath: "id" });
-        visits.createIndex("url", "url", { unique: false });
-        visits.createIndex("domain", "domain", { unique: false });
-        visits.createIndex("visitTime", "visitTime", { unique: false });
-        visits.createIndex("deletedAt", "deletedAt", { unique: false });
-      }
-
-      if (!db.objectStoreNames.contains(META_STORE)) {
-        db.createObjectStore(META_STORE, { keyPath: "key" });
-      }
-
-      if (!db.objectStoreNames.contains(RULE_STORE)) {
-        db.createObjectStore(RULE_STORE, { keyPath: "id" });
-      }
-    };
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-
-  return dbPromise;
-}
-
-function requestToPromise(request) {
-  return new Promise((resolve, reject) => {
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-async function getAll(storeName) {
-  const db = await openVaultDb();
-  const store = db.transaction(storeName, "readonly").objectStore(storeName);
-  return requestToPromise(store.getAll());
-}
-
-async function putMany(storeName, records) {
-  if (!records.length) {
-    return 0;
-  }
-
-  const db = await openVaultDb();
-  const tx = db.transaction(storeName, "readwrite");
-  const store = tx.objectStore(storeName);
-
-  for (const record of records) {
-    store.put(record);
-  }
-
-  await transactionDone(tx);
-
-  return records.length;
-}
-
-function transactionDone(tx) {
-  return new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-    tx.onabort = () => reject(tx.error);
-  });
-}
 
 export async function recordChromeVisit(item, options = {}) {
   const record = normalizeHistoryItem(item, options);
@@ -146,37 +92,6 @@ export async function recordChromeVisitWithCaptureMetadata(item, options = {}) {
 
   await transactionDone(tx);
   return record;
-}
-
-export function createChromeHistorySyncPlan(items, existingVisits = [], options = {}) {
-  const existing = Array.isArray(existingVisits) ? existingVisits : [];
-  const existingById = new Map(existing.map((record) => [record.id, record]));
-  const nextById = new Map(existingById);
-  const records = [];
-
-  for (const item of items) {
-    if (!item.url) {
-      continue;
-    }
-
-    const record = normalizeHistoryItem(item, options);
-    const previous = existingById.get(record.id);
-
-    records.push({
-      ...previous,
-      ...record,
-      createdAt: previous?.createdAt || record.createdAt,
-      deletedAt: previous?.deletedAt || null
-    });
-    nextById.set(record.id, records[records.length - 1]);
-  }
-
-  return {
-    scanned: items.length,
-    stored: records.length,
-    total: [...nextById.values()].filter((visit) => !visit.deletedAt).length,
-    records
-  };
 }
 
 async function writeChromeHistorySyncPlan(plan, metadata = null) {
@@ -390,254 +305,8 @@ export async function searchVisits(input = "", options = {}) {
   });
 }
 
-function normalizedCategoryRules(categories) {
-  return (Array.isArray(categories) ? categories : [])
-    .filter((rule) => rule?.value && rule?.category)
-    .map((rule) => ({
-      value: String(rule.value).toLowerCase(),
-      category: rule.category
-    }))
-    .sort((left, right) => right.value.length - left.value.length);
-}
-
-function categoryForVisitFromRules(visit, categories) {
-  const domain = (visit.domain || normalizeDomain(visit.url || "")).toLowerCase();
-  if (!domain || !categories.length) {
-    return "";
-  }
-
-  return categories.find((rule) => hostMatchesRule(domain, rule.value))?.category || "";
-}
-
-export function categoryForVisit(visit, categories) {
-  return categoryForVisitFromRules(visit, normalizedCategoryRules(categories));
-}
-
-export function decorateVisitsWithRuleCategories(visits, rules) {
-  const categories = normalizedCategoryRules(rules?.categories);
-  if (!categories.length) {
-    return visits;
-  }
-
-  return visits.map((visit) => {
-    const category = categoryForVisitFromRules(visit, categories);
-    return category ? { ...visit, category } : visit;
-  });
-}
-
-function visitMatchesWhitelist(visit, whitelist) {
-  const domain = (visit.domain || normalizeDomain(visit.url || "")).toLowerCase();
-  return Boolean(domain && whitelist.some((rule) => hostMatchesRule(domain, rule)));
-}
-
-function duplicateVisitKey(visit) {
-  const url = String(visit.normalizedUrl || visit.url || "").trim().toLowerCase();
-  const visitTime = Number(visit.visitTime);
-  if (!url || !Number.isFinite(visitTime)) {
-    return "";
-  }
-
-  return `${url}\n${Math.round(visitTime)}`;
-}
-
-function duplicateVisitQuality(visit) {
-  return (
-    String(visit.title || "").trim().length +
-    (visit.chromeId ? 1000 : 0) +
-    (visit.visitId ? 100 : 0) +
-    Number(visit.visitCount || 0)
-  );
-}
-
-function compareDuplicateKeepers(left, right) {
-  const qualityDelta = duplicateVisitQuality(right) - duplicateVisitQuality(left);
-  if (qualityDelta) {
-    return qualityDelta;
-  }
-
-  const updatedDelta = Date.parse(right.updatedAt || "") - Date.parse(left.updatedAt || "");
-  if (Number.isFinite(updatedDelta) && updatedDelta) {
-    return updatedDelta;
-  }
-
-  return String(left.id || "").localeCompare(String(right.id || ""));
-}
-
-export function duplicateCleanupCandidates(visits) {
-  const groups = new Map();
-
-  for (const visit of Array.isArray(visits) ? visits : []) {
-    if (!visit || visit.deletedAt) {
-      continue;
-    }
-
-    const key = duplicateVisitKey(visit);
-    if (!key) {
-      continue;
-    }
-
-    if (!groups.has(key)) {
-      groups.set(key, []);
-    }
-    groups.get(key).push(visit);
-  }
-
-  return [...groups.values()]
-    .filter((group) => group.length > 1)
-    .flatMap((group) => [...group].sort(compareDuplicateKeepers).slice(1));
-}
-
-export function summarizeVaultHealth(visits) {
-  const allVisits = Array.isArray(visits) ? visits : [];
-  let activeRecords = 0;
-  let deletedRecords = 0;
-  let chromeDeletedRecords = 0;
-  let missingUrlRecords = 0;
-  let invalidTimeRecords = 0;
-  const duplicateGroups = new Map();
-
-  for (const visit of allVisits) {
-    if (!visit || visit.deletedAt) {
-      deletedRecords += visit?.deletedAt ? 1 : 0;
-      continue;
-    }
-
-    activeRecords += 1;
-    if (visit.chromeDeletedAt) {
-      chromeDeletedRecords += 1;
-    }
-
-    if (!visit.url) {
-      missingUrlRecords += 1;
-    }
-
-    if (!Number.isFinite(Number(visit.visitTime))) {
-      invalidTimeRecords += 1;
-    }
-
-    const key = duplicateVisitKey(visit);
-    if (key) {
-      duplicateGroups.set(key, (duplicateGroups.get(key) || 0) + 1);
-    }
-  }
-
-  const duplicateActiveRecords = [...duplicateGroups.values()]
-    .filter((count) => count > 1)
-    .reduce((total, count) => total + count - 1, 0);
-  const issueRecords = missingUrlRecords + invalidTimeRecords + duplicateActiveRecords;
-
-  return {
-    storedRows: allVisits.length,
-    activeRecords,
-    deletedRecords,
-    chromeDeletedRecords,
-    missingUrlRecords,
-    invalidTimeRecords,
-    duplicateActiveRecords,
-    issueRecords
-  };
-}
-
-function localDayKeyFromTimestamp(value) {
-  const date = new Date(Number(value));
-  if (!Number.isFinite(date.getTime())) {
-    return "";
-  }
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function sortedCountEntries(counts, tieBreaker = "ascending") {
-  const compareText = (left, right) => (left < right ? -1 : left > right ? 1 : 0);
-
-  return [...counts.entries()]
-    .sort((left, right) => {
-      const countDelta = right[1] - left[1];
-      if (countDelta) {
-        return countDelta;
-      }
-
-      return tieBreaker === "descending"
-        ? compareText(String(right[0]), String(left[0]))
-        : compareText(String(left[0]), String(right[0]));
-    })
-    .map(([value, count]) => ({ value, count }));
-}
-
-export function summarizeArchiveInsights(visits, options = {}) {
-  const limit = Number.isInteger(options.limit) && options.limit > 0 ? options.limit : 3;
-  const activeVisits = (Array.isArray(visits) ? visits : []).filter((visit) => {
-    const visitTime = Number(visit?.visitTime);
-    return visit && !visit.deletedAt && Number.isFinite(visitTime);
-  });
-  const domainCounts = new Map();
-  const dayCounts = new Map();
-  let oldestVisitTime = 0;
-  let newestVisitTime = 0;
-
-  for (const visit of activeVisits) {
-    const visitTime = Number(visit.visitTime);
-    const domain = (visit.domain || normalizeDomain(visit.url || "")).trim().toLowerCase();
-    const day = localDayKeyFromTimestamp(visitTime);
-
-    if (domain) {
-      domainCounts.set(domain, (domainCounts.get(domain) || 0) + 1);
-    }
-
-    if (day) {
-      dayCounts.set(day, (dayCounts.get(day) || 0) + 1);
-    }
-
-    newestVisitTime = newestVisitTime ? Math.max(newestVisitTime, visitTime) : visitTime;
-    oldestVisitTime = oldestVisitTime ? Math.min(oldestVisitTime, visitTime) : visitTime;
-  }
-
-  return {
-    totalVisits: activeVisits.length,
-    activeDays: dayCounts.size,
-    averageVisitsPerActiveDay: dayCounts.size ? activeVisits.length / dayCounts.size : 0,
-    oldestVisitTime,
-    newestVisitTime,
-    topDomains: sortedCountEntries(domainCounts)
-      .slice(0, limit)
-      .map((entry) => ({
-        domain: entry.value,
-        count: entry.count
-      })),
-    busiestDays: sortedCountEntries(dayCounts, "descending")
-      .slice(0, limit)
-      .map((entry) => ({
-        day: entry.value,
-        count: entry.count
-      }))
-  };
-}
-
 export async function getDuplicateCleanupCandidates() {
   return duplicateCleanupCandidates(await getAllVisits());
-}
-
-export function retentionCleanupCandidates(visits, rules, options = {}) {
-  const retentionDays = Number(options.retentionDays);
-  const now = Number(options.now ?? Date.now());
-
-  if (!Number.isInteger(retentionDays) || retentionDays < 1 || !Number.isFinite(now)) {
-    return [];
-  }
-
-  const cutoff = now - retentionDays * DAY_MS;
-  const whitelist = Array.isArray(rules?.whitelist) ? rules.whitelist : [];
-
-  return visits.filter((visit) => {
-    if (!visit || visit.deletedAt || !Number.isFinite(Number(visit.visitTime))) {
-      return false;
-    }
-
-    return Number(visit.visitTime) < cutoff && !visitMatchesWhitelist(visit, whitelist);
-  });
 }
 
 export async function getRetentionCleanupCandidates(retentionDays, options = {}) {
@@ -701,31 +370,6 @@ export async function markChromeDeletedByUrls(urls, deletedAt = new Date().toISO
 
   await putMany(VISIT_STORE, changed);
   return changed.length;
-}
-
-export function archiveVisitsForExport(visits) {
-  const compareText = (left, right) => (left < right ? -1 : left > right ? 1 : 0);
-
-  return [...(Array.isArray(visits) ? visits : [])].sort((left, right) => {
-    const leftTime = Number(left?.visitTime);
-    const rightTime = Number(right?.visitTime);
-    const leftHasTime = Number.isFinite(leftTime);
-    const rightHasTime = Number.isFinite(rightTime);
-
-    if (leftHasTime && rightHasTime && leftTime !== rightTime) {
-      return rightTime - leftTime;
-    }
-
-    if (leftHasTime !== rightHasTime) {
-      return leftHasTime ? -1 : 1;
-    }
-
-    return [
-      compareText(String(left?.url || ""), String(right?.url || "")),
-      compareText(String(left?.title || ""), String(right?.title || "")),
-      compareText(String(left?.id || ""), String(right?.id || ""))
-    ].find((comparison) => comparison !== 0) || 0;
-  });
 }
 
 export async function exportArchive(items = null, options = {}) {
