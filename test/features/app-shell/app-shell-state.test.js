@@ -23,6 +23,7 @@ test("createAppShellState initializes mutable shell state", () => {
   assert.deepEqual(state.currentResults, []);
   assert.equal(state.currentTotal, 0);
   assert.equal(state.currentShownLimit, 500);
+  assert.equal(state.vaultHealth, null);
   assert.deepEqual([...state.selectedIds], []);
   assert.equal(state.lastCheckedIndex, null);
   assert.deepEqual(state.preferences, defaultPreferences);

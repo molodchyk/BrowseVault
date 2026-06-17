@@ -3,6 +3,7 @@ export function createAppShellState(defaultPreferences) {
     currentResults: [],
     currentTotal: 0,
     currentShownLimit: defaultPreferences.defaultLimit,
+    vaultHealth: null,
     selectedIds: new Set(),
     lastCheckedIndex: null,
     preferences: { ...defaultPreferences },

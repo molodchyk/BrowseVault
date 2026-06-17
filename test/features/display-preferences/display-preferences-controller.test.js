@@ -68,6 +68,8 @@ function createHarness({
     },
     archiveStartup: output(),
     archiveSync: output(),
+    archiveVault: output(),
+    archiveTombstones: output(),
     backupChecksum: output(),
     backupFormat: output(),
     backupHealth: {
@@ -213,6 +215,16 @@ test("refreshStats renders stat cards and backup health details", async () => {
       visits: 42,
       domains: 7,
       newestVisitTime: Date.parse("2026-06-16T12:00:00.000Z"),
+      vaultHealth: {
+        storedRows: 44,
+        activeRecords: 42,
+        deletedRecords: 2,
+        chromeDeletedRecords: 1,
+        missingUrlRecords: 0,
+        invalidTimeRecords: 0,
+        duplicateActiveRecords: 0,
+        issueRecords: 0
+      },
       meta: {
         lastChromeSync: {
           stored: 41,
@@ -264,6 +276,8 @@ test("refreshStats renders stat cards and backup health details", async () => {
   assert.match(elements.archiveStartup.textContent, /^2026-06-16 \d{2}:00$/);
   assert.match(elements.archiveSync.textContent, /^2026-06-16 \d{2}:00 · 41 stored$/);
   assert.match(elements.archiveCapture.textContent, /^2026-06-16 \d{2}:05 · docs\.example\.com$/);
+  assert.equal(elements.archiveVault.textContent, "42 active · 44 stored");
+  assert.equal(elements.archiveTombstones.textContent, "2 deleted tombstones");
   assert.equal(archiveHealthClassList.classes.has("is-ok"), true);
   assert.equal(archiveHealthClassList.classes.has("is-warning"), false);
   assert.equal(renderedActivity.length, 1);

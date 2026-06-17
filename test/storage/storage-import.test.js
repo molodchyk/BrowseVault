@@ -6,6 +6,7 @@ import {
   mergeImportedVisits,
   normalizeHistoryItem,
   retentionCleanupCandidates,
+  summarizeVaultHealth,
   summarizeImportArchive
 } from "../../src/storage.js";
 
@@ -270,6 +271,52 @@ test("duplicateCleanupCandidates keeps the richest active record per URL and vis
     duplicateCleanupCandidates([sparse, rich, separateVisit, deletedDuplicate, invalid]).map((visit) => visit.id),
     ["sparse"]
   );
+});
+
+test("summarizeVaultHealth counts active rows, tombstones, malformed rows, and duplicates", () => {
+  const visitTime = Date.parse("2026-06-16T12:00:00.000Z");
+  const visits = [
+    {
+      id: "active-1",
+      url: "https://example.com/page",
+      normalizedUrl: "https://example.com/page",
+      visitTime
+    },
+    {
+      id: "active-2",
+      url: "https://example.com/page",
+      normalizedUrl: "https://example.com/page",
+      visitTime,
+      chromeDeletedAt: "2026-06-17T00:00:00.000Z"
+    },
+    {
+      id: "missing-url",
+      url: "",
+      visitTime
+    },
+    {
+      id: "bad-time",
+      url: "https://bad.example/",
+      visitTime: "not-a-date"
+    },
+    {
+      id: "deleted",
+      url: "https://deleted.example/",
+      visitTime,
+      deletedAt: "2026-06-17T00:00:00.000Z"
+    }
+  ];
+
+  assert.deepEqual(summarizeVaultHealth(visits), {
+    storedRows: 5,
+    activeRecords: 4,
+    deletedRecords: 1,
+    chromeDeletedRecords: 1,
+    missingUrlRecords: 1,
+    invalidTimeRecords: 1,
+    duplicateActiveRecords: 1,
+    issueRecords: 3
+  });
 });
 
 test("retentionCleanupCandidates ignores invalid retention windows", () => {

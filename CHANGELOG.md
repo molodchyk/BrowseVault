@@ -22,7 +22,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Backup reminder status follows the configured reminder interval and warns when the next reminder date is reached.
 - History result rows expose exact ISO visit timestamps in their time metadata while preserving the selected visible date format.
 - Import preview and import support for BrowseVault JSON, CSV, TSV, Google Takeout Browser History, Google My Activity, and common competitor history exports.
-- Recent activity log for completed backup, export, import, cleanup, delete, restore, rule, and reset actions.
+- Recent activity log for completed backup, export, import, cleanup, delete, restore, rule, and reset actions, plus vault health checks for malformed rows, tombstones, and duplicate active records.
 - Domain blacklist and whitelist rules, selected-domain blacklisting, manual retention cleanup, duplicate cleanup, and full local vault reset.
 - Settings for system, light, and dark themes, accent color, high contrast, text size, date format, default result limit, backup reminder cadence, backup filename prefix, and backup filename template.
 - Feature-owned test folders and StorePilot-ready Chrome Web Store automation documents.

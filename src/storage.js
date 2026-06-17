@@ -413,6 +413,57 @@ export function duplicateCleanupCandidates(visits) {
     .flatMap((group) => [...group].sort(compareDuplicateKeepers).slice(1));
 }
 
+export function summarizeVaultHealth(visits) {
+  const allVisits = Array.isArray(visits) ? visits : [];
+  let activeRecords = 0;
+  let deletedRecords = 0;
+  let chromeDeletedRecords = 0;
+  let missingUrlRecords = 0;
+  let invalidTimeRecords = 0;
+  const duplicateGroups = new Map();
+
+  for (const visit of allVisits) {
+    if (!visit || visit.deletedAt) {
+      deletedRecords += visit?.deletedAt ? 1 : 0;
+      continue;
+    }
+
+    activeRecords += 1;
+    if (visit.chromeDeletedAt) {
+      chromeDeletedRecords += 1;
+    }
+
+    if (!visit.url) {
+      missingUrlRecords += 1;
+    }
+
+    if (!Number.isFinite(Number(visit.visitTime))) {
+      invalidTimeRecords += 1;
+    }
+
+    const key = duplicateVisitKey(visit);
+    if (key) {
+      duplicateGroups.set(key, (duplicateGroups.get(key) || 0) + 1);
+    }
+  }
+
+  const duplicateActiveRecords = [...duplicateGroups.values()]
+    .filter((count) => count > 1)
+    .reduce((total, count) => total + count - 1, 0);
+  const issueRecords = missingUrlRecords + invalidTimeRecords + duplicateActiveRecords;
+
+  return {
+    storedRows: allVisits.length,
+    activeRecords,
+    deletedRecords,
+    chromeDeletedRecords,
+    missingUrlRecords,
+    invalidTimeRecords,
+    duplicateActiveRecords,
+    issueRecords
+  };
+}
+
 export async function getDuplicateCleanupCandidates() {
   return duplicateCleanupCandidates(await getAllVisits());
 }
@@ -652,7 +703,8 @@ export async function importArchive(archive) {
 }
 
 export async function getStats() {
-  const visits = await getAllVisits();
+  const allVisits = await getAllVisits({ includeDeleted: true });
+  const visits = allVisits.filter((visit) => !visit.deletedAt);
   const domains = new Set(visits.map((visit) => visit.domain).filter(Boolean));
   const meta = await getAllMeta();
 
@@ -661,6 +713,7 @@ export async function getStats() {
     domains: domains.size,
     newestVisitTime: visits.reduce((max, visit) => Math.max(max, visit.visitTime || 0), 0),
     oldestVisitTime: visits.reduce((min, visit) => Math.min(min, visit.visitTime || Date.now()), Date.now()),
+    vaultHealth: summarizeVaultHealth(allVisits),
     meta
   };
 }

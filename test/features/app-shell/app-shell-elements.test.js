@@ -74,6 +74,8 @@ const singularSelectors = [
   "archive-startup",
   "archive-sync",
   "archive-capture",
+  "archive-vault",
+  "archive-tombstones",
   "rule-domain",
   "add-blacklist",
   "add-whitelist",

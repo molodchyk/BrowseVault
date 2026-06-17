@@ -75,6 +75,8 @@ export function collectAppElements(document) {
     archiveStartup: document.querySelector("#archive-startup"),
     archiveSync: document.querySelector("#archive-sync"),
     archiveCapture: document.querySelector("#archive-capture"),
+    archiveVault: document.querySelector("#archive-vault"),
+    archiveTombstones: document.querySelector("#archive-tombstones"),
     ruleDomain: document.querySelector("#rule-domain"),
     addBlacklist: document.querySelector("#add-blacklist"),
     addWhitelist: document.querySelector("#add-whitelist"),

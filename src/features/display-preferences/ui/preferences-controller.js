@@ -72,7 +72,8 @@ export function createDisplayPreferencesController({
 
   function renderArchiveHealth(meta) {
     const status = deps.archiveHealthDetails(meta, {
-      dateFormat: appState.preferences.dateFormat
+      dateFormat: appState.preferences.dateFormat,
+      vaultHealth: appState.vaultHealth
     });
 
     elements.archiveHealth.textContent = status.healthText;
@@ -81,6 +82,8 @@ export function createDisplayPreferencesController({
     elements.archiveStartup.textContent = status.startupText;
     elements.archiveSync.textContent = status.syncText;
     elements.archiveCapture.textContent = status.captureText;
+    elements.archiveVault.textContent = status.vaultText;
+    elements.archiveTombstones.textContent = status.tombstoneText;
   }
 
   function applyPreferences() {
@@ -112,6 +115,7 @@ export function createDisplayPreferencesController({
 
   async function refreshStats() {
     const stats = await getStats();
+    appState.vaultHealth = stats.vaultHealth;
     elements.statVisits.textContent = String(stats.visits);
     elements.statDomains.textContent = String(stats.domains);
     elements.statNewest.textContent = deps.formatShortDate(stats.newestVisitTime, appState.preferences.dateFormat);

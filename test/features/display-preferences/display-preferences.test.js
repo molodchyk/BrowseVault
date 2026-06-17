@@ -105,7 +105,9 @@ test("archiveHealthDetails summarizes startup, sync, and live capture metadata",
       isOk: false,
       startupText: "Not recorded",
       syncText: "Not synced yet",
-      captureText: "Waiting for next visit"
+      captureText: "Waiting for next visit",
+      vaultText: "0 active · 0 stored",
+      tombstoneText: "No deleted tombstones"
     }
   );
 
@@ -131,6 +133,36 @@ test("archiveHealthDetails summarizes startup, sync, and live capture metadata",
   assert.match(status.startupText, /^2026-06-16 \d{2}:00$/);
   assert.match(status.syncText, /^2026-06-16 \d{2}:00 · 42 stored$/);
   assert.match(status.captureText, /^2026-06-16 \d{2}:00 · example\.com$/);
+  assert.equal(status.vaultText, "0 active · 0 stored");
+  assert.equal(status.tombstoneText, "No deleted tombstones");
+});
+
+test("archiveHealthDetails warns about vault data issues", () => {
+  const status = archiveHealthDetails(
+    {
+      lastChromeSync: {
+        stored: 12,
+        syncedAt: "2026-06-16T09:00:00.000Z"
+      }
+    },
+    {
+      vaultHealth: {
+        activeRecords: 10,
+        storedRows: 12,
+        deletedRecords: 2,
+        missingUrlRecords: 1,
+        invalidTimeRecords: 1,
+        duplicateActiveRecords: 3,
+        issueRecords: 5
+      }
+    }
+  );
+
+  assert.equal(status.healthText, "Vault data needs review");
+  assert.equal(status.isWarning, true);
+  assert.equal(status.isOk, false);
+  assert.equal(status.vaultText, "1 missing URL · 1 bad time · 3 duplicate active");
+  assert.equal(status.tombstoneText, "2 deleted tombstones");
 });
 
 test("backupStatusDetails summarizes missing, fresh, and stale backups", () => {

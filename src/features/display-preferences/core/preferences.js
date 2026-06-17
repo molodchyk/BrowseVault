@@ -219,24 +219,49 @@ function domainFromUrl(url) {
 
 export function archiveHealthDetails(meta = {}, options = {}) {
   const dateFormat = options.dateFormat || DEFAULT_PREFERENCES.dateFormat;
+  const vaultHealth = options.vaultHealth || {};
   const sync = meta.lastChromeSync || null;
   const syncTimestamp = timestampFromIso(sync?.syncedAt);
   const startupTimestamp = timestampFromIso(meta.lastStartedAt) || timestampFromIso(meta.installedAt);
   const capture = meta.lastLiveCapture || null;
   const captureTimestamp = timestampFromIso(capture?.capturedAt);
   const hasSync = Boolean(syncTimestamp);
+  const issueRecords = Number(vaultHealth.issueRecords || 0);
+  const hasVaultIssues = issueRecords > 0;
+  const activeRecords = Number(vaultHealth.activeRecords || 0);
+  const storedRows = Number(vaultHealth.storedRows || activeRecords);
+  const deletedRecords = Number(vaultHealth.deletedRecords || 0);
+  const duplicateActiveRecords = Number(vaultHealth.duplicateActiveRecords || 0);
+  const missingUrlRecords = Number(vaultHealth.missingUrlRecords || 0);
+  const invalidTimeRecords = Number(vaultHealth.invalidTimeRecords || 0);
+
+  const issueDetails = [
+    missingUrlRecords ? `${formatCount(missingUrlRecords)} missing URL` : "",
+    invalidTimeRecords ? `${formatCount(invalidTimeRecords)} bad time` : "",
+    duplicateActiveRecords ? `${formatCount(duplicateActiveRecords)} duplicate active` : ""
+  ].filter(Boolean);
 
   return {
-    healthText: hasSync ? "Archive recording ready" : "Archive sync not run yet",
-    isWarning: !hasSync,
-    isOk: hasSync,
+    healthText: hasVaultIssues
+      ? "Vault data needs review"
+      : hasSync
+        ? "Archive recording ready"
+        : "Archive sync not run yet",
+    isWarning: hasVaultIssues || !hasSync,
+    isOk: !hasVaultIssues && hasSync,
     startupText: startupTimestamp ? formatDate(startupTimestamp, dateFormat) : "Not recorded",
     syncText: hasSync
       ? `${formatDate(syncTimestamp, dateFormat)} · ${formatCount(sync.stored)} stored`
       : "Not synced yet",
     captureText: captureTimestamp
       ? `${formatDate(captureTimestamp, dateFormat)}${domainFromUrl(capture.url) ? ` · ${domainFromUrl(capture.url)}` : ""}`
-      : "Waiting for next visit"
+      : "Waiting for next visit",
+    vaultText: hasVaultIssues
+      ? issueDetails.join(" · ")
+      : `${formatCount(activeRecords)} active · ${formatCount(storedRows)} stored`,
+    tombstoneText: deletedRecords
+      ? `${formatCount(deletedRecords)} deleted tombstone${deletedRecords === 1 ? "" : "s"}`
+      : "No deleted tombstones"
   };
 }
 
