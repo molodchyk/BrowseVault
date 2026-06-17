@@ -34,6 +34,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Current filtered result deletion can target only the BrowseVault vault or, with a separate confirmation, matching URLs in Chrome history plus the related vault records.
 - Settings for system, light, and dark themes, accent color, high contrast, text size, date format, default result limit, backup reminder cadence, backup/export save mode, backup filename prefix, and backup filename template.
 - Feature-owned test folders and StorePilot-ready Chrome Web Store automation documents.
+- StorePilot import structure with localized manifest messages, dedicated listing body, store icon, screenshots, promo assets, category/additional/privacy documents, and validator coverage.
 
 ### Data Safety
 

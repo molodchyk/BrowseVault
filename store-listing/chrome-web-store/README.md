@@ -12,7 +12,8 @@ Reference: [StorePilot Project Reference](../../../StorePilot/docs/reference.md)
   - `03-backup-health.jpg`
   - `04-rules-cleanup.jpg`
   - `05-settings-privacy.jpg`
-- `media/promo/` is reserved for final promo art such as `small-promo.png` (`440 x 280`) and `marquee-promo.png` (`1400 x 560`).
+- `media/promo/small-promo.png` is `440 x 280`.
+- `media/promo/marquee-promo.png` is `1400 x 560`.
 - Dashboard-only values live in `docs/chrome-web-store-additional-fields.md`, `docs/chrome-web-store-category.md`, and `docs/chrome-web-store-privacy-form.md`.
 - `docs/chrome-web-store-privacy-form.md` is not the public privacy policy. Keep the default extension privacy policy in `PRIVACY.md`.
 

@@ -1,0 +1,18 @@
+{
+  "extensionName": {
+    "message": "BrowseVault: History Search & Backup",
+    "description": "Chrome Web Store and browser extension name."
+  },
+  "extensionShortName": {
+    "message": "BrowseVault",
+    "description": "Short browser UI label."
+  },
+  "extensionDescription": {
+    "message": "Search, back up, export, and preserve your browser history locally.",
+    "description": "Chrome Web Store summary and manifest description."
+  },
+  "openCommandDescription": {
+    "message": "Open BrowseVault",
+    "description": "Keyboard shortcut command description."
+  }
+}

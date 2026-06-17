@@ -89,12 +89,16 @@ This repository contains a working Manifest V3 extension implementation. It incl
 
 ```text
 .
+├── _locales/
+│   └── en/
+│       └── messages.json
 ├── docs/
 │   ├── code-structure.md
 │   ├── decision-records.md
 │   ├── extension-modularization-playbook.md
 │   ├── release-notes.md
-│   └── reviewer-notes.md
+│   ├── reviewer-notes.md
+│   └── storepilot-project-structure.md
 ├── assets/
 │   └── icons/
 ├── scripts/
@@ -126,6 +130,8 @@ This repository contains a working Manifest V3 extension implementation. It incl
 │       └── media/
 │           ├── icon-128.png
 │           ├── promo/
+│           │   ├── marquee-promo.png
+│           │   └── small-promo.png
 │           └── screenshots/
 ├── test/
 │   ├── features/

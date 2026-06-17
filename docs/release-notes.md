@@ -14,6 +14,7 @@ Release focus:
 - JSON backup import/export with integrity metadata and self-test checks;
 - settings for theme, accent, text size, date display, result limit, backup reminders, and export filenames;
 - domain blacklist, whitelist, manual category rules, retention cleanup, and duplicate cleanup;
+- StorePilot-ready Chrome Web Store import structure, including localized manifest messages, listing body, store media, category/additional/privacy documents, and validator coverage;
 - no default Chrome history-page override, host permissions, content scripts, remote code, analytics, ads, tracking, or default network requests;
 - no default network requests from the extension source package.
 

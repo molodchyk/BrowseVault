@@ -4,6 +4,7 @@ import path from "node:path";
 const root = process.cwd();
 const requiredFiles = [
   "manifest.json",
+  "_locales/en/messages.json",
   "README.md",
   "CHANGELOG.md",
   "LICENSE",
@@ -21,6 +22,8 @@ const requiredFiles = [
   "store-listing/chrome-web-store/listing/en.md",
   "store-listing/chrome-web-store/media/icon-128.png",
   "store-listing/chrome-web-store/media/promo/.gitkeep",
+  "store-listing/chrome-web-store/media/promo/small-promo.png",
+  "store-listing/chrome-web-store/media/promo/marquee-promo.png",
   "store-listing/chrome-web-store/media/screenshots/.gitkeep",
   "store-listing/chrome-web-store/media/screenshots/01-history-search.jpg",
   "store-listing/chrome-web-store/media/screenshots/02-quick-open.jpg",
@@ -31,6 +34,7 @@ const requiredFiles = [
   "docs/reviewer-notes.md",
   "docs/release-notes.md",
   "docs/decision-records.md",
+  "docs/storepilot-project-structure.md",
   "docs/chrome-web-store-additional-fields.md",
   "docs/chrome-web-store-category.md",
   "docs/chrome-web-store-privacy-form.md",
@@ -111,10 +115,20 @@ for (const file of requiredFiles) {
 }
 
 const manifest = readJson("manifest.json");
+const localeMessages = readJson("_locales/en/messages.json");
+const localeMessage = (key) => localeMessages[key]?.message || "";
 assert(manifest.manifest_version === 3, "Manifest must use version 3.");
-assert(manifest.name === "BrowseVault: History Search & Backup", "Unexpected extension name.");
-assert(manifest.short_name === "BrowseVault", "Unexpected short_name.");
-assert(manifest.description.length <= 132, "Manifest description should stay within Chrome Web Store summary length.");
+assert(manifest.default_locale === "en", "Manifest must use the English _locales folder for StorePilot-compatible structure.");
+assert(manifest.name === "__MSG_extensionName__", "Manifest name should resolve through _locales/en/messages.json.");
+assert(manifest.short_name === "__MSG_extensionShortName__", "Manifest short_name should resolve through _locales/en/messages.json.");
+assert(manifest.description === "__MSG_extensionDescription__", "Manifest description should resolve through _locales/en/messages.json.");
+assert(localeMessage("extensionName") === "BrowseVault: History Search & Backup", "Unexpected localized extension name.");
+assert(localeMessage("extensionShortName") === "BrowseVault", "Unexpected localized short_name.");
+assert(
+  localeMessage("extensionDescription") === "Search, back up, export, and preserve your browser history locally.",
+  "Unexpected localized extension description."
+);
+assert(localeMessage("extensionDescription").length <= 132, "Manifest description should stay within Chrome Web Store summary length.");
 assert(manifest.background?.type === "module", "Background script should be an ES module.");
 for (const size of ["16", "32", "48", "128"]) {
   assert(manifest.icons?.[size] === `assets/icons/icon${size}.png`, `Missing manifest icon ${size}.`);
@@ -135,6 +149,11 @@ assert(!manifest.content_scripts?.length, "Manifest should not inject content sc
 assert(!manifest.externally_connectable, "Manifest should not expose externally_connectable messaging.");
 assert(!manifest.web_accessible_resources?.length, "Manifest should not expose web-accessible resources.");
 assert(manifest.commands?.["open-browsevault"], "Missing open-browsevault command.");
+assert(
+  manifest.commands["open-browsevault"].description === "__MSG_openCommandDescription__",
+  "Command description should resolve through _locales/en/messages.json."
+);
+assert(localeMessage("openCommandDescription") === "Open BrowseVault", "Unexpected localized open command description.");
 
 const packageJson = readJson("package.json");
 assert(packageJson.version === manifest.version, "package.json version must match manifest version.");
@@ -192,6 +211,14 @@ for (const screenshot of [
   assert(dimensions?.width === 1280 && dimensions?.height === 800, `Store screenshot ${screenshot} must be 1280 x 800.`);
 }
 
+for (const [promo, width, height] of [
+  ["small-promo.png", 440, 280],
+  ["marquee-promo.png", 1400, 560]
+]) {
+  const dimensions = imageDimensions(path.join("store-listing", "chrome-web-store", "media", "promo", promo));
+  assert(dimensions?.width === width && dimensions?.height === height, `Store promo ${promo} must be ${width} x ${height}.`);
+}
+
 const storePilotIcon = fs.readFileSync(path.join(root, "store-listing", "chrome-web-store", "media", "icon-128.png"));
 assert(
   storePilotIcon[0] === 137 && storePilotIcon[1] === 80 && storePilotIcon[2] === 78 && storePilotIcon[3] === 71,
@@ -235,10 +262,34 @@ const docsReadme = fs.readFileSync(path.join(root, "docs", "README.md"), "utf8")
 for (const expected of [
   "release-notes.md",
   "decision-records.md",
+  "storepilot-project-structure.md",
   "Browser Extension Playbook",
   "StorePilot Project Reference"
 ]) {
   assert(docsReadme.includes(expected), `Docs README missing playbook reference: ${expected}`);
+}
+
+const storePilotStructure = fs.readFileSync(path.join(root, "docs", "storepilot-project-structure.md"), "utf8");
+for (const expected of [
+  "StorePilot Project Reference",
+  "manifest.json",
+  "src/",
+  "_locales/",
+  "store-listing/",
+  "chrome-web-store/",
+  "listing/",
+  "en.md",
+  "media/",
+  "icon-128.png",
+  "screenshots/",
+  "promo/",
+  "small-promo.png",
+  "marquee-promo.png",
+  "docs/chrome-web-store-additional-fields.md",
+  "docs/chrome-web-store-category.md",
+  "docs/chrome-web-store-privacy-form.md"
+]) {
+  assert(storePilotStructure.includes(expected), `StorePilot structure checklist missing: ${expected}`);
 }
 
 const releaseNotes = fs.readFileSync(path.join(root, "docs", "release-notes.md"), "utf8");
@@ -293,7 +344,13 @@ for (const key of [
   "permission.storage",
   "permission.tabs",
   "data_usage.personally_identifiable_information",
+  "data_usage.health_information",
+  "data_usage.financial_payment_information",
+  "data_usage.authentication_information",
+  "data_usage.personal_communications",
+  "data_usage.location",
   "data_usage.web_history",
+  "data_usage.user_activity",
   "data_usage.website_content",
   "certification.no_sell_or_transfer",
   "certification.no_unrelated_use",
