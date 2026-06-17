@@ -49,6 +49,8 @@ export function collectAppElements(document) {
     deleteResults: document.querySelector("#delete-results"),
     loadMore: document.querySelector("#load-more"),
     loadAll: document.querySelector("#load-all"),
+    jumpResultsTop: document.querySelector("#jump-results-top"),
+    jumpResultsBottom: document.querySelector("#jump-results-bottom"),
     clearSelection: document.querySelector("#clear-selection"),
     selectionActions: [...document.querySelectorAll(".requires-selection")],
     resultCount: document.querySelector("#result-count"),

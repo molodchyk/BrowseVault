@@ -110,6 +110,8 @@ export function bindAppEvents({ elements, document, root, handlers }) {
   bindAsync(elements.deleteResults, "click", handlers.deleteCurrentResultsFromVault, setStatus);
   bindAsync(elements.loadMore, "click", handlers.loadMoreResults, setStatus);
   bindAsync(elements.loadAll, "click", handlers.loadAllResults, setStatus);
+  bindAsync(elements.jumpResultsTop, "click", handlers.jumpToFirstResult, setStatus);
+  bindAsync(elements.jumpResultsBottom, "click", handlers.jumpToLastResult, setStatus);
   elements.clearSelection.addEventListener("click", () => handlers.clearSelection());
 
   elements.importArchive.addEventListener("change", (event) => {

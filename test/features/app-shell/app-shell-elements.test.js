@@ -49,6 +49,8 @@ const singularSelectors = [
   "delete-results",
   "load-more",
   "load-all",
+  "jump-results-top",
+  "jump-results-bottom",
   "clear-selection",
   "result-count",
   "selected-count",

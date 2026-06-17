@@ -86,6 +86,8 @@ function createElements() {
     deleteResults: fakeElement(),
     loadMore: fakeElement(),
     loadAll: fakeElement(),
+    jumpResultsTop: fakeElement(),
+    jumpResultsBottom: fakeElement(),
     clearSelection: fakeElement(),
     addBlacklist: fakeElement(),
     addWhitelist: fakeElement(),
@@ -131,6 +133,8 @@ function createHandlers(calls) {
     "invertVisibleSelection",
     "loadAllResults",
     "loadMoreResults",
+    "jumpToFirstResult",
+    "jumpToLastResult",
     "openSelected",
     "openNativeChromeHistory",
     "previewRetentionCleanup",
@@ -314,6 +318,8 @@ test("bindAppEvents wires bulk and rules actions", () => {
   elements.deleteResults.dispatch("click");
   elements.loadMore.dispatch("click");
   elements.loadAll.dispatch("click");
+  elements.jumpResultsTop.dispatch("click");
+  elements.jumpResultsBottom.dispatch("click");
   elements.addBlacklist.dispatch("click");
   elements.addWhitelist.dispatch("click");
   elements.previewRetention.dispatch("click");
@@ -333,6 +339,8 @@ test("bindAppEvents wires bulk and rules actions", () => {
     ["deleteCurrentResultsFromVault"],
     ["loadMoreResults"],
     ["loadAllResults"],
+    ["jumpToFirstResult"],
+    ["jumpToLastResult"],
     ["addBlacklistRule"],
     ["addWhitelistRule"],
     ["previewRetentionCleanup"],

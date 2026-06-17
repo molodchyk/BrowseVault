@@ -20,6 +20,12 @@ function createHarness({
       hidden: true,
       textContent: ""
     },
+    jumpResultsTop: {
+      hidden: true
+    },
+    jumpResultsBottom: {
+      hidden: true
+    },
     loadMore: {
       hidden: true,
       textContent: ""
@@ -85,6 +91,8 @@ test("renderResults stores current results and delegates to the history renderer
   assert.equal(elements.loadMore.textContent, "Load 10 More");
   assert.equal(elements.loadAll.hidden, false);
   assert.equal(elements.loadAll.textContent, "Show All");
+  assert.equal(elements.jumpResultsTop.hidden, false);
+  assert.equal(elements.jumpResultsBottom.hidden, false);
 });
 
 test("updateLoadMoreButton hides the button when all results are shown", () => {
@@ -99,6 +107,20 @@ test("updateLoadMoreButton hides the button when all results are shown", () => {
   assert.equal(elements.loadMore.textContent, "");
   assert.equal(elements.loadAll.hidden, true);
   assert.equal(elements.loadAll.textContent, "");
+  assert.equal(elements.jumpResultsTop.hidden, false);
+  assert.equal(elements.jumpResultsBottom.hidden, false);
+});
+
+test("updateLoadMoreButton hides result jump controls when no results are shown", () => {
+  const { controller, elements } = createHarness({
+    currentResults: [],
+    currentTotal: 0
+  });
+
+  controller.updateLoadMoreButton();
+
+  assert.equal(elements.jumpResultsTop.hidden, true);
+  assert.equal(elements.jumpResultsBottom.hidden, true);
 });
 
 test("updateLoadMoreButton labels capped show-all results when matches exceed the max", () => {

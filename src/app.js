@@ -21,6 +21,7 @@ import {
 import { createDisplayPreferencesController } from "./features/display-preferences/ui/preferences-controller.js";
 import { createHistoryBulkActions } from "./features/history-results/ui/bulk-actions.js";
 import { createHistoryResultsController } from "./features/history-results/ui/results-controller.js";
+import { createResultJumpActions } from "./features/history-results/ui/result-jumps.js";
 import { createSavedSearchActions } from "./features/history-results/ui/saved-search-actions.js";
 import { createHistorySearchActions } from "./features/history-results/ui/search-actions.js";
 import { createHistorySearchForm } from "./features/history-results/ui/search-form.js";
@@ -130,6 +131,11 @@ const bulkActions = createHistoryBulkActions({
   setStatus
 });
 
+const resultJumpActions = createResultJumpActions({
+  elements,
+  setStatus
+});
+
 const savedSearchActions = createSavedSearchActions({
   deleteSavedSearch,
   elements,
@@ -183,6 +189,8 @@ function bindEvents() {
       focusSearchInput: appNavigation.focusSearchInput,
       importFromFile: backupActions.importFromFile,
       invertVisibleSelection: bulkActions.invertVisibleSelection,
+      jumpToFirstResult: resultJumpActions.jumpToFirstResult,
+      jumpToLastResult: resultJumpActions.jumpToLastResult,
       loadAllResults: historySearchActions.loadAllResults,
       loadMoreResults: historySearchActions.loadMoreResults,
       openSelected: bulkActions.openSelected,

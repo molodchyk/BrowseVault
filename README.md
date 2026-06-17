@@ -58,7 +58,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - bulk deletion from the BrowseVault vault;
 - selected-domain blacklisting for future archive capture;
 - checkbox, Shift-click, and Shift+Space range selection, plus select visible, invert visible, or select all filtered vault results;
-- sticky result controls with incremental Load More and one-click Show All for large result sets;
+- sticky result controls with incremental Load More, one-click Show All, and Top/Bottom jumps for large result sets;
 - undo for the last BrowseVault vault deletion;
 - optional URL-level deletion from Chrome history for selected records;
 - full local BrowseVault data reset without touching Chrome history;

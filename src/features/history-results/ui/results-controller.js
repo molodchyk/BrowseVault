@@ -48,6 +48,10 @@ export function createHistoryResultsController({
     } else {
       elements.loadAll.textContent = "";
     }
+
+    const hasResults = shown > 0;
+    elements.jumpResultsTop.hidden = !hasResults;
+    elements.jumpResultsBottom.hidden = !hasResults;
   }
 
   function applyResultSelection({ selectedIds: nextSelectedIds, lastCheckedIndex: nextLastCheckedIndex, shouldRerender }) {
