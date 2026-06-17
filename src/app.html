@@ -132,7 +132,7 @@
                 <button id="export-selected" class="requires-selection" type="button" hidden>Export JSON</button>
                 <button id="export-selected-csv" class="requires-selection" type="button" hidden>Export CSV</button>
                 <button id="export-selected-html" class="requires-selection" type="button" hidden>Export HTML</button>
-                <button id="blacklist-selected" class="ghost requires-selection" type="button" hidden>Blacklist Domains</button>
+                <button id="blacklist-selected" class="ghost requires-selection" type="button" hidden>Block Domains</button>
                 <button id="delete-vault" class="danger requires-selection" type="button" hidden>Delete From Vault</button>
                 <button id="delete-chrome" class="danger requires-selection" type="button" hidden>Delete URLs From Chrome</button>
               </div>
@@ -317,9 +317,11 @@
           <div class="rule-row">
             <input id="rule-domain" type="text" placeholder="example.com">
             <input id="rule-category" type="text" placeholder="Research">
-            <button id="add-category" class="ghost" type="button">Categorize</button>
-            <button id="add-blacklist" type="button">Blacklist</button>
-            <button id="add-whitelist" class="ghost" type="button">Whitelist</button>
+            <div class="rule-actions">
+              <button id="add-category" class="ghost" type="button">Categorize</button>
+              <button id="add-blacklist" type="button">Block</button>
+              <button id="add-whitelist" class="ghost" type="button">Keep</button>
+            </div>
           </div>
           <ul id="rules-list" class="rules-list"></ul>
           <section class="retention-cleanup" aria-label="Retention cleanup">
@@ -337,7 +339,7 @@
               <button id="preview-retention" class="ghost" type="button">Preview</button>
               <button id="cleanup-retention" class="danger" type="button">Clean Up</button>
             </div>
-            <p class="hint">Moves matching old vault records to undoable deletion. Whitelisted domains are kept during retention cleanup.</p>
+            <p class="hint">Moves matching old vault records to undoable deletion. Domains marked Keep are preserved during retention cleanup.</p>
           </section>
           <section class="retention-cleanup" aria-label="Duplicate cleanup">
             <div class="section-heading">

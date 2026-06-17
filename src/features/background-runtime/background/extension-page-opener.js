@@ -10,20 +10,20 @@ export function createExtensionPageOpener(actions, options) {
   const appUrl = normalizedPageUrl(options?.appUrl);
 
   async function openExtensionPage() {
-    const tabs = await actions.queryTabs({});
-    const existing = tabs.find((tab) =>
+    const tabs = await actions.queryTabs({ active: true, currentWindow: true });
+    const activeAppTab = tabs.find((tab) =>
       isSafeTabId(tab?.id) && normalizedPageUrl(tab.url) === appUrl
     );
 
-    if (existing) {
-      if (isSafeTabId(existing.windowId)) {
-        await actions.focusWindow(existing.windowId);
+    if (activeAppTab) {
+      if (isSafeTabId(activeAppTab.windowId)) {
+        await actions.focusWindow(activeAppTab.windowId);
       }
-      await actions.activateTab(existing.id);
+      await actions.activateTab(activeAppTab.id);
       return {
         reused: true,
-        tabId: existing.id,
-        windowId: isSafeTabId(existing.windowId) ? existing.windowId : null
+        tabId: activeAppTab.id,
+        windowId: isSafeTabId(activeAppTab.windowId) ? activeAppTab.windowId : null
       };
     }
 

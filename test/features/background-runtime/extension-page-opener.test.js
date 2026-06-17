@@ -22,9 +22,8 @@ function createHarness(tabs) {
   return { calls, opener };
 }
 
-test("openExtensionPage focuses an existing BrowseVault app tab", async () => {
+test("openExtensionPage reuses the active BrowseVault app tab", async () => {
   const { calls, opener } = createHarness([
-    { id: 4, windowId: 7, url: "https://example.com/" },
     { id: 5, windowId: 8, url: "chrome-extension://id/src/app.html" }
   ]);
 
@@ -34,13 +33,13 @@ test("openExtensionPage focuses an existing BrowseVault app tab", async () => {
     windowId: 8
   });
   assert.deepEqual(calls, [
-    ["queryTabs", {}],
+    ["queryTabs", { active: true, currentWindow: true }],
     ["focusWindow", 8],
     ["activateTab", 5]
   ]);
 });
 
-test("openExtensionPage treats query and hash variants as the app tab", async () => {
+test("openExtensionPage treats active query and hash variants as the app tab", async () => {
   const { calls, opener } = createHarness([
     { id: 6, windowId: 9, url: "chrome-extension://id/src/app.html?panel=history#top" }
   ]);
@@ -51,7 +50,7 @@ test("openExtensionPage treats query and hash variants as the app tab", async ()
     windowId: 9
   });
   assert.deepEqual(calls, [
-    ["queryTabs", {}],
+    ["queryTabs", { active: true, currentWindow: true }],
     ["focusWindow", 9],
     ["activateTab", 6]
   ]);
@@ -67,7 +66,7 @@ test("openExtensionPage creates the app tab when none is open", async () => {
     tabId: 99
   });
   assert.deepEqual(calls, [
-    ["queryTabs", {}],
+    ["queryTabs", { active: true, currentWindow: true }],
     ["createTab", { url: "chrome-extension://id/src/app.html" }]
   ]);
 });
