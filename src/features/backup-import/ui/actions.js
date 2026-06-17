@@ -49,21 +49,79 @@ export function backupImportPreviewElements(elements) {
   };
 }
 
-export function downloadJson(filename, data, runtime = globalThis) {
-  return downloadText(filename, "application/json", JSON.stringify(data, null, 2), runtime);
+export function downloadJson(filename, data, options = {}, runtime = globalThis) {
+  return downloadText(filename, "application/json", JSON.stringify(data, null, 2), options, runtime);
 }
 
-export function downloadText(filename, mimeType, text, runtime = globalThis) {
+function downloadWithSavePrompt(url, filename, runtime) {
+  const downloads = runtime.chrome?.downloads;
+  if (!downloads?.download) {
+    return null;
+  }
+
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const finish = (error, downloadId) => {
+      if (settled) {
+        return;
+      }
+
+      settled = true;
+      if (error) {
+        reject(error);
+        return;
+      }
+
+      resolve(downloadId);
+    };
+    const callback = (downloadId) => {
+      const lastError = runtime.chrome?.runtime?.lastError;
+      finish(lastError ? new Error(lastError.message) : null, downloadId);
+    };
+
+    try {
+      const maybePromise = downloads.download.call(downloads, {
+        filename,
+        saveAs: true,
+        url
+      }, callback);
+
+      if (maybePromise?.then) {
+        maybePromise.then((downloadId) => finish(null, downloadId)).catch((error) => finish(error));
+      }
+    } catch (error) {
+      finish(error);
+    }
+  });
+}
+
+export async function downloadText(filename, mimeType, text, options = {}, runtime = globalThis) {
   const blob = new runtime.Blob([text], { type: mimeType });
   const url = runtime.URL.createObjectURL(blob);
+  const useSavePrompt = options.saveMode === "ask";
+
+  if (useSavePrompt) {
+    const prompted = downloadWithSavePrompt(url, filename, runtime);
+    if (prompted) {
+      try {
+        await prompted;
+        return blob.size;
+      } finally {
+        runtime.URL.revokeObjectURL(url);
+      }
+    }
+  }
+
   const anchor = runtime.document.createElement("a");
 
-  anchor.href = url;
-  anchor.download = filename;
-  anchor.click();
-
-  runtime.URL.revokeObjectURL(url);
-  return blob.size;
+  try {
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.click();
+    return blob.size;
+  } finally {
+    runtime.URL.revokeObjectURL(url);
+  }
 }
 
 export function createBackupActions({
@@ -102,6 +160,12 @@ export function createBackupActions({
     );
   }
 
+  function saveOptions() {
+    return {
+      saveMode: appState.preferences?.backupSaveMode
+    };
+  }
+
   async function recordActivity(event) {
     await deps.appendActivityLog(event);
     await refreshStats();
@@ -123,7 +187,7 @@ export function createBackupActions({
       return;
     }
 
-    const sizeBytes = deps.downloadJson(exportFilename("archive", archive.exportedAt, "json"), archive);
+    const sizeBytes = await deps.downloadJson(exportFilename("archive", archive.exportedAt, "json"), archive, saveOptions());
     await deps.setMeta("lastBackup", {
       exportedAt: archive.exportedAt,
       format: "json",
@@ -145,10 +209,11 @@ export function createBackupActions({
   async function exportCsv() {
     setStatus("Preparing CSV");
     const archive = await deps.exportArchive();
-    const sizeBytes = deps.downloadText(
+    const sizeBytes = await deps.downloadText(
       exportFilename("history", archive.exportedAt, "csv"),
       "text/csv",
-      deps.visitsToCsv(archive.visits)
+      deps.visitsToCsv(archive.visits),
+      saveOptions()
     );
     await recordActivity({
       type: "export",
@@ -163,10 +228,11 @@ export function createBackupActions({
   async function exportHtml() {
     setStatus("Preparing HTML");
     const archive = await deps.exportArchive();
-    const sizeBytes = deps.downloadText(
+    const sizeBytes = await deps.downloadText(
       exportFilename("history", archive.exportedAt, "html"),
       "text/html",
-      deps.visitsToHtml(archive.visits, archive.exportedAt)
+      deps.visitsToHtml(archive.visits, archive.exportedAt),
+      saveOptions()
     );
     await recordActivity({
       type: "export",
@@ -186,7 +252,7 @@ export function createBackupActions({
     }
 
     const archive = await deps.attachArchiveIntegrity(await deps.exportArchive(items));
-    deps.downloadJson(exportFilename("selected", archive.exportedAt, "json"), archive);
+    await deps.downloadJson(exportFilename("selected", archive.exportedAt, "json"), archive, saveOptions());
     await recordActivity({
       type: "export",
       label: "Selected JSON exported",
@@ -204,10 +270,11 @@ export function createBackupActions({
     }
 
     const exportedAt = deps.now().toISOString();
-    deps.downloadText(
+    await deps.downloadText(
       exportFilename("selected", exportedAt, "csv"),
       "text/csv",
-      deps.visitsToCsv(items)
+      deps.visitsToCsv(items),
+      saveOptions()
     );
     await recordActivity({
       type: "export",
@@ -226,10 +293,11 @@ export function createBackupActions({
     }
 
     const exportedAt = deps.now().toISOString();
-    deps.downloadText(
+    await deps.downloadText(
       exportFilename("selected", exportedAt, "html"),
       "text/html",
-      deps.visitsToHtml(items, exportedAt)
+      deps.visitsToHtml(items, exportedAt),
+      saveOptions()
     );
     await recordActivity({
       type: "export",
@@ -249,7 +317,7 @@ export function createBackupActions({
     }
 
     const archive = await deps.attachArchiveIntegrity(await deps.exportArchive(items));
-    deps.downloadJson(exportFilename("results", archive.exportedAt, "json"), archive);
+    await deps.downloadJson(exportFilename("results", archive.exportedAt, "json"), archive, saveOptions());
     await recordActivity({
       type: "export",
       label: "Current results JSON exported",
@@ -269,10 +337,11 @@ export function createBackupActions({
     }
 
     const exportedAt = deps.now().toISOString();
-    deps.downloadText(
+    await deps.downloadText(
       exportFilename("results", exportedAt, "csv"),
       "text/csv",
-      deps.visitsToCsv(items)
+      deps.visitsToCsv(items),
+      saveOptions()
     );
     await recordActivity({
       type: "export",
@@ -293,10 +362,11 @@ export function createBackupActions({
     }
 
     const exportedAt = deps.now().toISOString();
-    deps.downloadText(
+    await deps.downloadText(
       exportFilename("results", exportedAt, "html"),
       "text/html",
-      deps.visitsToHtml(items, exportedAt)
+      deps.visitsToHtml(items, exportedAt),
+      saveOptions()
     );
     await recordActivity({
       type: "export",

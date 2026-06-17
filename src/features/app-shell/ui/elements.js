@@ -100,6 +100,7 @@ export function collectAppElements(document) {
     prefDateFormat: document.querySelector("#pref-date-format"),
     prefLimit: document.querySelector("#pref-limit"),
     prefBackupReminder: document.querySelector("#pref-backup-reminder"),
+    prefBackupSaveMode: document.querySelector("#pref-backup-save-mode"),
     prefBackupPrefix: document.querySelector("#pref-backup-prefix"),
     prefBackupTemplate: document.querySelector("#pref-backup-template"),
     openNativeHistory: document.querySelector("#open-native-history"),

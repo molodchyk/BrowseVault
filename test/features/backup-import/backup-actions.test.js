@@ -23,6 +23,7 @@ function previewElements() {
 function createHarness({
   getSearchText = () => "docs site:example.com",
   preferences = {
+    backupSaveMode: "downloads",
     backupFilenamePrefix: "browsevault"
   },
   searchVisits = async () => ({ results: [], total: 0 }),
@@ -32,7 +33,13 @@ function createHarness({
 } = {}) {
   const statuses = [];
   const calls = [];
-  const appState = { preferences, stagedImport };
+  const appState = {
+    preferences: {
+      backupSaveMode: "downloads",
+      ...preferences
+    },
+    stagedImport
+  };
   const actions = createBackupActions({
     appState,
     elements: previewElements(),
@@ -59,7 +66,7 @@ test("backupImportPreviewElements maps app shell elements for import preview ren
   assert.deepEqual(backupImportPreviewElements(elements), elements);
 });
 
-test("downloadText returns the generated blob size", () => {
+test("downloadText returns the generated blob size", async () => {
   const clicks = [];
   const revoked = [];
   const runtime = {
@@ -86,9 +93,46 @@ test("downloadText returns the generated blob size", () => {
     }
   };
 
-  assert.equal(downloadText("history.txt", "text/plain", "hello", runtime), 5);
+  assert.equal(await downloadText("history.txt", "text/plain", "hello", {}, runtime), 5);
   assert.deepEqual(clicks, [{ download: "history.txt", href: "blob:browsevault-test" }]);
   assert.deepEqual(revoked, ["blob:browsevault-test"]);
+});
+
+test("downloadText can ask Chrome for a Save As location", async () => {
+  const downloads = [];
+  const revoked = [];
+  const runtime = {
+    Blob: globalThis.Blob,
+    URL: {
+      createObjectURL: (blob) => {
+        assert.equal(blob.size, 5);
+        return "blob:browsevault-save-as";
+      },
+      revokeObjectURL: (url) => revoked.push(url)
+    },
+    chrome: {
+      downloads: {
+        download(options, callback) {
+          downloads.push(options);
+          callback(42);
+        }
+      },
+      runtime: {}
+    },
+    document: {
+      createElement() {
+        throw new Error("anchor fallback should not be used");
+      }
+    }
+  };
+
+  assert.equal(await downloadText("history.txt", "text/plain", "hello", { saveMode: "ask" }, runtime), 5);
+  assert.deepEqual(downloads, [{
+    filename: "history.txt",
+    saveAs: true,
+    url: "blob:browsevault-save-as"
+  }]);
+  assert.deepEqual(revoked, ["blob:browsevault-save-as"]);
 });
 
 test("exportAll downloads an integrity-protected archive and records backup metadata", async () => {
@@ -132,7 +176,8 @@ test("exportAll downloads an integrity-protected archive and records backup meta
     {
       ...archive,
       integrity: { sha256: "abc123" }
-    }
+    },
+    { saveMode: "downloads" }
   ]]);
   assert.deepEqual(metadata, [[
     "lastBackup",

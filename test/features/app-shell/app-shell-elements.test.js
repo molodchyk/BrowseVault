@@ -99,6 +99,7 @@ const singularSelectors = [
   "pref-date-format",
   "pref-limit",
   "pref-backup-reminder",
+  "pref-backup-save-mode",
   "pref-backup-prefix",
   "pref-backup-template",
   "open-native-history",

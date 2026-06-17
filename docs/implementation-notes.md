@@ -110,6 +110,7 @@ Avoid:
 Potential backup destinations:
 
 - local download file;
+- Chrome downloads Save As prompt for user-chosen locations when enabled in settings;
 - browser file system access API where available;
 - WebDAV/user-owned storage as premium/advanced feature;
 - user-supplied cloud folder if technically feasible;

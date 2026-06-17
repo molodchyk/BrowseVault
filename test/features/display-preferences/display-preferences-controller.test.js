@@ -46,6 +46,7 @@ function createHarness({
     dateFormat: "system",
     defaultLimit: 500,
     backupReminderDays: 30,
+    backupSaveMode: "downloads",
     backupFilenamePrefix: "browsevault",
     backupFilenameTemplate: "{prefix}-{kind}-{date}"
   }
@@ -93,6 +94,7 @@ function createHarness({
     prefDateFormat: input("system"),
     prefLimit: input("500"),
     prefBackupReminder: input("30"),
+    prefBackupSaveMode: input("downloads"),
     prefBackupPrefix: input("browsevault"),
     prefBackupTemplate: input("{prefix}-{kind}-{date}"),
     prefTheme: input("system"),
@@ -134,6 +136,7 @@ test("loadPreferences normalizes stored preferences and applies them to UI state
       dateFormat: "dmy",
       defaultLimit: "750",
       backupReminderDays: "14",
+      backupSaveMode: "ask",
       backupFilenamePrefix: "Team Backup:/2026",
       backupFilenameTemplate: "{date}/{prefix}/{kind}",
       theme: "dark"
@@ -149,6 +152,7 @@ test("loadPreferences normalizes stored preferences and applies them to UI state
     dateFormat: "dmy",
     defaultLimit: 750,
     backupReminderDays: 14,
+    backupSaveMode: "ask",
     backupFilenamePrefix: "Team-Backup-2026",
     backupFilenameTemplate: "{date}-{prefix}-{kind}",
     theme: "dark"
@@ -164,6 +168,7 @@ test("loadPreferences normalizes stored preferences and applies them to UI state
   assert.equal(elements.prefDateFormat.value, "dmy");
   assert.equal(elements.prefLimit.value, "750");
   assert.equal(elements.prefBackupReminder.value, "14");
+  assert.equal(elements.prefBackupSaveMode.value, "ask");
   assert.equal(elements.prefBackupPrefix.value, "Team-Backup-2026");
   assert.equal(elements.prefBackupTemplate.value, "{date}-{prefix}-{kind}");
   assert.equal(elements.limit.value, "750");
@@ -178,6 +183,7 @@ test("savePreferences persists normalized values, refreshes stats, reruns search
   elements.prefDateFormat.value = "iso";
   elements.prefLimit.value = "999999";
   elements.prefBackupReminder.value = "0";
+  elements.prefBackupSaveMode.value = "ask";
   elements.prefBackupPrefix.value = "Client Reports";
   elements.prefBackupTemplate.value = "{date} / {prefix} / {kind}";
 
@@ -192,6 +198,7 @@ test("savePreferences persists normalized values, refreshes stats, reruns search
         backupFilenamePrefix: "Client-Reports",
         backupFilenameTemplate: "{date}-{prefix}-{kind}",
         backupReminderDays: 0,
+        backupSaveMode: "ask",
         contrast: "high",
         dateFormat: "iso",
         defaultLimit: 50000,

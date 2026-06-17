@@ -27,6 +27,7 @@ test("normalizePreferences falls back for unsupported values and clamps limits",
       dateFormat: "dmy",
       defaultLimit: "999999",
       backupReminderDays: "999",
+      backupSaveMode: "surprise-folder",
       backupFilenamePrefix: "Team Backup:/2026",
       backupFilenameTemplate: "{date}/{prefix}/{kind}"
     }),
@@ -38,6 +39,7 @@ test("normalizePreferences falls back for unsupported values and clamps limits",
       dateFormat: "dmy",
       defaultLimit: 50000,
       backupReminderDays: 365,
+      backupSaveMode: "downloads",
       backupFilenamePrefix: "Team-Backup-2026",
       backupFilenameTemplate: "{date}-{prefix}-{kind}"
     }

@@ -9,7 +9,7 @@ permission.bookmarks:
 Used only for Quick Open bookmark search. BrowseVault reads bookmark titles and URLs locally so users can find and reopen saved pages.
 
 permission.downloads:
-Used only for Quick Open download search. BrowseVault reads local download metadata such as filenames, source URLs, and timestamps; it does not read downloaded file contents.
+Used for Quick Open download search and user-requested backup/export file saving. BrowseVault reads local download metadata such as filenames, source URLs, and timestamps; it does not read downloaded file contents. When the user selects ask-every-export save mode, BrowseVault uses Chrome's downloads API to show a Save As prompt for generated files.
 
 permission.history:
 Used to sync available Chrome history into the local BrowseVault archive, capture new visits, search history, and delete selected URLs from Chrome history only when the user chooses that action.

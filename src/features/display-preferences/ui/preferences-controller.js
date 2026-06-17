@@ -115,6 +115,7 @@ export function createDisplayPreferencesController({
     elements.prefDateFormat.value = appState.preferences.dateFormat;
     elements.prefLimit.value = String(appState.preferences.defaultLimit);
     elements.prefBackupReminder.value = String(appState.preferences.backupReminderDays);
+    elements.prefBackupSaveMode.value = appState.preferences.backupSaveMode;
     elements.prefBackupPrefix.value = appState.preferences.backupFilenamePrefix;
     elements.prefBackupTemplate.value = appState.preferences.backupFilenameTemplate;
 
@@ -156,6 +157,7 @@ export function createDisplayPreferencesController({
       dateFormat: elements.prefDateFormat.value,
       defaultLimit: elements.prefLimit.value,
       backupReminderDays: elements.prefBackupReminder.value,
+      backupSaveMode: elements.prefBackupSaveMode.value,
       backupFilenamePrefix: elements.prefBackupPrefix.value,
       backupFilenameTemplate: elements.prefBackupTemplate.value
     });

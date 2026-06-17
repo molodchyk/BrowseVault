@@ -69,7 +69,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - domain blacklist and whitelist rules;
 - manual retention cleanup that previews old vault records and keeps whitelisted domains;
 - duplicate cleanup that previews repeated active vault records and moves extras to undoable deletion;
-- local preferences for system/light/dark theme, accent color, high contrast, text size, date format, default result limit, backup reminders, backup filename prefix, and backup filename template;
+- local preferences for system/light/dark theme, accent color, high contrast, text size, date format, default result limit, backup reminders, backup/export save mode, backup filename prefix, and backup filename template;
 - backup reminder status follows the configured reminder interval and warns when the next reminder date is reached;
 - exact ISO visit timestamps in history result metadata while visible rows follow the selected date format;
 - in-app trust, permission, and product-limit disclosures;
@@ -193,7 +193,7 @@ The History tab also supports direct current-result deletion for targeted cleanu
 
 ## Backup Filenames
 
-Backup and export filenames use the configured prefix and template. The default template is `{prefix}-{kind}-{date}`. Templates are filename bases without the extension and can use `{prefix}`, `{kind}`, `{date}`, and `{time}` tokens. Browser download settings still control the destination folder.
+Backup and export filenames use the configured prefix and template. The default template is `{prefix}-{kind}-{date}`. Templates are filename bases without the extension and can use `{prefix}`, `{kind}`, `{date}`, and `{time}` tokens. The default save mode uses the browser's Downloads behavior; users can switch to an ask-every-export mode that opens Chrome's Save As prompt through the downloads API where the browser supports it.
 
 Backup status is advanced only by the integrity-checked JSON archive export. CSV and HTML files are portability/report exports and appear in recent activity without replacing the last restorable backup metadata.
 
