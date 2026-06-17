@@ -91,7 +91,10 @@ This repository contains a working Manifest V3 extension implementation. It incl
 .
 ├── docs/
 │   ├── code-structure.md
-│   └── extension-modularization-playbook.md
+│   ├── decision-records.md
+│   ├── extension-modularization-playbook.md
+│   ├── release-notes.md
+│   └── reviewer-notes.md
 ├── assets/
 │   └── icons/
 ├── scripts/

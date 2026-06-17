@@ -29,6 +29,8 @@ const requiredFiles = [
   "store-listing/chrome-web-store/media/screenshots/05-settings-privacy.jpg",
   "docs/README.md",
   "docs/reviewer-notes.md",
+  "docs/release-notes.md",
+  "docs/decision-records.md",
   "docs/chrome-web-store-additional-fields.md",
   "docs/chrome-web-store-category.md",
   "docs/chrome-web-store-privacy-form.md",
@@ -228,6 +230,39 @@ for (const expected of [
 ]) {
   assert(reviewerNotes.includes(expected), `Reviewer notes missing: ${expected}`);
 }
+
+const docsReadme = fs.readFileSync(path.join(root, "docs", "README.md"), "utf8");
+for (const expected of [
+  "release-notes.md",
+  "decision-records.md",
+  "Browser Extension Playbook",
+  "StorePilot Project Reference"
+]) {
+  assert(docsReadme.includes(expected), `Docs README missing playbook reference: ${expected}`);
+}
+
+const releaseNotes = fs.readFileSync(path.join(root, "docs", "release-notes.md"), "utf8");
+for (const expected of [
+  "CHANGELOG.md",
+  `## ${manifest.version} -`,
+  "local-first",
+  "no default network requests"
+]) {
+  assert(releaseNotes.includes(expected), `Release notes missing: ${expected}`);
+}
+
+const decisionRecords = fs.readFileSync(path.join(root, "docs", "decision-records.md"), "utf8");
+for (const expected of [
+  "local-first",
+  "Do Not Replace Chrome History By Default",
+  "Separate Vault Deletion From Chrome History Deletion",
+  "StorePilot Project Reference"
+]) {
+  assert(decisionRecords.includes(expected), `Decision records missing: ${expected}`);
+}
+
+const storePilotReadme = fs.readFileSync(path.join(root, "store-listing", "chrome-web-store", "README.md"), "utf8");
+assert(storePilotReadme.includes("StorePilot Project Reference"), "StorePilot README must link the shared StorePilot reference.");
 
 const storePilotCategory = fs.readFileSync(path.join(root, "docs", "chrome-web-store-category.md"), "utf8");
 assert(/Selected category:\s*\S/i.test(storePilotCategory), "Chrome Web Store category document needs a selected category.");

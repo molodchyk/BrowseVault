@@ -11,12 +11,15 @@ This folder captures the critical market research, user feedback, product direct
 - `extension-modularization-playbook.md` - reusable extension modularization rules copied from Defense against Distractions.
 - `code-structure.md` - BrowseVault-specific ownership map and next split candidates.
 - `reviewer-notes.md` - browser-store reviewer notes for limitations, permissions, package behavior, and user-data handling.
+- `release-notes.md` - docs-level release summary that points to the canonical root changelog.
+- `decision-records.md` - product, privacy, packaging, and release decisions to preserve across future edits.
 - `source-inventory.md` - index of raw source snapshots and how they map to the research notes.
 - `raw-sources/` - preserved Chrome Web Store listing/review text snapshots used as evidence.
 
 ## Related Playbooks
 
 - [Browser Extension Playbook](../../browser-extension-playbook.md) - shared product, release, repository, privacy, store listing, and reviewer standards for browser extensions.
+- [StorePilot Project Reference](../../StorePilot/docs/reference.md) - shared Chrome Web Store automation file layout used by StorePilot import flows.
 
 ## Core Insight
 
