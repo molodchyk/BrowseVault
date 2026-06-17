@@ -15,7 +15,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `src/features/browser-memory/` owns extension-page quick-open rendering and actions for tabs, bookmarks, downloads, and recently closed sessions.
 - `src/features/display-preferences/` owns preference normalization, result-limit clamping, date/count formatting, archive health summaries, backup reminder cadence, backup status summaries, settings persistence orchestration, and extension-page preference/stat rendering.
 - `src/features/history-export/core/export-format.js` owns pure CSV and HTML export formatting.
-- `src/features/history-results/core/` owns pure result selection, URL/domain extraction, grouping, count labels, load-more state, saved-search normalization, and search form query composition.
+- `src/features/history-results/core/` owns pure result selection, URL/domain extraction, grouping, count labels, load-more state, saved-search normalization, search form query composition, and chunked local search scanning.
 - `src/features/history-results/ui/` owns search form field state, saved-search controls, local history search/load-more orchestration, selected-record lookup, history result DOM rendering, rendering orchestration, search-hit highlighting, and selected-result bulk actions.
 - `src/features/vault-management/` owns extension-page vault deletion, Chrome-history deletion requests, undo, reset, and domain-rule actions.
 - `src/platform/` owns explicit wrappers around browser/platform APIs, including Chrome extension APIs and clipboard copy behavior.

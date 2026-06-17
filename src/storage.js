@@ -1,4 +1,3 @@
-import { matchesVisitQuery, parseQuery } from "./query.js";
 import {
   extractImportVisits,
   importArchiveSource
@@ -8,6 +7,7 @@ import {
   removeSavedSearch as removeSavedSearchFromList,
   upsertSavedSearch
 } from "./features/history-results/core/saved-searches.js";
+import { searchVisitRecords } from "./features/history-results/core/search-index.js";
 
 const DB_NAME = "browsevault";
 const DB_VERSION = 1;
@@ -317,17 +317,10 @@ export async function removeRule(id) {
 
 export async function searchVisits(input = "", options = {}) {
   const visits = await getAllVisits();
-  const query = parseQuery(input);
-  const limit = options.limit === "all" ? Infinity : Number(options.limit || DEFAULT_RESULT_LIMIT);
-  const filtered = visits
-    .filter((visit) => matchesVisitQuery(visit, query))
-    .sort((a, b) => b.visitTime - a.visitTime);
-
-  return {
-    query,
-    total: filtered.length,
-    results: filtered.slice(0, limit)
-  };
+  return searchVisitRecords(visits, input, {
+    ...options,
+    defaultLimit: DEFAULT_RESULT_LIMIT
+  });
 }
 
 function hostMatchesRule(host, rule) {

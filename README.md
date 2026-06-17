@@ -29,6 +29,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - visible archive health for startup, Chrome sync, and live capture status;
 - query syntax for site/host/domain, title, URL, source, transition, visit count, exact-day/date ranges, local-hour filters, exclusions, phrases, and regex;
 - bounded typo-tolerant matching for longer plain keyword searches;
+- chunked local search scanning for large vaults, covered by synthetic large-history tests;
 - saved searches for repeated local history queries and date/limit filter sets;
 - highlighted matches in vault and Quick Open search results;
 - keyboard-first search with autofocus, global query focus, Enter search, and debounced live refresh;
