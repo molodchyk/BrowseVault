@@ -7,6 +7,7 @@ function createHarness({
   currentTotal = 0,
   currentShownLimit = 0,
   requestedLimit = 10,
+  requestedSortOrder = "newest",
   selectedIds = [],
   searchVisits = async () => ({ results: [], total: 0 }),
   isCurrentHistorySearchRequestId = () => true
@@ -29,6 +30,7 @@ function createHarness({
     maxResultLimit: 50,
     renderResults: (results, total) => renderCalls.push({ results, total }),
     requestedResultLimit: () => requestedLimit,
+    requestedSortOrder: () => requestedSortOrder,
     searchVisits,
     services: {
       isCurrentHistorySearchRequestId,
@@ -50,6 +52,7 @@ test("runSearch applies requested limit, reconciles selection, and renders fresh
   const resultTwo = { id: "visit-2" };
   const searchCalls = [];
   const { actions, appState, renderCalls, statusMessages } = createHarness({
+    requestedSortOrder: "oldest",
     selectedIds: ["visit-1", "stale-visit"],
     searchVisits: async (query, options) => {
       searchCalls.push({ query, options });
@@ -65,7 +68,7 @@ test("runSearch applies requested limit, reconciles selection, and renders fresh
   assert.deepEqual(searchCalls, [
     {
       query: "docs site:example.com",
-      options: { limit: 10 }
+      options: { limit: 10, sortOrder: "oldest" }
     }
   ]);
   assert.equal(appState.currentShownLimit, 10);
@@ -140,7 +143,7 @@ test("loadMoreResults expands visible limit, renders fresh results, and ignores 
   assert.deepEqual(searchCalls, [
     {
       query: "docs site:example.com",
-      options: { limit: 9 }
+      options: { limit: 9, sortOrder: "newest" }
     }
   ]);
   assert.deepEqual(fresh.renderCalls, [
@@ -202,7 +205,7 @@ test("loadAllResults expands current results to the total match count", async ()
   assert.deepEqual(searchCalls, [
     {
       query: "docs site:example.com",
-      options: { limit: 12 }
+      options: { limit: 12, sortOrder: "newest" }
     }
   ]);
   assert.equal(renderCalls.length, 1);
@@ -231,7 +234,7 @@ test("loadAllResults respects the maximum result cap and ignores stale responses
   assert.deepEqual(searchCalls, [
     {
       query: "docs site:example.com",
-      options: { limit: 50 }
+      options: { limit: 50, sortOrder: "newest" }
     }
   ]);
   assert.equal(capped.renderCalls.length, 1);

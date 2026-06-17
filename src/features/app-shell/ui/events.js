@@ -66,6 +66,7 @@ export function bindAppEvents({ elements, document, root, handlers }) {
   for (const input of [elements.query, elements.onDate, elements.after, elements.before, elements.limit]) {
     input.addEventListener("input", handlers.scheduleSearches);
   }
+  elements.sortOrder.addEventListener("change", () => handlers.scheduleSearches());
 
   elements.query.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {

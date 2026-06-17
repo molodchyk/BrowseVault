@@ -127,6 +127,7 @@ export async function downloadText(filename, mimeType, text, options = {}, runti
 export function createBackupActions({
   appState,
   elements,
+  getSortOrder = () => "newest",
   getSearchText = () => "",
   refreshStats,
   renderRules,
@@ -173,7 +174,8 @@ export function createBackupActions({
 
   async function matchingResultsForExport() {
     const { results } = await searchVisits(getSearchText(), {
-      limit: "all"
+      limit: "all",
+      sortOrder: getSortOrder()
     });
     return results;
   }
@@ -251,7 +253,7 @@ export function createBackupActions({
       return;
     }
 
-    const archive = await deps.attachArchiveIntegrity(await deps.exportArchive(items));
+    const archive = await deps.attachArchiveIntegrity(await deps.exportArchive(items, { preserveOrder: true }));
     await deps.downloadJson(exportFilename("selected", archive.exportedAt, "json"), archive, saveOptions());
     await recordActivity({
       type: "export",
@@ -316,7 +318,7 @@ export function createBackupActions({
       return;
     }
 
-    const archive = await deps.attachArchiveIntegrity(await deps.exportArchive(items));
+    const archive = await deps.attachArchiveIntegrity(await deps.exportArchive(items, { preserveOrder: true }));
     await deps.downloadJson(exportFilename("results", archive.exportedAt, "json"), archive, saveOptions());
     await recordActivity({
       type: "export",

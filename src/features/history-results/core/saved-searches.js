@@ -45,6 +45,7 @@ export function normalizeSavedSearch(input, now = () => new Date().toISOString()
     after: cleanText(input?.after, 32),
     before: cleanText(input?.before, 32),
     limit: cleanText(input?.limit, 16),
+    sortOrder: input?.sortOrder === "oldest" ? "oldest" : "newest",
     createdAt,
     updatedAt
   };
@@ -62,7 +63,8 @@ export function savedSearchHasCriteria(values) {
     cleanText(values?.query, 500) ||
     cleanText(values?.onDate, 32) ||
     cleanText(values?.after, 32) ||
-    cleanText(values?.before, 32)
+    cleanText(values?.before, 32) ||
+    values?.sortOrder === "oldest"
   );
 }
 
@@ -72,7 +74,8 @@ export function defaultSavedSearchName(values) {
     return query;
   }
 
-  return cleanText(values?.onDate || values?.after || values?.before, 60) || "Saved search";
+  return cleanText(values?.onDate || values?.after || values?.before, 60) ||
+    (values?.sortOrder === "oldest" ? "Oldest first" : "Saved search");
 }
 
 export function upsertSavedSearch(searches, input, now = () => new Date().toISOString()) {

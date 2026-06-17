@@ -10,7 +10,8 @@ export function createHistorySearchForm({ elements }) {
       onDate: elements.onDate.value,
       after: elements.after.value,
       before: elements.before.value,
-      limit: elements.limit.value
+      limit: elements.limit.value,
+      sortOrder: elements.sortOrder.value
     };
   }
 
@@ -22,6 +23,7 @@ export function createHistorySearchForm({ elements }) {
     if (values?.limit) {
       elements.limit.value = values.limit;
     }
+    elements.sortOrder.value = values?.sortOrder === "oldest" ? "oldest" : "newest";
   }
 
   function clearSearchFields() {
@@ -47,9 +49,14 @@ export function createHistorySearchForm({ elements }) {
     return historySearchTextFromValues(readSearchValues());
   }
 
+  function getSortOrder() {
+    return elements.sortOrder.value === "oldest" ? "oldest" : "newest";
+  }
+
   return {
     applyDateShortcut,
     clearSearchFields,
+    getSortOrder,
     getSearchText,
     readSearchValues,
     writeSearchValues

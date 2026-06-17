@@ -21,6 +21,7 @@ function previewElements() {
 }
 
 function createHarness({
+  getSortOrder = () => "newest",
   getSearchText = () => "docs site:example.com",
   preferences = {
     backupSaveMode: "downloads",
@@ -43,6 +44,7 @@ function createHarness({
   const actions = createBackupActions({
     appState,
     elements: previewElements(),
+    getSortOrder,
     getSearchText,
     refreshStats: async () => calls.push("refreshStats"),
     renderRules: async () => calls.push("renderRules"),
@@ -336,11 +338,13 @@ test("filtered result exports search all current matches without changing backup
   const searchCalls = [];
   const downloadedJson = [];
   const downloadedText = [];
+  const exportCalls = [];
   const metadata = [];
   const { actions, statuses } = createHarness({
     preferences: {
       backupFilenamePrefix: "Current Results"
     },
+    getSortOrder: () => "oldest",
     getSearchText: () => "docs after:2026-01-01",
     searchVisits: async (...args) => {
       searchCalls.push(args);
@@ -353,11 +357,15 @@ test("filtered result exports search all current matches without changing backup
       }),
       downloadJson: (...args) => downloadedJson.push(args),
       downloadText: (...args) => downloadedText.push(args),
-      exportArchive: async (items) => ({
-        exportedAt: "2026-06-16T12:00:00.000Z",
-        counts: { visits: items.length },
-        visits: items
-      }),
+      exportArchive: async (...args) => {
+        exportCalls.push(args);
+        const [items] = args;
+        return {
+          exportedAt: "2026-06-16T12:00:00.000Z",
+          counts: { visits: items.length },
+          visits: items
+        };
+      },
       now: () => new Date("2026-06-16T12:00:00.000Z"),
       setMeta: async (...args) => metadata.push(args),
       visitsToCsv: (items) => `csv:${items.length}`,
@@ -370,10 +378,11 @@ test("filtered result exports search all current matches without changing backup
   await actions.exportFilteredResultsHtml();
 
   assert.deepEqual(searchCalls, [
-    ["docs after:2026-01-01", { limit: "all" }],
-    ["docs after:2026-01-01", { limit: "all" }],
-    ["docs after:2026-01-01", { limit: "all" }]
+    ["docs after:2026-01-01", { limit: "all", sortOrder: "oldest" }],
+    ["docs after:2026-01-01", { limit: "all", sortOrder: "oldest" }],
+    ["docs after:2026-01-01", { limit: "all", sortOrder: "oldest" }]
   ]);
+  assert.deepEqual(exportCalls, [[matching, { preserveOrder: true }]]);
   assert.deepEqual(statuses, [
     "Preparing result archive",
     "Exported 2 matching records as JSON",

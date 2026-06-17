@@ -63,7 +63,8 @@ test("createHistorySearchForm reads and clears history search fields", () => {
     before: input("2026-12-31"),
     limit: input("500"),
     onDate: input("2026-06-16"),
-    query: input("docs")
+    query: input("docs"),
+    sortOrder: input("oldest")
   };
   const form = createHistorySearchForm({ elements });
 
@@ -73,7 +74,8 @@ test("createHistorySearchForm reads and clears history search fields", () => {
     before: "2026-12-31",
     limit: "500",
     onDate: "2026-06-16",
-    query: "docs"
+    query: "docs",
+    sortOrder: "oldest"
   });
 
   form.writeSearchValues({
@@ -81,11 +83,13 @@ test("createHistorySearchForm reads and clears history search fields", () => {
     before: "2026-02-28",
     limit: "2500",
     onDate: "",
-    query: "title:report"
+    query: "title:report",
+    sortOrder: "newest"
   });
 
   assert.equal(form.getSearchText(), "title:report after:2026-02-01 before:2026-02-28");
   assert.equal(elements.limit.value, "2500");
+  assert.equal(form.getSortOrder(), "newest");
   assert.equal(form.applyDateShortcut("last7", new Date(2026, 5, 17, 13, 45)), true);
   assert.equal(form.getSearchText(), "title:report after:2026-06-11 before:2026-06-17");
   assert.equal(elements.limit.value, "2500");
@@ -100,12 +104,14 @@ test("createHistorySearchForm reads and clears history search fields", () => {
     before: elements.before.value,
     limit: elements.limit.value,
     onDate: elements.onDate.value,
-    query: elements.query.value
+    query: elements.query.value,
+    sortOrder: elements.sortOrder.value
   }, {
     after: "",
     before: "",
     limit: "2500",
     onDate: "",
-    query: ""
+    query: "",
+    sortOrder: "newest"
   });
 });

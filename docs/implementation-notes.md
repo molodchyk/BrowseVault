@@ -76,6 +76,7 @@ Required behavior:
 - optional regex mode;
 - highlighting;
 - stable sorting by recency/relevance.
+- limited searches must retain the right end of the result set before slicing, so oldest-first searches cannot reuse newest-first top-N retention.
 
 Implementation options:
 

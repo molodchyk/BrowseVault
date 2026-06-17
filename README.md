@@ -33,7 +33,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - chunked local search scanning for large vaults, covered by synthetic large-history tests;
 - bounded result retention for limited searches, covered by a 100k-record synthetic history test;
 - one-click Today, Yesterday, 7 Days, 30 Days, and All Dates shortcuts that fill ISO-style date filters;
-- saved searches for repeated local history queries and date/limit filter sets;
+- saved searches for repeated local history queries, date/limit filter sets, and newest/oldest result ordering;
 - highlighted matches in vault and Quick Open search results;
 - keyboard-first search with autofocus, global query focus, Enter search, and debounced live refresh;
 - keyboard navigation for visible history results with arrow keys, Enter-to-open, Space-to-select, and Shift+Space range selection;
@@ -42,7 +42,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - toolbar and keyboard-command opening that reuses an already open BrowseVault tab;
 - Settings escape hatch for opening Chrome's native history page without making BrowseVault a default-history override;
 - JSON backup export and import;
-- deterministic newest-first exports, including formula-safe CSV with ISO timestamp, local date/time, visit id, and Chrome id fields;
+- deterministic newest-first full exports, plus current-result exports that follow the selected newest/oldest result order, including formula-safe CSV with ISO timestamp, local date/time, visit id, and Chrome id fields;
 - offline HTML exports with summary metrics, exact timestamps, in-file filtering, sortable columns, and safer link handling;
 - visible backup status with freshness, format, record count, file size, checksum details, and a backup self-test that verifies restorable rows;
 - visible storage self-check status for the local vault metadata layer;

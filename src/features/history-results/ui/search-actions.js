@@ -16,6 +16,7 @@ export function createHistorySearchActions({
   maxResultLimit,
   renderResults,
   requestedResultLimit,
+  requestedSortOrder = () => "newest",
   searchVisits,
   services = {},
   setStatus,
@@ -35,7 +36,8 @@ export function createHistorySearchActions({
 
     try {
       const { results, total } = await searchVisits(searchText, {
-        limit
+        limit,
+        sortOrder: requestedSortOrder()
       });
 
       if (!deps.isCurrentHistorySearchRequestId(appState, requestId)) {
@@ -65,7 +67,8 @@ export function createHistorySearchActions({
     const requestId = deps.nextHistorySearchRequestId(appState);
 
     const { results, total } = await searchVisits(getSearchText(), {
-      limit: appState.currentShownLimit
+      limit: appState.currentShownLimit,
+      sortOrder: requestedSortOrder()
     });
 
     if (!deps.isCurrentHistorySearchRequestId(appState, requestId)) {
@@ -93,7 +96,8 @@ export function createHistorySearchActions({
     const requestId = deps.nextHistorySearchRequestId(appState);
 
     const { results, total } = await searchVisits(getSearchText(), {
-      limit: appState.currentShownLimit
+      limit: appState.currentShownLimit,
+      sortOrder: requestedSortOrder()
     });
 
     if (!deps.isCurrentHistorySearchRequestId(appState, requestId)) {

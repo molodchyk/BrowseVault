@@ -15,9 +15,9 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Advanced local search for site, host, domain, title, URL, source, transition, visit count, exact day, date range, local hour, exclusions, wildcards, phrases, and regex.
 - Limited history searches keep only the top visible results while counting the full match set, reducing memory and sort work on large archives.
 - One-click Today, Yesterday, 7 Days, 30 Days, and All Dates shortcuts using ISO-style date filters.
-- Saved searches, match highlighting, local-date grouped results, sticky result controls, incremental loading, one-click Show All expansion, Top/Bottom result jumps, keyboard-first search focus, keyboard navigation for visible history rows, and mouse/keyboard range selection.
+- Saved searches, newest/oldest result ordering, match highlighting, local-date grouped results, sticky result controls, incremental loading, one-click Show All expansion, Top/Bottom result jumps, keyboard-first search focus, keyboard navigation for visible history rows, and mouse/keyboard range selection.
 - Quick Open search across open tabs, bookmarks, downloads, recently closed tabs, and closed windows, with keyboard navigation for source results and readable source-unavailable warnings.
-- Deterministic newest-first JSON, formula-safe CSV, and offline HTML export for all records, selected records, and current filtered results, with HTML summary metrics, exact timestamps, in-file filtering, sortable columns, and safer link handling.
+- Deterministic newest-first full JSON, formula-safe CSV, and offline HTML export; selected and current filtered result exports; current-result exports follow the selected newest/oldest result order.
 - Bare `after:YYYY-MM-DD` and `before:YYYY-MM-DD` search filters use local calendar-day boundaries instead of browser-dependent UTC parsing.
 - JSON backup integrity metadata and backup self-test before full JSON export, including checksum, row-count, and restorable-row validation.
 - Backup reminder status follows the configured reminder interval and warns when the next reminder date is reached.

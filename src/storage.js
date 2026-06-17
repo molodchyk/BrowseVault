@@ -729,8 +729,11 @@ export function archiveVisitsForExport(visits) {
   });
 }
 
-export async function exportArchive(items = null) {
-  const visits = archiveVisitsForExport(items || (await getAllVisits()));
+export async function exportArchive(items = null, options = {}) {
+  const sourceVisits = items || (await getAllVisits());
+  const visits = options.preserveOrder
+    ? [...(Array.isArray(sourceVisits) ? sourceVisits : [])]
+    : archiveVisitsForExport(sourceVisits);
   return {
     app: "BrowseVault",
     schemaVersion: 1,

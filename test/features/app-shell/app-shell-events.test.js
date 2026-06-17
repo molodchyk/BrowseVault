@@ -48,6 +48,7 @@ function createElements() {
     after: fakeElement(),
     before: fakeElement(),
     limit: fakeElement(),
+    sortOrder: fakeElement(),
     dateShortcuts: [
       fakeElement({ dataset: { dateShortcut: "today" } }),
       fakeElement({ dataset: { dateShortcut: "last7" } })
@@ -216,6 +217,7 @@ test("bindAppEvents wires tabs, theme previews, search clearing, and keyboard fo
   elements.saveSearch.dispatch("click");
   elements.applySavedSearch.dispatch("click");
   elements.deleteSavedSearch.dispatch("click");
+  elements.sortOrder.dispatch("change");
   elements.query.dispatch("keydown", { key: "Enter" });
   document.dispatch("keydown", {
     key: "k",
@@ -257,6 +259,7 @@ test("bindAppEvents wires tabs, theme previews, search clearing, and keyboard fo
     ["saveCurrentSearch"],
     ["applySavedSearch"],
     ["deleteSavedSearch"],
+    ["scheduleSearches"],
     ["runSearchesNow"],
     ["preventDefault", "ctrl-k"],
     ["focusSearchInput"],

@@ -94,6 +94,26 @@ test("searchVisitRecords keeps only top limited results while counting a 100k ma
   assert.equal(yields.length, 9);
 });
 
+test("searchVisitRecords can retain oldest limited results", async () => {
+  const visits = Array.from({ length: 100 }, (_value, index) => syntheticVisit(99 - index));
+
+  const result = await searchVisitRecords(visits, "", {
+    chunkSize: 25,
+    limit: 5,
+    scheduler: async () => {},
+    sortOrder: "oldest"
+  });
+
+  assert.equal(result.total, 100);
+  assert.deepEqual(result.results.map((visit) => visit.id), [
+    "visit-99",
+    "visit-98",
+    "visit-97",
+    "visit-96",
+    "visit-95"
+  ]);
+});
+
 test("searchVisitRecords preserves input order for equal timestamps within limited results", async () => {
   const visitTime = Date.parse("2026-06-17T12:00:00.000Z");
   const visits = [

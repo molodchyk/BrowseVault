@@ -8,6 +8,7 @@ const singularSelectors = [
   "after",
   "before",
   "limit",
+  "sort-order",
   "search",
   "quick-search",
   "clear-search",

@@ -41,6 +41,7 @@ function createHarness() {
     after: "",
     before: "",
     limit: "500",
+    sortOrder: "newest",
     createdAt: "2026-06-16T12:00:00.000Z",
     updatedAt: "2026-06-16T12:00:00.000Z"
   }];
@@ -52,7 +53,8 @@ function createHarness() {
     onDate: "",
     after: "2026-01-01",
     before: "",
-    limit: "1000"
+    limit: "1000",
+    sortOrder: "oldest"
   };
   const savedSearches = fakeSelect();
   const actions = createSavedSearchActions({
@@ -75,6 +77,7 @@ function createHarness() {
         after: input.after,
         before: input.before,
         limit: input.limit,
+        sortOrder: input.sortOrder,
         createdAt: "2026-06-16T12:00:00.000Z",
         updatedAt: "2026-06-16T12:00:00.000Z"
       }];
@@ -109,6 +112,7 @@ test("saved search actions render, save, apply, and delete saved searches", asyn
   await actions.applySelectedSearch();
   assert.equal(runCalls.length, 1);
   assert.equal(appliedValues[0].query, "github site:github.com");
+  assert.equal(appliedValues[0].sortOrder, "oldest");
   assert.equal(statuses.at(-1), "Applied saved search: GitHub docs");
 
   await actions.deleteSelectedSearch();
@@ -126,7 +130,7 @@ test("saved search actions report missing criteria or selection", async () => {
       savedSearches: fakeSelect()
     },
     getSavedSearches: async () => [],
-    readSearchValues: () => ({ query: "", onDate: "", after: "", before: "", limit: "500" }),
+    readSearchValues: () => ({ query: "", onDate: "", after: "", before: "", limit: "500", sortOrder: "newest" }),
     runSearchesNow: async () => {},
     saveSavedSearch: async () => [],
     setStatus: (message) => statuses.push(message),

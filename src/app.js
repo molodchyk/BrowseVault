@@ -74,6 +74,7 @@ const historySearchActions = createHistorySearchActions({
   maxResultLimit: MAX_RESULT_LIMIT,
   renderResults: historyResults.renderResults,
   requestedResultLimit: displayPreferences.requestedResultLimit,
+  requestedSortOrder: historySearchForm.getSortOrder,
   searchVisits,
   setStatus,
   updateLoadMoreButton: historyResults.updateLoadMoreButton
@@ -82,6 +83,7 @@ const historySearchActions = createHistorySearchActions({
 const vaultActions = createVaultManagementActions({
   appState,
   elements,
+  getSortOrder: historySearchForm.getSortOrder,
   getSearchText: historySearchForm.getSearchText,
   refreshStats: displayPreferences.refreshStats,
   runSearch: historySearchActions.runSearch,
