@@ -77,9 +77,7 @@ function collectFilesByExtension(entry, extensions) {
     .flatMap((child) => collectFilesByExtension(path.join(entry, child), extensions));
 }
 
-for (const file of requiredProjectFiles) {
-  assert(fs.existsSync(path.join(root, file)), `Missing required file: ${file}`);
-}
+for (const file of requiredProjectFiles) assert(fs.existsSync(path.join(root, file)), `Missing required file: ${file}`);
 
 const manifest = readJson("manifest.json");
 const localeMessages = readJson("_locales/en/messages.json");
@@ -421,7 +419,9 @@ for (const expected of [
 }
 
 const appJs = fs.readFileSync(path.join(root, "src/app.js"), "utf8");
-assert(appJs.includes("localizeAppShell") && appJs.includes("getChromeMessage"), "App shell must initialize extension-page localization.");
+assert(appJs.includes("startBrowseVaultApp"), "Runtime entry should delegate to the app-shell bootstrap.");
+const appBootstrap = fs.readFileSync(path.join(root, "src", "features", "app-shell", "ui", "bootstrap.js"), "utf8");
+assert(appBootstrap.includes("localizeAppShell") && appBootstrap.includes("getChromeMessage"), "App shell bootstrap must initialize extension-page localization.");
 
 for (const [id, label] of [
   ["open-native-history", "Open Chrome History"],

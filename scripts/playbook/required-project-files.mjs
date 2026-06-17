@@ -13,6 +13,7 @@ export const requiredProjectFiles = [
   "src/app.html",
   "src/app.css",
   "src/app.js",
+  "src/features/app-shell/ui/bootstrap.js",
   "src/styles/backup-rules.css",
   "src/styles/layout.css",
   "src/styles/responsive.css",

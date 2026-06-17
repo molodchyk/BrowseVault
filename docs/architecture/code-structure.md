@@ -4,14 +4,14 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 
 ## Current Ownership
 
-- `src/app.html`, `src/app.css`, and `src/app.js` own the extension page runtime shell; `src/app.css` is now a thin stylesheet entrypoint.
+- `src/app.html`, `src/app.css`, and `src/app.js` own the extension page runtime shell; `src/app.css` and `src/app.js` are thin entrypoints.
 - `src/styles/` owns surface-level extension page styles split into tokens, layout, backup/rules/trust, results, and responsive layers.
 - `src/background.js` owns MV3 service worker listener wiring, extension-page opening, and startup/install metadata.
 - `src/storage.js` owns IndexedDB vault records, backup metadata, domain/category rules, and vault mutations.
 - `src/browser-memory.js` owns read-only search over tabs, bookmarks, downloads, and recently closed sessions.
 - `src/query.js` owns search parsing and matching.
 - `src/features/activity-log/` owns recent activity event normalization and Backup-tab activity rendering for user-visible backup, export, import, cleanup, delete, restore, rule, and reset operations.
-- `src/features/app-shell/` owns extension-page shell state, element collection, tab navigation/focus helpers, shared search scheduling, event wiring, static extension-page localization, and shared shell UI behavior.
+- `src/features/app-shell/` owns extension-page bootstrap composition, shell state, element collection, tab navigation/focus helpers, shared search scheduling, event wiring, static extension-page localization, and shared shell UI behavior.
 - `src/features/backup-import/` owns archive import/export actions, export filename rules, file parsing, import normalization, integrity metadata, import-preview display state, and restore-flow rendering.
 - `src/features/background-runtime/` owns background message routing, payload validation, privileged action dispatch, Chrome history bootstrap, archive filtering, live-visit capture, native Chrome history removal reconciliation, localized status strings, and extension-page actions that coordinate with background runtime messages.
 - `src/features/browser-memory/` owns extension-page quick-open rendering and actions for tabs, bookmarks, downloads, and recently closed sessions.
@@ -32,7 +32,6 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 
 ## Next Split Candidates
 
-- Move remaining app composition/bootstrap glue out of `src/app.js` only when a clearer owner emerges.
 - Split `src/storage.js` into feature storage models and a thinner IndexedDB platform/storage layer; it is capped as current file-size hard-limit debt by `scripts/check-file-sizes.mjs`.
 
 ## Rules For Future Edits
