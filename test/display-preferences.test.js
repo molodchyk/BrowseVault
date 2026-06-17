@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   backupStatusDetails,
+  clampBackupReminderDays,
   clampResultLimit,
   formatShortDate,
   localDayKey,
@@ -15,13 +16,15 @@ test("normalizePreferences falls back for unsupported values and clamps limits",
       theme: "neon",
       accent: "blue",
       dateFormat: "dmy",
-      defaultLimit: "999999"
+      defaultLimit: "999999",
+      backupReminderDays: "999"
     }),
     {
       theme: "system",
       accent: "blue",
       dateFormat: "dmy",
-      defaultLimit: 50000
+      defaultLimit: 50000,
+      backupReminderDays: 365
     }
   );
 });
@@ -31,6 +34,13 @@ test("clampResultLimit handles empty, low, high, and rounded values", () => {
   assert.equal(clampResultLimit(1), 25);
   assert.equal(clampResultLimit(50001), 50000);
   assert.equal(clampResultLimit(124.6), 125);
+});
+
+test("clampBackupReminderDays handles disabled, high, empty, and rounded values", () => {
+  assert.equal(clampBackupReminderDays("", 14), 14);
+  assert.equal(clampBackupReminderDays(0), 0);
+  assert.equal(clampBackupReminderDays(366), 365);
+  assert.equal(clampBackupReminderDays(14.6), 15);
 });
 
 test("formatShortDate supports explicit non-US formats", () => {
@@ -53,6 +63,7 @@ test("backupStatusDetails summarizes missing, fresh, and stale backups", () => {
     isWarning: true,
     isOk: false,
     lastText: "Never",
+    nextText: "After first backup",
     formatText: "-",
     recordsText: "0",
     checksumText: "Not available"
@@ -75,6 +86,7 @@ test("backupStatusDetails summarizes missing, fresh, and stale backups", () => {
 
   assert.equal(fresh.healthText, "Backup current");
   assert.equal(fresh.isOk, true);
+  assert.match(fresh.nextText, /^2026-07-01 \d{2}:\d{2}$/);
   assert.equal(fresh.formatText, "JSON");
   assert.equal(fresh.recordsText, "12");
   assert.equal(fresh.checksumText, "1234567890ab...90abcdef");
@@ -88,4 +100,15 @@ test("backupStatusDetails summarizes missing, fresh, and stale backups", () => {
   );
   assert.equal(stale.healthText, "Backup older than 30 days");
   assert.equal(stale.isWarning, true);
+
+  const disabled = backupStatusDetails(
+    { exportedAt, format: "json", records: 12 },
+    {
+      dateFormat: "iso",
+      reminderDays: 0
+    }
+  );
+  assert.equal(disabled.healthText, "Backup reminder off");
+  assert.equal(disabled.nextText, "Off");
+  assert.equal(disabled.isOk, false);
 });

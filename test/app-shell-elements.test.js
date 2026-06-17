@@ -54,6 +54,7 @@ const singularSelectors = [
   "stat-backup",
   "backup-health",
   "backup-last",
+  "backup-next",
   "backup-format",
   "backup-records",
   "backup-checksum",
@@ -65,6 +66,7 @@ const singularSelectors = [
   "pref-accent",
   "pref-date-format",
   "pref-limit",
+  "pref-backup-reminder",
   "save-preferences"
 ];
 
@@ -98,6 +100,7 @@ test("collectAppElements queries the app shell selectors", () => {
   assert.equal(elements.quickSearch.selector, "#quick-search");
   assert.equal(elements.importPreviewTitle.selector, "#import-preview-title");
   assert.equal(elements.backupChecksum.selector, "#backup-checksum");
+  assert.equal(elements.backupNext.selector, "#backup-next");
   assert.equal(elements.savePreferences.selector, "#save-preferences");
   assert.equal(elements.tabs.length, 2);
   assert.equal(elements.panels.length, 2);

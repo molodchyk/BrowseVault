@@ -53,6 +53,7 @@ export function createDisplayPreferencesController({
     elements.backupHealth.classList.toggle("is-warning", status.isWarning);
     elements.backupHealth.classList.toggle("is-ok", status.isOk);
     elements.backupLast.textContent = status.lastText;
+    elements.backupNext.textContent = status.nextText;
     elements.backupFormat.textContent = status.formatText;
     elements.backupRecords.textContent = status.recordsText;
     elements.backupChecksum.textContent = status.checksumText;
@@ -66,6 +67,7 @@ export function createDisplayPreferencesController({
     elements.prefAccent.value = appState.preferences.accent;
     elements.prefDateFormat.value = appState.preferences.dateFormat;
     elements.prefLimit.value = String(appState.preferences.defaultLimit);
+    elements.prefBackupReminder.value = String(appState.preferences.backupReminderDays);
 
     if (!elements.limit.value || Number(elements.limit.value) === DEFAULT_PREFERENCES.defaultLimit) {
       elements.limit.value = String(appState.preferences.defaultLimit);
@@ -94,7 +96,8 @@ export function createDisplayPreferencesController({
       theme: elements.prefTheme.value,
       accent: elements.prefAccent.value,
       dateFormat: elements.prefDateFormat.value,
-      defaultLimit: elements.prefLimit.value
+      defaultLimit: elements.prefLimit.value,
+      backupReminderDays: elements.prefBackupReminder.value
     });
 
     await deps.setLocalStorage({

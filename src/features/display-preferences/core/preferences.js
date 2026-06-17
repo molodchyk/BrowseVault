@@ -6,7 +6,8 @@ export const DEFAULT_PREFERENCES = {
   theme: "system",
   accent: "teal",
   dateFormat: "system",
-  defaultLimit: 500
+  defaultLimit: 500,
+  backupReminderDays: BACKUP_STALE_DAYS
 };
 
 const THEMES = new Set(["system", "light", "dark"]);
@@ -30,13 +31,27 @@ export function clampResultLimit(value, defaultLimit = DEFAULT_PREFERENCES.defau
   return Math.min(MAX_RESULT_LIMIT, Math.max(25, Math.round(parsed)));
 }
 
+export function clampBackupReminderDays(value, defaultDays = DEFAULT_PREFERENCES.backupReminderDays) {
+  if (value === null || value === undefined || (typeof value === "string" && !value.trim())) {
+    return defaultDays;
+  }
+
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return defaultDays;
+  }
+
+  return Math.min(365, Math.max(0, Math.round(parsed)));
+}
+
 export function normalizePreferences(input = {}) {
   const source = input && typeof input === "object" ? input : {};
   return {
     theme: pickSupported(source.theme, THEMES, DEFAULT_PREFERENCES.theme),
     accent: pickSupported(source.accent, ACCENTS, DEFAULT_PREFERENCES.accent),
     dateFormat: pickSupported(source.dateFormat, DATE_FORMATS, DEFAULT_PREFERENCES.dateFormat),
-    defaultLimit: clampResultLimit(source.defaultLimit, DEFAULT_PREFERENCES.defaultLimit)
+    defaultLimit: clampResultLimit(source.defaultLimit, DEFAULT_PREFERENCES.defaultLimit),
+    backupReminderDays: clampBackupReminderDays(source.backupReminderDays, DEFAULT_PREFERENCES.backupReminderDays)
   };
 }
 
@@ -131,7 +146,11 @@ export function backupStatusDetails(backup, options = {}) {
   const timestamp = backupTimestamp(backup);
   const dateFormat = options.dateFormat || DEFAULT_PREFERENCES.dateFormat;
   const now = Number.isFinite(options.now) ? options.now : Date.now();
-  const staleDays = Number.isFinite(options.staleDays) ? options.staleDays : BACKUP_STALE_DAYS;
+  const reminderDays = Number.isFinite(options.reminderDays)
+    ? options.reminderDays
+    : Number.isFinite(options.staleDays)
+      ? options.staleDays
+      : DEFAULT_PREFERENCES.backupReminderDays;
 
   if (!timestamp) {
     return {
@@ -139,6 +158,7 @@ export function backupStatusDetails(backup, options = {}) {
       isWarning: true,
       isOk: false,
       lastText: "Never",
+      nextText: reminderDays > 0 ? "After first backup" : "Off",
       formatText: "-",
       recordsText: "0",
       checksumText: "Not available"
@@ -146,12 +166,19 @@ export function backupStatusDetails(backup, options = {}) {
   }
 
   const ageDays = Math.floor((now - timestamp) / 86400000);
-  const isStale = ageDays > staleDays;
+  const remindersEnabled = reminderDays > 0;
+  const isStale = remindersEnabled && ageDays > reminderDays;
+  const nextTimestamp = remindersEnabled ? timestamp + (reminderDays * 86400000) : 0;
   return {
-    healthText: isStale ? `Backup older than ${staleDays} days` : "Backup current",
+    healthText: remindersEnabled
+      ? isStale
+        ? `Backup older than ${reminderDays} days`
+        : "Backup current"
+      : "Backup reminder off",
     isWarning: isStale,
-    isOk: !isStale,
+    isOk: remindersEnabled && !isStale,
     lastText: formatDate(timestamp, dateFormat),
+    nextText: remindersEnabled ? formatDate(nextTimestamp, dateFormat) : "Off",
     formatText: String(backup.format || "unknown").toUpperCase(),
     recordsText: formatCount(backup.records),
     checksumText: formatChecksum(backup.sha256)

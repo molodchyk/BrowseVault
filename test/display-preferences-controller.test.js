@@ -42,7 +42,8 @@ function createHarness({
     theme: "system",
     accent: "teal",
     dateFormat: "system",
-    defaultLimit: 500
+    defaultLimit: 500,
+    backupReminderDays: 30
   }
 } = {}) {
   const storageWrites = [];
@@ -60,11 +61,13 @@ function createHarness({
       classList: backupHealthClassList
     },
     backupLast: output(),
+    backupNext: output(),
     backupRecords: output(),
     limit: input(""),
     prefAccent: input("teal"),
     prefDateFormat: input("system"),
     prefLimit: input("500"),
+    prefBackupReminder: input("30"),
     prefTheme: input("system"),
     statBackup: output(),
     statDomains: output(),
@@ -100,6 +103,7 @@ test("loadPreferences normalizes stored preferences and applies them to UI state
       accent: "blue",
       dateFormat: "dmy",
       defaultLimit: "750",
+      backupReminderDays: "14",
       theme: "dark"
     }
   });
@@ -110,6 +114,7 @@ test("loadPreferences normalizes stored preferences and applies them to UI state
     accent: "blue",
     dateFormat: "dmy",
     defaultLimit: 750,
+    backupReminderDays: 14,
     theme: "dark"
   });
   assert.equal(root.dataset.theme, "dark");
@@ -118,6 +123,7 @@ test("loadPreferences normalizes stored preferences and applies them to UI state
   assert.equal(elements.prefAccent.value, "blue");
   assert.equal(elements.prefDateFormat.value, "dmy");
   assert.equal(elements.prefLimit.value, "750");
+  assert.equal(elements.prefBackupReminder.value, "14");
   assert.equal(elements.limit.value, "750");
 });
 
@@ -127,6 +133,7 @@ test("savePreferences persists normalized values, refreshes stats, reruns search
   elements.prefAccent.value = "purple";
   elements.prefDateFormat.value = "iso";
   elements.prefLimit.value = "999999";
+  elements.prefBackupReminder.value = "0";
 
   await controller.savePreferences();
 
@@ -136,6 +143,7 @@ test("savePreferences persists normalized values, refreshes stats, reruns search
     {
       "browseVault.preferences": {
         accent: "purple",
+        backupReminderDays: 0,
         dateFormat: "iso",
         defaultLimit: 50000,
         theme: "light"
@@ -152,6 +160,7 @@ test("refreshStats renders stat cards and backup health details", async () => {
     preferences: {
       theme: "system",
       accent: "teal",
+      backupReminderDays: 30,
       dateFormat: "iso",
       defaultLimit: 500
     },
@@ -177,6 +186,7 @@ test("refreshStats renders stat cards and backup health details", async () => {
   assert.equal(elements.statNewest.textContent, "2026-06-16");
   assert.equal(elements.statBackup.textContent, "2026-06-01");
   assert.equal(elements.backupHealth.textContent, "Backup current");
+  assert.match(elements.backupNext.textContent, /^2026-07-01 \d{2}:\d{2}$/);
   assert.equal(elements.backupFormat.textContent, "JSON");
   assert.equal(elements.backupRecords.textContent, "42");
   assert.equal(elements.backupChecksum.textContent, "1234567890ab...90abcdef");

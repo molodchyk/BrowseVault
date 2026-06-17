@@ -54,6 +54,7 @@ export function collectAppElements(document) {
     statBackup: document.querySelector("#stat-backup"),
     backupHealth: document.querySelector("#backup-health"),
     backupLast: document.querySelector("#backup-last"),
+    backupNext: document.querySelector("#backup-next"),
     backupFormat: document.querySelector("#backup-format"),
     backupRecords: document.querySelector("#backup-records"),
     backupChecksum: document.querySelector("#backup-checksum"),
@@ -65,6 +66,7 @@ export function collectAppElements(document) {
     prefAccent: document.querySelector("#pref-accent"),
     prefDateFormat: document.querySelector("#pref-date-format"),
     prefLimit: document.querySelector("#pref-limit"),
+    prefBackupReminder: document.querySelector("#pref-backup-reminder"),
     savePreferences: document.querySelector("#save-preferences")
   };
 }
