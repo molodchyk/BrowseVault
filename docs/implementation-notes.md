@@ -135,13 +135,13 @@ CSV export should include:
 - locale-friendly time;
 - URL;
 - domain;
+- derived category label where a category rule applies;
 - title;
 - visit id;
 - source;
-- tags/categories if present.
 - spreadsheet formula neutralization for text cells that begin with `=`, `+`, `-`, `@`, tab, or whitespace before a formula trigger.
 
-HTML export should produce clickable links, exact timestamps, summary metrics, in-file filtering, sortable columns, and safe handling for unsupported URL schemes.
+HTML export should produce clickable links, exact timestamps, category labels, summary metrics, in-file filtering, sortable columns, and safe handling for unsupported URL schemes.
 
 Secondary archive insights should stay local, compact, and non-decorative:
 

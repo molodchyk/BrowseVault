@@ -4,6 +4,7 @@ import {
   archiveVisitsForExport,
   createChromeHistorySyncPlan,
   createImportArchivePlan,
+  decorateVisitsWithRuleCategories,
   duplicateCleanupCandidates,
   makeVisitId,
   mergeImportedVisits,
@@ -22,6 +23,7 @@ test("summarizeImportArchive reports new, existing, duplicate, invalid, and rule
     schemaVersion: 1,
     rules: [
       { type: "blacklist", value: "ads.example" },
+      { type: "category", value: "docs.example", category: "Research" },
       { type: "other", value: "ignored.example" }
     ],
     visits: [
@@ -57,7 +59,7 @@ test("summarizeImportArchive reports new, existing, duplicate, invalid, and rule
     duplicateRows: 1,
     existingVisits: 1,
     newVisits: 1,
-    rules: 1
+    rules: 2
   });
 });
 
@@ -297,6 +299,7 @@ test("createImportArchivePlan prepares atomic visits, rules, and metadata writes
     rules: [
       { type: "blacklist", value: "ads.example" },
       { type: "whitelist", value: "https://www.keep.example/path" },
+      { type: "category", value: "https://www.docs.example/path", category: "Research Docs" },
       { type: "unsupported", value: "ignored.example" }
     ],
     visits: [
@@ -348,6 +351,13 @@ test("createImportArchivePlan prepares atomic visits, rules, and metadata writes
       type: "whitelist",
       value: "keep.example",
       createdAt: importedAt
+    },
+    {
+      id: "category:docs.example",
+      type: "category",
+      value: "docs.example",
+      category: "Research Docs",
+      createdAt: importedAt
     }
   ]);
   assert.deepEqual(plan.metadata, {
@@ -357,15 +367,47 @@ test("createImportArchivePlan prepares atomic visits, rules, and metadata writes
     visits: 2,
     validRows: 3,
     duplicateRows: 1,
-    rules: 2
+    rules: 3
   });
   assert.deepEqual(plan.result, {
     importedAt,
     visits: 2,
     validRows: 3,
     duplicateRows: 1,
-    rules: 2
+    rules: 3
   });
+});
+
+test("decorateVisitsWithRuleCategories applies the most specific matching domain rule", () => {
+  const visits = [
+    {
+      id: "root",
+      domain: "example.com",
+      url: "https://example.com/"
+    },
+    {
+      id: "docs",
+      domain: "docs.example.com",
+      url: "https://docs.example.com/"
+    },
+    {
+      id: "other",
+      domain: "other.test",
+      url: "https://other.test/"
+    }
+  ];
+
+  const decorated = decorateVisitsWithRuleCategories(visits, {
+    categories: [
+      { value: "example.com", category: "General" },
+      { value: "docs.example.com", category: "Research" }
+    ]
+  });
+
+  assert.equal(decorated[0].category, "General");
+  assert.equal(decorated[1].category, "Research");
+  assert.equal(decorated[2].category, undefined);
+  assert.equal(decorated[2], visits[2]);
 });
 
 test("retentionCleanupCandidates skips deleted, recent, and whitelisted visits", () => {

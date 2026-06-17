@@ -137,6 +137,7 @@ Users want privacy cleanup but fear accidental deletion. Provide:
 - preview before deletion;
 - undo;
 - whitelist/blacklist;
+- manual category rules instead of opaque auto-categorization;
 - delete by domain/query/date;
 - "delete from now on" blacklisting;
 - "keep these domains forever" retention rules.
@@ -188,7 +189,7 @@ Free tier should still include:
 3. Backup/export/import integrity.
 4. Bulk selection and deletion.
 5. Command palette for tabs/bookmarks/history/downloads.
-6. Whitelist/blacklist and retention rules.
+6. Whitelist/blacklist, manual category, and retention rules.
 7. Analytics and optional AI search.
 
 ## Success Metrics

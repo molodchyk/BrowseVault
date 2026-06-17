@@ -16,11 +16,12 @@ const visit = {
 
 describe("parseQuery", () => {
   it("extracts fields, phrases, exclusions, and terms", () => {
-    const query = parseQuery('history site:github.com title:extension url:docs source:chrome -ads "exact phrase"');
+    const query = parseQuery('history site:github.com title:extension url:docs category:research source:chrome -ads "exact phrase"');
 
     assert.deepEqual(query.site, ["github.com"]);
     assert.deepEqual(query.title, ["extension"]);
     assert.deepEqual(query.url, ["docs"]);
+    assert.deepEqual(query.category, ["research"]);
     assert.deepEqual(query.source, ["chrome"]);
     assert.deepEqual(query.negatives, ["ads"]);
     assert.deepEqual(query.phrases, ["exact phrase"]);
@@ -85,6 +86,17 @@ describe("matchesVisitQuery", () => {
     assert.equal(matchesVisitQuery(visit, parseQuery("visits:13+")), false);
     assert.equal(matchesVisitQuery(visit, parseQuery("count:10..12")), true);
     assert.equal(matchesVisitQuery(visit, parseQuery("visitcount:12")), true);
+  });
+
+  it("matches category filters and aliases", () => {
+    const categorizedVisit = {
+      ...visit,
+      category: "Research Docs"
+    };
+
+    assert.equal(matchesVisitQuery(categorizedVisit, parseQuery("category:research")), true);
+    assert.equal(matchesVisitQuery(categorizedVisit, parseQuery("tag:docs")), true);
+    assert.equal(matchesVisitQuery(categorizedVisit, parseQuery("category:shop*")), false);
   });
 
   it("matches local hour filters", () => {

@@ -164,6 +164,7 @@ function appendResultMeta({ meta, item, dateFormat, metaTokens, query }) {
   const iso = visitTimeIso(item.visitTime);
   const details = `${item.visitCount || 0} visits · ${item.source || "unknown source"}`;
   const domainPart = ownerDocument.createElement("span");
+  const categoryPart = ownerDocument.createElement("span");
   const detailsPart = ownerDocument.createElement("span");
 
   timestamp.textContent = formatDate(item.visitTime, dateFormat);
@@ -173,14 +174,21 @@ function appendResultMeta({ meta, item, dateFormat, metaTokens, query }) {
   }
 
   appendHighlightedText(domainPart, domain, metaTokens, query.regex);
+  appendHighlightedText(categoryPart, `category: ${item.category || ""}`, metaTokens, query.regex);
   appendHighlightedText(detailsPart, details, metaTokens, query.regex);
-  meta.replaceChildren(
+  const parts = [
     domainPart,
     ownerDocument.createTextNode(" · "),
     timestamp,
     ownerDocument.createTextNode(" · "),
     detailsPart
-  );
+  ];
+
+  if (item.category) {
+    parts.splice(2, 0, categoryPart, ownerDocument.createTextNode(" · "));
+  }
+
+  meta.replaceChildren(...parts);
 }
 
 function renderResultItem({

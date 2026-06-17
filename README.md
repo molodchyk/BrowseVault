@@ -28,7 +28,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - manual sync from currently available Chrome history, expanded to individual visits where Chrome exposes them;
 - atomic Chrome sync and live-capture metadata commits so recorder health matches recorded rows;
 - visible archive health for startup, Chrome sync, live capture status, malformed vault rows, tombstones, and duplicate active records;
-- query syntax for site/host/domain, title, URL, source, transition, visit count, exact-day/date ranges, local-hour filters, exclusions, wildcards, phrases, and regex;
+- query syntax for site/host/domain, title, URL, manual category/tag, source, transition, visit count, exact-day/date ranges, local-hour filters, exclusions, wildcards, phrases, and regex;
 - bounded typo-tolerant matching for longer plain keyword searches;
 - chunked local search scanning for large vaults, covered by synthetic large-history tests;
 - bounded result retention for limited searches, covered by a 100k-record synthetic history test;
@@ -42,8 +42,8 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - toolbar and keyboard-command opening that reuses an already open BrowseVault tab;
 - Settings escape hatch for opening Chrome's native history page without making BrowseVault a default-history override;
 - JSON backup export and import;
-- deterministic newest-first full exports, plus current-result exports that follow the selected newest/oldest result order, including formula-safe CSV with ISO timestamp, local date/time, visit id, and Chrome id fields;
-- offline HTML exports with summary metrics, exact timestamps, in-file filtering, sortable columns, and safer link handling;
+- deterministic newest-first full exports, plus current-result exports that follow the selected newest/oldest result order, including formula-safe CSV with ISO timestamp, local date/time, manual category, visit id, and Chrome id fields;
+- offline HTML exports with summary metrics, exact timestamps, manual category column, in-file filtering, sortable columns, and safer link handling;
 - visible backup status with freshness, format, record count, file size, checksum details, and a backup self-test that verifies restorable rows;
 - visible storage self-check status for the local vault metadata layer;
 - secondary archive insights for top domains, busiest day, active days, and date range;
@@ -67,7 +67,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - undo for the last BrowseVault vault deletion;
 - optional URL-level deletion from Chrome history for selected records or the current filtered result set;
 - full local BrowseVault data reset without touching Chrome history;
-- domain blacklist and whitelist rules;
+- domain blacklist, whitelist, and manual category rules;
 - manual retention cleanup that previews old vault records and keeps whitelisted domains;
 - duplicate cleanup that previews repeated active vault records and moves extras to undoable deletion;
 - local preferences for system/light/dark theme, accent color, high contrast, text size, date format, default result limit, backup reminders, backup/export save mode, backup filename prefix, and backup filename template;
@@ -170,6 +170,7 @@ Examples:
 github site:github.com
 host:www.github.com source:chrome-history
 title:invoice after:2026-01-01
+category:research
 date:2026-06-16
 date:2026-06-16 hour:14
 hour:9-17
@@ -182,7 +183,11 @@ regex:github|gitlab
 
 The main vault search is used for archived history management. Quick Open uses the same query text to search current browser sources such as open tabs, bookmarks, downloads, recently closed tabs, and closed windows. Quick Open results are read-only and are not affected by vault delete/export actions. Longer plain keywords use a bounded fuzzy fallback, so common one-character typos such as `histroy` can still find `history`; short keywords, phrases, regex, and structured filters stay exact unless they include `*` or `?` wildcards. Wildcards work in plain keywords, exclusions, and `title:`, `url:`, `source:`, or `transition:` filters.
 
-Date filters use `YYYY-MM-DD` text fields to avoid browser-specific date input formatting. Use `date:`, `day:`, or `on:` for one local calendar day, and `after:` / `before:` for ranges. Bare `after:YYYY-MM-DD` starts at local midnight, and bare `before:YYYY-MM-DD` includes the full local day. Use `hour:14` for one local hour or `hour:9-17` / `hour:9..17` for an inclusive local-hour range. Domain filters accept `site:`, `host:`, or `domain:`. Visit count filters accept exact values, comparisons such as `visits:>=10`, ranges such as `count:5..12`, and minimum shorthand such as `visits:7+`. Displayed dates can be switched between system locale, ISO, day/month/year, month/day/year, and year/month/day in Settings.
+Date filters use `YYYY-MM-DD` text fields to avoid browser-specific date input formatting. Use `date:`, `day:`, or `on:` for one local calendar day, and `after:` / `before:` for ranges. Bare `after:YYYY-MM-DD` starts at local midnight, and bare `before:YYYY-MM-DD` includes the full local day. Use `hour:14` for one local hour or `hour:9-17` / `hour:9..17` for an inclusive local-hour range. Domain filters accept `site:`, `host:`, or `domain:`. Manual category rules are searchable with `category:` or `tag:`. Visit count filters accept exact values, comparisons such as `visits:>=10`, ranges such as `count:5..12`, and minimum shorthand such as `visits:7+`. Displayed dates can be switched between system locale, ISO, day/month/year, month/day/year, and year/month/day in Settings.
+
+## Rules
+
+The Rules tab supports manual domain categories, blacklist rules, and whitelist rules. Category rules label matching domains and subdomains in search results, can be searched with `category:` or `tag:`, and are included in BrowseVault JSON archives as rules. CSV and HTML history reports include the derived category label when one applies.
 
 ## Retention Cleanup
 

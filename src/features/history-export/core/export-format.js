@@ -122,6 +122,7 @@ export function visitsToCsv(visits) {
     "visitTimeLocal",
     "visitTimestampMs",
     "domain",
+    "category",
     "title",
     "url",
     "visitCount",
@@ -139,6 +140,7 @@ export function visitsToCsv(visits) {
       local.time,
       visit.visitTime,
       visit.domain,
+      visit.category,
       visit.title,
       visit.url,
       visit.visitCount,
@@ -166,6 +168,7 @@ export function visitsToHtml(visits, exportedAt) {
       return `<tr>
         <td data-label="Visited" data-sort="${escapeHtml(visitTimestamp)}"><time datetime="${escapeHtml(visitIso)}">${escapeHtml(visitLocal)}</time><div class="muted">${escapeHtml(visitIso)}</div></td>
         <td data-label="Domain" data-sort="${escapeHtml(visit.domain)}">${escapeHtml(visit.domain)}</td>
+        <td data-label="Category" data-sort="${escapeHtml(visit.category)}">${escapeHtml(visit.category)}</td>
         <td data-label="Page" data-sort="${escapeHtml(titleSort)}">${pageCell(visit)}</td>
         <td data-label="Visits" data-sort="${escapeHtml(visit.visitCount)}">${escapeHtml(visit.visitCount)}</td>
         <td data-label="Transition" data-sort="${escapeHtml(visit.transition)}">${escapeHtml(visit.transition)}</td>
@@ -235,7 +238,7 @@ export function visitsToHtml(visits, exportedAt) {
   <div class="table-wrap">
   <table id="visits">
     <caption>History records</caption>
-    <thead><tr><th><button type="button" data-sort-type="number">Visited</button></th><th><button type="button" data-sort-type="text">Domain</button></th><th><button type="button" data-sort-type="text">Page</button></th><th><button type="button" data-sort-type="number">Visits</button></th><th><button type="button" data-sort-type="text">Transition</button></th><th><button type="button" data-sort-type="text">Source</button></th><th><button type="button" data-sort-type="text">Visit ID</button></th><th><button type="button" data-sort-type="text">Chrome ID</button></th></tr></thead>
+    <thead><tr><th><button type="button" data-sort-type="number">Visited</button></th><th><button type="button" data-sort-type="text">Domain</button></th><th><button type="button" data-sort-type="text">Category</button></th><th><button type="button" data-sort-type="text">Page</button></th><th><button type="button" data-sort-type="number">Visits</button></th><th><button type="button" data-sort-type="text">Transition</button></th><th><button type="button" data-sort-type="text">Source</button></th><th><button type="button" data-sort-type="text">Visit ID</button></th><th><button type="button" data-sort-type="text">Chrome ID</button></th></tr></thead>
     <tbody>
 ${rows}
     </tbody>

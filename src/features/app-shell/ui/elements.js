@@ -87,6 +87,8 @@ export function collectAppElements(document) {
     archiveActiveDays: document.querySelector("#archive-active-days"),
     archiveDateRange: document.querySelector("#archive-date-range"),
     ruleDomain: document.querySelector("#rule-domain"),
+    ruleCategory: document.querySelector("#rule-category"),
+    addCategory: document.querySelector("#add-category"),
     addBlacklist: document.querySelector("#add-blacklist"),
     addWhitelist: document.querySelector("#add-whitelist"),
     rulesList: document.querySelector("#rules-list"),

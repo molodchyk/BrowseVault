@@ -10,6 +10,7 @@ export function parseQuery(input = "") {
     site: [],
     title: [],
     url: [],
+    category: [],
     source: [],
     transition: [],
     visitCount: {
@@ -50,6 +51,11 @@ export function parseQuery(input = "") {
 
     if (value && field === "url") {
       query.url.push(value);
+      continue;
+    }
+
+    if (value && ["category", "tag"].includes(field)) {
+      query.category.push(value);
       continue;
     }
 
@@ -460,8 +466,9 @@ export function matchesVisitQuery(visit, query) {
     : [domain].filter(Boolean);
   const source = (visit.source || "").toLowerCase();
   const transition = (visit.transition || "").toLowerCase();
+  const category = (visit.category || "").toLowerCase();
   const visitCount = Number(visit.visitCount || 0);
-  const haystack = `${title} ${url} ${domains.join(" ")}`;
+  const haystack = `${title} ${url} ${domains.join(" ")} ${category}`;
 
   if (query.after !== null && visit.visitTime < query.after) {
     return false;
@@ -491,6 +498,10 @@ export function matchesVisitQuery(visit, query) {
   }
 
   if (query.url.length && !includesAllWildcard(url, query.url)) {
+    return false;
+  }
+
+  if (query.category.length && !query.category.some((token) => wildcardIncludes(category, token))) {
     return false;
   }
 

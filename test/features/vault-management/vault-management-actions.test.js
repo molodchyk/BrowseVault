@@ -53,6 +53,7 @@ function createHarness({
   const elements = {
     quickResults: fakeList(),
     retentionDays: { value: "30" },
+    ruleCategory: { value: "Research" },
     ruleDomain: { value: "example.com" },
     rulesList: fakeList()
   };
@@ -68,7 +69,7 @@ function createHarness({
       appendActivityLog: async () => {},
       confirmAction: () => true,
       document: fakeDocument(),
-      getRules: async () => ({ rules: [], blacklist: [], whitelist: [] }),
+      getRules: async () => ({ rules: [], blacklist: [], whitelist: [], categories: [] }),
       ...services
     },
     setStatus: (message) => statuses.push(message)
@@ -102,6 +103,59 @@ test("renderRules renders empty and removable rule states", async () => {
   assert.deepEqual(removed, ["rule-1"]);
   assert.deepEqual(statuses, ["Removed example.com"]);
   assert.equal(elements.rulesList.children[0].textContent, "No domain rules yet.");
+});
+
+test("renderRules renders category rule labels", async () => {
+  const { actions, elements } = createHarness({
+    services: {
+      getRules: async () => ({
+        rules: [{ id: "category:example.com", type: "category", value: "example.com", category: "Research" }],
+        blacklist: [],
+        whitelist: [],
+        categories: [{ id: "category:example.com", value: "example.com", category: "Research" }]
+      })
+    }
+  });
+
+  await actions.renderRules();
+
+  assert.equal(elements.rulesList.children.length, 1);
+  const label = elements.rulesList.children[0].children[0];
+  assert.equal(label.children[0].textContent, "category");
+  assert.deepEqual(label.children.slice(1), [" example.com", " as Research"]);
+});
+
+test("addCategoryRule stores a manual domain category and refreshes visible results", async () => {
+  const added = [];
+  const activity = [];
+  const { actions, calls, elements, statuses } = createHarness({
+    services: {
+      addCategoryRule: async (...args) => {
+        added.push(args);
+        return {
+          id: "category:example.com",
+          type: "category",
+          value: "example.com",
+          category: "Research"
+        };
+      },
+      appendActivityLog: async (...args) => activity.push(args)
+    }
+  });
+
+  await actions.addCategoryRule();
+
+  assert.deepEqual(added, [["example.com", "Research"]]);
+  assert.equal(elements.ruleDomain.value, "");
+  assert.equal(elements.ruleCategory.value, "");
+  assert.deepEqual(calls, ["refreshStats", "runSearch"]);
+  assert.deepEqual(statuses, ["Categorized example.com as Research"]);
+  assert.deepEqual(activity, [[{
+    type: "rule",
+    label: "category rule added",
+    count: 1,
+    detail: "example.com as Research"
+  }]]);
 });
 
 test("blacklistSelectedDomains adds unique selected domains and reports whitelist moves", async () => {

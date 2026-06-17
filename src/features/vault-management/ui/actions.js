@@ -1,4 +1,5 @@
 import {
+  addCategoryRule,
   addDomainRule,
   appendActivityLog,
   clearVaultData,
@@ -19,6 +20,7 @@ import {
 import { sendRuntimeMessage } from "../../../platform/chrome/runtime.js";
 
 const defaultServices = {
+  addCategoryRule,
   addDomainRule,
   appendActivityLog,
   clearVaultData,
@@ -83,6 +85,9 @@ export function createVaultManagementActions({
       const type = deps.document.createElement("strong");
       type.textContent = rule.type;
       label.append(type, ` ${rule.value}`);
+      if (rule.type === "category" && rule.category) {
+        label.append(` as ${rule.category}`);
+      }
 
       const remove = deps.document.createElement("button");
       remove.className = "ghost";
@@ -98,6 +103,7 @@ export function createVaultManagementActions({
         });
         await renderRules();
         await refreshStats();
+        await runSearch();
         setStatus(`Removed ${rule.value}`);
       });
 
@@ -322,6 +328,24 @@ export function createVaultManagementActions({
     setStatus(`Added ${type} rule`);
   }
 
+  async function addCategoryRuleAction() {
+    const domain = elements.ruleDomain.value;
+    const category = elements.ruleCategory.value;
+    const rule = await deps.addCategoryRule(domain, category);
+    await recordActivity({
+      type: "rule",
+      label: "category rule added",
+      count: 1,
+      detail: `${rule.value} as ${rule.category}`
+    });
+    elements.ruleDomain.value = "";
+    elements.ruleCategory.value = "";
+    await renderRules();
+    await refreshStats();
+    await runSearch();
+    setStatus(`Categorized ${rule.value} as ${rule.category}`);
+  }
+
   async function previewRetentionCleanup() {
     const retentionDays = retentionDaysFromInput(elements.retentionDays.value);
     if (!retentionDays) {
@@ -428,6 +452,7 @@ export function createVaultManagementActions({
   }
 
   return {
+    addCategoryRule: addCategoryRuleAction,
     addRule,
     blacklistSelectedDomains,
     cleanupDuplicates,

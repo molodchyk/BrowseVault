@@ -394,7 +394,7 @@ code {
 
 .rule-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) minmax(140px, 0.5fr) auto auto auto;
   gap: 10px;
 }
 
@@ -839,6 +839,14 @@ code {
   .filters,
   .settings-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rule-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rule-row button {
+    width: 100%;
   }
 
   .section-heading,

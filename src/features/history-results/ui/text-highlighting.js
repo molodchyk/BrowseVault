@@ -8,7 +8,7 @@ export function highlightTokensForScope(query, scope, options = {}) {
     ? query.title
     : scope === "url"
       ? [...query.url, ...query.site]
-      : query.site;
+      : [...query.site, ...(query.category || [])];
 
   return [...new Set([...shared, ...scoped]
     .map((token) => token.trim().toLowerCase())

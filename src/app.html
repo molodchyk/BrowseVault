@@ -100,7 +100,7 @@
                 </select>
               </label>
             </div>
-            <p class="hint">Syntax: <code>site:</code>, <code>host:</code>, <code>domain:</code>, <code>title:</code>, <code>url:</code>, <code>source:</code>, <code>transition:</code>, <code>visits:</code>, <code>date:</code>, <code>hour:</code>, <code>after:</code>, <code>before:</code>, <code>-exclude</code>, <code>*</code>/<code>?</code> wildcards, quoted phrases, and <code>regex:</code>.</p>
+            <p class="hint">Syntax: <code>site:</code>, <code>host:</code>, <code>domain:</code>, <code>title:</code>, <code>url:</code>, <code>category:</code>, <code>tag:</code>, <code>source:</code>, <code>transition:</code>, <code>visits:</code>, <code>date:</code>, <code>hour:</code>, <code>after:</code>, <code>before:</code>, <code>-exclude</code>, <code>*</code>/<code>?</code> wildcards, quoted phrases, and <code>regex:</code>.</p>
           </details>
         </section>
 
@@ -316,6 +316,8 @@
           </div>
           <div class="rule-row">
             <input id="rule-domain" type="text" placeholder="example.com">
+            <input id="rule-category" type="text" placeholder="Research">
+            <button id="add-category" class="ghost" type="button">Categorize</button>
             <button id="add-blacklist" type="button">Blacklist</button>
             <button id="add-whitelist" class="ghost" type="button">Whitelist</button>
           </div>

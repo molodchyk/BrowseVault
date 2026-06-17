@@ -11,6 +11,7 @@ test("visitsToCsv includes spreadsheet-friendly date/time and identity columns",
       url: "https://example.com/report",
       title: "Report, Q2",
       domain: "example.com",
+      category: "Research",
       visitTime,
       visitCount: 3,
       transition: "typed",
@@ -22,10 +23,10 @@ test("visitsToCsv includes spreadsheet-friendly date/time and identity columns",
 
   assert.equal(
     header,
-    "visitId,visitTimeIso,visitDate,visitTimeLocal,visitTimestampMs,domain,title,url,visitCount,transition,source,chromeId"
+    "visitId,visitTimeIso,visitDate,visitTimeLocal,visitTimestampMs,domain,category,title,url,visitCount,transition,source,chromeId"
   );
   assert.match(row, /^visit-1,2026-06-16T12:34:56\.000Z,/);
-  assert.match(row, new RegExp(`,${visitTime},example\\.com,`));
+  assert.match(row, new RegExp(`,${visitTime},example\\.com,Research,`));
   assert.match(row, /,"Report, Q2",https:\/\/example\.com\/report,3,typed,fixture,chrome\|1$/);
 });
 
@@ -45,7 +46,7 @@ test("visitsToCsv does not throw on malformed timestamps", () => {
   ]);
 
   const [, row] = csv.split("\n");
-  assert.match(row, /^visit-1,,,,not-a-date,example\.com,Report,/);
+  assert.match(row, /^visit-1,,,,not-a-date,example\.com,,Report,/);
 });
 
 test("visitsToCsv neutralizes spreadsheet formulas in exported text", () => {
@@ -101,9 +102,10 @@ test("visitsToHtml creates a filterable sortable audit report", () => {
         id: "visit-1",
         chromeId: "chrome|1",
         url: "https://example.com/report",
-        title: "Report",
-        domain: "example.com",
-        visitTime,
+      title: "Report",
+      domain: "example.com",
+      category: "Research",
+      visitTime,
         visitCount: 3,
         transition: "typed",
         source: "fixture"
@@ -114,6 +116,7 @@ test("visitsToHtml creates a filterable sortable audit report", () => {
 
   assert.match(html, /id="report-filter"/);
   assert.match(html, /data-sort-type="number">Visited/);
+  assert.match(html, /data-label="Category" data-sort="Research">Research<\/td>/);
   assert.match(html, /2026-06-16T12:34:56\.000Z/);
   assert.match(html, new RegExp(`data-sort="${visitTime}"`));
   assert.match(html, /data-label="Visits" data-sort="3">3<\/td>/);

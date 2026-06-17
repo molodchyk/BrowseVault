@@ -165,6 +165,7 @@ function bindEvents() {
     document,
     root: document.documentElement,
     handlers: {
+      addCategoryRule: vaultActions.addCategoryRule,
       addBlacklistRule: () => vaultActions.addRule("blacklist"),
       addWhitelistRule: () => vaultActions.addRule("whitelist"),
       applyDateShortcut: historySearchForm.applyDateShortcut,

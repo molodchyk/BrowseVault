@@ -86,11 +86,13 @@ test("highlight helpers choose scoped tokens and merge overlapping ranges", () =
     phrases: ["beta docs"],
     title: ["report"],
     url: ["example"],
-    site: ["docs.example.com"]
+    site: ["docs.example.com"],
+    category: ["research"]
   };
 
   assert.deepEqual(highlightTokensForScope(query, "title"), ["beta docs", "report", "alpha"]);
   assert.deepEqual(highlightTokensForScope(query, "url"), ["docs.example.com", "beta docs", "example", "alpha"]);
+  assert.deepEqual(highlightTokensForScope(query, "meta"), ["docs.example.com", "beta docs", "research", "alpha"]);
   assert.deepEqual(highlightRanges("Alpha beta docs report", ["alpha", "beta docs"], /docs report/), [
     [0, 5],
     [6, 22]
@@ -243,6 +245,49 @@ test("renderHistoryResults exposes exact visit timestamps in result metadata", (
   assert.equal(time.dateTime, iso);
   assert.equal(time.title, `Exact visit time: ${iso}`);
   assert.equal(meta.textContent, `docs.github.com · ${displayedTime} · 3 visits · chrome-history`);
+});
+
+test("renderHistoryResults shows category metadata when present", () => {
+  const document = fakeDocument();
+  const fragments = [];
+  const visitTime = new Date(2026, 5, 10, 12, 34).getTime();
+  const resultsList = fakeResultsList(document);
+  const resultTemplate = {
+    content: {
+      cloneNode() {
+        const fragment = fakeResultFragment(document);
+        fragments.push(fragment);
+        return fragment;
+      }
+    }
+  };
+
+  renderHistoryResults({
+    results: [{
+      id: "visit-1",
+      title: "Docs",
+      url: "https://docs.github.com/en/apps",
+      domain: "docs.github.com",
+      category: "Research",
+      visitTime,
+      visitCount: 3,
+      source: "chrome-history"
+    }],
+    total: 1,
+    queryText: "category:research",
+    selectedIds: new Set(),
+    dateFormat: "iso",
+    elements: {
+      resultCount: fakeDomNode(document, "strong"),
+      results: resultsList,
+      resultTemplate
+    },
+    getSelectionState: () => ({ selectedIds: new Set(), lastCheckedIndex: null }),
+    onSelectionChange: () => {}
+  });
+
+  const meta = fragments[0].nodes[".meta"];
+  assert.match(meta.textContent, /docs\.github\.com · category: Research · /);
 });
 
 function fakeResultRow(id, calls, options = {}) {

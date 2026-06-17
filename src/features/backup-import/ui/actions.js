@@ -210,7 +210,7 @@ export function createBackupActions({
 
   async function exportCsv() {
     setStatus("Preparing CSV");
-    const archive = await deps.exportArchive();
+    const archive = await deps.exportArchive(null, { includeCategories: true });
     const sizeBytes = await deps.downloadText(
       exportFilename("history", archive.exportedAt, "csv"),
       "text/csv",
@@ -229,7 +229,7 @@ export function createBackupActions({
 
   async function exportHtml() {
     setStatus("Preparing HTML");
-    const archive = await deps.exportArchive();
+    const archive = await deps.exportArchive(null, { includeCategories: true });
     const sizeBytes = await deps.downloadText(
       exportFilename("history", archive.exportedAt, "html"),
       "text/html",

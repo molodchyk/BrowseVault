@@ -12,12 +12,12 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Manual sync from currently available Chrome history, expanded to individual visits where Chrome exposes them.
 - Chrome sync and live-capture recorder metadata are committed with their related vault records where the storage layer can do so atomically.
 - Full-page tabbed app with History, Quick Open, Backup, Rules, and Settings areas.
-- Advanced local search for site, host, domain, title, URL, source, transition, visit count, exact day, date range, local hour, exclusions, wildcards, phrases, and regex.
+- Advanced local search for site, host, domain, title, URL, manual category/tag, source, transition, visit count, exact day, date range, local hour, exclusions, wildcards, phrases, and regex.
 - Limited history searches keep only the top visible results while counting the full match set, reducing memory and sort work on large archives.
 - One-click Today, Yesterday, 7 Days, 30 Days, and All Dates shortcuts using ISO-style date filters.
 - Saved searches, newest/oldest result ordering, match highlighting, local-date grouped results, sticky result controls, incremental loading, one-click Show All expansion, Top/Bottom result jumps, keyboard-first search focus, keyboard navigation for visible history rows, and mouse/keyboard range selection.
 - Quick Open search across open tabs, bookmarks, downloads, recently closed tabs, and closed windows, with keyboard navigation for source results and readable source-unavailable warnings.
-- Deterministic newest-first full JSON, formula-safe CSV, and offline HTML export; selected and current filtered result exports; current-result exports follow the selected newest/oldest result order.
+- Deterministic newest-first full JSON, formula-safe CSV, and offline HTML export with category columns where category rules apply; selected and current filtered result exports; current-result exports follow the selected newest/oldest result order.
 - Bare `after:YYYY-MM-DD` and `before:YYYY-MM-DD` search filters use local calendar-day boundaries instead of browser-dependent UTC parsing.
 - JSON backup integrity metadata and backup self-test before full JSON export, including checksum, row-count, and restorable-row validation.
 - Backup reminder status follows the configured reminder interval and warns when the next reminder date is reached.
@@ -28,7 +28,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Import preview and import support for BrowseVault JSON, CSV, TSV, Google Takeout Browser History, Google My Activity, and common competitor history exports.
 - Import commits write visits, rules, and last-import metadata in one IndexedDB transaction to avoid partial restore state.
 - Recent activity log for completed backup, export, import, cleanup, delete, restore, rule, and reset actions, plus vault health checks for malformed rows, tombstones, and duplicate active records.
-- Domain blacklist and whitelist rules, selected-domain blacklisting, manual retention cleanup, duplicate cleanup, and full local vault reset.
+- Domain blacklist, whitelist, and manual category rules, selected-domain blacklisting, manual retention cleanup, duplicate cleanup, and full local vault reset.
 - Current filtered result deletion can target only the BrowseVault vault or, with a separate confirmation, matching URLs in Chrome history plus the related vault records.
 - Settings for system, light, and dark themes, accent color, high contrast, text size, date format, default result limit, backup reminder cadence, backup/export save mode, backup filename prefix, and backup filename template.
 - Feature-owned test folders and StorePilot-ready Chrome Web Store automation documents.
@@ -41,6 +41,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Delete-from-Chrome actions explicitly remove Chrome history by URL and then mark the selected or current-result BrowseVault records deleted.
 - Reset Vault clears BrowseVault local archive data, rules, and backup metadata without deleting Chrome history.
 - Imports are staged behind a preview with row counts, duplicate estimates, existing/new visit counts, rule counts, and checksum health where available.
+- Manual category rules are stored locally with other rules and exported/imported in BrowseVault JSON archives.
 - Imports merge with matching existing vault visits and preserve local vault deletion markers, Chrome-deletion markers, and original creation metadata.
 - Imports merge duplicate archive rows into unique restored records and report duplicate rows in the final import status and activity log.
 - Duplicate cleanup moves repeated active vault records with the same URL and visit time to undoable deletion while keeping the richest record.

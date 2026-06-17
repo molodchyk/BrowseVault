@@ -356,6 +356,7 @@ export async function getRules() {
   const rules = await getAll(RULE_STORE);
   const blacklist = [];
   const whitelist = [];
+  const categories = [];
 
   for (const rule of rules) {
     if (rule.type === "blacklist") {
@@ -364,9 +365,16 @@ export async function getRules() {
     if (rule.type === "whitelist") {
       whitelist.push(rule.value);
     }
+    if (rule.type === "category" && rule.value && rule.category) {
+      categories.push({
+        id: rule.id,
+        value: rule.value,
+        category: rule.category
+      });
+    }
   }
 
-  return { blacklist, whitelist, rules };
+  return { blacklist, whitelist, categories, rules };
 }
 
 export async function addDomainRule(type, value) {
@@ -397,6 +405,25 @@ export async function addDomainRule(type, value) {
   return record;
 }
 
+export async function addCategoryRule(domainValue, categoryValue) {
+  const value = normalizeRuleValue(domainValue);
+  const category = normalizeCategoryValue(categoryValue);
+  if (!value || !category) {
+    throw new Error("Enter a domain and category first.");
+  }
+
+  const record = {
+    id: `category:${value}`,
+    type: "category",
+    value,
+    category,
+    createdAt: new Date().toISOString()
+  };
+
+  await putMany(RULE_STORE, [record]);
+  return record;
+}
+
 function normalizeRuleValue(value) {
   return String(value || "")
     .toLowerCase()
@@ -407,6 +434,13 @@ function normalizeRuleValue(value) {
     .replace(/[^a-z0-9.-]/g, "");
 }
 
+function normalizeCategoryValue(value) {
+  return String(value || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .slice(0, 80);
+}
+
 export async function removeRule(id) {
   const db = await openVaultDb();
   const tx = db.transaction(RULE_STORE, "readwrite");
@@ -415,7 +449,7 @@ export async function removeRule(id) {
 }
 
 export async function searchVisits(input = "", options = {}) {
-  const visits = await getAllVisits();
+  const visits = decorateVisitsWithRuleCategories(await getAllVisits(), await getRules());
   return searchVisitRecords(visits, input, {
     ...options,
     defaultLimit: DEFAULT_RESULT_LIMIT
@@ -424,6 +458,41 @@ export async function searchVisits(input = "", options = {}) {
 
 function hostMatchesRule(host, rule) {
   return host === rule || host.endsWith(`.${rule}`);
+}
+
+function normalizedCategoryRules(categories) {
+  return (Array.isArray(categories) ? categories : [])
+    .filter((rule) => rule?.value && rule?.category)
+    .map((rule) => ({
+      value: String(rule.value).toLowerCase(),
+      category: rule.category
+    }))
+    .sort((left, right) => right.value.length - left.value.length);
+}
+
+function categoryForVisitFromRules(visit, categories) {
+  const domain = (visit.domain || normalizeDomain(visit.url || "")).toLowerCase();
+  if (!domain || !categories.length) {
+    return "";
+  }
+
+  return categories.find((rule) => hostMatchesRule(domain, rule.value))?.category || "";
+}
+
+export function categoryForVisit(visit, categories) {
+  return categoryForVisitFromRules(visit, normalizedCategoryRules(categories));
+}
+
+export function decorateVisitsWithRuleCategories(visits, rules) {
+  const categories = normalizedCategoryRules(rules?.categories);
+  if (!categories.length) {
+    return visits;
+  }
+
+  return visits.map((visit) => {
+    const category = categoryForVisitFromRules(visit, categories);
+    return category ? { ...visit, category } : visit;
+  });
 }
 
 function visitMatchesWhitelist(visit, whitelist) {
@@ -731,6 +800,7 @@ export function archiveVisitsForExport(visits) {
 
 export async function exportArchive(items = null, options = {}) {
   const sourceVisits = items || (await getAllVisits());
+  const rules = await getRules();
   const visits = options.preserveOrder
     ? [...(Array.isArray(sourceVisits) ? sourceVisits : [])]
     : archiveVisitsForExport(sourceVisits);
@@ -742,8 +812,8 @@ export async function exportArchive(items = null, options = {}) {
       visits: visits.length
     },
     meta: await getAllMeta(),
-    rules: (await getRules()).rules,
-    visits
+    rules: rules.rules,
+    visits: options.includeCategories ? decorateVisitsWithRuleCategories(visits, rules) : visits
   };
 }
 
@@ -825,9 +895,22 @@ function normalizeImportRules(archive, importedAt = new Date().toISOString()) {
   }
 
   return archive.rules
-    .filter((rule) => ["blacklist", "whitelist"].includes(rule?.type))
+    .filter((rule) => ["blacklist", "whitelist", "category"].includes(rule?.type))
     .map((rule) => {
       const value = normalizeRuleValue(rule.value);
+      const category = normalizeCategoryValue(rule.category);
+      if (rule.type === "category") {
+        return value && category
+          ? {
+              id: `category:${value}`,
+              type: "category",
+              value,
+              category,
+              createdAt: rule.createdAt || importedAt
+            }
+          : null;
+      }
+
       return value
         ? {
             id: `${rule.type}:${value}`,

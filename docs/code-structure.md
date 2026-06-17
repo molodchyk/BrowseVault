@@ -6,7 +6,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 
 - `src/app.html`, `src/app.css`, and `src/app.js` own the extension page runtime shell while the UI is being split.
 - `src/background.js` owns MV3 service worker listener wiring, extension-page opening, and startup/install metadata.
-- `src/storage.js` owns IndexedDB vault records, backup metadata, rules, and vault mutations.
+- `src/storage.js` owns IndexedDB vault records, backup metadata, domain/category rules, and vault mutations.
 - `src/browser-memory.js` owns read-only search over tabs, bookmarks, downloads, and recently closed sessions.
 - `src/query.js` owns search parsing and matching.
 - `src/features/activity-log/` owns recent activity event normalization and Backup-tab activity rendering for user-visible backup, export, import, cleanup, delete, restore, rule, and reset operations.
@@ -18,7 +18,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `src/features/history-export/core/export-format.js` owns pure CSV and HTML export formatting.
 - `src/features/history-results/core/` owns pure result selection, URL/domain extraction, grouping, count labels, load-more state, saved-search normalization, search form query composition, and chunked local search scanning.
 - `src/features/history-results/ui/` owns search form field state, saved-search controls, local history search/load-more/show-all orchestration, selected-record lookup, history result DOM rendering, rendering orchestration, search-hit highlighting, result jump controls, and selected-result bulk actions.
-- `src/features/vault-management/` owns extension-page vault deletion, Chrome-history deletion requests, undo, reset, domain-rule actions, retention cleanup, and duplicate cleanup.
+- `src/features/vault-management/` owns extension-page vault deletion, Chrome-history deletion requests, undo, reset, domain/category-rule actions, retention cleanup, and duplicate cleanup.
 - `src/platform/` owns explicit wrappers around browser/platform APIs, including Chrome extension APIs and clipboard copy behavior.
 - `src/export-format.js` is a compatibility barrel for existing import paths.
 - `test/features/` mirrors feature-owned tests by product area so no single flat test folder becomes a dumping ground.

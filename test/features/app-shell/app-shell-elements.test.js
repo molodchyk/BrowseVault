@@ -86,6 +86,8 @@ const singularSelectors = [
   "archive-active-days",
   "archive-date-range",
   "rule-domain",
+  "rule-category",
+  "add-category",
   "add-blacklist",
   "add-whitelist",
   "rules-list",

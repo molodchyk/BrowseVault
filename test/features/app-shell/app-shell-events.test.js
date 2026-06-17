@@ -91,6 +91,7 @@ function createElements() {
     jumpResultsTop: fakeElement(),
     jumpResultsBottom: fakeElement(),
     clearSelection: fakeElement(),
+    addCategory: fakeElement(),
     addBlacklist: fakeElement(),
     addWhitelist: fakeElement(),
     previewRetention: fakeElement(),
@@ -108,6 +109,7 @@ function createElements() {
 function createHandlers(calls) {
   const handlerNames = [
     "addBlacklistRule",
+    "addCategoryRule",
     "addWhitelistRule",
     "applyDateShortcut",
     "applySavedSearch",
@@ -326,6 +328,7 @@ test("bindAppEvents wires bulk and rules actions", () => {
   elements.loadAll.dispatch("click");
   elements.jumpResultsTop.dispatch("click");
   elements.jumpResultsBottom.dispatch("click");
+  elements.addCategory.dispatch("click");
   elements.addBlacklist.dispatch("click");
   elements.addWhitelist.dispatch("click");
   elements.previewRetention.dispatch("click");
@@ -348,6 +351,7 @@ test("bindAppEvents wires bulk and rules actions", () => {
     ["loadAllResults"],
     ["jumpToFirstResult"],
     ["jumpToLastResult"],
+    ["addCategoryRule"],
     ["addBlacklistRule"],
     ["addWhitelistRule"],
     ["previewRetentionCleanup"],

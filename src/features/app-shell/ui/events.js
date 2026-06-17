@@ -126,6 +126,7 @@ export function bindAppEvents({ elements, document, root, handlers }) {
 
   bindAsync(elements.confirmImport, "click", handlers.confirmStagedImport, setStatus);
   elements.cancelImport.addEventListener("click", () => handlers.cancelStagedImport());
+  bindAsync(elements.addCategory, "click", handlers.addCategoryRule, setStatus);
   bindAsync(elements.addBlacklist, "click", handlers.addBlacklistRule, setStatus);
   bindAsync(elements.addWhitelist, "click", handlers.addWhitelistRule, setStatus);
   bindAsync(elements.previewRetention, "click", handlers.previewRetentionCleanup, setStatus);
