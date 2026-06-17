@@ -19,7 +19,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Saved searches, newest/oldest result ordering, match highlighting, local-date grouped results, sticky result controls, incremental loading, one-click Show All expansion, Top/Bottom result jumps, keyboard-first search focus, keyboard navigation for visible history rows, and mouse/keyboard range selection.
 - Quick Open search across open tabs, bookmarks, downloads, recently closed tabs, and closed windows, with keyboard navigation for source results and readable source-unavailable warnings.
 - Toolbar and keyboard-command opening create a new BrowseVault tab unless the current active tab is already BrowseVault, avoiding a global one-tab limitation.
-- Deterministic newest-first full JSON, chunked formula-safe CSV generation, and offline HTML export with category columns where category rules apply; selected and current filtered result exports; current-result exports follow the selected newest/oldest result order.
+- Deterministic newest-first full JSON, chunked formula-safe CSV generation, and chunked offline HTML export with category columns where category rules apply; selected and current filtered result exports; current-result exports follow the selected newest/oldest result order.
 - Bare `after:YYYY-MM-DD` and `before:YYYY-MM-DD` search filters use local calendar-day boundaries instead of browser-dependent UTC parsing.
 - JSON backup integrity metadata and backup self-test before full JSON export, including checksum, row-count, restorable-row validation, and chunked JSON serialization for large backup downloads.
 - Backup reminder status follows the configured reminder interval and warns when the next reminder date is reached.

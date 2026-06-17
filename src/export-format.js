@@ -1,5 +1,6 @@
 export {
   visitsToCsv,
   visitsToCsvAsync,
-  visitsToHtml
+  visitsToHtml,
+  visitsToHtmlAsync
 } from "./features/history-export/core/export-format.js";

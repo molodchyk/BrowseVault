@@ -20,14 +20,15 @@ const CSV_HEADERS = [
 ];
 
 const DEFAULT_CSV_CHUNK_SIZE = 1000;
+const DEFAULT_HTML_CHUNK_SIZE = 500;
 
 export function yieldToEventLoop() {
   return new Promise((resolve) => setTimeout(resolve, 0));
 }
 
-function normalizeChunkSize(value) {
-  const chunkSize = Number(value || DEFAULT_CSV_CHUNK_SIZE);
-  return Number.isInteger(chunkSize) && chunkSize > 0 ? chunkSize : DEFAULT_CSV_CHUNK_SIZE;
+function normalizeChunkSize(value, defaultSize = DEFAULT_CSV_CHUNK_SIZE) {
+  const chunkSize = Number(value || defaultSize);
+  return Number.isInteger(chunkSize) && chunkSize > 0 ? chunkSize : defaultSize;
 }
 
 function neutralizeSpreadsheetFormula(text) {
@@ -141,6 +142,26 @@ function pageCell(visit) {
   return `<a class="page-title" href="${escapeHtml(href)}" target="_blank" rel="noreferrer noopener">${titleHtml}</a>${urlHtml}`;
 }
 
+function visitToHtmlRow(visit) {
+  const visitDate = dateFromTimestamp(visit.visitTime);
+  const visitTimestamp = visitDate?.getTime() ?? "";
+  const visitIso = visitDate?.toISOString() ?? "";
+  const visitLocal = visitDate?.toLocaleString() ?? "";
+  const titleSort = visit.title || visit.url || "";
+
+  return `<tr>
+        <td data-label="Visited" data-sort="${escapeHtml(visitTimestamp)}"><time datetime="${escapeHtml(visitIso)}">${escapeHtml(visitLocal)}</time><div class="muted">${escapeHtml(visitIso)}</div></td>
+        <td data-label="Domain" data-sort="${escapeHtml(visit.domain)}">${escapeHtml(visit.domain)}</td>
+        <td data-label="Category" data-sort="${escapeHtml(visit.category)}">${escapeHtml(visit.category)}</td>
+        <td data-label="Page" data-sort="${escapeHtml(titleSort)}">${pageCell(visit)}</td>
+        <td data-label="Visits" data-sort="${escapeHtml(visit.visitCount)}">${escapeHtml(visit.visitCount)}</td>
+        <td data-label="Transition" data-sort="${escapeHtml(visit.transition)}">${escapeHtml(visit.transition)}</td>
+        <td data-label="Source" data-sort="${escapeHtml(visit.source)}">${escapeHtml(visit.source)}</td>
+        <td data-label="Visit ID" data-sort="${escapeHtml(visit.id)}"><code>${escapeHtml(visit.id)}</code></td>
+        <td data-label="Chrome ID" data-sort="${escapeHtml(visit.chromeId)}"><code>${escapeHtml(visit.chromeId)}</code></td>
+      </tr>`;
+}
+
 export function visitsToCsv(visits) {
   return [CSV_HEADERS, ...visits.map(visitToCsvRow)].map(rowToCsvLine).join("\n");
 }
@@ -191,28 +212,34 @@ export function visitsToHtml(visits, exportedAt) {
   const range = visitRange(visits);
   const exportedIso = isoDateString(Date.parse(exportedAt));
   const exportedLocal = localDateTime(Date.parse(exportedAt)) || exportedAt;
-  const rows = visits
-    .map((visit) => {
-      const visitDate = dateFromTimestamp(visit.visitTime);
-      const visitTimestamp = visitDate?.getTime() ?? "";
-      const visitIso = visitDate?.toISOString() ?? "";
-      const visitLocal = visitDate?.toLocaleString() ?? "";
-      const titleSort = visit.title || visit.url || "";
+  const rows = visits.map(visitToHtmlRow).join("\n");
 
-      return `<tr>
-        <td data-label="Visited" data-sort="${escapeHtml(visitTimestamp)}"><time datetime="${escapeHtml(visitIso)}">${escapeHtml(visitLocal)}</time><div class="muted">${escapeHtml(visitIso)}</div></td>
-        <td data-label="Domain" data-sort="${escapeHtml(visit.domain)}">${escapeHtml(visit.domain)}</td>
-        <td data-label="Category" data-sort="${escapeHtml(visit.category)}">${escapeHtml(visit.category)}</td>
-        <td data-label="Page" data-sort="${escapeHtml(titleSort)}">${pageCell(visit)}</td>
-        <td data-label="Visits" data-sort="${escapeHtml(visit.visitCount)}">${escapeHtml(visit.visitCount)}</td>
-        <td data-label="Transition" data-sort="${escapeHtml(visit.transition)}">${escapeHtml(visit.transition)}</td>
-        <td data-label="Source" data-sort="${escapeHtml(visit.source)}">${escapeHtml(visit.source)}</td>
-        <td data-label="Visit ID" data-sort="${escapeHtml(visit.id)}"><code>${escapeHtml(visit.id)}</code></td>
-        <td data-label="Chrome ID" data-sort="${escapeHtml(visit.chromeId)}"><code>${escapeHtml(visit.chromeId)}</code></td>
-      </tr>`;
-    })
-    .join("\n");
+  return htmlDocument(visits, rows, range, exportedIso, exportedLocal);
+}
 
+export async function visitsToHtmlAsync(visits, exportedAt, options = {}) {
+  const items = Array.isArray(visits) ? visits : [];
+  const range = visitRange(items);
+  const exportedIso = isoDateString(Date.parse(exportedAt));
+  const exportedLocal = localDateTime(Date.parse(exportedAt)) || exportedAt;
+  const chunkSize = normalizeChunkSize(options.chunkSize, DEFAULT_HTML_CHUNK_SIZE);
+  const scheduler = options.scheduler || yieldToEventLoop;
+  const rows = [];
+
+  for (let start = 0; start < items.length; start += chunkSize) {
+    const end = Math.min(start + chunkSize, items.length);
+    for (let index = start; index < end; index += 1) {
+      rows.push(visitToHtmlRow(items[index]));
+    }
+    if (end < items.length) {
+      await scheduler();
+    }
+  }
+
+  return htmlDocument(items, rows.join("\n"), range, exportedIso, exportedLocal);
+}
+
+function htmlDocument(visits, rows, range, exportedIso, exportedLocal) {
   return `<!doctype html>
 <html lang="en">
 <head>

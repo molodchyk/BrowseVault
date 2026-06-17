@@ -5,7 +5,7 @@ import {
   importArchive,
   setMeta
 } from "../../../storage.js";
-import { visitsToCsvAsync, visitsToHtml } from "../../history-export/core/export-format.js";
+import { visitsToCsvAsync, visitsToHtmlAsync } from "../../history-export/core/export-format.js";
 import { archiveFromFileText } from "../core/archive-parser.js";
 import { backupExportFilename } from "../core/backup-filenames.js";
 import { createBackupSelfTest } from "../core/backup-verification.js";
@@ -34,7 +34,7 @@ const defaultServices = {
   stringifyJson,
   verifyArchiveIntegrity,
   visitsToCsv: visitsToCsvAsync,
-  visitsToHtml
+  visitsToHtml: visitsToHtmlAsync
 };
 
 export function backupImportPreviewElements(elements) {
@@ -241,7 +241,7 @@ export function createBackupActions({
     const sizeBytes = await deps.downloadText(
       exportFilename("history", archive.exportedAt, "html"),
       "text/html",
-      deps.visitsToHtml(archive.visits, archive.exportedAt),
+      await deps.visitsToHtml(archive.visits, archive.exportedAt),
       saveOptions()
     );
     await recordActivity({
@@ -306,7 +306,7 @@ export function createBackupActions({
     await deps.downloadText(
       exportFilename("selected", exportedAt, "html"),
       "text/html",
-      deps.visitsToHtml(items, exportedAt),
+      await deps.visitsToHtml(items, exportedAt),
       saveOptions()
     );
     await recordActivity({
@@ -375,7 +375,7 @@ export function createBackupActions({
     await deps.downloadText(
       exportFilename("results", exportedAt, "html"),
       "text/html",
-      deps.visitsToHtml(items, exportedAt),
+      await deps.visitsToHtml(items, exportedAt),
       saveOptions()
     );
     await recordActivity({
