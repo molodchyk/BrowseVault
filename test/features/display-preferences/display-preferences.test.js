@@ -83,6 +83,7 @@ test("formatBackupSelfTest summarizes passed, failed, and missing checks", () =>
   assert.equal(formatBackupSelfTest({ status: "passed", records: 12 }), "Passed 12 records");
   assert.equal(formatBackupSelfTest({ status: "failed", checksum: "mismatch" }), "Failed checksum");
   assert.equal(formatBackupSelfTest({ status: "failed", countMatches: false }), "Failed count");
+  assert.equal(formatBackupSelfTest({ status: "failed", restoreCountMatches: false }), "Failed restore rows");
   assert.equal(formatBackupSelfTest({ status: "failed" }), "Failed");
 });
 

@@ -44,7 +44,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - JSON backup export and import;
 - deterministic newest-first exports, including formula-safe CSV with ISO timestamp, local date/time, visit id, and Chrome id fields;
 - offline HTML exports with summary metrics, exact timestamps, in-file filtering, sortable columns, and safer link handling;
-- visible backup status with freshness, format, record count, file size, backup self-test, and checksum details;
+- visible backup status with freshness, format, record count, file size, checksum details, and a backup self-test that verifies restorable rows;
 - visible storage self-check status for the local vault metadata layer;
 - secondary archive insights for top domains, busiest day, active days, and date range;
 - recent activity log for completed backup, export, import, cleanup, delete, restore, rule, and reset operations;
@@ -195,7 +195,7 @@ The History tab also supports direct current-result deletion for targeted cleanu
 
 Backup and export filenames use the configured prefix and template. The default template is `{prefix}-{kind}-{date}`. Templates are filename bases without the extension and can use `{prefix}`, `{kind}`, `{date}`, and `{time}` tokens. The default save mode uses the browser's Downloads behavior; users can switch to an ask-every-export mode that opens Chrome's Save As prompt through the downloads API where the browser supports it.
 
-Backup status is advanced only by the integrity-checked JSON archive export. CSV and HTML files are portability/report exports and appear in recent activity without replacing the last restorable backup metadata.
+Backup status is advanced only by the integrity-checked JSON archive export after its self-test verifies checksum, raw row count, and restorable row count. CSV and HTML files are portability/report exports and appear in recent activity without replacing the last restorable backup metadata.
 
 ## GitHub Description
 

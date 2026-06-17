@@ -19,7 +19,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Quick Open search across open tabs, bookmarks, downloads, recently closed tabs, and closed windows, with keyboard navigation for source results and readable source-unavailable warnings.
 - Deterministic newest-first JSON, formula-safe CSV, and offline HTML export for all records, selected records, and current filtered results, with HTML summary metrics, exact timestamps, in-file filtering, sortable columns, and safer link handling.
 - Bare `after:YYYY-MM-DD` and `before:YYYY-MM-DD` search filters use local calendar-day boundaries instead of browser-dependent UTC parsing.
-- JSON backup integrity metadata and backup self-test before full JSON export.
+- JSON backup integrity metadata and backup self-test before full JSON export, including checksum, row-count, and restorable-row validation.
 - Backup reminder status follows the configured reminder interval and warns when the next reminder date is reached.
 - Storage self-check metadata is written and read during extension-page stats refresh, then shown in the Backup tab's archive health panel.
 - Backup tab includes secondary archive insights for top domains, busiest day, active days, and date range.
@@ -43,7 +43,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Imports merge with matching existing vault visits and preserve local vault deletion markers, Chrome-deletion markers, and original creation metadata.
 - Imports merge duplicate archive rows into unique restored records and report duplicate rows in the final import status and activity log.
 - Duplicate cleanup moves repeated active vault records with the same URL and visit time to undoable deletion while keeping the richest record.
-- Backup status is updated only by the integrity-checked JSON archive export; CSV and HTML history exports are tracked as export activity instead of restorable backups.
+- Backup status is updated only by the integrity-checked JSON archive export after checksum, row-count, and restorable-row checks pass; CSV and HTML history exports are tracked as export activity instead of restorable backups.
 
 ### Trust And Permissions
 

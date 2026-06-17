@@ -161,6 +161,8 @@ test("exportAll downloads an integrity-protected archive and records backup meta
         countMatches: true,
         expectedRecords: 2,
         records: 2,
+        restorableRecords: 2,
+        restoreCountMatches: true,
         status: "passed"
       }),
       exportArchive: async () => archive,
@@ -192,6 +194,8 @@ test("exportAll downloads an integrity-protected archive and records backup meta
         countMatches: true,
         expectedRecords: 2,
         records: 2,
+        restorableRecords: 2,
+        restoreCountMatches: true,
         status: "passed"
       },
       sha256: "abc123"

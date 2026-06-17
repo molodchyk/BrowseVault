@@ -204,6 +204,10 @@ export function formatBackupSelfTest(selfTest) {
     return "Failed count";
   }
 
+  if (selfTest.restoreCountMatches === false) {
+    return "Failed restore rows";
+  }
+
   return "Failed";
 }
 
