@@ -52,6 +52,10 @@ function createElements() {
     search: fakeElement(),
     quickSearch: fakeElement(),
     clearSearch: fakeElement(),
+    savedSearches: fakeElement(),
+    applySavedSearch: fakeElement(),
+    saveSearch: fakeElement(),
+    deleteSavedSearch: fakeElement(),
     syncChrome: fakeElement(),
     exportJson: fakeElement(),
     exportCsv: fakeElement(),
@@ -88,6 +92,7 @@ function createHandlers(calls) {
   const handlerNames = [
     "addBlacklistRule",
     "addWhitelistRule",
+    "applySavedSearch",
     "blacklistSelectedDomains",
     "cancelStagedImport",
     "clearSearchFields",
@@ -113,12 +118,14 @@ function createHandlers(calls) {
     "resetVault",
     "runQuickSearch",
     "runSearchesNow",
+    "saveCurrentSearch",
     "savePreferences",
     "scheduleSearches",
     "selectAllFiltered",
     "selectVisible",
     "switchTab",
     "syncChromeHistory",
+    "deleteSavedSearch",
     "undoVaultDelete"
   ];
   const handlers = {
@@ -176,6 +183,9 @@ test("bindAppEvents wires tabs, theme previews, search clearing, and keyboard fo
   elements.after.value = "2026-01-01";
   elements.before.value = "2026-12-31";
   elements.clearSearch.dispatch("click");
+  elements.saveSearch.dispatch("click");
+  elements.applySavedSearch.dispatch("click");
+  elements.deleteSavedSearch.dispatch("click");
   elements.query.dispatch("keydown", { key: "Enter" });
   document.dispatch("keydown", {
     key: "k",
@@ -210,6 +220,9 @@ test("bindAppEvents wires tabs, theme previews, search clearing, and keyboard fo
     ["switchTab", "backup"],
     ["clearSearchFields"],
     ["runSearchesNow"],
+    ["saveCurrentSearch"],
+    ["applySavedSearch"],
+    ["deleteSavedSearch"],
     ["runSearchesNow"],
     ["preventDefault", "ctrl-k"],
     ["focusSearchInput"],

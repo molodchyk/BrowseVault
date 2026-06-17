@@ -11,6 +11,10 @@ const singularSelectors = [
   "search",
   "quick-search",
   "clear-search",
+  "saved-searches",
+  "apply-saved-search",
+  "save-search",
+  "delete-saved-search",
   "sync-chrome",
   "export-json",
   "export-csv",
@@ -108,6 +112,7 @@ test("collectAppElements queries the app shell selectors", () => {
   assert.equal(elements.query.selector, "#query");
   assert.equal(elements.onDate.selector, "#on-date");
   assert.equal(elements.quickSearch.selector, "#quick-search");
+  assert.equal(elements.savedSearches.selector, "#saved-searches");
   assert.equal(elements.importPreviewTitle.selector, "#import-preview-title");
   assert.equal(elements.backupChecksum.selector, "#backup-checksum");
   assert.equal(elements.backupNext.selector, "#backup-next");

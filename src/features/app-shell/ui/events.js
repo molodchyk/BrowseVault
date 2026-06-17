@@ -39,6 +39,9 @@ export function bindAppEvents({ elements, document, root, handlers }) {
   bindAsync(elements.savePreferences, "click", handlers.savePreferences, setStatus);
   bindAsync(elements.search, "click", handlers.runSearchesNow, setStatus);
   bindAsync(elements.quickSearch, "click", handlers.runQuickSearch, setStatus);
+  bindAsync(elements.applySavedSearch, "click", handlers.applySavedSearch, setStatus);
+  bindAsync(elements.saveSearch, "click", handlers.saveCurrentSearch, setStatus);
+  bindAsync(elements.deleteSavedSearch, "click", handlers.deleteSavedSearch, setStatus);
 
   elements.clearSearch.addEventListener("click", () => {
     handlers.clearSearchFields();

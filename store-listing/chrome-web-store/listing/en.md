@@ -2,7 +2,7 @@ BrowseVault helps you find, preserve, and back up your browsing history without 
 
 Chrome's built-in history is limited and hard to search when you need to recover a page, retrace work, or export records. BrowseVault is designed as a local-first history vault: fast search, clear export, reliable backup, and precise control over your browsing memory.
 
-Use BrowseVault to search archived history by keyword, site, host, domain, title, URL, source, transition, visit count, exact day, date range, exclusion, phrase, or regex, with keyboard-first focus and debounced live refresh.
+Use BrowseVault to search archived history by keyword, site, host, domain, title, URL, source, transition, visit count, exact day, date range, exclusion, phrase, or regex, with saved searches, keyboard-first focus, and debounced live refresh.
 
 Scan results by local date with highlighted matches, then open, copy, export the current result set as JSON, CSV, or HTML, export selected records, select, or delete the records you need.
 

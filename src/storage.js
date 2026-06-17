@@ -3,6 +3,11 @@ import {
   extractImportVisits,
   importArchiveSource
 } from "./features/backup-import/core/import-normalization.js";
+import {
+  normalizeSavedSearches,
+  removeSavedSearch as removeSavedSearchFromList,
+  upsertSavedSearch
+} from "./features/history-results/core/saved-searches.js";
 
 const DB_NAME = "browsevault";
 const DB_VERSION = 1;
@@ -10,6 +15,7 @@ const VISIT_STORE = "visits";
 const META_STORE = "meta";
 const RULE_STORE = "rules";
 const DEFAULT_RESULT_LIMIT = 500;
+const SAVED_SEARCHES_META = "savedSearches";
 
 let dbPromise;
 
@@ -221,6 +227,22 @@ export async function getMeta(key, fallback = null) {
 export async function getAllMeta() {
   const records = await getAll(META_STORE);
   return Object.fromEntries(records.map((record) => [record.key, record.value]));
+}
+
+export async function getSavedSearches() {
+  return normalizeSavedSearches(await getMeta(SAVED_SEARCHES_META, []));
+}
+
+export async function saveSavedSearch(input) {
+  const searches = upsertSavedSearch(await getSavedSearches(), input);
+  await setMeta(SAVED_SEARCHES_META, searches);
+  return searches;
+}
+
+export async function deleteSavedSearch(id) {
+  const searches = removeSavedSearchFromList(await getSavedSearches(), id);
+  await setMeta(SAVED_SEARCHES_META, searches);
+  return searches;
 }
 
 export async function getRules() {

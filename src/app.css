@@ -290,6 +290,13 @@ code {
   align-items: end;
 }
 
+.saved-search-line {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto auto auto;
+  gap: 10px;
+  align-items: center;
+}
+
 .query-wrap {
   display: grid;
   gap: 5px;
@@ -694,6 +701,14 @@ code {
     grid-template-columns: 1fr 1fr;
   }
 
+  .saved-search-line {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .saved-search-line select {
+    grid-column: 1 / -1;
+  }
+
   .query-wrap {
     grid-column: 1 / -1;
   }
@@ -731,7 +746,8 @@ code {
 
   .backup-actions button,
   .backup-actions .file-button,
-  .search-line button {
+  .search-line button,
+  .saved-search-line button {
     width: 100%;
   }
 

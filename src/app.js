@@ -1,5 +1,8 @@
 import {
+  deleteSavedSearch,
+  getSavedSearches,
   getStats,
+  saveSavedSearch,
   searchVisits
 } from "./storage.js";
 import { createAppShellState } from "./features/app-shell/core/state.js";
@@ -17,6 +20,7 @@ import {
 import { createDisplayPreferencesController } from "./features/display-preferences/ui/preferences-controller.js";
 import { createHistoryBulkActions } from "./features/history-results/ui/bulk-actions.js";
 import { createHistoryResultsController } from "./features/history-results/ui/results-controller.js";
+import { createSavedSearchActions } from "./features/history-results/ui/saved-search-actions.js";
 import { createHistorySearchActions } from "./features/history-results/ui/search-actions.js";
 import { createHistorySearchForm } from "./features/history-results/ui/search-form.js";
 import { createSelectedResultLookup } from "./features/history-results/ui/selected-results.js";
@@ -123,6 +127,17 @@ const bulkActions = createHistoryBulkActions({
   setStatus
 });
 
+const savedSearchActions = createSavedSearchActions({
+  deleteSavedSearch,
+  elements,
+  getSavedSearches,
+  readSearchValues: historySearchForm.readSearchValues,
+  runSearchesNow: () => searchCoordinator.runSearchesNow(),
+  saveSavedSearch,
+  setStatus,
+  writeSearchValues: historySearchForm.writeSearchValues
+});
+
 const syncChromeHistory = createChromeHistorySyncAction({
   refreshStats: displayPreferences.refreshStats,
   runSearch: historySearchActions.runSearch,
@@ -137,6 +152,7 @@ function bindEvents() {
     handlers: {
       addBlacklistRule: () => vaultActions.addRule("blacklist"),
       addWhitelistRule: () => vaultActions.addRule("whitelist"),
+      applySavedSearch: savedSearchActions.applySelectedSearch,
       blacklistSelectedDomains: vaultActions.blacklistSelectedDomains,
       cancelStagedImport: backupActions.cancelStagedImport,
       clearSearchFields: historySearchForm.clearSearchFields,
@@ -163,12 +179,14 @@ function bindEvents() {
       runQuickSearch: quickOpenActions.runQuickSearch,
       runSearchesNow: searchCoordinator.runSearchesNow,
       savePreferences: displayPreferences.savePreferences,
+      saveCurrentSearch: savedSearchActions.saveCurrentSearch,
       scheduleSearches: searchCoordinator.scheduleSearches,
       selectAllFiltered: bulkActions.selectAllFiltered,
       selectVisible: bulkActions.selectVisibleResults,
       setStatus,
       switchTab: appNavigation.switchTab,
       syncChromeHistory,
+      deleteSavedSearch: savedSearchActions.deleteSelectedSearch,
       undoVaultDelete: vaultActions.undoVaultDelete
     }
   });
@@ -176,6 +194,7 @@ function bindEvents() {
 
 async function init() {
   await displayPreferences.loadPreferences();
+  await savedSearchActions.loadSavedSearches();
   bindEvents();
   appNavigation.focusSearchInput();
   await displayPreferences.refreshStats();
