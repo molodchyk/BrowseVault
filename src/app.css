@@ -9,8 +9,16 @@
   --accent: #155e63;
   --accent-hover: #104c50;
   --accent-soft: #e5f0f1;
+  --control-text: var(--accent);
   --danger: #8b2635;
   --danger-hover: #731f2b;
+  --font-base: 14px;
+  --font-small: 13px;
+  --font-tiny: 11px;
+  --font-heading: 24px;
+  --font-section-heading: 18px;
+  --font-stat: 20px;
+  --font-result-title: 15px;
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
@@ -68,7 +76,50 @@
     --muted: #9fb0b6;
     --border: #304146;
     --accent-soft: #203438;
+    --control-text: #78dbe2;
   }
+}
+
+:root[data-contrast="high"] {
+  --surface-alt: #e5eef2;
+  --text: #061114;
+  --muted: #2a3a40;
+  --border: #6c7f87;
+  --control-text: #064e56;
+}
+
+:root[data-theme="dark"][data-contrast="high"] {
+  --bg: #050809;
+  --surface: #0c1315;
+  --surface-alt: #172327;
+  --text: #ffffff;
+  --muted: #d4e3e7;
+  --border: #758891;
+  --accent-soft: #18333a;
+  --control-text: #8eeaf0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"])[data-contrast="high"] {
+    --bg: #050809;
+    --surface: #0c1315;
+    --surface-alt: #172327;
+    --text: #ffffff;
+    --muted: #d4e3e7;
+    --border: #758891;
+    --accent-soft: #18333a;
+    --control-text: #8eeaf0;
+  }
+}
+
+:root[data-text-size="large"] {
+  --font-base: 16px;
+  --font-small: 15px;
+  --font-tiny: 12px;
+  --font-heading: 26px;
+  --font-section-heading: 20px;
+  --font-stat: 22px;
+  --font-result-title: 17px;
 }
 
 * {
@@ -85,6 +136,7 @@ body {
   margin: 0;
   color: var(--text);
   background: var(--bg);
+  font-size: var(--font-base);
 }
 
 button,
@@ -123,7 +175,7 @@ button.ghost,
 .tab {
   border: 1px solid var(--border);
   background: var(--surface);
-  color: var(--accent);
+  color: var(--control-text);
 }
 
 button.ghost:hover,
@@ -152,7 +204,7 @@ select {
 
 label {
   color: var(--text);
-  font-size: 13px;
+  font-size: var(--font-small);
   font-weight: 800;
 }
 
@@ -194,19 +246,19 @@ code {
 }
 
 .header h1 {
-  font-size: 24px;
+  font-size: var(--font-heading);
   line-height: 1.15;
 }
 
 .section-heading h3 {
-  font-size: 18px;
+  font-size: var(--font-section-heading);
   line-height: 1.2;
 }
 
 .eyebrow {
   margin: 0 0 3px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--font-tiny);
   font-weight: 900;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -322,7 +374,7 @@ code {
 .advanced summary {
   color: var(--accent);
   cursor: pointer;
-  font-size: 13px;
+  font-size: var(--font-small);
   font-weight: 850;
 }
 
@@ -395,7 +447,7 @@ code {
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--surface);
-  color: var(--accent);
+  color: var(--control-text);
   cursor: pointer;
   font-weight: 750;
   list-style: none;
@@ -470,7 +522,7 @@ code {
 
 .activity-item span {
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--font-tiny);
   white-space: nowrap;
 }
 
@@ -484,7 +536,7 @@ code {
   border-radius: 6px;
   background: var(--surface-alt);
   color: var(--text);
-  font-size: 13px;
+  font-size: var(--font-small);
   font-weight: 800;
   padding: 9px 11px;
 }
@@ -512,7 +564,7 @@ code {
 
 .backup-meta dt {
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--font-tiny);
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -556,7 +608,7 @@ code {
 .trust-list dt,
 .limit-list strong {
   color: var(--text);
-  font-size: 13px;
+  font-size: var(--font-small);
   font-weight: 850;
 }
 
@@ -565,7 +617,7 @@ code {
   display: block;
   margin: 3px 0 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--font-small);
   overflow-wrap: anywhere;
 }
 
@@ -583,7 +635,7 @@ code {
 .meta,
 #selected-count {
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--font-small);
 }
 
 .stats-grid {
@@ -611,7 +663,7 @@ code {
   min-width: 0;
   overflow: hidden;
   color: var(--accent);
-  font-size: 20px;
+  font-size: var(--font-stat);
   font-weight: 900;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -621,7 +673,7 @@ code {
 .preview-stat p {
   margin: 2px 0 0;
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--font-tiny);
   font-weight: 750;
 }
 
@@ -659,7 +711,7 @@ code {
   min-width: 0;
   border-bottom: 1px solid var(--border);
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--font-tiny);
   font-weight: 900;
   padding: 8px 2px 4px;
   text-transform: uppercase;
@@ -685,7 +737,7 @@ code {
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--text);
-  font-size: 11px;
+  font-size: var(--font-tiny);
   font-weight: 900;
   padding: 5px 8px;
   text-align: center;
@@ -712,7 +764,7 @@ code {
   justify-items: center;
   gap: 4px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--font-tiny);
   text-transform: uppercase;
 }
 
@@ -738,7 +790,7 @@ code {
 
 .result-title {
   color: var(--accent);
-  font-size: 15px;
+  font-size: var(--font-result-title);
   font-weight: 850;
   text-decoration: none;
 }
@@ -876,11 +928,11 @@ code {
   }
 
   .stat span {
-    font-size: 17px;
+    font-size: calc(var(--font-stat) - 3px);
   }
 
   .stat p {
-    font-size: 11px;
+    font-size: var(--font-tiny);
   }
 
   .bulk-actions {

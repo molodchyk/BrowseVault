@@ -24,7 +24,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Import preview and import support for BrowseVault JSON, CSV, TSV, Google Takeout Browser History, Google My Activity, and common competitor history exports.
 - Recent activity log for completed backup, export, import, cleanup, delete, restore, rule, and reset actions.
 - Domain blacklist and whitelist rules, selected-domain blacklisting, manual retention cleanup, duplicate cleanup, and full local vault reset.
-- Settings for system, light, and dark themes, accent color, date format, default result limit, backup reminder cadence, backup filename prefix, and backup filename template.
+- Settings for system, light, and dark themes, accent color, high contrast, text size, date format, default result limit, backup reminder cadence, backup filename prefix, and backup filename template.
 - Feature-owned test folders and StorePilot-ready Chrome Web Store automation documents.
 
 ### Data Safety

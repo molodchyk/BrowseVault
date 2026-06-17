@@ -36,6 +36,14 @@ export function bindAppEvents({ elements, document, root, handlers }) {
     root.dataset.accent = elements.prefAccent.value;
   });
 
+  elements.prefContrast.addEventListener("change", () => {
+    root.dataset.contrast = elements.prefContrast.value === "high" ? "high" : "";
+  });
+
+  elements.prefTextSize.addEventListener("change", () => {
+    root.dataset.textSize = elements.prefTextSize.value === "large" ? "large" : "";
+  });
+
   bindAsync(elements.savePreferences, "click", handlers.savePreferences, setStatus);
   bindAsync(elements.search, "click", handlers.runSearchesNow, setStatus);
   bindAsync(elements.quickSearch, "click", handlers.runQuickSearch, setStatus);

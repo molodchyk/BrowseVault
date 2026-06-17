@@ -4,8 +4,10 @@ import {
   archiveHealthDetails,
   backupStatusDetails,
   clampResultLimit,
+  contrastDatasetValue,
   formatShortDate,
   normalizePreferences,
+  textSizeDatasetValue,
   themeDatasetValue
 } from "../core/preferences.js";
 import {
@@ -18,11 +20,13 @@ const defaultServices = {
   archiveHealthDetails,
   backupStatusDetails,
   clampResultLimit,
+  contrastDatasetValue,
   formatShortDate,
   getLocalStorage,
   normalizePreferences,
   renderActivityLog,
   setLocalStorage,
+  textSizeDatasetValue,
   themeDatasetValue
 };
 
@@ -82,9 +86,13 @@ export function createDisplayPreferencesController({
   function applyPreferences() {
     root.dataset.theme = deps.themeDatasetValue(appState.preferences.theme);
     root.dataset.accent = appState.preferences.accent;
+    root.dataset.contrast = deps.contrastDatasetValue(appState.preferences.contrast);
+    root.dataset.textSize = deps.textSizeDatasetValue(appState.preferences.textSize);
 
     elements.prefTheme.value = appState.preferences.theme;
     elements.prefAccent.value = appState.preferences.accent;
+    elements.prefContrast.value = appState.preferences.contrast;
+    elements.prefTextSize.value = appState.preferences.textSize;
     elements.prefDateFormat.value = appState.preferences.dateFormat;
     elements.prefLimit.value = String(appState.preferences.defaultLimit);
     elements.prefBackupReminder.value = String(appState.preferences.backupReminderDays);
@@ -121,6 +129,8 @@ export function createDisplayPreferencesController({
     appState.preferences = deps.normalizePreferences({
       theme: elements.prefTheme.value,
       accent: elements.prefAccent.value,
+      contrast: elements.prefContrast.value,
+      textSize: elements.prefTextSize.value,
       dateFormat: elements.prefDateFormat.value,
       defaultLimit: elements.prefLimit.value,
       backupReminderDays: elements.prefBackupReminder.value,

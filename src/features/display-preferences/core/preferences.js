@@ -12,6 +12,8 @@ export const BACKUP_STALE_DAYS = 30;
 export const DEFAULT_PREFERENCES = {
   theme: "system",
   accent: "teal",
+  contrast: "standard",
+  textSize: "standard",
   dateFormat: "system",
   defaultLimit: 500,
   backupReminderDays: BACKUP_STALE_DAYS,
@@ -21,6 +23,8 @@ export const DEFAULT_PREFERENCES = {
 
 const THEMES = new Set(["system", "light", "dark"]);
 const ACCENTS = new Set(["teal", "blue", "green", "purple", "slate"]);
+const CONTRASTS = new Set(["standard", "high"]);
+const TEXT_SIZES = new Set(["standard", "large"]);
 const DATE_FORMATS = new Set(["system", "iso", "dmy", "mdy", "ymd"]);
 
 function pickSupported(value, supported, fallback) {
@@ -58,6 +62,8 @@ export function normalizePreferences(input = {}) {
   return {
     theme: pickSupported(source.theme, THEMES, DEFAULT_PREFERENCES.theme),
     accent: pickSupported(source.accent, ACCENTS, DEFAULT_PREFERENCES.accent),
+    contrast: pickSupported(source.contrast, CONTRASTS, DEFAULT_PREFERENCES.contrast),
+    textSize: pickSupported(source.textSize, TEXT_SIZES, DEFAULT_PREFERENCES.textSize),
     dateFormat: pickSupported(source.dateFormat, DATE_FORMATS, DEFAULT_PREFERENCES.dateFormat),
     defaultLimit: clampResultLimit(source.defaultLimit, DEFAULT_PREFERENCES.defaultLimit),
     backupReminderDays: clampBackupReminderDays(source.backupReminderDays, DEFAULT_PREFERENCES.backupReminderDays),
@@ -68,6 +74,14 @@ export function normalizePreferences(input = {}) {
 
 export function themeDatasetValue(theme) {
   return theme === "system" ? "" : theme;
+}
+
+export function contrastDatasetValue(contrast) {
+  return contrast === "high" ? "high" : "";
+}
+
+export function textSizeDatasetValue(textSize) {
+  return textSize === "large" ? "large" : "";
 }
 
 export function formatShortDate(value, dateFormat = DEFAULT_PREFERENCES.dateFormat) {

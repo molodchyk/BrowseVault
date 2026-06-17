@@ -85,6 +85,8 @@ const singularSelectors = [
   "cleanup-duplicates",
   "pref-theme",
   "pref-accent",
+  "pref-contrast",
+  "pref-text-size",
   "pref-date-format",
   "pref-limit",
   "pref-backup-reminder",

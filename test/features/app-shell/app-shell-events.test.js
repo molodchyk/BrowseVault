@@ -95,6 +95,8 @@ function createElements() {
     cleanupDuplicates: fakeElement(),
     prefTheme: fakeElement(),
     prefAccent: fakeElement(),
+    prefContrast: fakeElement(),
+    prefTextSize: fakeElement(),
     openNativeHistory: fakeElement()
   };
 }
@@ -196,6 +198,10 @@ test("bindAppEvents wires tabs, theme previews, search clearing, and keyboard fo
   elements.prefTheme.dispatch("change");
   elements.prefAccent.value = "blue";
   elements.prefAccent.dispatch("change");
+  elements.prefContrast.value = "high";
+  elements.prefContrast.dispatch("change");
+  elements.prefTextSize.value = "large";
+  elements.prefTextSize.dispatch("change");
 
   elements.query.value = "docs";
   elements.onDate.value = "2026-06-16";
@@ -232,6 +238,8 @@ test("bindAppEvents wires tabs, theme previews, search clearing, and keyboard fo
   await new Promise((resolve) => setTimeout(resolve, 0));
   assert.equal(root.dataset.theme, "light");
   assert.equal(root.dataset.accent, "blue");
+  assert.equal(root.dataset.contrast, "high");
+  assert.equal(root.dataset.textSize, "large");
   assert.equal(elements.query.value, "");
   assert.equal(elements.onDate.value, "");
   assert.equal(elements.after.value, "");

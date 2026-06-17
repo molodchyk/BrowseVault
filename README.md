@@ -65,7 +65,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - domain blacklist and whitelist rules;
 - manual retention cleanup that previews old vault records and keeps whitelisted domains;
 - duplicate cleanup that previews repeated active vault records and moves extras to undoable deletion;
-- local preferences for system/light/dark theme, accent color, date format, default result limit, backup reminders, backup filename prefix, and backup filename template;
+- local preferences for system/light/dark theme, accent color, high contrast, text size, date format, default result limit, backup reminders, backup filename prefix, and backup filename template;
 - backup reminder status follows the configured reminder interval and warns when the next reminder date is reached;
 - exact ISO visit timestamps in history result metadata while visible rows follow the selected date format;
 - in-app trust, permission, and product-limit disclosures;

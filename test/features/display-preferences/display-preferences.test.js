@@ -5,11 +5,13 @@ import {
   backupStatusDetails,
   clampBackupReminderDays,
   clampResultLimit,
+  contrastDatasetValue,
   formatBackupSelfTest,
   formatFileSize,
   formatShortDate,
   localDayKey,
   normalizePreferences,
+  textSizeDatasetValue,
   themeDatasetValue
 } from "../../../src/features/display-preferences/core/preferences.js";
 
@@ -18,6 +20,8 @@ test("normalizePreferences falls back for unsupported values and clamps limits",
     normalizePreferences({
       theme: "neon",
       accent: "blue",
+      contrast: "low",
+      textSize: "giant",
       dateFormat: "dmy",
       defaultLimit: "999999",
       backupReminderDays: "999",
@@ -27,6 +31,8 @@ test("normalizePreferences falls back for unsupported values and clamps limits",
     {
       theme: "system",
       accent: "blue",
+      contrast: "standard",
+      textSize: "standard",
       dateFormat: "dmy",
       defaultLimit: 50000,
       backupReminderDays: 365,
@@ -79,6 +85,15 @@ test("formatBackupSelfTest summarizes passed, failed, and missing checks", () =>
 test("themeDatasetValue leaves system theme to CSS media queries", () => {
   assert.equal(themeDatasetValue("system"), "");
   assert.equal(themeDatasetValue("dark"), "dark");
+});
+
+test("display dataset helpers leave standard readability settings implicit", () => {
+  assert.equal(contrastDatasetValue("standard"), "");
+  assert.equal(contrastDatasetValue("high"), "high");
+  assert.equal(contrastDatasetValue("unknown"), "");
+  assert.equal(textSizeDatasetValue("standard"), "");
+  assert.equal(textSizeDatasetValue("large"), "large");
+  assert.equal(textSizeDatasetValue("unknown"), "");
 });
 
 test("archiveHealthDetails summarizes startup, sync, and live capture metadata", () => {

@@ -86,6 +86,8 @@ export function collectAppElements(document) {
     cleanupDuplicates: document.querySelector("#cleanup-duplicates"),
     prefTheme: document.querySelector("#pref-theme"),
     prefAccent: document.querySelector("#pref-accent"),
+    prefContrast: document.querySelector("#pref-contrast"),
+    prefTextSize: document.querySelector("#pref-text-size"),
     prefDateFormat: document.querySelector("#pref-date-format"),
     prefLimit: document.querySelector("#pref-limit"),
     prefBackupReminder: document.querySelector("#pref-backup-reminder"),

@@ -41,6 +41,8 @@ function createHarness({
   preferences = {
     theme: "system",
     accent: "teal",
+    contrast: "standard",
+    textSize: "standard",
     dateFormat: "system",
     defaultLimit: 500,
     backupReminderDays: 30,
@@ -79,6 +81,8 @@ function createHarness({
     backupSelfTest: output(),
     limit: input(""),
     prefAccent: input("teal"),
+    prefContrast: input("standard"),
+    prefTextSize: input("standard"),
     prefDateFormat: input("system"),
     prefLimit: input("500"),
     prefBackupReminder: input("30"),
@@ -118,6 +122,8 @@ test("loadPreferences normalizes stored preferences and applies them to UI state
   const { appState, controller, elements, root } = createHarness({
     storedPreferences: {
       accent: "blue",
+      contrast: "high",
+      textSize: "large",
       dateFormat: "dmy",
       defaultLimit: "750",
       backupReminderDays: "14",
@@ -131,6 +137,8 @@ test("loadPreferences normalizes stored preferences and applies them to UI state
 
   assert.deepEqual(appState.preferences, {
     accent: "blue",
+    contrast: "high",
+    textSize: "large",
     dateFormat: "dmy",
     defaultLimit: 750,
     backupReminderDays: 14,
@@ -140,8 +148,12 @@ test("loadPreferences normalizes stored preferences and applies them to UI state
   });
   assert.equal(root.dataset.theme, "dark");
   assert.equal(root.dataset.accent, "blue");
+  assert.equal(root.dataset.contrast, "high");
+  assert.equal(root.dataset.textSize, "large");
   assert.equal(elements.prefTheme.value, "dark");
   assert.equal(elements.prefAccent.value, "blue");
+  assert.equal(elements.prefContrast.value, "high");
+  assert.equal(elements.prefTextSize.value, "large");
   assert.equal(elements.prefDateFormat.value, "dmy");
   assert.equal(elements.prefLimit.value, "750");
   assert.equal(elements.prefBackupReminder.value, "14");
@@ -154,6 +166,8 @@ test("savePreferences persists normalized values, refreshes stats, reruns search
   const { appState, controller, elements, refreshAfterSaveCalls, statusMessages, storageWrites } = createHarness();
   elements.prefTheme.value = "light";
   elements.prefAccent.value = "purple";
+  elements.prefContrast.value = "high";
+  elements.prefTextSize.value = "large";
   elements.prefDateFormat.value = "iso";
   elements.prefLimit.value = "999999";
   elements.prefBackupReminder.value = "0";
@@ -171,8 +185,10 @@ test("savePreferences persists normalized values, refreshes stats, reruns search
         backupFilenamePrefix: "Client-Reports",
         backupFilenameTemplate: "{date}-{prefix}-{kind}",
         backupReminderDays: 0,
+        contrast: "high",
         dateFormat: "iso",
         defaultLimit: 50000,
+        textSize: "large",
         theme: "light"
       }
     }
@@ -187,6 +203,8 @@ test("refreshStats renders stat cards and backup health details", async () => {
     preferences: {
       theme: "system",
       accent: "teal",
+      contrast: "standard",
+      textSize: "standard",
       backupReminderDays: 30,
       dateFormat: "iso",
       defaultLimit: 500
@@ -260,6 +278,8 @@ test("refreshStats applies the configured backup reminder interval", async () =>
     preferences: {
       theme: "system",
       accent: "teal",
+      contrast: "standard",
+      textSize: "standard",
       backupFilenamePrefix: "browsevault",
       backupReminderDays: 14,
       dateFormat: "iso",
