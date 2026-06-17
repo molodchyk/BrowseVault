@@ -51,6 +51,7 @@ function createHarness({
   };
   const elements = {
     quickResults: fakeList(),
+    retentionDays: { value: "30" },
     ruleDomain: { value: "example.com" },
     rulesList: fakeList()
   };
@@ -187,6 +188,56 @@ test("deleteFromVault and undoVaultDelete handle selected and missing states", a
   assert.deepEqual(statuses, [
     "Deleted 2 records from vault",
     "Restored 1 vault records"
+  ]);
+});
+
+test("retention cleanup previews and deletes eligible old records", async () => {
+  const marked = [];
+  const candidates = [
+    { id: "old-1" },
+    { id: "old-2" }
+  ];
+  const { actions, appState, calls, statuses } = createHarness({
+    selectedIds: ["visible"],
+    services: {
+      getRetentionCleanupCandidates: async (days) => {
+        assert.equal(days, 30);
+        return candidates;
+      },
+      markDeletedByIds: async (ids) => {
+        marked.push(ids);
+        return ids.length;
+      }
+    }
+  });
+
+  await actions.previewRetentionCleanup();
+  await actions.cleanupByRetention();
+
+  assert.deepEqual(marked, [["old-1", "old-2"]]);
+  assert.equal(appState.selectedIds.size, 0);
+  assert.deepEqual(calls, ["refreshStats", "runSearch"]);
+  assert.deepEqual(statuses, [
+    "2 vault records older than 30 days can be cleaned up. Whitelisted domains are kept.",
+    "Cleaned up 2 old vault records. Whitelisted domains kept."
+  ]);
+});
+
+test("retention cleanup validates input and handles empty previews", async () => {
+  const { actions, elements, statuses } = createHarness({
+    services: {
+      getRetentionCleanupCandidates: async () => []
+    }
+  });
+
+  elements.retentionDays.value = "0";
+  await actions.previewRetentionCleanup();
+  elements.retentionDays.value = "45";
+  await actions.cleanupByRetention();
+
+  assert.deepEqual(statuses, [
+    "Enter retention days of 1 or more",
+    "No cleanup candidates older than 45 days"
   ]);
 });
 

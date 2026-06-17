@@ -41,6 +41,10 @@
         <button class="tab" type="button" data-tab="settings">Settings</button>
       </nav>
 
+      <section class="summary" aria-live="polite">
+        <span id="status">Ready</span>
+      </section>
+
       <section id="tab-history" class="tab-panel" data-panel="history">
         <section class="panel search-panel sticky-panel" aria-label="History search">
           <div class="search-line">
@@ -109,10 +113,6 @@
             <button id="delete-chrome" class="danger requires-selection" type="button" hidden>Delete URLs From Chrome</button>
             <button id="undo-delete" class="ghost" type="button">Undo</button>
           </div>
-        </section>
-
-        <section class="summary" aria-live="polite">
-          <span id="status">Ready</span>
         </section>
 
         <ol id="results" class="results"></ol>
@@ -246,6 +246,23 @@
             <button id="add-whitelist" class="ghost" type="button">Whitelist</button>
           </div>
           <ul id="rules-list" class="rules-list"></ul>
+          <section class="retention-cleanup" aria-label="Retention cleanup">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Retention</p>
+                <h3>Clean up old vault records</h3>
+              </div>
+            </div>
+            <div class="retention-row">
+              <label>
+                Keep records for days
+                <input id="retention-days" type="number" min="1" max="36500" step="1" value="365">
+              </label>
+              <button id="preview-retention" class="ghost" type="button">Preview</button>
+              <button id="cleanup-retention" class="danger" type="button">Clean Up</button>
+            </div>
+            <p class="hint">Moves matching old vault records to undoable deletion. Whitelisted domains are kept during retention cleanup.</p>
+          </section>
         </section>
       </section>
 

@@ -1,6 +1,7 @@
 import {
   addDomainRule,
   clearVaultData,
+  getRetentionCleanupCandidates,
   getRules,
   getStats,
   markDeletedByIds,
@@ -21,6 +22,7 @@ const defaultServices = {
   document: globalThis.document,
   getRules,
   getStats,
+  getRetentionCleanupCandidates,
   markDeletedByIds,
   removeRule,
   restoreDeletedByIds,
@@ -28,6 +30,11 @@ const defaultServices = {
   uniqueDomainsForItems,
   uniqueUrlsForItems
 };
+
+function retentionDaysFromInput(value) {
+  const days = Number(value);
+  return Number.isInteger(days) && days >= 1 ? days : null;
+}
 
 export function createVaultManagementActions({
   appState,
@@ -178,6 +185,48 @@ export function createVaultManagementActions({
     setStatus(`Added ${type} rule`);
   }
 
+  async function previewRetentionCleanup() {
+    const retentionDays = retentionDaysFromInput(elements.retentionDays.value);
+    if (!retentionDays) {
+      setStatus("Enter retention days of 1 or more");
+      return;
+    }
+
+    const candidates = await deps.getRetentionCleanupCandidates(retentionDays);
+    if (!candidates.length) {
+      setStatus(`No cleanup candidates older than ${retentionDays} days`);
+      return;
+    }
+
+    setStatus(`${candidates.length} vault record${candidates.length === 1 ? "" : "s"} older than ${retentionDays} days can be cleaned up. Whitelisted domains are kept.`);
+  }
+
+  async function cleanupByRetention() {
+    const retentionDays = retentionDaysFromInput(elements.retentionDays.value);
+    if (!retentionDays) {
+      setStatus("Enter retention days of 1 or more");
+      return;
+    }
+
+    const candidates = await deps.getRetentionCleanupCandidates(retentionDays);
+    if (!candidates.length) {
+      setStatus(`No cleanup candidates older than ${retentionDays} days`);
+      return;
+    }
+
+    const message = `Move ${candidates.length} vault record${candidates.length === 1 ? "" : "s"} older than ${retentionDays} days to undoable deletion? Whitelisted domains will be kept.`;
+    if (!deps.confirmAction(message)) {
+      setStatus("Retention cleanup canceled");
+      return;
+    }
+
+    const deleted = await deps.markDeletedByIds(candidates.map((visit) => visit.id));
+    appState.selectedIds.clear();
+    await refreshStats();
+    await runSearch();
+    setStatus(`Cleaned up ${deleted} old vault record${deleted === 1 ? "" : "s"}. Whitelisted domains kept.`);
+  }
+
   async function resetVault() {
     if (!deps.confirmAction("Erase all BrowseVault local archive data, rules, and backup metadata? This will not delete Chrome history.")) {
       return;
@@ -197,8 +246,10 @@ export function createVaultManagementActions({
   return {
     addRule,
     blacklistSelectedDomains,
+    cleanupByRetention,
     deleteFromChrome,
     deleteFromVault,
+    previewRetentionCleanup,
     renderRules,
     resetVault,
     undoVaultDelete

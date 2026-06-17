@@ -16,6 +16,7 @@ const META_STORE = "meta";
 const RULE_STORE = "rules";
 const DEFAULT_RESULT_LIMIT = 500;
 const SAVED_SEARCHES_META = "savedSearches";
+const DAY_MS = 86400000;
 
 let dbPromise;
 
@@ -327,6 +328,42 @@ export async function searchVisits(input = "", options = {}) {
     total: filtered.length,
     results: filtered.slice(0, limit)
   };
+}
+
+function hostMatchesRule(host, rule) {
+  return host === rule || host.endsWith(`.${rule}`);
+}
+
+function visitMatchesWhitelist(visit, whitelist) {
+  const domain = (visit.domain || normalizeDomain(visit.url || "")).toLowerCase();
+  return Boolean(domain && whitelist.some((rule) => hostMatchesRule(domain, rule)));
+}
+
+export function retentionCleanupCandidates(visits, rules, options = {}) {
+  const retentionDays = Number(options.retentionDays);
+  const now = Number(options.now ?? Date.now());
+
+  if (!Number.isInteger(retentionDays) || retentionDays < 1 || !Number.isFinite(now)) {
+    return [];
+  }
+
+  const cutoff = now - retentionDays * DAY_MS;
+  const whitelist = Array.isArray(rules?.whitelist) ? rules.whitelist : [];
+
+  return visits.filter((visit) => {
+    if (!visit || visit.deletedAt || !Number.isFinite(Number(visit.visitTime))) {
+      return false;
+    }
+
+    return Number(visit.visitTime) < cutoff && !visitMatchesWhitelist(visit, whitelist);
+  });
+}
+
+export async function getRetentionCleanupCandidates(retentionDays, options = {}) {
+  return retentionCleanupCandidates(await getAllVisits(), await getRules(), {
+    retentionDays,
+    now: options.now
+  });
 }
 
 export async function markDeletedByIds(ids, deletedAt = new Date().toISOString()) {

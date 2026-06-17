@@ -1,6 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { makeVisitId, normalizeHistoryItem, summarizeImportArchive } from "../src/storage.js";
+import {
+  makeVisitId,
+  normalizeHistoryItem,
+  retentionCleanupCandidates,
+  summarizeImportArchive
+} from "../src/storage.js";
 
 test("summarizeImportArchive reports new, existing, duplicate, invalid, and rule counts", () => {
   const visitTime = Date.parse("2026-06-16T12:00:00Z");
@@ -114,4 +119,55 @@ test("normalizeHistoryItem keeps BrowseVault ids separate from Chrome ids", () =
   assert.equal(csvImport.chromeId, "chrome|visit");
   assert.equal(chromeImport.id, makeVisitId("https://example.com/chrome", visitTime));
   assert.equal(chromeImport.chromeId, "123");
+});
+
+test("retentionCleanupCandidates skips deleted, recent, and whitelisted visits", () => {
+  const now = Date.parse("2026-06-17T12:00:00.000Z");
+  const oldVisit = {
+    id: "old",
+    url: "https://old.example/page",
+    domain: "old.example",
+    visitTime: now - 40 * 86400000
+  };
+  const recentVisit = {
+    id: "recent",
+    url: "https://recent.example/page",
+    domain: "recent.example",
+    visitTime: now - 10 * 86400000
+  };
+  const whitelistedVisit = {
+    id: "kept",
+    url: "https://docs.keep.example/page",
+    domain: "docs.keep.example",
+    visitTime: now - 90 * 86400000
+  };
+  const deletedVisit = {
+    id: "deleted",
+    url: "https://deleted.example/page",
+    domain: "deleted.example",
+    visitTime: now - 90 * 86400000,
+    deletedAt: "2026-06-01T00:00:00.000Z"
+  };
+
+  assert.deepEqual(
+    retentionCleanupCandidates(
+      [oldVisit, recentVisit, whitelistedVisit, deletedVisit],
+      { whitelist: ["keep.example"] },
+      { retentionDays: 30, now }
+    ).map((visit) => visit.id),
+    ["old"]
+  );
+});
+
+test("retentionCleanupCandidates ignores invalid retention windows", () => {
+  const now = Date.parse("2026-06-17T12:00:00.000Z");
+  const visits = [{
+    id: "old",
+    url: "https://old.example/page",
+    visitTime: now - 40 * 86400000
+  }];
+
+  assert.deepEqual(retentionCleanupCandidates(visits, {}, { retentionDays: 0, now }), []);
+  assert.deepEqual(retentionCleanupCandidates(visits, {}, { retentionDays: 1.5, now }), []);
+  assert.deepEqual(retentionCleanupCandidates(visits, {}, { retentionDays: "abc", now }), []);
 });

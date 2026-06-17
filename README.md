@@ -53,6 +53,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - optional URL-level deletion from Chrome history for selected records;
 - full local BrowseVault data reset without touching Chrome history;
 - domain blacklist and whitelist rules;
+- manual retention cleanup that previews old vault records and keeps whitelisted domains;
 - local preferences for system/light/dark theme, accent color, date format, default result limit, backup reminders, and backup filename prefix;
 - in-app trust, permission, and product-limit disclosures;
 - local-first privacy documentation;
@@ -148,6 +149,10 @@ regex:github|gitlab
 The main vault search is used for archived history management. Quick Open uses the same query text to search current browser sources such as open tabs, bookmarks, downloads, and recently closed tabs. Quick Open results are read-only and are not affected by vault delete/export actions.
 
 Date filters use `YYYY-MM-DD` text fields to avoid browser-specific date input formatting. Use `date:`, `day:`, or `on:` for one local calendar day, and `after:` / `before:` for ranges. Use `hour:14` for one local hour or `hour:9-17` / `hour:9..17` for an inclusive local-hour range. Domain filters accept `site:`, `host:`, or `domain:`. Visit count filters accept exact values, comparisons such as `visits:>=10`, ranges such as `count:5..12`, and minimum shorthand such as `visits:7+`. Displayed dates can be switched between system locale, ISO, day/month/year, month/day/year, and year/month/day in Settings.
+
+## Retention Cleanup
+
+The Rules tab supports manual vault retention cleanup. Enter a number of days, preview how many old BrowseVault records would be cleaned up, then confirm the cleanup. Cleanup uses the same undoable vault deletion path as selected-record deletion and skips whitelisted domains.
 
 ## GitHub Description
 

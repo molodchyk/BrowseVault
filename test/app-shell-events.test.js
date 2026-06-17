@@ -83,6 +83,8 @@ function createElements() {
     clearSelection: fakeElement(),
     addBlacklist: fakeElement(),
     addWhitelist: fakeElement(),
+    previewRetention: fakeElement(),
+    cleanupRetention: fakeElement(),
     prefTheme: fakeElement(),
     prefAccent: fakeElement()
   };
@@ -94,6 +96,7 @@ function createHandlers(calls) {
     "addWhitelistRule",
     "applySavedSearch",
     "blacklistSelectedDomains",
+    "cleanupByRetention",
     "cancelStagedImport",
     "clearSearchFields",
     "clearSelection",
@@ -115,6 +118,7 @@ function createHandlers(calls) {
     "invertVisibleSelection",
     "loadMoreResults",
     "openSelected",
+    "previewRetentionCleanup",
     "resetVault",
     "runQuickSearch",
     "runSearchesNow",
@@ -283,6 +287,8 @@ test("bindAppEvents wires bulk and rules actions", () => {
   elements.exportResultsHtml.dispatch("click");
   elements.addBlacklist.dispatch("click");
   elements.addWhitelist.dispatch("click");
+  elements.previewRetention.dispatch("click");
+  elements.cleanupRetention.dispatch("click");
   elements.cancelImport.dispatch("click");
 
   assert.deepEqual(calls, [
@@ -294,6 +300,8 @@ test("bindAppEvents wires bulk and rules actions", () => {
     ["exportFilteredResultsHtml"],
     ["addBlacklistRule"],
     ["addWhitelistRule"],
+    ["previewRetentionCleanup"],
+    ["cleanupByRetention"],
     ["cancelStagedImport"]
   ]);
 });

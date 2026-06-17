@@ -12,6 +12,6 @@ Export history as JSON, spreadsheet-friendly CSV, or HTML, including ISO and loc
 
 Use Quick Open to search tabs, bookmarks, downloads, and recently closed pages from the same interface, then switch, open, restore, or copy the result URL.
 
-Control what gets saved with domain blacklist and whitelist rules, selected-domain blacklisting, local display preferences, default result limits, and explicit destructive actions with undo where the vault can support it.
+Control what gets saved with domain blacklist and whitelist rules, selected-domain blacklisting, manual retention cleanup that keeps whitelisted domains, local display preferences, default result limits, and explicit destructive actions with undo where the vault can support it.
 
 BrowseVault stores its archive locally in your browser profile. It does not include analytics, ads, tracking scripts, remote code, or automatic page-content capture.
