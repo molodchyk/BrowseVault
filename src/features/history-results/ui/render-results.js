@@ -40,7 +40,36 @@ function focusResultByIndex(resultsElement, index) {
   return next;
 }
 
-export function handleHistoryResultKeyDown(event, resultsElement) {
+function applyCheckboxSelection({
+  checkbox,
+  index,
+  results,
+  getSelectionState,
+  onSelectionChange,
+  shiftKey
+}) {
+  if (!results[index]?.id) {
+    return;
+  }
+
+  const state = getSelectionState();
+  if (shiftKey && state.lastCheckedIndex !== null) {
+    onSelectionChange({
+      selectedIds: selectRangeByIndex(state.selectedIds, results, state.lastCheckedIndex, index, checkbox.checked),
+      lastCheckedIndex: state.lastCheckedIndex,
+      shouldRerender: true
+    });
+    return;
+  }
+
+  onSelectionChange({
+    selectedIds: toggleSelectedId(state.selectedIds, results[index]?.id, checkbox.checked),
+    lastCheckedIndex: index,
+    shouldRerender: false
+  });
+}
+
+export function handleHistoryResultKeyDown(event, resultsElement, selection = null) {
   const current = targetResult(event.target);
   if (!current) {
     return false;
@@ -87,7 +116,20 @@ export function handleHistoryResultKeyDown(event, resultsElement) {
     }
 
     event.preventDefault();
-    checkbox.click();
+    if (!selection) {
+      checkbox.click();
+      return true;
+    }
+
+    checkbox.checked = !checkbox.checked;
+    applyCheckboxSelection({
+      checkbox,
+      index,
+      results: selection.results,
+      getSelectionState: selection.getSelectionState,
+      onSelectionChange: selection.onSelectionChange,
+      shiftKey: event.shiftKey
+    });
     return true;
   }
 
@@ -168,20 +210,13 @@ function renderResultItem({
   result.tabIndex = index === 0 ? 0 : -1;
   checkbox.checked = selectedIds.has(item.id);
   checkbox.addEventListener("click", (event) => {
-    const state = getSelectionState();
-    if (event.shiftKey && state.lastCheckedIndex !== null) {
-      onSelectionChange({
-        selectedIds: selectRangeByIndex(state.selectedIds, results, state.lastCheckedIndex, index, checkbox.checked),
-        lastCheckedIndex: state.lastCheckedIndex,
-        shouldRerender: true
-      });
-      return;
-    }
-
-    onSelectionChange({
-      selectedIds: toggleSelectedId(state.selectedIds, item.id, checkbox.checked),
-      lastCheckedIndex: index,
-      shouldRerender: false
+    applyCheckboxSelection({
+      checkbox,
+      index,
+      results,
+      getSelectionState,
+      onSelectionChange,
+      shiftKey: event.shiftKey
     });
   });
 
@@ -217,7 +252,11 @@ export function renderHistoryResults({
   let currentDayKey = "";
 
   elements.resultCount.textContent = resultCountLabel(total, results.length);
-  elements.results.onkeydown = (event) => handleHistoryResultKeyDown(event, elements.results);
+  elements.results.onkeydown = (event) => handleHistoryResultKeyDown(event, elements.results, {
+    getSelectionState,
+    onSelectionChange,
+    results
+  });
   elements.results.replaceChildren();
 
   results.forEach((item, index) => {

@@ -245,8 +245,12 @@ test("renderHistoryResults exposes exact visit timestamps in result metadata", (
   assert.equal(meta.textContent, `docs.github.com · ${displayedTime} · 3 visits · chrome-history`);
 });
 
-function fakeResultRow(id, calls) {
+function fakeResultRow(id, calls, options = {}) {
+  const checkbox = options.checkbox || {
+    click: () => calls.push(`select:${id}`)
+  };
   const row = {
+    dataset: options.dataset || {},
     id,
     closest: (selector) => (selector === ".result" ? row : null),
     focus: () => calls.push(`focus:${id}`),
@@ -257,9 +261,7 @@ function fakeResultRow(id, calls) {
         };
       }
       if (selector === ".result-check") {
-        return {
-          click: () => calls.push(`select:${id}`)
-        };
+        return checkbox;
       }
       return null;
     }
@@ -273,6 +275,7 @@ function fakeKeyEvent(key, target) {
     calls,
     event: {
       key,
+      shiftKey: false,
       target,
       preventDefault: () => calls.push("prevent")
     }
@@ -323,4 +326,44 @@ test("history result keyboard selection uses row focus without hijacking child c
   const childEnter = fakeKeyEvent("Enter", childTarget);
   assert.equal(handleHistoryResultKeyDown(childEnter.event, resultsElement), false);
   assert.deepEqual(calls, ["select:a"]);
+});
+
+test("history result Shift+Space range-selects from the keyboard", () => {
+  const calls = [];
+  const checkboxes = [
+    { checked: true, click: () => calls.push("select:a") },
+    { checked: false, click: () => calls.push("select:b") },
+    { checked: false, click: () => calls.push("select:c") }
+  ];
+  const rows = [
+    fakeResultRow("a", calls, { checkbox: checkboxes[0], dataset: { resultIndex: "0" } }),
+    fakeResultRow("b", calls, { checkbox: checkboxes[1], dataset: { resultIndex: "1" } }),
+    fakeResultRow("c", calls, { checkbox: checkboxes[2], dataset: { resultIndex: "2" } })
+  ];
+  const resultsElement = {
+    querySelectorAll: (selector) => (selector === ".result" ? rows : [])
+  };
+  const selectionChanges = [];
+  const space = fakeKeyEvent(" ", rows[2]);
+  space.event.shiftKey = true;
+
+  assert.equal(
+    handleHistoryResultKeyDown(space.event, resultsElement, {
+      results,
+      getSelectionState: () => ({
+        selectedIds: new Set(["a"]),
+        lastCheckedIndex: 0
+      }),
+      onSelectionChange: (change) => selectionChanges.push(change)
+    }),
+    true
+  );
+
+  assert.deepEqual(space.calls, ["prevent"]);
+  assert.equal(checkboxes[2].checked, true);
+  assert.equal(selectionChanges.length, 1);
+  assert.deepEqual([...selectionChanges[0].selectedIds], ["a", "b", "c"]);
+  assert.equal(selectionChanges[0].lastCheckedIndex, 0);
+  assert.equal(selectionChanges[0].shouldRerender, true);
+  assert.deepEqual(calls, []);
 });

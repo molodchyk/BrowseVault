@@ -14,7 +14,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Advanced local search for site, host, domain, title, URL, source, transition, visit count, exact day, date range, local hour, exclusions, wildcards, phrases, and regex.
 - Limited history searches keep only the top visible results while counting the full match set, reducing memory and sort work on large archives.
 - One-click Today, Yesterday, 7 Days, 30 Days, and All Dates shortcuts using ISO-style date filters.
-- Saved searches, match highlighting, local-date grouped results, sticky result controls, incremental loading, one-click Show All expansion, keyboard-first search focus, and keyboard navigation for visible history rows.
+- Saved searches, match highlighting, local-date grouped results, sticky result controls, incremental loading, one-click Show All expansion, keyboard-first search focus, keyboard navigation for visible history rows, and mouse/keyboard range selection.
 - Quick Open search across open tabs, bookmarks, downloads, recently closed tabs, and closed windows, with keyboard navigation for source results and readable source-unavailable warnings.
 - JSON, CSV, and offline HTML export for all records, selected records, and current filtered results, with HTML summary metrics, exact timestamps, in-file filtering, sortable columns, and safer link handling.
 - Bare `after:YYYY-MM-DD` and `before:YYYY-MM-DD` search filters use local calendar-day boundaries instead of browser-dependent UTC parsing.

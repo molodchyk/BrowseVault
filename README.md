@@ -35,7 +35,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - saved searches for repeated local history queries and date/limit filter sets;
 - highlighted matches in vault and Quick Open search results;
 - keyboard-first search with autofocus, global query focus, Enter search, and debounced live refresh;
-- keyboard navigation for visible history results with arrow keys, Enter-to-open, and Space-to-select;
+- keyboard navigation for visible history results with arrow keys, Enter-to-open, Space-to-select, and Shift+Space range selection;
 - local-date grouped vault results for easier timeline scanning;
 - Quick Open search across open tabs, bookmarks, downloads, recently closed tabs, and closed windows, with source-aware switch/open/open-in-background/restore actions, keyboard navigation, and readable source-unavailable warnings;
 - toolbar and keyboard-command opening that reuses an already open BrowseVault tab;
@@ -57,7 +57,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - selected-record batch opening with a tab-flood safety cap;
 - bulk deletion from the BrowseVault vault;
 - selected-domain blacklisting for future archive capture;
-- select visible, invert visible, or select all filtered vault results;
+- checkbox, Shift-click, and Shift+Space range selection, plus select visible, invert visible, or select all filtered vault results;
 - sticky result controls with incremental Load More and one-click Show All for large result sets;
 - undo for the last BrowseVault vault deletion;
 - optional URL-level deletion from Chrome history for selected records;
