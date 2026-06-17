@@ -248,6 +248,38 @@ test("refreshStats renders stat cards and backup health details", async () => {
   assert.equal(renderedActivity[0][2].formatDate(Date.parse(exportedAt)), "2026-06-01");
 });
 
+test("refreshStats applies the configured backup reminder interval", async () => {
+  const { backupHealthClassList, controller, elements } = createHarness({
+    preferences: {
+      theme: "system",
+      accent: "teal",
+      backupFilenamePrefix: "browsevault",
+      backupReminderDays: 14,
+      dateFormat: "iso",
+      defaultLimit: 500
+    },
+    stats: {
+      visits: 42,
+      domains: 7,
+      newestVisitTime: Date.parse("2026-06-16T12:00:00.000Z"),
+      meta: {
+        lastBackup: {
+          exportedAt: "2026-06-01T00:00:00.000Z",
+          format: "json",
+          records: 42
+        }
+      }
+    }
+  });
+
+  await controller.refreshStats();
+
+  assert.equal(elements.backupHealth.textContent, "Backup due after 14 days");
+  assert.equal(backupHealthClassList.classes.has("is-warning"), true);
+  assert.equal(backupHealthClassList.classes.has("is-ok"), false);
+  assert.match(elements.backupNext.textContent, /^2026-06-15 \d{2}:\d{2}$/);
+});
+
 test("requested limits respect current field values and quick-open cap", () => {
   const { controller, elements } = createHarness();
 

@@ -256,18 +256,17 @@ export function backupStatusDetails(backup, options = {}) {
     };
   }
 
-  const ageDays = Math.floor((now - timestamp) / 86400000);
   const remindersEnabled = reminderDays > 0;
-  const isStale = remindersEnabled && ageDays > reminderDays;
   const nextTimestamp = remindersEnabled ? timestamp + (reminderDays * 86400000) : 0;
+  const isDue = remindersEnabled && now >= nextTimestamp;
   return {
     healthText: remindersEnabled
-      ? isStale
-        ? `Backup older than ${reminderDays} days`
+      ? isDue
+        ? `Backup due after ${reminderDays} day${reminderDays === 1 ? "" : "s"}`
         : "Backup current"
       : "Backup reminder off",
-    isWarning: isStale,
-    isOk: remindersEnabled && !isStale,
+    isWarning: isDue,
+    isOk: remindersEnabled && !isDue,
     lastText: formatDate(timestamp, dateFormat),
     nextText: remindersEnabled ? formatDate(nextTimestamp, dateFormat) : "Off",
     formatText: String(backup.format || "unknown").toUpperCase(),

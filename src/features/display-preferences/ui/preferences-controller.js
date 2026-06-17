@@ -50,7 +50,8 @@ export function createDisplayPreferencesController({
 
   function renderBackupStatus(backup) {
     const status = deps.backupStatusDetails(backup, {
-      dateFormat: appState.preferences.dateFormat
+      dateFormat: appState.preferences.dateFormat,
+      reminderDays: appState.preferences.backupReminderDays
     });
 
     elements.backupHealth.textContent = status.healthText;

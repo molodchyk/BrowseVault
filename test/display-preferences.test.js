@@ -159,15 +159,15 @@ test("backupStatusDetails summarizes missing, fresh, and stale backups", () => {
   assert.equal(fresh.selfTestText, "Passed 12 records");
   assert.equal(fresh.checksumText, "1234567890ab...90abcdef");
 
-  const stale = backupStatusDetails(
+  const due = backupStatusDetails(
     { exportedAt, format: "csv", records: 1 },
     {
-      now: Date.parse("2026-07-16T00:00:00.000Z"),
+      now: Date.parse("2026-07-01T00:00:00.000Z"),
       staleDays: 30
     }
   );
-  assert.equal(stale.healthText, "Backup older than 30 days");
-  assert.equal(stale.isWarning, true);
+  assert.equal(due.healthText, "Backup due after 30 days");
+  assert.equal(due.isWarning, true);
 
   const disabled = backupStatusDetails(
     { exportedAt, format: "json", records: 12 },
