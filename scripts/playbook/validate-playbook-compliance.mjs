@@ -35,6 +35,20 @@ export function validatePlaybookCompliance(root, assert) {
     readme.indexOf(canonicalSourceBlock) < readme.indexOf(canonicalSupportBlock),
     "README support block must appear after privacy and license/source information."
   );
+  for (const expected of [
+    "docs/project/repository-metadata.md",
+    "playbook/",
+    "qa/",
+    "zip-utils.mjs",
+    "activity-log/",
+    "app-shell/",
+    "background-runtime/",
+    "browser-memory/",
+    "vault-management/",
+    "platform/"
+  ]) {
+    assert(readme.includes(expected), `README project structure missing current tree entry: ${expected}`);
+  }
 
   const privacy = fs.readFileSync(path.join(root, "PRIVACY.md"), "utf8");
   assert(privacy.includes("Chrome local extension storage"), "Privacy policy must name the storage area used for settings.");

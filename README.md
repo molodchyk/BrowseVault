@@ -84,7 +84,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - copied research and product docs in [`docs/`](docs/);
 - Chrome Web Store listing notes in [`store/listing.md`](store/listing.md);
 - StorePilot-ready Chrome Web Store import files in [`store-listing/chrome-web-store/`](store-listing/chrome-web-store/);
-- repository description and topic/tag metadata in [`package.json`](package.json).
+- repository description and topic/tag metadata in [`package.json`](package.json) and [`docs/project/repository-metadata.md`](docs/project/repository-metadata.md).
 
 ## Project Structure
 
@@ -115,9 +115,12 @@ This repository contains a working Manifest V3 extension implementation. It incl
 │   ├── check-syntax.mjs
 │   ├── generate-icons.mjs
 │   ├── media/
+│   ├── playbook/
+│   ├── qa/
 │   ├── package-extension.mjs
+│   ├── validate-extension.mjs
 │   ├── verify-package.mjs
-│   └── validate-extension.mjs
+│   └── zip-utils.mjs
 ├── src/
 │   ├── app.css
 │   ├── app.html
@@ -126,10 +129,16 @@ This repository contains a working Manifest V3 extension implementation. It incl
 │   ├── browser-memory.js
 │   ├── export-format.js
 │   ├── features/
+│   │   ├── activity-log/
+│   │   ├── app-shell/
+│   │   ├── background-runtime/
 │   │   ├── backup-import/
+│   │   ├── browser-memory/
 │   │   ├── display-preferences/
 │   │   ├── history-export/
-│   │   └── history-results/
+│   │   ├── history-results/
+│   │   └── vault-management/
+│   ├── platform/
 │   ├── query.js
 │   ├── styles/
 │   └── storage.js

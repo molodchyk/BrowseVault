@@ -32,7 +32,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 
 ## Next Split Candidates
 
-- Split remaining oversized UI/action modules and test files called out by `npm run check` soft warnings.
+- There are no current file-size or folder-density warnings from `npm run check`. Future split candidates should come from new `npm run check` warnings or feature folders approaching the density budgets.
 
 ## Rules For Future Edits
 
@@ -41,5 +41,5 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - Keep compatibility barrels export-only.
 - Add or update focused tests when pure logic moves.
 - Keep test files grouped by feature or responsibility rather than adding new root-level `test/*.test.js` files.
-- Run `npm run check` after structure changes; it fails when static JavaScript imports, stylesheet imports, extension-page module script or stylesheet paths, locale references, manifest-owned paths, or privacy/permission disclosures break, when known file-size debt grows beyond its cap, or when runtime/support/docs folders exceed 12 files or feature/test-feature folders exceed 15 files.
+- Run `npm run check` after structure changes; it fails when static JavaScript imports, stylesheet imports, extension-page module script or stylesheet paths, locale references, manifest-owned paths, privacy/permission disclosures, or Chrome QA profile-safety guardrails break, and when runtime/support/docs folders exceed 12 files or feature/test-feature folders exceed 15 files.
 - Update this file when ownership changes.
