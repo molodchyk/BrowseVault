@@ -24,6 +24,7 @@ export const requiredProjectFiles = [
   "src/features/background-runtime/core/chrome-history-sync-plan.js",
   "src/features/background-runtime/ui/localization-keys.js",
   "src/features/backup-import/core/archive-import-plan.js",
+  "src/features/backup-import/ui/downloads.js",
   "src/features/history-results/core/query-matcher.js",
   "src/features/history-results/core/query-parser.js",
   "src/features/history-results/core/query-text.js",
