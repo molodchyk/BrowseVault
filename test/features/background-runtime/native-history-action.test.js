@@ -31,6 +31,29 @@ test("openNativeChromeHistory opens Chrome native history through validated runt
   ]);
 });
 
+test("openNativeChromeHistory can localize status messages", async () => {
+  const statuses = [];
+  const openNativeChromeHistory = createNativeHistoryAction({
+    getMessage(key) {
+      return {
+        statusOpeningNativeChromeHistory: "opening localized",
+        statusOpenedNativeChromeHistory: "opened localized"
+      }[key] || "";
+    },
+    services: {
+      sendRuntimeMessage: async () => ({ ok: true })
+    },
+    setStatus: (message) => statuses.push(message)
+  });
+
+  await openNativeChromeHistory();
+
+  assert.deepEqual(statuses, [
+    "opening localized",
+    "opened localized"
+  ]);
+});
+
 test("openNativeChromeHistory reports runtime failures", async () => {
   const statuses = [];
   const openNativeChromeHistory = createNativeHistoryAction({

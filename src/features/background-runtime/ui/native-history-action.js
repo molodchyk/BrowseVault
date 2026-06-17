@@ -7,7 +7,12 @@ const defaultServices = {
   sendRuntimeMessage
 };
 
+function localizedMessage(getMessage, key, fallback) {
+  return getMessage?.(key) || fallback;
+}
+
 export function createNativeHistoryAction({
+  getMessage = () => "",
   services = {},
   setStatus
 }) {
@@ -17,16 +22,16 @@ export function createNativeHistoryAction({
   };
 
   return async function openNativeChromeHistory() {
-    setStatus("Opening native Chrome history");
+    setStatus(localizedMessage(getMessage, "statusOpeningNativeChromeHistory", "Opening native Chrome history"));
     const response = await deps.sendRuntimeMessage({
       type: BACKGROUND_MESSAGE_TYPES.OPEN_URL,
       url: NATIVE_CHROME_HISTORY_URL
     });
 
     if (!response?.ok) {
-      throw new Error(response?.error || "Native Chrome history did not open.");
+      throw new Error(response?.error || localizedMessage(getMessage, "errorNativeChromeHistoryDidNotOpen", "Native Chrome history did not open."));
     }
 
-    setStatus("Opened native Chrome history");
+    setStatus(localizedMessage(getMessage, "statusOpenedNativeChromeHistory", "Opened native Chrome history"));
   };
 }

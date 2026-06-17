@@ -794,5 +794,35 @@
   "buttonOpen": {
     "message": "Open",
     "description": "Static BrowseVault extension-page UI string."
+  },
+  "statusSyncingChromeHistory": {
+    "message": "Syncing Chrome history",
+    "description": "Status shown while BrowseVault imports currently available Chrome history."
+  },
+  "statusSyncedRecords": {
+    "message": "Synced $COUNT$ records",
+    "description": "Status shown after BrowseVault imports currently available Chrome history.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "125"
+      }
+    }
+  },
+  "errorChromeHistorySyncFailed": {
+    "message": "Chrome history sync failed.",
+    "description": "Fallback error shown when Chrome history sync fails without a detailed runtime error."
+  },
+  "statusOpeningNativeChromeHistory": {
+    "message": "Opening native Chrome history",
+    "description": "Status shown while Chrome's native history page is being opened."
+  },
+  "statusOpenedNativeChromeHistory": {
+    "message": "Opened native Chrome history",
+    "description": "Status shown after Chrome's native history page is opened."
+  },
+  "errorNativeChromeHistoryDidNotOpen": {
+    "message": "Native Chrome history did not open.",
+    "description": "Fallback error shown when Chrome's native history page cannot be opened."
   }
 }

@@ -162,12 +162,14 @@ const savedSearchActions = createSavedSearchActions({
 });
 
 const syncChromeHistory = createChromeHistorySyncAction({
+  getMessage: getChromeMessage,
   refreshStats: displayPreferences.refreshStats,
   runSearch: historySearchActions.runSearch,
   setStatus
 });
 
 const openNativeChromeHistory = createNativeHistoryAction({
+  getMessage: getChromeMessage,
   setStatus
 });
 

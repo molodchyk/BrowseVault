@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { appShellLocalization } from "../src/features/app-shell/ui/localization-map.js";
+import { backgroundRuntimeLocalization } from "../src/features/background-runtime/ui/localization-keys.js";
 
 const root = process.cwd();
 const messageReferencePattern = /__MSG_([A-Za-z0-9_@]+?)__/g;
@@ -68,7 +69,8 @@ if (!fs.existsSync(path.join(root, localePath))) {
 const messages = readJson(localePath);
 const references = collectManifestReferences(manifest);
 const referencedKeys = new Set(references.map((reference) => reference.key));
-for (const { key } of appShellLocalization) {
+const uiLocalizationBindings = [...appShellLocalization, ...backgroundRuntimeLocalization];
+for (const { key } of uiLocalizationBindings) {
   referencedKeys.add(key);
 }
 
@@ -88,7 +90,7 @@ for (const { key, location } of references) {
   }
 }
 
-for (const { key, selector } of appShellLocalization) {
+for (const { key, selector = "dynamic UI status" } of uiLocalizationBindings) {
   const record = messages[key];
   if (!record) {
     fail(`app shell localization selector ${selector}: missing locale key ${key} in ${localePath}.`);
@@ -130,6 +132,4 @@ if (process.exitCode) {
   process.exit(process.exitCode);
 }
 
-console.log(
-  `Locale coverage checked ${references.length} manifest references and ${appShellLocalization.length} app shell bindings against ${localePath}.`
-);
+console.log(`Locale coverage checked ${references.length} manifest references and ${uiLocalizationBindings.length} UI bindings against ${localePath}.`);

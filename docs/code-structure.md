@@ -12,7 +12,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `src/features/activity-log/` owns recent activity event normalization and Backup-tab activity rendering for user-visible backup, export, import, cleanup, delete, restore, rule, and reset operations.
 - `src/features/app-shell/` owns extension-page shell state, element collection, tab navigation/focus helpers, shared search scheduling, event wiring, static extension-page localization, and shared shell UI behavior.
 - `src/features/backup-import/` owns archive import/export actions, export filename rules, file parsing, import normalization, integrity metadata, import-preview display state, and restore-flow rendering.
-- `src/features/background-runtime/` owns background message routing, payload validation, privileged action dispatch, Chrome history bootstrap, archive filtering, live-visit capture, native Chrome history removal reconciliation, and extension-page actions that coordinate with background runtime messages.
+- `src/features/background-runtime/` owns background message routing, payload validation, privileged action dispatch, Chrome history bootstrap, archive filtering, live-visit capture, native Chrome history removal reconciliation, localized status strings, and extension-page actions that coordinate with background runtime messages.
 - `src/features/browser-memory/` owns extension-page quick-open rendering and actions for tabs, bookmarks, downloads, and recently closed sessions.
 - `src/features/display-preferences/` owns preference normalization, result-limit clamping, date/count formatting, archive health summaries, backup reminder cadence, backup filename preferences, backup status summaries, settings persistence orchestration, and extension-page preference/stat rendering.
 - `src/features/history-export/core/export-format.js` owns pure CSV and HTML export formatting.
@@ -23,7 +23,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `src/export-format.js` is a compatibility barrel for existing import paths.
 - `test/features/` mirrors feature-owned tests by product area so no single flat test folder becomes a dumping ground.
 - `test/platform/`, `test/query/`, and `test/storage/` own cross-feature platform, query-parser, and storage tests.
-- `scripts/check-locales.mjs` verifies manifest `__MSG_*__` references and app-shell UI localization bindings against `_locales/en/messages.json`, then rejects unresolved or unused locale keys.
+- `scripts/check-locales.mjs` verifies manifest `__MSG_*__` references and extension UI localization bindings against `_locales/en/messages.json`, then rejects unresolved or unused locale keys.
 - `scripts/check-manifest-paths.mjs` verifies manifest-owned extension paths such as icons, service workers, popups, options pages, content scripts, and web-accessible resources.
 - `scripts/check-privacy-permissions.mjs` verifies that manifest permissions, `PRIVACY.md`, and the StorePilot privacy form stay aligned.
 - `scripts/check-file-sizes.mjs` audits the file-size budgets from the modularization playbook for `src/`, `test/`, and `scripts/`, reports soft-budget warnings, and caps known hard-limit debt.

@@ -2,12 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createChromeHistorySyncAction } from "../../../src/features/background-runtime/ui/chrome-history-sync-action.js";
 
-function createHarness({ response } = {}) {
+function createHarness({ getMessage, response } = {}) {
   const calls = [];
   const messages = [];
   const statuses = [];
   const hasResponse = arguments[0] && Object.hasOwn(arguments[0], "response");
   const syncChromeHistory = createChromeHistorySyncAction({
+    getMessage,
     refreshStats: async () => calls.push("refreshStats"),
     runSearch: async () => calls.push("runSearch"),
     services: {
@@ -37,6 +38,33 @@ test("syncChromeHistory sends bootstrap message, refreshes UI, and reports store
   assert.deepEqual(statuses, [
     "Syncing Chrome history",
     "Synced 12 records"
+  ]);
+});
+
+test("syncChromeHistory can localize status messages", async () => {
+  const requested = [];
+  const { statuses, syncChromeHistory } = createHarness({
+    getMessage(key, substitutions = []) {
+      requested.push([key, substitutions]);
+      if (key === "statusSyncingChromeHistory") {
+        return "syncing localized";
+      }
+      if (key === "statusSyncedRecords") {
+        return `synced localized ${substitutions[0]}`;
+      }
+      return "";
+    }
+  });
+
+  await syncChromeHistory();
+
+  assert.deepEqual(statuses, [
+    "syncing localized",
+    "synced localized 12"
+  ]);
+  assert.deepEqual(requested, [
+    ["statusSyncingChromeHistory", []],
+    ["statusSyncedRecords", ["12"]]
   ]);
 });
 

@@ -159,13 +159,10 @@ function collectMessageReferences(value) {
 }
 
 function collectPackagedUiMessageReferences(entries) {
-  const localizationMap = entries.find((entry) => entry.name === "src/features/app-shell/ui/localization-map.js");
-  if (!localizationMap) {
-    return [];
-  }
-
-  const source = localizationMap.data.toString("utf8");
-  return [...source.matchAll(/\bkey:\s*"([A-Za-z0-9_@]+)"/g)].map((match) => match[1]);
+  return entries
+    .filter((entry) => /\/localization[^/]*\.js$/.test(entry.name))
+    .flatMap((entry) => [...entry.data.toString("utf8").matchAll(/\bkey:\s*"([A-Za-z0-9_@]+)"/g)])
+    .map((match) => match[1]);
 }
 
 function normalizeExtensionPath(value) {

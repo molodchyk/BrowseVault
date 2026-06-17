@@ -5,7 +5,12 @@ const defaultServices = {
   sendRuntimeMessage
 };
 
+function localizedMessage(getMessage, key, fallback, substitutions) {
+  return getMessage?.(key, substitutions) || fallback;
+}
+
 export function createChromeHistorySyncAction({
+  getMessage = () => "",
   refreshStats,
   runSearch,
   services = {},
@@ -17,17 +22,22 @@ export function createChromeHistorySyncAction({
   };
 
   return async function syncChromeHistory() {
-    setStatus("Syncing Chrome history");
+    setStatus(localizedMessage(getMessage, "statusSyncingChromeHistory", "Syncing Chrome history"));
     const response = await deps.sendRuntimeMessage({
       type: BACKGROUND_MESSAGE_TYPES.BOOTSTRAP_CHROME_HISTORY
     });
 
     if (!response?.ok) {
-      throw new Error(response?.error || "Chrome history sync failed.");
+      throw new Error(response?.error || localizedMessage(getMessage, "errorChromeHistorySyncFailed", "Chrome history sync failed."));
     }
 
     await refreshStats();
     await runSearch();
-    setStatus(`Synced ${response.result.stored} records`);
+    setStatus(localizedMessage(
+      getMessage,
+      "statusSyncedRecords",
+      `Synced ${response.result.stored} records`,
+      [String(response.result.stored)]
+    ));
   };
 }

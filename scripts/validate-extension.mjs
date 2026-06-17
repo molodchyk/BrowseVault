@@ -17,7 +17,7 @@ const requiredFiles = [
   "src/app.html",
   "src/app.css",
   "src/app.js",
-  "src/features/app-shell/ui/localization-map.js", "src/features/app-shell/ui/localization.js", "src/platform/chrome/i18n.js",
+  "src/features/app-shell/ui/localization-map.js", "src/features/app-shell/ui/localization.js", "src/features/background-runtime/ui/localization-keys.js", "src/platform/chrome/i18n.js",
   "store/listing.md",
   "store-listing/chrome-web-store/README.md",
   "store-listing/chrome-web-store/listing/en.md",
@@ -214,7 +214,7 @@ for (const expected of [
 }
 
 const localeCheckScript = fs.readFileSync(path.join(root, "scripts", "check-locales.mjs"), "utf8");
-for (const expected of ["manifest.default_locale", "appShellLocalization", "app shell bindings", "missing locale key", "unused locale key", "__MSG_*__ references are only supported in manifest.json", "Locale coverage checked"]) {
+for (const expected of ["manifest.default_locale", "appShellLocalization", "backgroundRuntimeLocalization", "UI bindings", "missing locale key", "unused locale key", "__MSG_*__ references are only supported in manifest.json", "Locale coverage checked"]) {
   assert(localeCheckScript.includes(expected), `Locale audit missing coverage guardrail: ${expected}`);
 }
 
