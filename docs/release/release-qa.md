@@ -2,6 +2,8 @@
 
 This file records release verification status for the current BrowseVault package.
 
+Use [`browser-extension-playbook-audit.md`](browser-extension-playbook-audit.md) for the requirement-by-requirement playbook status.
+
 ## Automated Gates
 
 Last verified for `1.0.0`:

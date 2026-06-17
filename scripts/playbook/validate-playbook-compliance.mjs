@@ -76,6 +76,7 @@ export function validatePlaybookCompliance(root, assert) {
 
   const docsReadme = fs.readFileSync(path.join(root, "docs", "README.md"), "utf8");
   for (const expected of [
+    "release/browser-extension-playbook-audit.md",
     "release/browser-extension-playbook-compliance.md",
     "release/manual-browser-qa-checklist.md",
     "release/release-notes.md",
@@ -213,6 +214,7 @@ export function validatePlaybookCompliance(root, assert) {
   const releaseQa = fs.readFileSync(path.join(root, "docs", "release", "release-qa.md"), "utf8");
   for (const expected of [
     "Load the unpacked extension in the target browser",
+    "browser-extension-playbook-audit.md",
     "manual-browser-qa-checklist.md",
     "npm run validate",
     "npm run check",
@@ -238,5 +240,28 @@ export function validatePlaybookCompliance(root, assert) {
     "Result: Not run"
   ]) {
     assert(manualBrowserQa.includes(expected), `Manual browser QA checklist missing required check: ${expected}`);
+  }
+
+  const playbookAudit = fs.readFileSync(
+    path.join(root, "docs", "release", "browser-extension-playbook-audit.md"),
+    "utf8"
+  );
+  for (const expected of [
+    "Product shape",
+    "Repository shape",
+    "Store listing copy",
+    "Localization baseline",
+    "Open source and license",
+    "Privacy and permissions",
+    "UI expectations",
+    "Reviewer notes",
+    "Release package checks",
+    "Target-browser load-unpacked check",
+    "Manual required",
+    "Load the unpacked extension in the target browser",
+    "Do not use automated Chrome or Playwright runs against a live Chrome profile",
+    "do not create or target named personal Chrome profiles such as `Your Chrome`"
+  ]) {
+    assert(playbookAudit.includes(expected), `Browser extension playbook audit missing: ${expected}`);
   }
 }

@@ -59,6 +59,7 @@ export const requiredProjectFiles = [
   "docs/project/decision-records.md",
   "docs/project/repository-metadata.md",
   "docs/release/reviewer-notes.md",
+  "docs/release/browser-extension-playbook-audit.md",
   "docs/release/browser-extension-playbook-compliance.md",
   "docs/release/manual-browser-qa-checklist.md",
   "docs/release/release-qa.md",

@@ -12,6 +12,7 @@ This folder captures the critical market research, user feedback, product direct
 - `architecture/code-structure.md` - BrowseVault-specific ownership map and next split candidates.
 - `release/reviewer-notes.md` - browser-store reviewer notes for limitations, permissions, package behavior, and user-data handling.
 - `release/browser-extension-playbook-compliance.md` - evidence matrix mapping BrowseVault to the shared browser-extension playbook.
+- `release/browser-extension-playbook-audit.md` - requirement-by-requirement release audit separating verified evidence from manual browser evidence still needed.
 - `release/release-qa.md` - release verification status and real-browser QA notes.
 - `release/manual-browser-qa-checklist.md` - manual target-browser QA checklist for the load-unpacked release requirement.
 - `release/release-notes.md` - docs-level release summary that points to the canonical root changelog.
