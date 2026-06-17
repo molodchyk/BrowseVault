@@ -22,6 +22,11 @@ const requiredFiles = [
   "store-listing/chrome-web-store/media/icon-128.png",
   "store-listing/chrome-web-store/media/promo/.gitkeep",
   "store-listing/chrome-web-store/media/screenshots/.gitkeep",
+  "store-listing/chrome-web-store/media/screenshots/01-history-search.jpg",
+  "store-listing/chrome-web-store/media/screenshots/02-quick-open.jpg",
+  "store-listing/chrome-web-store/media/screenshots/03-backup-health.jpg",
+  "store-listing/chrome-web-store/media/screenshots/04-rules-cleanup.jpg",
+  "store-listing/chrome-web-store/media/screenshots/05-settings-privacy.jpg",
   "docs/README.md",
   "docs/reviewer-notes.md",
   "docs/chrome-web-store-additional-fields.md",
@@ -46,6 +51,44 @@ function assert(condition, message) {
   if (!condition) {
     throw new Error(message);
   }
+}
+
+function jpegDimensions(buffer) {
+  if (buffer[0] !== 0xff || buffer[1] !== 0xd8) {
+    return null;
+  }
+
+  let offset = 2;
+  while (offset + 9 < buffer.length) {
+    if (buffer[offset] !== 0xff) {
+      offset += 1;
+      continue;
+    }
+
+    const marker = buffer[offset + 1];
+    const length = buffer.readUInt16BE(offset + 2);
+    if (marker >= 0xc0 && marker <= 0xc3) {
+      return {
+        height: buffer.readUInt16BE(offset + 5),
+        width: buffer.readUInt16BE(offset + 7)
+      };
+    }
+    offset += 2 + length;
+  }
+
+  return null;
+}
+
+function imageDimensions(file) {
+  const buffer = fs.readFileSync(path.join(root, file));
+  if (buffer[0] === 137 && buffer[1] === 80 && buffer[2] === 78 && buffer[3] === 71) {
+    return {
+      height: buffer.readUInt32BE(20),
+      width: buffer.readUInt32BE(16)
+    };
+  }
+
+  return jpegDimensions(buffer);
 }
 
 function collectFilesByExtension(entry, extensions) {
@@ -134,6 +177,17 @@ for (const size of [16, 32, 48, 128]) {
   const icon = fs.readFileSync(path.join(root, "assets", "icons", `icon${size}.png`));
   assert(icon[0] === 137 && icon[1] === 80 && icon[2] === 78 && icon[3] === 71, `Icon ${size} is not a PNG.`);
   assert(icon.readUInt32BE(16) === size && icon.readUInt32BE(20) === size, `Icon ${size} has wrong dimensions.`);
+}
+
+for (const screenshot of [
+  "01-history-search.jpg",
+  "02-quick-open.jpg",
+  "03-backup-health.jpg",
+  "04-rules-cleanup.jpg",
+  "05-settings-privacy.jpg"
+]) {
+  const dimensions = imageDimensions(path.join("store-listing", "chrome-web-store", "media", "screenshots", screenshot));
+  assert(dimensions?.width === 1280 && dimensions?.height === 800, `Store screenshot ${screenshot} must be 1280 x 800.`);
 }
 
 const storePilotIcon = fs.readFileSync(path.join(root, "store-listing", "chrome-web-store", "media", "icon-128.png"));
