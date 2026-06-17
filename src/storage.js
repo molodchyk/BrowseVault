@@ -473,6 +473,30 @@ function normalizeImportVisits(archive) {
     );
 }
 
+export function mergeImportedVisits(existingVisits, importedVisits) {
+  const currentById = new Map((Array.isArray(existingVisits) ? existingVisits : []).map((visit) => [visit.id, visit]));
+
+  return (Array.isArray(importedVisits) ? importedVisits : []).map((record) => {
+    const previous = currentById.get(record.id);
+    if (!previous) {
+      currentById.set(record.id, record);
+      return record;
+    }
+
+    const merged = {
+      ...previous,
+      ...record,
+      deletedAt: previous.deletedAt || record.deletedAt || null,
+      chromeDeletedAt: previous.chromeDeletedAt || record.chromeDeletedAt || null
+    };
+    if (previous.createdAt || record.createdAt) {
+      merged.createdAt = previous.createdAt || record.createdAt;
+    }
+    currentById.set(record.id, merged);
+    return merged;
+  });
+}
+
 function normalizeImportRules(archive, importedAt = new Date().toISOString()) {
   if (!Array.isArray(archive?.rules)) {
     return [];
@@ -529,9 +553,10 @@ export async function analyzeImportArchive(archive) {
 export async function importArchive(archive) {
   const importedAt = new Date().toISOString();
   const normalized = normalizeImportVisits(archive);
+  const records = mergeImportedVisits(await getAllVisits({ includeDeleted: true }), normalized);
   const rules = normalizeImportRules(archive, importedAt);
 
-  await putMany(VISIT_STORE, normalized);
+  await putMany(VISIT_STORE, records);
   await putMany(RULE_STORE, rules);
 
   await setMeta("lastImport", {

@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   makeVisitId,
+  mergeImportedVisits,
   normalizeHistoryItem,
   retentionCleanupCandidates,
   summarizeImportArchive
@@ -119,6 +120,59 @@ test("normalizeHistoryItem keeps BrowseVault ids separate from Chrome ids", () =
   assert.equal(csvImport.chromeId, "chrome|visit");
   assert.equal(chromeImport.id, makeVisitId("https://example.com/chrome", visitTime));
   assert.equal(chromeImport.chromeId, "123");
+});
+
+test("mergeImportedVisits preserves existing local tombstones and creation metadata", () => {
+  const id = "visit-1";
+  const existing = {
+    id,
+    url: "https://example.com/original",
+    title: "Original",
+    createdAt: "2026-01-01T00:00:00.000Z",
+    deletedAt: "2026-06-01T00:00:00.000Z",
+    chromeDeletedAt: "2026-06-02T00:00:00.000Z",
+    updatedAt: "2026-06-01T00:00:00.000Z"
+  };
+  const imported = {
+    id,
+    url: "https://example.com/imported",
+    title: "Imported",
+    createdAt: "2026-06-16T00:00:00.000Z",
+    deletedAt: null,
+    chromeDeletedAt: null,
+    updatedAt: "2026-06-16T00:00:00.000Z"
+  };
+
+  assert.deepEqual(mergeImportedVisits([existing], [imported]), [{
+    ...imported,
+    createdAt: "2026-01-01T00:00:00.000Z",
+    deletedAt: "2026-06-01T00:00:00.000Z",
+    chromeDeletedAt: "2026-06-02T00:00:00.000Z"
+  }]);
+});
+
+test("mergeImportedVisits carries tombstones across duplicate rows in one import", () => {
+  const first = {
+    id: "visit-1",
+    title: "First",
+    deletedAt: "2026-06-01T00:00:00.000Z",
+    chromeDeletedAt: null
+  };
+  const second = {
+    id: "visit-1",
+    title: "Second",
+    deletedAt: null,
+    chromeDeletedAt: "2026-06-02T00:00:00.000Z"
+  };
+
+  assert.deepEqual(mergeImportedVisits([], [first, second]), [
+    first,
+    {
+      ...second,
+      deletedAt: "2026-06-01T00:00:00.000Z",
+      chromeDeletedAt: "2026-06-02T00:00:00.000Z"
+    }
+  ]);
 });
 
 test("retentionCleanupCandidates skips deleted, recent, and whitelisted visits", () => {

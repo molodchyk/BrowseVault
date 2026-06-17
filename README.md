@@ -45,6 +45,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - recent activity log for completed backup, export, import, cleanup, delete, restore, rule, and reset operations;
 - SHA-256 integrity metadata for JSON backups;
 - staged import preview with valid row, duplicate row, existing visit, new visit, rule, and restore-check health status;
+- imports preserve existing local vault tombstones and Chrome-deletion markers when matching visits are imported again;
 - JSON, CSV, TSV, Google Takeout Browser History, Google My Activity, and common competitor-export import handling;
 - current filtered result-set JSON, CSV, and HTML export without manual selection;
 - current filtered result-set vault deletion with confirmation and undo;

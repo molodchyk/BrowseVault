@@ -30,6 +30,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Delete-from-Chrome actions explicitly remove Chrome history by URL and then mark the selected BrowseVault records deleted.
 - Reset Vault clears BrowseVault local archive data, rules, and backup metadata without deleting Chrome history.
 - Imports are staged behind a preview with row counts, duplicate estimates, existing/new visit counts, rule counts, and checksum health where available.
+- Imports merge with matching existing vault visits and preserve local vault deletion markers, Chrome-deletion markers, and original creation metadata.
 
 ### Trust And Permissions
 
