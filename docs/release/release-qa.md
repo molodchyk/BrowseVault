@@ -7,6 +7,7 @@ This file records release verification status for the current BrowseVault packag
 Last verified for `1.0.0`:
 
 ```text
+npm run store:media
 npm run validate
 npm run check
 npm test
@@ -18,6 +19,7 @@ git diff --check
 Expected results:
 
 - extension validation passes;
+- Chrome Web Store promo PNGs regenerate at the required `440 x 280` and `1400 x 560` dimensions;
 - JavaScript syntax, static import resolution, extension-page module script path, manifest and extension UI locale coverage, manifest path, privacy/permission disclosure parity, file-size budget, and runtime/test/script/docs folder-density checks pass;
 - unit tests pass;
 - `dist/browsevault-1.0.0.zip` is produced;

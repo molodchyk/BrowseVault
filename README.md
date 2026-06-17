@@ -79,6 +79,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - automated folder-density checks that enforce 12-file runtime/support/docs and 15-file feature-folder budgets;
 - versioned release notes in [`CHANGELOG.md`](CHANGELOG.md), including trust-sensitive behavior changes;
 - generated PNG extension icons;
+- generated Chrome Web Store promo PNGs;
 - deterministic runtime-only local ZIP packaging that excludes repo research, tests, scripts, StorePilot files, and feature docs;
 - copied research and product docs in [`docs/`](docs/);
 - Chrome Web Store listing notes in [`store/listing.md`](store/listing.md);
@@ -113,6 +114,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 │   ├── check-privacy-permissions.mjs
 │   ├── check-syntax.mjs
 │   ├── generate-icons.mjs
+│   ├── media/
 │   ├── package-extension.mjs
 │   ├── verify-package.mjs
 │   └── validate-extension.mjs
@@ -172,6 +174,7 @@ npm run validate
 npm run check
 npm test
 npm run icons
+npm run store:media
 npm run package
 npm run verify:package
 ```
@@ -179,6 +182,8 @@ npm run verify:package
 `npm run validate` also enforces the current trust baseline: exact manifest permissions, no host permissions, no optional permission prompts, no content scripts, no web-accessible resources, no external extension messaging surface, no remote source URLs, no source-level network APIs or dynamic code loaders, and no default `chrome_url_overrides` replacement of Chrome history.
 
 `npm run check` verifies JavaScript syntax, static import targets, extension-page module script paths, manifest and extension UI locale message coverage, manifest file paths, privacy/permission disclosure parity, file-size budgets, and folder-density budgets so flat runtime/support and documentation folders stay at 12 files or fewer, while feature folders and feature test folders stay at 15 files or fewer before being split again. File-size debt is reported as warnings, and known hard-limit debt is capped so it cannot grow unnoticed.
+
+`npm run store:media` regenerates the Chrome Web Store promo PNGs in `store-listing/chrome-web-store/media/promo/`. It uses Python with Pillow as a development-only asset tool; the generated PNGs are committed and are not part of the extension runtime dependency graph.
 
 `npm run package` writes `dist/browsevault-1.0.0.zip` and verifies the final ZIP contents, including packaged manifest paths, locale messages, static import targets, and module script targets.
 

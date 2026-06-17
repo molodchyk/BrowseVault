@@ -50,6 +50,7 @@ const requiredFiles = [
   "scripts/check-privacy-permissions.mjs",
   "scripts/check-syntax.mjs",
   "scripts/generate-icons.mjs",
+  "scripts/media/generate-store-media.py",
   "scripts/package-extension.mjs",
   "scripts/verify-package.mjs",
   "scripts/zip-utils.mjs"
@@ -183,6 +184,7 @@ assert(packageJson.scripts.check.includes("check-privacy-permissions.mjs"), "Che
 assert(packageJson.scripts.check.includes("check-file-sizes.mjs"), "Check script must enforce file-size budgets.");
 assert(packageJson.scripts.check.includes("check-folder-density.mjs"), "Check script must enforce folder density.");
 assert(packageJson.scripts.icons, "Missing icons script.");
+assert(packageJson.scripts["store:media"]?.includes("generate-store-media.py"), "Missing store media generation script.");
 assert(packageJson.scripts.package?.includes("verify-package.mjs"), "Package script must verify the final ZIP output.");
 assert(packageJson.scripts["verify:package"]?.includes("verify-package.mjs"), "Missing verify:package script.");
 
