@@ -62,6 +62,15 @@ function assert(condition, message) {
   }
 }
 
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function assertButtonLabel(source, id, label) {
+  const pattern = new RegExp(`<button\\b(?=[^>]*\\bid="${escapeRegExp(id)}")[^>]*>${escapeRegExp(label)}<\\/button>`);
+  assert(pattern.test(source), `Missing #${id} button labeled "${label}".`);
+}
+
 function jpegDimensions(buffer) {
   if (buffer[0] !== 0xff || buffer[1] !== 0xd8) {
     return null;
@@ -409,6 +418,28 @@ const appHtml = fs.readFileSync(path.join(root, "src/app.html"), "utf8");
 assert(appHtml.includes('type="module"'), "App script should load as a module.");
 assert(appHtml.includes("Permissions and limits"), "Settings should disclose permissions and product limits.");
 assert(appHtml.includes("cannot recover visits Chrome already deleted"), "Settings should disclose old-history recovery limits.");
+
+for (const [id, label] of [
+  ["delete-results", "Delete Results From Vault"],
+  ["delete-results-chrome", "Delete Results From Chrome"],
+  ["delete-vault", "Delete From Vault"],
+  ["delete-chrome", "Delete URLs From Chrome"],
+  ["reset-vault", "Reset Vault"]
+]) {
+  assertButtonLabel(appHtml, id, label);
+}
+
+const vaultActions = fs.readFileSync(path.join(root, "src", "features", "vault-management", "ui", "actions.js"), "utf8");
+for (const expected of [
+  "Erase all BrowseVault local archive data, rules, and backup metadata? This will not delete Chrome history.",
+  "Chrome history untouched",
+  'notifyVaultChanged("vault-delete")',
+  'notifyVaultChanged("chrome-and-vault-delete")',
+  'notifyVaultChanged("vault-cleanup")',
+  'notifyVaultChanged("vault-reset")'
+]) {
+  assert(vaultActions.includes(expected), `Vault actions missing destructive-action guardrail: ${expected}`);
+}
 
 const sourceFiles = collectFilesByExtension("src", new Set([".js", ".html", ".css"]));
 const forbiddenSourcePatterns = [
