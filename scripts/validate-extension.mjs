@@ -72,9 +72,19 @@ for (const size of ["16", "32", "48", "128"]) {
   assert(manifest.action?.default_icon?.[size] === `assets/icons/icon${size}.png`, `Missing action icon ${size}.`);
 }
 
-for (const permission of ["bookmarks", "downloads", "history", "sessions", "storage", "tabs"]) {
-  assert(manifest.permissions.includes(permission), `Missing permission: ${permission}`);
-}
+const expectedPermissions = ["bookmarks", "downloads", "history", "sessions", "storage", "tabs"];
+assert(Array.isArray(manifest.permissions), "Manifest permissions must be explicit.");
+assert(
+  JSON.stringify([...manifest.permissions].sort()) === JSON.stringify([...expectedPermissions].sort()),
+  `Manifest permissions changed; expected exactly: ${expectedPermissions.join(", ")}.`
+);
+assert(!manifest.optional_permissions?.length, "Manifest should not request optional permissions.");
+assert(!manifest.host_permissions?.length, "Manifest should not request host permissions.");
+assert(!manifest.optional_host_permissions?.length, "Manifest should not request optional host permissions.");
+assert(!manifest.chrome_url_overrides, "Manifest must not replace Chrome history by default.");
+assert(!manifest.content_scripts?.length, "Manifest should not inject content scripts.");
+assert(!manifest.externally_connectable, "Manifest should not expose externally_connectable messaging.");
+assert(!manifest.web_accessible_resources?.length, "Manifest should not expose web-accessible resources.");
 assert(manifest.commands?.["open-browsevault"], "Missing open-browsevault command.");
 
 const packageJson = readJson("package.json");
