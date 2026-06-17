@@ -119,6 +119,7 @@ Native archive should be versioned and lossless:
 
 - metadata: app version, schema version, created at, source profile, record counts, hash;
 - visits: URL, title, timestamp, transition, visit count/source when available;
+- visit rows ordered newest first with deterministic tie-breakers;
 - rules: optional whitelist/blacklist/category rules;
 - backup metadata.
 

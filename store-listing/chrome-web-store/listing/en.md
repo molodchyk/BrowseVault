@@ -8,7 +8,7 @@ Scan results by local date with highlighted matches, use sticky Load More, Show 
 
 Back up your vault as JSON with checksum metadata, review restore-check health before import, and import CSV, TSV, Google Takeout Browser History, Google My Activity, or common history-extension export files. Backup status is reserved for the restorable JSON archive, while CSV and HTML exports stay in the recent-activity log. BrowseVault also keeps a local vault health check for completed backup, import, export, cleanup, delete, restore, rule, and reset actions.
 
-Export history as JSON, formula-safe spreadsheet CSV, or offline HTML reports with summary metrics, exact timestamps, in-file filtering, sortable columns, and safer link handling.
+Export history in deterministic newest-first order as JSON, formula-safe spreadsheet CSV, or offline HTML reports with summary metrics, exact timestamps, in-file filtering, sortable columns, and safer link handling.
 
 Use Quick Open to search tabs, bookmarks, downloads, recently closed tabs, and closed windows from the same interface, then switch, open, open in the background, restore, or copy the result URL. Toolbar and keyboard-command opening reuse an already open BrowseVault tab instead of piling up duplicates.
 

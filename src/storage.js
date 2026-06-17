@@ -551,8 +551,33 @@ export async function markChromeDeletedByUrls(urls, deletedAt = new Date().toISO
   return changed.length;
 }
 
+export function archiveVisitsForExport(visits) {
+  const compareText = (left, right) => (left < right ? -1 : left > right ? 1 : 0);
+
+  return [...(Array.isArray(visits) ? visits : [])].sort((left, right) => {
+    const leftTime = Number(left?.visitTime);
+    const rightTime = Number(right?.visitTime);
+    const leftHasTime = Number.isFinite(leftTime);
+    const rightHasTime = Number.isFinite(rightTime);
+
+    if (leftHasTime && rightHasTime && leftTime !== rightTime) {
+      return rightTime - leftTime;
+    }
+
+    if (leftHasTime !== rightHasTime) {
+      return leftHasTime ? -1 : 1;
+    }
+
+    return [
+      compareText(String(left?.url || ""), String(right?.url || "")),
+      compareText(String(left?.title || ""), String(right?.title || "")),
+      compareText(String(left?.id || ""), String(right?.id || ""))
+    ].find((comparison) => comparison !== 0) || 0;
+  });
+}
+
 export async function exportArchive(items = null) {
-  const visits = items || (await getAllVisits());
+  const visits = archiveVisitsForExport(items || (await getAllVisits()));
   return {
     app: "BrowseVault",
     schemaVersion: 1,

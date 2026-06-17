@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  archiveVisitsForExport,
   duplicateCleanupCandidates,
   makeVisitId,
   mergeImportedVisits,
@@ -122,6 +123,55 @@ test("normalizeHistoryItem keeps BrowseVault ids separate from Chrome ids", () =
   assert.equal(csvImport.chromeId, "chrome|visit");
   assert.equal(chromeImport.id, makeVisitId("https://example.com/chrome", visitTime));
   assert.equal(chromeImport.chromeId, "123");
+});
+
+test("archiveVisitsForExport orders visits newest first with stable tie-breakers", () => {
+  const newest = {
+    id: "newest",
+    url: "https://example.com/newest",
+    title: "Newest",
+    visitTime: Date.parse("2026-06-17T12:00:00.000Z")
+  };
+  const older = {
+    id: "older",
+    url: "https://example.com/older",
+    title: "Older",
+    visitTime: Date.parse("2026-06-16T12:00:00.000Z")
+  };
+  const sameTimeB = {
+    id: "same-b",
+    url: "https://b.example/page",
+    title: "B",
+    visitTime: newest.visitTime
+  };
+  const sameTimeA = {
+    id: "same-a",
+    url: "https://a.example/page",
+    title: "A",
+    visitTime: newest.visitTime
+  };
+  const invalidTime = {
+    id: "invalid",
+    url: "https://invalid.example/page",
+    title: "Invalid",
+    visitTime: "not-a-date"
+  };
+  const input = [invalidTime, older, sameTimeB, newest, sameTimeA];
+
+  assert.deepEqual(archiveVisitsForExport(input).map((visit) => visit.id), [
+    "same-a",
+    "same-b",
+    "newest",
+    "older",
+    "invalid"
+  ]);
+  assert.deepEqual(input.map((visit) => visit.id), [
+    "invalid",
+    "older",
+    "same-b",
+    "newest",
+    "same-a"
+  ]);
 });
 
 test("mergeImportedVisits preserves existing local tombstones and creation metadata", () => {
