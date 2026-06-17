@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   archiveIntegrityPayload,
+  archiveIntegrityPayloadAsync,
   attachArchiveIntegrity,
   verifyArchiveIntegrity
 } from "../../../src/features/backup-import/core/archive-integrity.js";
@@ -35,6 +36,27 @@ test("archiveIntegrityPayload accepts legacy item archives", () => {
       visits: [{ id: "legacy-item" }]
     })
   );
+});
+
+test("archiveIntegrityPayloadAsync preserves hash payload bytes and yields", async () => {
+  const archive = {
+    schemaVersion: 2,
+    rules: [{ type: "category", value: "example.com", category: "Research" }],
+    visits: Array.from({ length: 12 }, (_, index) => ({
+      id: `visit-${index}`,
+      url: `https://example.com/${index}`
+    }))
+  };
+  const yields = [];
+
+  assert.equal(
+    await archiveIntegrityPayloadAsync(archive, {
+      jsonChunkSize: 5,
+      jsonScheduler: async () => yields.push("yield")
+    }),
+    archiveIntegrityPayload(archive)
+  );
+  assert.ok(yields.length > 0);
 });
 
 test("attachArchiveIntegrity stores hash metadata for the payload scope", async () => {
