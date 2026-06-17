@@ -46,6 +46,7 @@ const requiredFiles = [
   "assets/icons/icon32.png",
   "assets/icons/icon48.png",
   "assets/icons/icon128.png",
+  "scripts/check-file-sizes.mjs",
   "scripts/check-imports.mjs",
   "scripts/check-syntax.mjs",
   "scripts/generate-icons.mjs",
@@ -176,6 +177,7 @@ assert(packageJson.keywords.includes("browser-history"), "Missing browser-histor
 assert(packageJson.keywords.includes("history-backup"), "Missing history-backup keyword.");
 assert(packageJson.scripts.check.includes("check-syntax.mjs"), "Check script must verify JavaScript syntax.");
 assert(packageJson.scripts.check.includes("check-imports.mjs"), "Check script must verify static import resolution.");
+assert(packageJson.scripts.check.includes("check-file-sizes.mjs"), "Check script must enforce file-size budgets.");
 assert(packageJson.scripts.check.includes("check-folder-density.mjs"), "Check script must enforce folder density.");
 assert(packageJson.scripts.icons, "Missing icons script.");
 assert(packageJson.scripts.package?.includes("verify-package.mjs"), "Package script must verify the final ZIP output.");
@@ -188,6 +190,18 @@ for (const expected of [
   "Packaged extension entry must not use bare imports"
 ]) {
   assert(verifyPackageScript.includes(expected), `Package verifier missing import-resolution guardrail: ${expected}`);
+}
+
+const fileSizeScript = fs.readFileSync(path.join(root, "scripts", "check-file-sizes.mjs"), "utf8");
+for (const expected of [
+  "knownDebtCaps",
+  "soft target",
+  "hard max",
+  "src/app.css",
+  "src/storage.js",
+  "split follow-up expected"
+]) {
+  assert(fileSizeScript.includes(expected), `File-size audit missing modularization guardrail: ${expected}`);
 }
 
 const changelog = fs.readFileSync(path.join(root, "CHANGELOG.md"), "utf8");

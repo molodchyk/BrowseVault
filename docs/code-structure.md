@@ -23,11 +23,14 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `src/export-format.js` is a compatibility barrel for existing import paths.
 - `test/features/` mirrors feature-owned tests by product area so no single flat test folder becomes a dumping ground.
 - `test/platform/`, `test/query/`, and `test/storage/` own cross-feature platform, query-parser, and storage tests.
+- `scripts/check-file-sizes.mjs` audits the file-size budgets from the modularization playbook for `src/`, `test/`, and `scripts/`, reports soft-budget warnings, and caps known hard-limit debt.
 - `scripts/check-folder-density.mjs` enforces the folder-density budgets from the modularization playbook for `src/`, `test/`, and `scripts/`.
 
 ## Next Split Candidates
 
 - Move remaining app composition/bootstrap glue out of `src/app.js` only when a clearer owner emerges.
+- Split `src/app.css` into feature-owned or surface-owned styles; it is capped as current file-size hard-limit debt by `scripts/check-file-sizes.mjs`.
+- Split `src/storage.js` into feature storage models and a thinner IndexedDB platform/storage layer; it is capped as current file-size hard-limit debt by `scripts/check-file-sizes.mjs`.
 
 ## Rules For Future Edits
 
@@ -36,5 +39,5 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - Keep compatibility barrels export-only.
 - Add or update focused tests when pure logic moves.
 - Keep test files grouped by feature or responsibility rather than adding new root-level `test/*.test.js` files.
-- Run `npm run check` after structure changes; it fails when static imports or extension-page module script paths break, or when runtime/support folders exceed 12 files or feature/test-feature folders exceed 15 files.
+- Run `npm run check` after structure changes; it fails when static imports or extension-page module script paths break, when known file-size debt grows beyond its cap, or when runtime/support folders exceed 12 files or feature/test-feature folders exceed 15 files.
 - Update this file when ownership changes.
