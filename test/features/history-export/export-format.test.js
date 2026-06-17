@@ -48,6 +48,29 @@ test("visitsToCsv does not throw on malformed timestamps", () => {
   assert.match(row, /^visit-1,,,,not-a-date,example\.com,Report,/);
 });
 
+test("visitsToCsv neutralizes spreadsheet formulas in exported text", () => {
+  const csv = visitsToCsv([
+    {
+      id: "=visit-1",
+      chromeId: "@chrome",
+      url: "https://example.com/report",
+      title: "=HYPERLINK(\"https://evil.example\",\"open\")",
+      domain: "+example.com",
+      visitTime: Date.parse("2026-06-16T12:34:56Z"),
+      visitCount: 1,
+      transition: "-typed",
+      source: " @import"
+    }
+  ]);
+
+  const [, row] = csv.split("\n");
+
+  assert.match(row, /^'=visit-1,/);
+  assert.match(row, /,'\+example\.com,/);
+  assert.match(row, /,"'=HYPERLINK\(""https:\/\/evil\.example"",""open""\)",/);
+  assert.match(row, /,'-typed,' @import,'@chrome$/);
+});
+
 test("visitsToHtml escapes visit fields", () => {
   const html = visitsToHtml(
     [

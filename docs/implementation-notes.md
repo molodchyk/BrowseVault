@@ -133,6 +133,7 @@ CSV export should include:
 - visit id;
 - source;
 - tags/categories if present.
+- spreadsheet formula neutralization for text cells that begin with `=`, `+`, `-`, `@`, tab, or whitespace before a formula trigger.
 
 HTML export should produce clickable links, exact timestamps, summary metrics, in-file filtering, sortable columns, and safe handling for unsupported URL schemes.
 

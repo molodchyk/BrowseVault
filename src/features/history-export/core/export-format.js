@@ -1,6 +1,10 @@
 function escapeCsv(value) {
-  const text = String(value ?? "");
+  const text = neutralizeSpreadsheetFormula(String(value ?? ""));
   return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+}
+
+function neutralizeSpreadsheetFormula(text) {
+  return /^[=+\-@\t\r\n]/.test(text) || /^\s+[=+\-@]/.test(text) ? `'${text}` : text;
 }
 
 function escapeHtml(value) {
