@@ -25,11 +25,39 @@ Private browser history search with local backup and export.
 
 ## Longer Description Draft
 
-BrowseVault helps you find, preserve, and back up your browsing history without sending it to a remote service.
+BrowseVault lets you search, preserve, back up, export, and clean up your Chrome browsing history locally.
 
-Chrome's built-in history is limited and hard to search when you need to recover a page, retrace work, or export records. BrowseVault is designed as a local-first history vault: fast search, clear export, reliable backup, and precise control over your browsing memory.
+Chrome's built-in history is easy to lose, hard to search deeply, and awkward to export when you need to retrace work. BrowseVault creates a local history vault in your browser profile, captures new visits after installation, syncs the Chrome history that Chrome still exposes, and imports history files you choose.
 
-The current version supports a tabbed local BrowseVault archive, background capture for new visits, manual sync from available Chrome history with per-visit expansion where Chrome exposes it, atomic recorder metadata commits for Chrome sync/live capture health, toolbar and keyboard-command opening that creates a new BrowseVault tab unless the current active tab is already BrowseVault, Settings access to Chrome's native history page without a default-history override, advanced search syntax with site/host/domain/category/tag/source/transition/visit-count/hour filters, bounded typo-tolerant keyword matching, wildcard matching, chunked local search scanning for large vaults, one-click date shortcuts, saved searches, newest/oldest result ordering, highlighted matches, exact-day/range filters, keyboard-first live refresh, local-date grouped result scanning, Quick Open search across tabs/bookmarks/downloads/recently closed tabs/closed windows with switch/open/open-in-background/restore/copy actions, JSON backup export/import with checksum metadata, visible JSON backup freshness/format/count/checksum/restorable-row status, configurable backup/export filenames and optional ask-every-export Save As prompts, vault health checks for malformed rows/tombstones/duplicate active records, storage self-check status for the local metadata layer, compact archive insights for top domains/busiest days/date range, recent activity logging for completed backup/import/export/cleanup/delete/restore/rule/reset actions, staged import preview with restore-check health and duplicate/existing/new visit counts, atomic import commits for visits/rules/import metadata, CSV/TSV/Google Takeout Browser History/Google My Activity/common competitor export import handling, deterministic newest-first full export ordering, formula-safe spreadsheet CSV export with ISO/local date-time/category fields, offline HTML reports with summary metrics, exact timestamps, category labels, in-file filtering, sortable columns, and safer link handling, current-result JSON/CSV/HTML export in the selected result order, current-result vault deletion with undo, current-result Chrome-history deletion by URL with confirmation, selected-record JSON/CSV/HTML export, selected-record URL copy, selected-record batch opening with a safety cap, checkbox/Shift-click/Shift+Space range selection, selected-domain blacklisting, select-visible/invert-visible/select-all-filtered bulk workflows, sticky incremental Load More, Show All, Top, and Bottom controls for large result sets, domain blacklist/whitelist/category rules, manual retention cleanup that keeps whitelisted domains, selected deletion from the vault with undo, full local vault reset, local theme/contrast/text-size/date/limit preferences, and URL-level deletion from Chrome history.
+Popular ways to use BrowseVault:
+
+- Find a page again with `site:`, `host:`, `title:`, `url:`, `after:`, `before:`, `date:`, `hour:`, quoted phrase, wildcard, exclusion, or `regex:` search.
+- Save repeated searches for projects, clients, research trails, or troubleshooting work.
+- Export the current result set or selected records as JSON, CSV, or offline HTML.
+- Back up the full local vault as checksum-protected JSON and review restore health before importing.
+- Search open tabs, bookmarks, downloads, recently closed tabs, and closed windows from Quick Open.
+- Clean up selected vault records, filtered result sets, duplicate rows, or old records while keeping whitelist rules.
+
+Feature list:
+
+- Local IndexedDB archive with background capture for new visits.
+- Manual Chrome history sync for history Chrome still exposes.
+- Fast local search with typo-tolerant keywords, operators, saved searches, date shortcuts, highlighted matches, newest/oldest sorting, and grouped results.
+- Bulk selection with checkbox, Shift-click, Shift+Space, select visible, invert visible, and select all filtered results.
+- JSON backup import/export with SHA-256 metadata, self-test status, staged preview, and duplicate/import health summaries.
+- CSV and HTML exports with exact timestamps, category labels, spreadsheet-safe text, filtering, sorting, and safer links.
+- Quick Open for tabs, bookmarks, downloads, recently closed tabs, and closed windows.
+- Domain blacklist, whitelist, and manual category rules.
+- Explicit destructive actions with undo where the local vault supports it.
+- Local display preferences for theme, contrast, text size, date format, default result limit, backup reminders, and export filenames.
+
+Browser and data limits:
+
+- BrowseVault can preserve history from installation onward; it cannot recover visits Chrome already deleted unless you import them from another file.
+- Imported records live in BrowseVault; Chrome extension APIs do not reliably write arbitrary old visits back into Chrome's native history database.
+- Deleting from the BrowseVault vault is separate from deleting URLs from Chrome history. Chrome history deletion is explicit and URL-based.
+- BrowseVault keeps Chrome's native history page available from Settings instead of silently replacing it.
+- The extension stores its archive locally in your browser profile. It does not include analytics, ads, tracking scripts, remote code, host permissions, or automatic page-content capture.
 
 ## Keywords
 

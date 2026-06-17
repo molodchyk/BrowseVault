@@ -1,20 +1,36 @@
-BrowseVault helps you find, preserve, and back up your browsing history without sending it to a remote service.
+BrowseVault lets you search, preserve, back up, export, and clean up your Chrome browsing history locally.
 
-Chrome's built-in history is limited and hard to search when you need to recover a page, retrace work, or export records. BrowseVault is designed as a local-first history vault: fast search, clear export, reliable backup, and precise control over your browsing memory.
+Chrome's built-in history is easy to lose, hard to search deeply, and awkward to export when you need to retrace work. BrowseVault creates a local history vault in your browser profile, captures new visits after installation, syncs the Chrome history that Chrome still exposes, and imports history files you choose.
 
-Use BrowseVault to search archived history by typo-tolerant keyword, wildcard, site, host, domain, title, URL, manual category, source, transition, visit count, exact day, local hour, date range, exclusion, phrase, or regex, with saved searches, newest/oldest result ordering, date shortcuts, keyboard-first focus, and debounced live refresh.
+Popular ways to use BrowseVault:
 
-Scan results by local date with highlighted matches, use sticky Load More, Show All, Top, or Bottom controls when a search has many matches, then open, copy, export the current result set as JSON, CSV, or HTML, export selected records, use checkbox or range selection, delete only the vault records you need, or separately delete matching URLs from Chrome history.
+- Find a page again with site:, host:, title:, url:, after:, before:, date:, hour:, quoted phrase, wildcard, exclusion, or regex: search.
+- Save repeated searches for projects, clients, research trails, or troubleshooting work.
+- Export the current result set or selected records as JSON, CSV, or offline HTML.
+- Back up the full local vault as checksum-protected JSON and review restore health before importing.
+- Search open tabs, bookmarks, downloads, recently closed tabs, and closed windows from Quick Open.
+- Clean up selected vault records, filtered result sets, duplicate rows, or old records while keeping whitelist rules.
 
-Back up your vault as JSON with checksum metadata and a self-test for restorable rows, review restore-check health before import, and import CSV, TSV, Google Takeout Browser History, Google My Activity, or common history-extension export files. Imports commit visits, rules, and import status together, while Chrome sync and live-capture health metadata are committed with their related vault rows. Backup status is reserved for the restorable JSON archive, while CSV and HTML exports stay in the recent-activity log. BrowseVault can use normal Downloads behavior or ask Chrome for a Save As location on each export when that setting is selected. BrowseVault also keeps local vault health, storage self-checks, and compact archive insights for completed backup, import, export, cleanup, delete, restore, rule, and reset actions.
+Feature list:
 
-Export history in deterministic newest-first order as JSON, formula-safe spreadsheet CSV, or offline HTML reports with summary metrics, exact timestamps, category labels where rules apply, in-file filtering, sortable columns, and safer link handling. Current-result exports follow the selected newest/oldest result order.
+- Local IndexedDB archive with background capture for new visits.
+- Manual Chrome history sync for history Chrome still exposes.
+- Fast local search with typo-tolerant keywords, operators, saved searches, date shortcuts, highlighted matches, newest/oldest sorting, and grouped results.
+- Bulk selection with checkbox, Shift-click, Shift+Space, select visible, invert visible, and select all filtered results.
+- JSON backup import/export with SHA-256 metadata, self-test status, staged preview, and duplicate/import health summaries.
+- CSV and HTML exports with exact timestamps, category labels, spreadsheet-safe text, filtering, sorting, and safer links.
+- Quick Open for tabs, bookmarks, downloads, recently closed tabs, and closed windows.
+- Domain blacklist, whitelist, and manual category rules.
+- Explicit destructive actions with undo where the local vault supports it.
+- Local display preferences for theme, contrast, text size, date format, default result limit, backup reminders, and export filenames.
 
-Use Quick Open to search tabs, bookmarks, downloads, recently closed tabs, and closed windows from the same interface, then switch, open, open in the background, restore, or copy the result URL. Toolbar and keyboard-command opening creates a new BrowseVault tab unless the current active tab is already BrowseVault, so you can keep separate BrowseVault tabs open for different searches.
+Browser and data limits:
 
-Control what gets saved and how it is organized with domain blacklist, whitelist, and manual category rules, selected-domain blacklisting, manual retention cleanup that keeps whitelisted domains, local display preferences for theme, contrast, text size, dates, and default result limits, plus explicit destructive actions with undo where the vault can support it.
-
-BrowseVault stores its archive locally in your browser profile. It does not include analytics, ads, tracking scripts, remote code, or automatic page-content capture. It also keeps Chrome's native history page available from Settings instead of silently replacing it.
+- BrowseVault can preserve history from installation onward; it cannot recover visits Chrome already deleted unless you import them from another file.
+- Imported records live in BrowseVault; Chrome extension APIs do not reliably write arbitrary old visits back into Chrome's native history database.
+- Deleting from the BrowseVault vault is separate from deleting URLs from Chrome history. Chrome history deletion is explicit and URL-based.
+- BrowseVault keeps Chrome's native history page available from Settings instead of silently replacing it.
+- The extension stores its archive locally in your browser profile. It does not include analytics, ads, tracking scripts, remote code, host permissions, or automatic page-content capture.
 
 Open source under the GPL-3.0 license:
 https://github.com/molodchyk/BrowseVault

@@ -79,4 +79,27 @@ export function validatePlaybookCompliance(root, assert) {
   ]) {
     assert(playbookCompliance.includes(expected), `Playbook compliance matrix missing: ${expected}`);
   }
+
+  const storeDraft = fs.readFileSync(path.join(root, "store", "listing.md"), "utf8");
+  const storePilotListing = fs.readFileSync(path.join(root, "store-listing", "chrome-web-store", "listing", "en.md"), "utf8");
+  for (const source of [
+    { label: "Human store listing draft", text: storeDraft },
+    { label: "StorePilot listing body", text: storePilotListing }
+  ]) {
+    for (const expected of [
+      "BrowseVault lets you search, preserve, back up, export, and clean up your Chrome browsing history locally.",
+      "Popular ways to use BrowseVault:",
+      "Feature list:",
+      "Browser and data limits:",
+      "Open source under the GPL-3.0 license:",
+      "https://github.com/molodchyk/BrowseVault"
+    ]) {
+      assert(source.text.includes(expected), `${source.label} missing playbook store-copy structure: ${expected}`);
+    }
+
+    assert(
+      !source.text.includes("The current version supports"),
+      `${source.label} should not regress to an exhaustive feature-dump sentence.`
+    );
+  }
 }
