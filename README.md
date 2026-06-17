@@ -56,6 +56,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - JSON, CSV, TSV, Google Takeout Browser History, Google My Activity, and common competitor-export import handling;
 - current filtered result-set JSON, CSV, and HTML export without manual selection;
 - current filtered result-set vault deletion with confirmation and undo;
+- current filtered result-set Chrome history deletion by URL with confirmation;
 - selected-record JSON, CSV, and HTML export;
 - selected-record URL copy;
 - selected-record batch opening with a tab-flood safety cap;
@@ -64,7 +65,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - checkbox, Shift-click, and Shift+Space range selection, plus select visible, invert visible, or select all filtered vault results;
 - sticky result controls with incremental Load More, one-click Show All, and Top/Bottom jumps for large result sets;
 - undo for the last BrowseVault vault deletion;
-- optional URL-level deletion from Chrome history for selected records;
+- optional URL-level deletion from Chrome history for selected records or the current filtered result set;
 - full local BrowseVault data reset without touching Chrome history;
 - domain blacklist and whitelist rules;
 - manual retention cleanup that previews old vault records and keeps whitelisted domains;
@@ -189,7 +190,7 @@ The Rules tab supports manual vault retention cleanup. Enter a number of days, p
 
 The Rules tab also supports duplicate cleanup. It finds active vault records with the same URL and visit time, keeps the richest record, and moves extra duplicates to undoable deletion. It does not delete Chrome history.
 
-The History tab also supports direct current-result deletion for targeted cleanup by query, domain, date, or hour. Enter a query or date filter first, then use Delete Results From Vault. This action only removes records from BrowseVault, does not delete Chrome history, and can be undone.
+The History tab also supports direct current-result deletion for targeted cleanup by query, domain, date, or hour. Enter a query or date filter first, then use Delete Results From Vault to remove matching records only from BrowseVault with undo. Use Delete Results From Chrome only when you also want matching URLs removed from Chrome history; Chrome removes by URL, so that action can affect every native Chrome visit for the matched URLs and cannot be undone by BrowseVault.
 
 ## Backup Filenames
 

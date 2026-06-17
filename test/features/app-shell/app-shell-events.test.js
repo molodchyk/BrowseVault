@@ -85,6 +85,7 @@ function createElements() {
     exportResultsCsv: fakeElement(),
     exportResultsHtml: fakeElement(),
     deleteResults: fakeElement(),
+    deleteResultsChrome: fakeElement(),
     loadMore: fakeElement(),
     loadAll: fakeElement(),
     jumpResultsTop: fakeElement(),
@@ -118,6 +119,7 @@ function createHandlers(calls) {
     "confirmStagedImport",
     "copySelectedUrls",
     "deleteFromChrome",
+    "deleteCurrentResultsFromChrome",
     "deleteCurrentResultsFromVault",
     "deleteFromVault",
     "exportAll",
@@ -319,6 +321,7 @@ test("bindAppEvents wires bulk and rules actions", () => {
   elements.exportResultsCsv.dispatch("click");
   elements.exportResultsHtml.dispatch("click");
   elements.deleteResults.dispatch("click");
+  elements.deleteResultsChrome.dispatch("click");
   elements.loadMore.dispatch("click");
   elements.loadAll.dispatch("click");
   elements.jumpResultsTop.dispatch("click");
@@ -340,6 +343,7 @@ test("bindAppEvents wires bulk and rules actions", () => {
     ["exportFilteredResultsCsv"],
     ["exportFilteredResultsHtml"],
     ["deleteCurrentResultsFromVault"],
+    ["deleteCurrentResultsFromChrome"],
     ["loadMoreResults"],
     ["loadAllResults"],
     ["jumpToFirstResult"],

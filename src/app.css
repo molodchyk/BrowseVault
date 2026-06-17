@@ -989,6 +989,7 @@ code {
   #delete-vault,
   #delete-chrome,
   #delete-results,
+  #delete-results-chrome,
   #open-selected,
   #blacklist-selected {
     grid-column: 1 / -1;

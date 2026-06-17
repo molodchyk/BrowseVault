@@ -29,6 +29,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Import commits write visits, rules, and last-import metadata in one IndexedDB transaction to avoid partial restore state.
 - Recent activity log for completed backup, export, import, cleanup, delete, restore, rule, and reset actions, plus vault health checks for malformed rows, tombstones, and duplicate active records.
 - Domain blacklist and whitelist rules, selected-domain blacklisting, manual retention cleanup, duplicate cleanup, and full local vault reset.
+- Current filtered result deletion can target only the BrowseVault vault or, with a separate confirmation, matching URLs in Chrome history plus the related vault records.
 - Settings for system, light, and dark themes, accent color, high contrast, text size, date format, default result limit, backup reminder cadence, backup/export save mode, backup filename prefix, and backup filename template.
 - Feature-owned test folders and StorePilot-ready Chrome Web Store automation documents.
 
@@ -37,7 +38,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - BrowseVault stores archive data locally in the browser profile.
 - Vault deletion and Chrome history deletion are separate actions with separate button labels and confirmation prompts.
 - Delete-from-vault actions use undoable tombstones where the vault can support restore.
-- Delete-from-Chrome actions explicitly remove Chrome history by URL and then mark the selected BrowseVault records deleted.
+- Delete-from-Chrome actions explicitly remove Chrome history by URL and then mark the selected or current-result BrowseVault records deleted.
 - Reset Vault clears BrowseVault local archive data, rules, and backup metadata without deleting Chrome history.
 - Imports are staged behind a preview with row counts, duplicate estimates, existing/new visit counts, rule counts, and checksum health where available.
 - Imports merge with matching existing vault visits and preserve local vault deletion markers, Chrome-deletion markers, and original creation metadata.

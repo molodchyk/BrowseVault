@@ -239,6 +239,56 @@ test("deleteCurrentResultsFromVault deletes the current filtered result set", as
   assert.deepEqual(statuses, ["Deleted 2 current results from vault"]);
 });
 
+test("deleteCurrentResultsFromChrome deletes matching Chrome URLs and vault records", async () => {
+  const activity = [];
+  const marked = [];
+  const runtimeMessages = [];
+  const searched = [];
+  const { actions, appState, calls, statuses } = createHarness({
+    selectedIds: ["visible"],
+    services: {
+      appendActivityLog: async (...args) => activity.push(args),
+      markDeletedByIds: async (ids) => {
+        marked.push(ids);
+        return ids.length;
+      },
+      searchVisits: async (query, options) => {
+        searched.push([query, options]);
+        return {
+          total: 3,
+          results: [
+            { id: "filtered-1", url: "https://example.com/a" },
+            { id: "filtered-2", url: "https://example.com/a" },
+            { id: "filtered-3", url: "https://example.com/b" }
+          ]
+        };
+      },
+      sendRuntimeMessage: async (message) => {
+        runtimeMessages.push(message);
+        return { ok: true };
+      }
+    }
+  });
+
+  await actions.deleteCurrentResultsFromChrome();
+
+  assert.deepEqual(searched, [["docs site:example.com", { limit: "all" }]]);
+  assert.deepEqual(runtimeMessages, [{
+    type: "browseVault.deleteChromeUrls",
+    urls: ["https://example.com/a", "https://example.com/b"]
+  }]);
+  assert.deepEqual(marked, [["filtered-1", "filtered-2", "filtered-3"]]);
+  assert.equal(appState.selectedIds.size, 0);
+  assert.deepEqual(calls, ["refreshStats", "runSearch"]);
+  assert.deepEqual(statuses, ["Deleted 3 current results from Chrome and vault"]);
+  assert.deepEqual(activity, [[{
+    type: "delete",
+    label: "Current Chrome URLs and vault records deleted",
+    count: 3,
+    detail: "2 URLs · docs site:example.com"
+  }]]);
+});
+
 test("deleteCurrentResultsFromVault guards empty search, no matches, and cancel", async () => {
   const emptySearch = createHarness({
     getSearchText: () => " "
@@ -263,6 +313,43 @@ test("deleteCurrentResultsFromVault guards empty search, no matches, and cancel"
   });
   await canceled.actions.deleteCurrentResultsFromVault();
   assert.deepEqual(canceled.statuses, ["Current result deletion canceled"]);
+});
+
+test("deleteCurrentResultsFromChrome guards empty search, no URLs, no matches, and cancel", async () => {
+  const emptySearch = createHarness({
+    getSearchText: () => " "
+  });
+  await emptySearch.actions.deleteCurrentResultsFromChrome();
+  assert.deepEqual(emptySearch.statuses, [
+    "Enter a query or date filter before deleting current results from Chrome"
+  ]);
+
+  const noMatches = createHarness();
+  await noMatches.actions.deleteCurrentResultsFromChrome();
+  assert.deepEqual(noMatches.statuses, ["No matching vault records to delete from Chrome"]);
+
+  const noUrls = createHarness({
+    services: {
+      searchVisits: async () => ({
+        total: 1,
+        results: [{ id: "filtered-1" }]
+      })
+    }
+  });
+  await noUrls.actions.deleteCurrentResultsFromChrome();
+  assert.deepEqual(noUrls.statuses, ["Matching vault records have no URLs to delete from Chrome"]);
+
+  const canceled = createHarness({
+    services: {
+      confirmAction: () => false,
+      searchVisits: async () => ({
+        total: 1,
+        results: [{ id: "filtered-1", url: "https://example.com/a" }]
+      })
+    }
+  });
+  await canceled.actions.deleteCurrentResultsFromChrome();
+  assert.deepEqual(canceled.statuses, ["Current result Chrome deletion canceled"]);
 });
 
 test("retention cleanup previews and deletes eligible old records", async () => {

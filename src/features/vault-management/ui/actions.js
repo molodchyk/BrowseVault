@@ -202,6 +202,56 @@ export function createVaultManagementActions({
     setStatus(`Deleted ${deleted} current result${deleted === 1 ? "" : "s"} from vault`);
   }
 
+  async function deleteCurrentResultsFromChrome() {
+    const queryText = getSearchText().trim();
+    if (!queryText) {
+      setStatus("Enter a query or date filter before deleting current results from Chrome");
+      return;
+    }
+
+    const { results, total } = await deps.searchVisits(queryText, {
+      limit: "all"
+    });
+
+    if (!results.length) {
+      setStatus("No matching vault records to delete from Chrome");
+      return;
+    }
+
+    const urls = deps.uniqueUrlsForItems(results);
+    if (!urls.length) {
+      setStatus("Matching vault records have no URLs to delete from Chrome");
+      return;
+    }
+
+    const message = `Delete ${urls.length} URL${urls.length === 1 ? "" : "s"} from Chrome history and ${total} current BrowseVault result${total === 1 ? "" : "s"} for "${queryText}"? Chrome deletion removes by URL and cannot be undone by BrowseVault.`;
+    if (!deps.confirmAction(message)) {
+      setStatus("Current result Chrome deletion canceled");
+      return;
+    }
+
+    const response = await deps.sendRuntimeMessage({
+      type: BACKGROUND_MESSAGE_TYPES.DELETE_CHROME_URLS,
+      urls
+    });
+
+    if (!response?.ok) {
+      throw new Error(response?.error || "Chrome deletion failed.");
+    }
+
+    const deleted = await deps.markDeletedByIds(results.map((visit) => visit.id));
+    await recordActivity({
+      type: "delete",
+      label: "Current Chrome URLs and vault records deleted",
+      count: deleted,
+      detail: `${urls.length} URL${urls.length === 1 ? "" : "s"} · ${queryText}`
+    });
+    appState.selectedIds.clear();
+    await refreshStats();
+    await runSearch();
+    setStatus(`Deleted ${deleted} current result${deleted === 1 ? "" : "s"} from Chrome and vault`);
+  }
+
   async function deleteFromChrome() {
     const items = await selectedResults();
     if (!items.length) {
@@ -382,6 +432,7 @@ export function createVaultManagementActions({
     blacklistSelectedDomains,
     cleanupDuplicates,
     cleanupByRetention,
+    deleteCurrentResultsFromChrome,
     deleteCurrentResultsFromVault,
     deleteFromChrome,
     deleteFromVault,

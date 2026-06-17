@@ -109,6 +109,7 @@ export function bindAppEvents({ elements, document, root, handlers }) {
   bindAsync(elements.exportResultsCsv, "click", handlers.exportFilteredResultsCsv, setStatus);
   bindAsync(elements.exportResultsHtml, "click", handlers.exportFilteredResultsHtml, setStatus);
   bindAsync(elements.deleteResults, "click", handlers.deleteCurrentResultsFromVault, setStatus);
+  bindAsync(elements.deleteResultsChrome, "click", handlers.deleteCurrentResultsFromChrome, setStatus);
   bindAsync(elements.loadMore, "click", handlers.loadMoreResults, setStatus);
   bindAsync(elements.loadAll, "click", handlers.loadAllResults, setStatus);
   bindAsync(elements.jumpResultsTop, "click", handlers.jumpToFirstResult, setStatus);

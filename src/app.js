@@ -177,6 +177,7 @@ function bindEvents() {
       confirmStagedImport: backupActions.confirmStagedImport,
       copySelectedUrls: bulkActions.copySelectedUrls,
       deleteFromChrome: vaultActions.deleteFromChrome,
+      deleteCurrentResultsFromChrome: vaultActions.deleteCurrentResultsFromChrome,
       deleteCurrentResultsFromVault: vaultActions.deleteCurrentResultsFromVault,
       deleteFromVault: vaultActions.deleteFromVault,
       exportAll: backupActions.exportAll,

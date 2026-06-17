@@ -48,6 +48,7 @@ export function collectAppElements(document) {
     exportResultsCsv: document.querySelector("#export-results-csv"),
     exportResultsHtml: document.querySelector("#export-results-html"),
     deleteResults: document.querySelector("#delete-results"),
+    deleteResultsChrome: document.querySelector("#delete-results-chrome"),
     loadMore: document.querySelector("#load-more"),
     loadAll: document.querySelector("#load-all"),
     jumpResultsTop: document.querySelector("#jump-results-top"),

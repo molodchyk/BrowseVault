@@ -161,7 +161,7 @@ Bulk actions must be transaction-like:
 - delete selected;
 - export selected;
 - undo tombstone for archive deletion;
-- separate action for deleting from Chrome native history, because users are surprised by both behaviors.
+- separate actions for deleting from Chrome native history, including selected-record deletion and current-result URL deletion, because users are surprised by both vault-only and Chrome-native behaviors.
 
 ## Permission UX
 

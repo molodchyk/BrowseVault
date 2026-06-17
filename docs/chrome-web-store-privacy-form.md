@@ -12,7 +12,7 @@ permission.downloads:
 Used for Quick Open download search and user-requested backup/export file saving. BrowseVault reads local download metadata such as filenames, source URLs, and timestamps; it does not read downloaded file contents. When the user selects ask-every-export save mode, BrowseVault uses Chrome's downloads API to show a Save As prompt for generated files.
 
 permission.history:
-Used to sync available Chrome history into the local BrowseVault archive, capture new visits, search history, and delete selected URLs from Chrome history only when the user chooses that action.
+Used to sync available Chrome history into the local BrowseVault archive, capture new visits, search history, and delete selected or current-result URLs from Chrome history only when the user chooses that action.
 
 permission.sessions:
 Used only to show and restore recently closed tabs and windows in Quick Open.
