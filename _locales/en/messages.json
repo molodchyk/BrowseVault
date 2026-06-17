@@ -14,5 +14,785 @@
   "openCommandDescription": {
     "message": "Open BrowseVault",
     "description": "Keyboard shortcut command description."
+  },
+  "pageTitle": {
+    "message": "BrowseVault",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "brandName": {
+    "message": "BrowseVault",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "appHeading": {
+    "message": "History Search & Backup",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "vaultStatsLabel": {
+    "message": "Vault stats",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "statRecordsLabel": {
+    "message": "records",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "statDomainsLabel": {
+    "message": "domains",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "statNewestEmpty": {
+    "message": "No visits",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "statNewestLabel": {
+    "message": "newest",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "statBackupEmpty": {
+    "message": "Never",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "statBackupLabel": {
+    "message": "backup",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "sectionsLabel": {
+    "message": "BrowseVault sections",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "tabHistory": {
+    "message": "History",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "tabQuickOpen": {
+    "message": "Quick Open",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "tabBackup": {
+    "message": "Backup",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "tabRules": {
+    "message": "Rules",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "tabSettings": {
+    "message": "Settings",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "statusReady": {
+    "message": "Ready",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "historySearchLabel": {
+    "message": "History search",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "searchHistoryLabel": {
+    "message": "Search history",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "searchQueryPlaceholder": {
+    "message": "docs host:github.com hour:14 visits:>=3 -ads \"exact phrase\"",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonSearch": {
+    "message": "Search",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonClear": {
+    "message": "Clear",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "dateShortcutsLabel": {
+    "message": "Date shortcuts",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "dateToday": {
+    "message": "Today",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "dateYesterday": {
+    "message": "Yesterday",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "dateLast7": {
+    "message": "7 Days",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "dateLast30": {
+    "message": "30 Days",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "dateAllDates": {
+    "message": "All Dates",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "savedSearchesLabel": {
+    "message": "Saved searches",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "savedSearchesOption": {
+    "message": "Saved searches",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonApply": {
+    "message": "Apply",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonSaveSearch": {
+    "message": "Save Search",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonDelete": {
+    "message": "Delete",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "filtersAndSyntax": {
+    "message": "Filters and syntax",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "filterDay": {
+    "message": "Day",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "filterAfter": {
+    "message": "After",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "filterBefore": {
+    "message": "Before",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "filterLimit": {
+    "message": "Limit",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "filterSort": {
+    "message": "Sort",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "sortNewestFirst": {
+    "message": "Newest first",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "sortOldestFirst": {
+    "message": "Oldest first",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "syntaxHintHtml": {
+    "message": "Syntax: <code>site:</code>, <code>host:</code>, <code>domain:</code>, <code>title:</code>, <code>url:</code>, <code>category:</code>, <code>tag:</code>, <code>source:</code>, <code>transition:</code>, <code>visits:</code>, <code>date:</code>, <code>hour:</code>, <code>after:</code>, <code>before:</code>, <code>-exclude</code>, <code>*</code>/<code>?</code> wildcards, quoted phrases, and <code>regex:</code>.",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "bulkActionsLabel": {
+    "message": "Bulk actions",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "resultCountEmpty": {
+    "message": "0 results",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "selectedCountEmpty": {
+    "message": "0 selected",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonSelectVisible": {
+    "message": "Select Visible",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonInvertVisible": {
+    "message": "Invert Visible",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonSelectAllResults": {
+    "message": "Select All Results",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonLoadMore": {
+    "message": "Load More",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonShowAll": {
+    "message": "Show All",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonTop": {
+    "message": "Top",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "jumpFirstResultLabel": {
+    "message": "Jump to first visible result",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonBottom": {
+    "message": "Bottom",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "jumpLastResultLabel": {
+    "message": "Jump to last visible result",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonOpenSelected": {
+    "message": "Open Selected",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonUndo": {
+    "message": "Undo",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonMore": {
+    "message": "More",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonExportResults": {
+    "message": "Export Results",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonCsvResults": {
+    "message": "CSV Results",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonHtmlResults": {
+    "message": "HTML Results",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonDeleteResultsVault": {
+    "message": "Delete Results From Vault",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonDeleteResultsChrome": {
+    "message": "Delete Results From Chrome",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonCopyUrls": {
+    "message": "Copy URLs",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonExportJson": {
+    "message": "Export JSON",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonExportCsv": {
+    "message": "Export CSV",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonExportHtml": {
+    "message": "Export HTML",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonBlacklistDomains": {
+    "message": "Blacklist Domains",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonDeleteFromVault": {
+    "message": "Delete From Vault",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonDeleteUrlsChrome": {
+    "message": "Delete URLs From Chrome",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "quickOpenLabel": {
+    "message": "Quick open",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "quickOpenHeading": {
+    "message": "Search tabs, bookmarks, downloads, and closed sessions",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonSearchSources": {
+    "message": "Search Sources",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "quickOpenHint": {
+    "message": "Uses the same query text and ISO day/date filters as the History tab. Results here are read-only and never affected by vault cleanup.",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupImportLabel": {
+    "message": "Backup and import",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupHeading": {
+    "message": "Import, export, and sync",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonSyncChromeHistory": {
+    "message": "Sync Chrome History",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupStatusLabel": {
+    "message": "Backup status",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupHealthEmpty": {
+    "message": "No backup yet",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupLastLabel": {
+    "message": "Last backup",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupNextReminderLabel": {
+    "message": "Next reminder",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupNextAfterFirst": {
+    "message": "After first backup",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupFormatLabel": {
+    "message": "Format",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupRecordsLabel": {
+    "message": "Records",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupSizeLabel": {
+    "message": "Size",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupSelfTestLabel": {
+    "message": "Self-test",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupChecksumLabel": {
+    "message": "Checksum",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupChecksumUnavailable": {
+    "message": "Not available",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveRecorderHealthLabel": {
+    "message": "Archive recorder health",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveSyncNotRun": {
+    "message": "Archive sync not run yet",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveStartupLabel": {
+    "message": "Startup",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveNotRecorded": {
+    "message": "Not recorded",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveChromeSyncLabel": {
+    "message": "Chrome sync",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveNotSynced": {
+    "message": "Not synced yet",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveLiveCaptureLabel": {
+    "message": "Live capture",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveWaitingForVisit": {
+    "message": "Waiting for next visit",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveStorageCheckLabel": {
+    "message": "Storage check",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveNotChecked": {
+    "message": "Not checked yet",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveVaultCheckLabel": {
+    "message": "Vault check",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveVaultEmpty": {
+    "message": "0 active · 0 stored",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveTombstonesLabel": {
+    "message": "Tombstones",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveNoTombstones": {
+    "message": "No deleted tombstones",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveInsightsLabel": {
+    "message": "Archive insights",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "insightsEyebrow": {
+    "message": "Insights",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveOverviewHeading": {
+    "message": "Archive overview",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "topDomainsLabel": {
+    "message": "Top domains",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "noDomainsYet": {
+    "message": "No domains yet",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "busiestDayLabel": {
+    "message": "Busiest day",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "noVisitsYet": {
+    "message": "No visits yet",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "activeDaysLabel": {
+    "message": "Active days",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "noActiveDaysYet": {
+    "message": "No active days yet",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "dateRangeLabel": {
+    "message": "Date range",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "recentActivityLabel": {
+    "message": "Recent activity",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "activityEyebrow": {
+    "message": "Activity",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "recentChangesHeading": {
+    "message": "Recent changes",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "noActivityLogged": {
+    "message": "No activity logged yet.",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonImportArchive": {
+    "message": "Import Archive",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonResetVault": {
+    "message": "Reset Vault",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "importPreviewLabel": {
+    "message": "Import preview",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "importPreviewEyebrow": {
+    "message": "Import Preview",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "importPreviewHeading": {
+    "message": "Review archive before importing",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonCancel": {
+    "message": "Cancel",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "validRowsLabel": {
+    "message": "valid rows",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "newVisitsLabel": {
+    "message": "new visits",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "alreadySavedLabel": {
+    "message": "already saved",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "fileDuplicatesLabel": {
+    "message": "file duplicates",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonImportNow": {
+    "message": "Import Now",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "domainRulesLabel": {
+    "message": "Domain rules",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "rulesHeading": {
+    "message": "Control what gets archived",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "ruleDomainPlaceholder": {
+    "message": "example.com",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "ruleCategoryPlaceholder": {
+    "message": "Research",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonCategorize": {
+    "message": "Categorize",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonBlacklist": {
+    "message": "Blacklist",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonWhitelist": {
+    "message": "Whitelist",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "retentionCleanupLabel": {
+    "message": "Retention cleanup",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "retentionEyebrow": {
+    "message": "Retention",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "retentionHeading": {
+    "message": "Clean up old vault records",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "retentionDaysLabel": {
+    "message": "Keep records for days",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonPreview": {
+    "message": "Preview",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonCleanUp": {
+    "message": "Clean Up",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "retentionHint": {
+    "message": "Moves matching old vault records to undoable deletion. Whitelisted domains are kept during retention cleanup.",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "duplicateCleanupLabel": {
+    "message": "Duplicate cleanup",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "duplicatesEyebrow": {
+    "message": "Duplicates",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "duplicatesHeading": {
+    "message": "Clean repeated vault records",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "duplicatesHint": {
+    "message": "Finds active records with the same URL and visit time, keeps the richest record, and moves the rest to undoable deletion.",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "displaySettingsLabel": {
+    "message": "Display settings",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "settingsHeading": {
+    "message": "Display and search defaults",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonSaveSettings": {
+    "message": "Save Settings",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "themeLabel": {
+    "message": "Theme",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "themeSystem": {
+    "message": "System",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "themeLight": {
+    "message": "Light",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "themeDark": {
+    "message": "Dark",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "accentLabel": {
+    "message": "Accent",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "accentTeal": {
+    "message": "Teal",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "accentBlue": {
+    "message": "Blue",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "accentGreen": {
+    "message": "Green",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "accentPurple": {
+    "message": "Purple",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "accentSlate": {
+    "message": "Slate",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "contrastLabel": {
+    "message": "Contrast",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "standardOption": {
+    "message": "Standard",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "highContrastOption": {
+    "message": "High contrast",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "textSizeLabel": {
+    "message": "Text size",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "largeOption": {
+    "message": "Large",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "dateDisplayLabel": {
+    "message": "Date display",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "systemLocaleOption": {
+    "message": "System locale",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "defaultResultLimitLabel": {
+    "message": "Default result limit",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupReminderDaysLabel": {
+    "message": "Backup reminder days",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "saveFilesLabel": {
+    "message": "Save files",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "downloadsFolderOption": {
+    "message": "Downloads folder",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "askEveryExportOption": {
+    "message": "Ask every export",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupFilenamePrefixLabel": {
+    "message": "Backup filename prefix",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupFilenameTemplateLabel": {
+    "message": "Backup filename template",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupFilenameTemplatePlaceholder": {
+    "message": "{prefix}-{kind}-{date}",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "trustLimitsLabel": {
+    "message": "Trust and limits",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "trustEyebrow": {
+    "message": "Trust",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "trustHeading": {
+    "message": "Permissions and limits",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonOpenChromeHistory": {
+    "message": "Open Chrome History",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "permissionHistoryLabel": {
+    "message": "History",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "permissionHistoryDescription": {
+    "message": "Syncs available Chrome history, records new visits, and deletes Chrome URLs only after an explicit delete action.",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "permissionBrowserSourcesLabel": {
+    "message": "Tabs, bookmarks, downloads, sessions",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "permissionBrowserSourcesDescription": {
+    "message": "Power Quick Open search, switching, opening, copying, and recently closed tab or window restore.",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "permissionStorageLabel": {
+    "message": "Storage",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "permissionStorageDescription": {
+    "message": "Saves the local vault, rules, backup metadata, and display preferences in this browser profile.",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "permissionNetworkLabel": {
+    "message": "Network",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "permissionNetworkDescription": {
+    "message": "No remote code, analytics, ads, tracking, or page-content capture is built into the extension.",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "productLimitsLabel": {
+    "message": "Product limits",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "oldHistoryLimitLabel": {
+    "message": "Old history",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "oldHistoryLimitDescription": {
+    "message": "BrowseVault preserves history from installation onward and can import files, but cannot recover visits Chrome already deleted.",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "nativeHistoryLimitLabel": {
+    "message": "Native Chrome history",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "nativeHistoryLimitDescription": {
+    "message": "Imported records live in BrowseVault; Chrome APIs do not reliably write arbitrary old visits back into Chrome's own history page.",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "deviceHistoryLimitLabel": {
+    "message": "Device history",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "deviceHistoryLimitDescription": {
+    "message": "Mobile, account, or other-device history depends on what Chrome exposes locally or what the user imports.",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "selectLabel": {
+    "message": "Select",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonCopy": {
+    "message": "Copy",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonOpenBackground": {
+    "message": "Open Background",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "buttonOpen": {
+    "message": "Open",
+    "description": "Static BrowseVault extension-page UI string."
   }
 }

@@ -8,6 +8,7 @@ import {
 import { createAppShellState } from "./features/app-shell/core/state.js";
 import { collectAppElements } from "./features/app-shell/ui/elements.js";
 import { bindAppEvents } from "./features/app-shell/ui/events.js";
+import { localizeAppShell } from "./features/app-shell/ui/localization.js";
 import { createAppNavigation } from "./features/app-shell/ui/navigation.js";
 import { createSearchCoordinator } from "./features/app-shell/ui/search-coordinator.js";
 import { createVaultInvalidationController } from "./features/app-shell/core/vault-invalidation.js";
@@ -28,9 +29,15 @@ import { createHistorySearchActions } from "./features/history-results/ui/search
 import { createHistorySearchForm } from "./features/history-results/ui/search-form.js";
 import { createSelectedResultLookup } from "./features/history-results/ui/selected-results.js";
 import { copyText } from "./platform/clipboard.js";
+import { getChromeMessage } from "./platform/chrome/i18n.js";
 import { createVaultManagementActions } from "./features/vault-management/ui/actions.js";
 
 const SEARCH_DEBOUNCE_MS = 300;
+
+localizeAppShell({
+  document,
+  getMessage: getChromeMessage
+});
 
 const elements = collectAppElements(document);
 const appState = createAppShellState(DEFAULT_PREFERENCES);

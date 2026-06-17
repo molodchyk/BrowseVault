@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { appShellLocalization } from "../src/features/app-shell/ui/localization-map.js";
 
 const root = process.cwd();
 const messageReferencePattern = /__MSG_([A-Za-z0-9_@]+?)__/g;
@@ -67,6 +68,9 @@ if (!fs.existsSync(path.join(root, localePath))) {
 const messages = readJson(localePath);
 const references = collectManifestReferences(manifest);
 const referencedKeys = new Set(references.map((reference) => reference.key));
+for (const { key } of appShellLocalization) {
+  referencedKeys.add(key);
+}
 
 for (const { key, location } of references) {
   const record = messages[key];
@@ -81,6 +85,22 @@ for (const { key, location } of references) {
 
   if (typeof record.description !== "string" || !record.description.trim()) {
     fail(`${localePath}: locale key ${key} must explain its use with a description.`);
+  }
+}
+
+for (const { key, selector } of appShellLocalization) {
+  const record = messages[key];
+  if (!record) {
+    fail(`app shell localization selector ${selector}: missing locale key ${key} in ${localePath}.`);
+    continue;
+  }
+
+  if (typeof record.message !== "string" || !record.message.trim()) {
+    fail(`${localePath}: app shell locale key ${key} must have a non-empty message.`);
+  }
+
+  if (typeof record.description !== "string" || !record.description.trim()) {
+    fail(`${localePath}: app shell locale key ${key} must explain its use with a description.`);
   }
 }
 
@@ -110,4 +130,6 @@ if (process.exitCode) {
   process.exit(process.exitCode);
 }
 
-console.log(`Locale coverage checked ${references.length} manifest references against ${localePath}.`);
+console.log(
+  `Locale coverage checked ${references.length} manifest references and ${appShellLocalization.length} app shell bindings against ${localePath}.`
+);

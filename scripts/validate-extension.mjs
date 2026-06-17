@@ -17,6 +17,7 @@ const requiredFiles = [
   "src/app.html",
   "src/app.css",
   "src/app.js",
+  "src/features/app-shell/ui/localization-map.js", "src/features/app-shell/ui/localization.js", "src/platform/chrome/i18n.js",
   "store/listing.md",
   "store-listing/chrome-web-store/README.md",
   "store-listing/chrome-web-store/listing/en.md",
@@ -213,13 +214,7 @@ for (const expected of [
 }
 
 const localeCheckScript = fs.readFileSync(path.join(root, "scripts", "check-locales.mjs"), "utf8");
-for (const expected of [
-  "manifest.default_locale",
-  "missing locale key",
-  "unused locale key",
-  "__MSG_*__ references are only supported in manifest.json",
-  "Locale coverage checked"
-]) {
+for (const expected of ["manifest.default_locale", "appShellLocalization", "app shell bindings", "missing locale key", "unused locale key", "__MSG_*__ references are only supported in manifest.json", "Locale coverage checked"]) {
   assert(localeCheckScript.includes(expected), `Locale audit missing coverage guardrail: ${expected}`);
 }
 
@@ -522,6 +517,9 @@ const appHtml = fs.readFileSync(path.join(root, "src/app.html"), "utf8");
 assert(appHtml.includes('type="module"'), "App script should load as a module.");
 assert(appHtml.includes("Permissions and limits"), "Settings should disclose permissions and product limits.");
 assert(appHtml.includes("cannot recover visits Chrome already deleted"), "Settings should disclose old-history recovery limits.");
+
+const appJs = fs.readFileSync(path.join(root, "src/app.js"), "utf8");
+assert(appJs.includes("localizeAppShell") && appJs.includes("getChromeMessage"), "App shell must initialize extension-page localization.");
 
 for (const [id, label] of [
   ["delete-results", "Delete Results From Vault"],

@@ -158,6 +158,16 @@ function collectMessageReferences(value) {
   return [];
 }
 
+function collectPackagedUiMessageReferences(entries) {
+  const localizationMap = entries.find((entry) => entry.name === "src/features/app-shell/ui/localization-map.js");
+  if (!localizationMap) {
+    return [];
+  }
+
+  const source = localizationMap.data.toString("utf8");
+  return [...source.matchAll(/\bkey:\s*"([A-Za-z0-9_@]+)"/g)].map((match) => match[1]);
+}
+
 function normalizeExtensionPath(value) {
   return String(value).replace(/^\/+/, "").replaceAll("\\", "/");
 }
@@ -285,6 +295,9 @@ const localeEntryName = `_locales/${packagedManifest.default_locale}/messages.js
 assert(entrySet.has(localeEntryName), `Package missing default locale messages: ${localeEntryName}`);
 const packagedLocaleMessages = JSON.parse(entries.find((entry) => entry.name === localeEntryName).data.toString("utf8"));
 const packagedLocaleReferences = new Set(collectMessageReferences(packagedManifest));
+for (const key of collectPackagedUiMessageReferences(entries)) {
+  packagedLocaleReferences.add(key);
+}
 for (const key of packagedLocaleReferences) {
   const record = packagedLocaleMessages[key];
   assert(record, `Package locale missing key: ${key}`);

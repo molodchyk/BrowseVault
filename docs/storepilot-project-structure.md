@@ -43,4 +43,4 @@ docs/
 - Category stays in `docs/chrome-web-store-category.md` with an explicit `Selected category:` line.
 - Store privacy answers stay in `docs/chrome-web-store-privacy-form.md` with canonical StorePilot keys.
 - Public privacy policy remains in root `PRIVACY.md`.
-- `_locales/en/messages.json` is a real Chrome localization folder because `manifest.json` uses `default_locale: "en"`.
+- `_locales/en/messages.json` is a real Chrome localization folder because `manifest.json` uses `default_locale: "en"` and the extension page reads app-shell UI labels through Chrome i18n.
