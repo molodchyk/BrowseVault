@@ -110,6 +110,37 @@ function renderDayHeading({ resultsElement, visitTime, dayCount, dateFormat }) {
   resultsElement.append(day);
 }
 
+function visitTimeIso(value) {
+  const date = new Date(value);
+  return Number.isFinite(date.getTime()) ? date.toISOString() : "";
+}
+
+function appendResultMeta({ meta, item, dateFormat, metaTokens, query }) {
+  const ownerDocument = meta.ownerDocument;
+  const domain = item.domain || "unknown domain";
+  const timestamp = ownerDocument.createElement("time");
+  const iso = visitTimeIso(item.visitTime);
+  const details = `${item.visitCount || 0} visits · ${item.source || "unknown source"}`;
+  const domainPart = ownerDocument.createElement("span");
+  const detailsPart = ownerDocument.createElement("span");
+
+  timestamp.textContent = formatDate(item.visitTime, dateFormat);
+  timestamp.title = iso ? `Exact visit time: ${iso}` : "Exact visit time unavailable";
+  if (iso) {
+    timestamp.dateTime = iso;
+  }
+
+  appendHighlightedText(domainPart, domain, metaTokens, query.regex);
+  appendHighlightedText(detailsPart, details, metaTokens, query.regex);
+  meta.replaceChildren(
+    domainPart,
+    ownerDocument.createTextNode(" · "),
+    timestamp,
+    ownerDocument.createTextNode(" · "),
+    detailsPart
+  );
+}
+
 function renderResultItem({
   item,
   index,
@@ -157,12 +188,13 @@ function renderResultItem({
   title.href = item.url;
   appendHighlightedText(title, item.title || item.url, titleTokens, query.regex);
   appendHighlightedText(url, item.url, urlTokens, query.regex);
-  appendHighlightedText(
+  appendResultMeta({
     meta,
-    `${item.domain || "unknown domain"} · ${formatDate(item.visitTime, dateFormat)} · ${item.visitCount || 0} visits · ${item.source}`,
     metaTokens,
-    query.regex
-  );
+    query,
+    item,
+    dateFormat
+  });
 
   resultsElement.append(fragment);
 }

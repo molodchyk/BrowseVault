@@ -19,6 +19,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - JSON, CSV, and HTML export for all records, selected records, and current filtered results.
 - JSON backup integrity metadata and backup self-test before full JSON export.
 - Backup reminder status follows the configured reminder interval and warns when the next reminder date is reached.
+- History result rows expose exact ISO visit timestamps in their time metadata while preserving the selected visible date format.
 - Import preview and import support for BrowseVault JSON, CSV, TSV, Google Takeout Browser History, Google My Activity, and common competitor history exports.
 - Recent activity log for completed backup, export, import, cleanup, delete, restore, rule, and reset actions.
 - Domain blacklist and whitelist rules, selected-domain blacklisting, manual retention cleanup, and full local vault reset.

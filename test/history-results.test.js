@@ -18,7 +18,11 @@ import {
   highlightRanges,
   highlightTokensForScope
 } from "../src/features/history-results/ui/text-highlighting.js";
-import { handleHistoryResultKeyDown } from "../src/features/history-results/ui/render-results.js";
+import {
+  handleHistoryResultKeyDown,
+  renderHistoryResults
+} from "../src/features/history-results/ui/render-results.js";
+import { formatDate } from "../src/features/display-preferences/core/preferences.js";
 
 const results = [
   { id: "a", url: "https://www.example.com/a", domain: "example.com", day: "2026-06-16" },
@@ -91,6 +95,154 @@ test("highlight helpers choose scoped tokens and merge overlapping ranges", () =
     [0, 5],
     [6, 22]
   ]);
+});
+
+function textFromChild(child) {
+  return typeof child === "string" ? child : child?.textContent || "";
+}
+
+function fakeDomNode(ownerDocument, tagName = "div") {
+  return {
+    ownerDocument,
+    tagName,
+    attributes: {},
+    checked: false,
+    children: [],
+    className: "",
+    dataset: {},
+    href: "",
+    listeners: {},
+    tabIndex: null,
+    textContent: "",
+    addEventListener(type, handler) {
+      this.listeners[type] = handler;
+    },
+    append(...children) {
+      this.children.push(...children);
+      this.textContent += children.map(textFromChild).join("");
+    },
+    focus() {
+      this.focused = true;
+    },
+    querySelector() {
+      return null;
+    },
+    replaceChildren(...children) {
+      this.children = [];
+      this.textContent = "";
+      if (children.length) {
+        this.append(...children);
+      }
+    },
+    setAttribute(name, value) {
+      this.attributes[name] = String(value);
+    }
+  };
+}
+
+function fakeDocument() {
+  const document = {
+    createElement(tagName) {
+      return fakeDomNode(document, tagName);
+    },
+    createTextNode(text) {
+      return {
+        nodeType: 3,
+        textContent: String(text)
+      };
+    }
+  };
+  return document;
+}
+
+function fakeResultFragment(document) {
+  const nodes = {
+    ".result": fakeDomNode(document, "li"),
+    ".result-check": fakeDomNode(document, "input"),
+    ".result-title": fakeDomNode(document, "a"),
+    ".url": fakeDomNode(document, "div"),
+    ".meta": fakeDomNode(document, "div")
+  };
+  nodes[".result"].closest = (selector) => (selector === ".result" ? nodes[".result"] : null);
+  nodes[".result"].querySelector = (selector) => nodes[selector] || null;
+
+  return {
+    nodes,
+    querySelector(selector) {
+      return nodes[selector] || null;
+    }
+  };
+}
+
+function fakeResultsList(document) {
+  return {
+    ownerDocument: document,
+    children: [],
+    onkeydown: null,
+    append(...children) {
+      this.children.push(...children);
+    },
+    querySelectorAll(selector) {
+      if (selector !== ".result") {
+        return [];
+      }
+      return this.children
+        .map((child) => child.nodes?.[".result"] || (child.className === "result" ? child : null))
+        .filter(Boolean);
+    },
+    replaceChildren(...children) {
+      this.children = [...children];
+    }
+  };
+}
+
+test("renderHistoryResults exposes exact visit timestamps in result metadata", () => {
+  const document = fakeDocument();
+  const fragments = [];
+  const visitTime = new Date(2026, 5, 10, 12, 34).getTime();
+  const resultsList = fakeResultsList(document);
+  const resultTemplate = {
+    content: {
+      cloneNode() {
+        const fragment = fakeResultFragment(document);
+        fragments.push(fragment);
+        return fragment;
+      }
+    }
+  };
+
+  renderHistoryResults({
+    results: [{
+      id: "visit-1",
+      title: "Docs",
+      url: "https://docs.github.com/en/apps",
+      domain: "docs.github.com",
+      visitTime,
+      visitCount: 3,
+      source: "chrome-history"
+    }],
+    total: 1,
+    queryText: "",
+    selectedIds: new Set(),
+    dateFormat: "iso",
+    elements: {
+      resultCount: fakeDomNode(document, "strong"),
+      results: resultsList,
+      resultTemplate
+    },
+    getSelectionState: () => ({ selectedIds: new Set(), lastCheckedIndex: null }),
+    onSelectionChange: () => {}
+  });
+
+  const meta = fragments[0].nodes[".meta"];
+  const time = meta.children.find((child) => child.tagName === "time");
+  const iso = new Date(visitTime).toISOString();
+  const displayedTime = formatDate(visitTime, "iso");
+
+  assert.equal(time.textContent, displayedTime);
+  assert.equal(time.dateTime, iso);
+  assert.equal(time.title, `Exact visit time: ${iso}`);
+  assert.equal(meta.textContent, `docs.github.com · ${displayedTime} · 3 visits · chrome-history`);
 });
 
 function fakeResultRow(id, calls) {
