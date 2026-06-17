@@ -25,12 +25,76 @@ function normalizeChunkSize(value) {
   return Number.isInteger(chunkSize) && chunkSize > 0 ? chunkSize : DEFAULT_SEARCH_CHUNK_SIZE;
 }
 
+function resultCompare(a, b) {
+  const timeDelta = b.visit.visitTime - a.visit.visitTime;
+  return Number.isFinite(timeDelta) && timeDelta !== 0
+    ? timeDelta
+    : a.index - b.index;
+}
+
+function isWorseResult(a, b) {
+  return resultCompare(a, b) > 0;
+}
+
+function moveResultUp(heap, index) {
+  let current = index;
+  while (current > 0) {
+    const parent = Math.floor((current - 1) / 2);
+    if (!isWorseResult(heap[current], heap[parent])) {
+      return;
+    }
+    [heap[current], heap[parent]] = [heap[parent], heap[current]];
+    current = parent;
+  }
+}
+
+function moveResultDown(heap, index) {
+  let current = index;
+  while (true) {
+    const left = current * 2 + 1;
+    const right = left + 1;
+    let worst = current;
+
+    if (left < heap.length && isWorseResult(heap[left], heap[worst])) {
+      worst = left;
+    }
+    if (right < heap.length && isWorseResult(heap[right], heap[worst])) {
+      worst = right;
+    }
+    if (worst === current) {
+      return;
+    }
+
+    [heap[current], heap[worst]] = [heap[worst], heap[current]];
+    current = worst;
+  }
+}
+
+function retainLimitedResult(heap, item, limit) {
+  if (limit <= 0) {
+    return;
+  }
+
+  if (heap.length < limit) {
+    heap.push(item);
+    moveResultUp(heap, heap.length - 1);
+    return;
+  }
+
+  if (resultCompare(item, heap[0]) < 0) {
+    heap[0] = item;
+    moveResultDown(heap, 0);
+  }
+}
+
 export async function searchVisitRecords(visits, input = "", options = {}) {
   const query = parseQuery(input);
   const limit = normalizeLimit(options.limit, options.defaultLimit);
+  const retainedLimit = Number.isFinite(limit) ? Math.trunc(limit) : Infinity;
   const chunkSize = normalizeChunkSize(options.chunkSize);
   const scheduler = options.scheduler || yieldToEventLoop;
-  const filtered = [];
+  const retained = [];
+  let total = 0;
 
   for (let start = 0; start < visits.length; start += chunkSize) {
     const end = Math.min(start + chunkSize, visits.length);
@@ -38,7 +102,13 @@ export async function searchVisitRecords(visits, input = "", options = {}) {
     for (let index = start; index < end; index += 1) {
       const visit = visits[index];
       if (matchesVisitQuery(visit, query)) {
-        filtered.push(visit);
+        total += 1;
+        const item = { visit, index };
+        if (Number.isFinite(retainedLimit)) {
+          retainLimitedResult(retained, item, retainedLimit);
+        } else {
+          retained.push(item);
+        }
       }
     }
 
@@ -47,11 +117,11 @@ export async function searchVisitRecords(visits, input = "", options = {}) {
     }
   }
 
-  filtered.sort((a, b) => b.visitTime - a.visitTime);
+  retained.sort(resultCompare);
 
   return {
     query,
-    total: filtered.length,
-    results: filtered.slice(0, limit)
+    total,
+    results: retained.map((item) => item.visit)
   };
 }

@@ -12,6 +12,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Manual sync from currently available Chrome history, expanded to individual visits where Chrome exposes them.
 - Full-page tabbed app with History, Quick Open, Backup, Rules, and Settings areas.
 - Advanced local search for site, host, domain, title, URL, source, transition, visit count, exact day, date range, local hour, exclusions, wildcards, phrases, and regex.
+- Limited history searches keep only the top visible results while counting the full match set, reducing memory and sort work on large archives.
 - One-click Today, Yesterday, 7 Days, 30 Days, and All Dates shortcuts using ISO-style date filters.
 - Saved searches, match highlighting, local-date grouped results, incremental loading, keyboard-first search focus, and keyboard navigation for visible history rows.
 - Quick Open search across open tabs, bookmarks, downloads, and recently closed tabs, with keyboard navigation for source results and readable source-unavailable warnings.

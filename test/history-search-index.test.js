@@ -69,3 +69,46 @@ test("searchVisitRecords returns all matches when no limit is supplied", async (
   assert.equal(result.total, 5);
   assert.equal(result.results.length, 5);
 });
+
+test("searchVisitRecords keeps only top limited results while counting a 100k match set", async () => {
+  const visits = Array.from({ length: 100000 }, (_value, index) => syntheticVisit(99999 - index));
+  const yields = [];
+
+  const result = await searchVisitRecords(visits, "", {
+    chunkSize: 10000,
+    limit: 5,
+    scheduler: async () => {
+      yields.push("yield");
+    }
+  });
+
+  assert.equal(result.total, 100000);
+  assert.equal(result.results.length, 5);
+  assert.deepEqual(result.results.map((visit) => visit.id), [
+    "visit-0",
+    "visit-1",
+    "visit-2",
+    "visit-3",
+    "visit-4"
+  ]);
+  assert.equal(yields.length, 9);
+});
+
+test("searchVisitRecords preserves input order for equal timestamps within limited results", async () => {
+  const visitTime = Date.parse("2026-06-17T12:00:00.000Z");
+  const visits = [
+    syntheticVisit(0, { id: "a", visitTime }),
+    syntheticVisit(1, { id: "b", visitTime }),
+    syntheticVisit(2, { id: "c", visitTime }),
+    syntheticVisit(3, { id: "d", visitTime })
+  ];
+
+  const result = await searchVisitRecords(visits, "", {
+    chunkSize: 2,
+    limit: 3,
+    scheduler: async () => {}
+  });
+
+  assert.equal(result.total, 4);
+  assert.deepEqual(result.results.map((visit) => visit.id), ["a", "b", "c"]);
+});
