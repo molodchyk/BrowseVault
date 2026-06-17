@@ -86,6 +86,9 @@ export function bindAppEvents({ elements, document, root, handlers }) {
   elements.selectVisible.addEventListener("click", () => handlers.selectVisible());
   elements.invertVisible.addEventListener("click", () => handlers.invertVisibleSelection());
   bindAsync(elements.selectFiltered, "click", handlers.selectAllFiltered, setStatus);
+  bindAsync(elements.exportResults, "click", handlers.exportFilteredResults, setStatus);
+  bindAsync(elements.exportResultsCsv, "click", handlers.exportFilteredResultsCsv, setStatus);
+  bindAsync(elements.exportResultsHtml, "click", handlers.exportFilteredResultsHtml, setStatus);
   bindAsync(elements.loadMore, "click", handlers.loadMoreResults, setStatus);
   elements.clearSelection.addEventListener("click", () => handlers.clearSelection());
 

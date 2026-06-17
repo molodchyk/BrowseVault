@@ -4,7 +4,7 @@ Chrome's built-in history is limited and hard to search when you need to recover
 
 Use BrowseVault to search archived history by keyword, site, host, domain, title, URL, source, transition, visit count, exact day, date range, exclusion, phrase, or regex, with keyboard-first focus and debounced live refresh.
 
-Scan results by local date with highlighted matches, then open, copy, export selected records as JSON, CSV, or HTML, select, or delete the records you need.
+Scan results by local date with highlighted matches, then open, copy, export the current result set as JSON, CSV, or HTML, export selected records, select, or delete the records you need.
 
 Back up your vault as JSON with checksum metadata, review restore-check health before import, and import CSV, TSV, Google Takeout Browser History, Google My Activity, or common history-extension export files.
 

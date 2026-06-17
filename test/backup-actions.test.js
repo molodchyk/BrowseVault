@@ -21,9 +21,11 @@ function previewElements() {
 }
 
 function createHarness({
+  getSearchText = () => "docs site:example.com",
   preferences = {
     backupFilenamePrefix: "browsevault"
   },
+  searchVisits = async () => ({ results: [], total: 0 }),
   selected = [],
   stagedImport = null,
   services = {}
@@ -34,9 +36,11 @@ function createHarness({
   const actions = createBackupActions({
     appState,
     elements: previewElements(),
+    getSearchText,
     refreshStats: async () => calls.push("refreshStats"),
     renderRules: async () => calls.push("renderRules"),
     runSearch: async () => calls.push("runSearch"),
+    searchVisits,
     selectedResults: async () => selected,
     services: {
       renderImportPreview: (...args) => calls.push(["renderImportPreview", ...args]),
@@ -227,6 +231,82 @@ test("selected exports use the configured backup filename prefix", async () => {
     "Research-Backup-selected-2026-06-16.csv",
     "Research-Backup-selected-2026-06-16.html"
   ]);
+});
+
+test("filtered result exports search all current matches without changing backup metadata", async () => {
+  const matching = [{ id: "visit-1" }, { id: "visit-2" }];
+  const searchCalls = [];
+  const downloadedJson = [];
+  const downloadedText = [];
+  const metadata = [];
+  const { actions, statuses } = createHarness({
+    preferences: {
+      backupFilenamePrefix: "Current Results"
+    },
+    getSearchText: () => "docs after:2026-01-01",
+    searchVisits: async (...args) => {
+      searchCalls.push(args);
+      return { results: matching, total: 2 };
+    },
+    services: {
+      attachArchiveIntegrity: async (input) => ({
+        ...input,
+        integrity: { sha256: "abc123" }
+      }),
+      downloadJson: (...args) => downloadedJson.push(args),
+      downloadText: (...args) => downloadedText.push(args),
+      exportArchive: async (items) => ({
+        exportedAt: "2026-06-16T12:00:00.000Z",
+        counts: { visits: items.length },
+        visits: items
+      }),
+      now: () => new Date("2026-06-16T12:00:00.000Z"),
+      setMeta: async (...args) => metadata.push(args),
+      visitsToCsv: (items) => `csv:${items.length}`,
+      visitsToHtml: (items) => `html:${items.length}`
+    }
+  });
+
+  await actions.exportFilteredResults();
+  await actions.exportFilteredResultsCsv();
+  await actions.exportFilteredResultsHtml();
+
+  assert.deepEqual(searchCalls, [
+    ["docs after:2026-01-01", { limit: "all" }],
+    ["docs after:2026-01-01", { limit: "all" }],
+    ["docs after:2026-01-01", { limit: "all" }]
+  ]);
+  assert.deepEqual(statuses, [
+    "Preparing result archive",
+    "Exported 2 matching records as JSON",
+    "Preparing result CSV",
+    "Exported 2 matching records as CSV",
+    "Preparing result HTML",
+    "Exported 2 matching records as HTML"
+  ]);
+  assert.deepEqual(downloadedJson.map(([filename]) => filename), [
+    "Current-Results-results-2026-06-16.json"
+  ]);
+  assert.deepEqual(downloadedText.map(([filename, mimeType, text]) => [filename, mimeType, text]), [
+    ["Current-Results-results-2026-06-16.csv", "text/csv", "csv:2"],
+    ["Current-Results-results-2026-06-16.html", "text/html", "html:2"]
+  ]);
+  assert.deepEqual(metadata, []);
+});
+
+test("filtered result export reports empty current matches", async () => {
+  const downloaded = [];
+  const { actions, statuses } = createHarness({
+    searchVisits: async () => ({ results: [], total: 0 }),
+    services: {
+      downloadJson: (...args) => downloaded.push(args)
+    }
+  });
+
+  await actions.exportFilteredResults();
+
+  assert.deepEqual(statuses, ["Preparing result archive", "No matching records to export"]);
+  assert.deepEqual(downloaded, []);
 });
 
 test("exportAll stops before download when generated archive self-test fails", async () => {

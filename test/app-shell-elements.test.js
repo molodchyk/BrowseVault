@@ -39,6 +39,9 @@ const singularSelectors = [
   "select-visible",
   "invert-visible",
   "select-filtered",
+  "export-results",
+  "export-results-csv",
+  "export-results-html",
   "load-more",
   "clear-selection",
   "result-count",
@@ -111,6 +114,7 @@ test("collectAppElements queries the app shell selectors", () => {
   assert.equal(elements.backupSize.selector, "#backup-size");
   assert.equal(elements.backupSelfTest.selector, "#backup-self-test");
   assert.equal(elements.archiveHealth.selector, "#archive-health");
+  assert.equal(elements.exportResults.selector, "#export-results");
   assert.equal(elements.savePreferences.selector, "#save-preferences");
   assert.equal(elements.tabs.length, 2);
   assert.equal(elements.panels.length, 2);

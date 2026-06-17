@@ -67,9 +67,14 @@ export function downloadText(filename, mimeType, text, runtime = globalThis) {
 export function createBackupActions({
   appState,
   elements,
+  getSearchText = () => "",
   refreshStats,
   renderRules,
   runSearch,
+  searchVisits = async () => ({
+    results: appState.currentResults || [],
+    total: appState.currentTotal || 0
+  }),
   selectedResults,
   services = {},
   setStatus,
@@ -87,6 +92,13 @@ export function createBackupActions({
 
   function exportFilename(kind, exportedAt, extension) {
     return deps.backupExportFilename(appState.preferences?.backupFilenamePrefix, kind, exportedAt, extension);
+  }
+
+  async function matchingResultsForExport() {
+    const { results } = await searchVisits(getSearchText(), {
+      limit: "all"
+    });
+    return results;
   }
 
   async function exportAll() {
@@ -191,6 +203,53 @@ export function createBackupActions({
     setStatus(`Exported ${items.length} selected records as HTML`);
   }
 
+  async function exportFilteredResults() {
+    setStatus("Preparing result archive");
+    const items = await matchingResultsForExport();
+    if (!items.length) {
+      setStatus("No matching records to export");
+      return;
+    }
+
+    const archive = await deps.attachArchiveIntegrity(await deps.exportArchive(items));
+    deps.downloadJson(exportFilename("results", archive.exportedAt, "json"), archive);
+    setStatus(`Exported ${items.length} matching records as JSON`);
+  }
+
+  async function exportFilteredResultsCsv() {
+    setStatus("Preparing result CSV");
+    const items = await matchingResultsForExport();
+    if (!items.length) {
+      setStatus("No matching records to export");
+      return;
+    }
+
+    const exportedAt = deps.now().toISOString();
+    deps.downloadText(
+      exportFilename("results", exportedAt, "csv"),
+      "text/csv",
+      deps.visitsToCsv(items)
+    );
+    setStatus(`Exported ${items.length} matching records as CSV`);
+  }
+
+  async function exportFilteredResultsHtml() {
+    setStatus("Preparing result HTML");
+    const items = await matchingResultsForExport();
+    if (!items.length) {
+      setStatus("No matching records to export");
+      return;
+    }
+
+    const exportedAt = deps.now().toISOString();
+    deps.downloadText(
+      exportFilename("results", exportedAt, "html"),
+      "text/html",
+      deps.visitsToHtml(items, exportedAt)
+    );
+    setStatus(`Exported ${items.length} matching records as HTML`);
+  }
+
   async function importFromFile(file) {
     setStatus("Reading archive");
     const text = await file.text();
@@ -253,6 +312,9 @@ export function createBackupActions({
     confirmStagedImport,
     exportAll,
     exportCsv,
+    exportFilteredResults,
+    exportFilteredResultsCsv,
+    exportFilteredResultsHtml,
     exportHtml,
     exportSelected,
     exportSelectedCsv,

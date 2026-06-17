@@ -40,6 +40,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - SHA-256 integrity metadata for JSON backups;
 - staged import preview with valid row, duplicate row, existing visit, new visit, rule, and restore-check health status;
 - JSON, CSV, TSV, Google Takeout Browser History, Google My Activity, and common competitor-export import handling;
+- current filtered result-set JSON, CSV, and HTML export without manual selection;
 - selected-record JSON, CSV, and HTML export;
 - selected-record URL copy;
 - selected-record batch opening with a tab-flood safety cap;

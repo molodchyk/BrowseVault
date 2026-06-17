@@ -72,6 +72,9 @@ function createElements() {
     selectVisible: fakeElement(),
     invertVisible: fakeElement(),
     selectFiltered: fakeElement(),
+    exportResults: fakeElement(),
+    exportResultsCsv: fakeElement(),
+    exportResultsHtml: fakeElement(),
     loadMore: fakeElement(),
     clearSelection: fakeElement(),
     addBlacklist: fakeElement(),
@@ -95,6 +98,9 @@ function createHandlers(calls) {
     "deleteFromVault",
     "exportAll",
     "exportCsv",
+    "exportFilteredResults",
+    "exportFilteredResultsCsv",
+    "exportFilteredResultsHtml",
     "exportHtml",
     "exportSelected",
     "exportSelectedCsv",
@@ -259,6 +265,9 @@ test("bindAppEvents wires bulk and rules actions", () => {
   elements.selectVisible.dispatch("click");
   elements.clearSelection.dispatch("click");
   elements.invertVisible.dispatch("click");
+  elements.exportResults.dispatch("click");
+  elements.exportResultsCsv.dispatch("click");
+  elements.exportResultsHtml.dispatch("click");
   elements.addBlacklist.dispatch("click");
   elements.addWhitelist.dispatch("click");
   elements.cancelImport.dispatch("click");
@@ -267,6 +276,9 @@ test("bindAppEvents wires bulk and rules actions", () => {
     ["selectVisible"],
     ["clearSelection"],
     ["invertVisibleSelection"],
+    ["exportFilteredResults"],
+    ["exportFilteredResultsCsv"],
+    ["exportFilteredResultsHtml"],
     ["addBlacklistRule"],
     ["addWhitelistRule"],
     ["cancelStagedImport"]

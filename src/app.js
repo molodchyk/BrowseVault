@@ -85,9 +85,11 @@ const vaultActions = createVaultManagementActions({
 const backupActions = createBackupActions({
   appState,
   elements,
+  getSearchText: historySearchForm.getSearchText,
   refreshStats: displayPreferences.refreshStats,
   renderRules: vaultActions.renderRules,
   runSearch: historySearchActions.runSearch,
+  searchVisits,
   selectedResults: selectedResultLookup.selectedResults,
   setStatus,
   switchTab: appNavigation.switchTab
@@ -145,6 +147,9 @@ function bindEvents() {
       deleteFromVault: vaultActions.deleteFromVault,
       exportAll: backupActions.exportAll,
       exportCsv: backupActions.exportCsv,
+      exportFilteredResults: backupActions.exportFilteredResults,
+      exportFilteredResultsCsv: backupActions.exportFilteredResultsCsv,
+      exportFilteredResultsHtml: backupActions.exportFilteredResultsHtml,
       exportHtml: backupActions.exportHtml,
       exportSelected: backupActions.exportSelected,
       exportSelectedCsv: backupActions.exportSelectedCsv,
