@@ -1,6 +1,6 @@
 # BrowseVault Code Structure
 
-BrowseVault follows the local `extension-modularization-playbook.md` gradually. The current migration rule is: keep runtime entry files stable, move pure product logic into feature-owned modules, and leave compatibility barrels for old import paths.
+BrowseVault follows the local `extension-modularization-playbook.md` gradually. This document is a current-tree ownership map and migration aid; it does not redefine the playbook's target architecture. The current migration rule is: keep runtime entry files stable, move pure product logic into feature-owned modules, and leave compatibility barrels for old import paths.
 
 ## Current Ownership
 

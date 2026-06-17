@@ -2,6 +2,14 @@
 
 This playbook captures the reusable architecture discipline learned from Defense against Distractions. It is written so Codex can apply the same structure to other browser extensions without needing the full DaD product context.
 
+This is a prescriptive target, not a description of whatever structure a current extension happens to have. When existing code differs from this playbook, treat the existing shape as migration inventory and move it toward this architecture in small verified steps.
+
+Treat this playbook as the architecture standard. It should preach the best target design, not the easiest shape to preserve from an existing codebase. Project-specific roadmaps describe how a real extension is migrating toward the standard; code-structure documents describe the current tree; coordination docs describe who owns which files during active work. Those documents can record temporary constraints, but they should not redefine the target architecture.
+
+The playbook should be opinionated. If guidance only explains a weaker compatibility shape, move that explanation into a project-specific migration roadmap. This document should preserve the best target design Codex should bias toward when creating or reshaping an extension.
+
+Do not copy transitional folders such as a broad `src/js` tree, classic manifest script chains, or global CSS folders into a new project merely because an existing extension still has them. In the playbook, those shapes are migration inventory, not design recommendations.
+
 The goal is not prettier folders. The goal is to keep an extension maintainable as it grows: small reviewable modules, explicit ownership, testable core logic, bounded browser permissions, and safe migration around user data.
 
 ## Core Principle
@@ -10,13 +18,16 @@ Use feature-first modules with thin runtime entry points.
 
 Runtime entry points should bootstrap and wire. They should not own business logic.
 
-Feature modules should own product behavior and nearby UI assets. Shared core modules should be pure and testable. Platform modules should own browser APIs and permission-specific behavior.
+Feature modules should own product behavior and nearby UI assets. Shared core modules should be pure and testable. Platform modules should own browser APIs and permission-specific behavior. The toolchain should be chosen to preserve that ownership in source, even when Chrome needs generated runtime output.
 
 The best default is:
 
 1. group by feature or product responsibility;
 2. split by runtime surface inside that feature when needed;
-3. keep runtime entry files thin when manifest, CSP, or browser-extension loading rules require them.
+3. keep runtime entry files thin;
+4. use generated output to satisfy manifest, CSP, or browser-extension loading rules instead of letting those rules define the source tree.
+
+Do not organize a mature extension primarily by file type. Product behavior should be discoverable by feature, not by hunting across global type folders. File-type folders are build artifacts or runtime-entry surfaces only; they are not architectural owners.
 
 ## Why This Matters For Codex
 
@@ -24,14 +35,14 @@ Codex tends to follow the shape it finds. If a project has broad files, broad fo
 
 - new behavior goes to the narrowest existing owner;
 - broad files become compatibility barrels or controllers;
-- HTML, CSS, tests, and UI helpers stay near the feature they serve where the toolchain allows it;
+- HTML, CSS, tests, and UI helpers stay near the feature they serve, and the build pipeline preserves that source ownership;
 - storage and browser APIs stay behind explicit boundaries;
 - tests are placed by feature instead of in omnibus files;
 - file-size and folder-density audits detect structural decay early.
 
 ## Recommended Source Shape
 
-A mature extension can use this shape as a target, even if it migrates gradually. This is intentionally more feature-co-located than the current DaD tree.
+A mature extension should use this shape as its target. New extensions should start here. Existing extensions measure their migration distance against this shape.
 
 ```text
 src/
@@ -117,11 +128,11 @@ dist/
     options.html
 ```
 
-This is a target shape, not a required first commit. Existing projects can keep their current paths while moving toward the boundaries.
+This is the target shape. Existing projects may reach it gradually, but gradual migration is a delivery tactic, not a competing architecture.
 
-## Module And Build Target
+## ES Modules And Build Target
 
-Author source as ES modules by default.
+Author source as ES modules by default. For a new or redesigned extension, the source tree should be modular first and manifest-compatible second; generated output handles the browser contract.
 
 Best-practice target:
 
@@ -134,7 +145,9 @@ Best-practice target:
 - The background service worker uses `"type": "module"` and static imports.
 - Build output is audited before release.
 
-The build step is not the architecture. The architecture is feature ownership and explicit boundaries. The build step exists to preserve that architecture while satisfying browser-extension loading rules.
+The build step is not the architecture. The architecture is feature ownership and explicit boundaries. The build step exists to preserve that architecture while satisfying browser-extension loading rules. If build tooling and source ownership disagree, fix the tooling or document a temporary migration constraint in the project roadmap.
+
+Do not let native-support gaps decide source organization. Use native ES modules directly where extension surfaces support them cleanly: extension pages, tests, shared pure modules, and MV3 module service workers. Compile or bundle manifest-loaded content scripts from modular source when the browser cannot load the source graph directly. Source architecture stays feature-owned; generated output satisfies Chrome.
 
 Tooling should support:
 
@@ -150,7 +163,7 @@ Avoid dynamic import in MV3 extension service workers. Use static imports or hav
 
 Avoid remote executable code. Dependencies may be bundled, but executable JavaScript and WebAssembly used by the extension must be included in the extension package.
 
-TypeScript is a strong candidate when the extension has growing schemas, runtime messages, storage records, and cross-surface contracts. It is not required for the architecture, but the best mature design should either use TypeScript or maintain equivalent schema validation and tests.
+TypeScript is the preferred default once the extension has growing schemas, runtime messages, storage records, and cross-surface contracts. If a project keeps JavaScript, it should maintain equivalent schema validation and tests so the architecture still has explicit contracts.
 
 ## Runtime Entry Rules
 
@@ -187,6 +200,7 @@ Avoid:
 
 - putting unrelated helpers into a broad `utils.js`;
 - placing new behavior in a root `content.js`, `popup.js`, or `options.js`;
+- treating global `html/`, `css/`, and `js/` folders as the primary design;
 - sending all tests to a broad `test/` tree without feature ownership;
 - duplicating the same rule in UI and background code;
 - hiding storage migrations inside UI rendering files.
@@ -229,6 +243,7 @@ Examples:
 Rules:
 
 - Promise-wrap callback APIs.
+- Wrap browser listener registration when the listener is a cross-surface platform event, and return an unsubscribe function for cleanup-capable surfaces.
 - Normalize errors in one place.
 - Keep permission-specific behavior visible.
 - Do not scatter raw `chrome.tabs`, `chrome.storage`, or `chrome.runtime.sendMessage` calls through feature modules unless the project is still in early migration.
@@ -426,7 +441,7 @@ Rules:
 - Put styles in the narrowest feature/surface/component file.
 - Keep design tokens separate from feature styles.
 - HTML entry files belong to runtime surfaces such as popup/options/blocked pages.
-- HTML templates that belong to one feature should live with that feature if the toolchain supports it.
+- HTML templates that belong to one feature should live with that feature; packaging can emit runtime HTML from feature-owned source when needed.
 - Content-script CSS may stay injected by content modules when page isolation or manifest compatibility requires it.
 
 ## Test Structure
@@ -478,7 +493,7 @@ Preferred migration:
 Good refactor commits say what responsibility moved:
 
 - `Split popup diagnostics panel`
-- `Move schedule time helpers into shared schedules`
+- `Move schedule time helpers into schedules core`
 - `Extract content blocking overlay style`
 
 Weak commit messages hide risk:
@@ -494,11 +509,12 @@ When Codex edits a growing extension:
 1. Read the local architecture docs first.
 2. Identify the owning feature folder before editing.
 3. If no owner exists, create a narrow feature folder rather than adding to a root runtime folder.
-4. Keep behavior changes separate from broad file moves.
-5. Add or update tests in the feature's test area.
-6. Run the narrowest relevant checks.
-7. Update code-structure docs when ownership changes.
-8. Commit small checkpoints when the repo is stable.
+4. Prefer ES-module feature boundaries before adding new runtime or global helper files.
+5. Keep behavior changes separate from broad file moves.
+6. Add or update tests in the feature's test area.
+7. Run the narrowest relevant checks.
+8. Update code-structure docs when ownership changes.
+9. Commit small checkpoints when the repo is stable.
 
 Default decision:
 
@@ -589,6 +605,7 @@ Avoid:
 - one giant `background.js`;
 - one giant `content.js`;
 - one giant `options.js`;
+- primary source organization by file-type folders;
 - broad `utils.js` modules;
 - tests collected into a single huge file;
 - storage mutations hidden in render functions;
@@ -603,7 +620,7 @@ Avoid:
 A healthy extension codebase has:
 
 - feature-owned modules;
-- colocated feature UI, styles, and tests where the toolchain allows it;
+- colocated feature UI, styles, and tests in source;
 - thin runtime entries;
 - pure tested core logic;
 - explicit platform/browser wrappers;

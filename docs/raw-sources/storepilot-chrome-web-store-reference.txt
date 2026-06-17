@@ -1,20 +1,14 @@
+# StorePilot Project Reference
 
-StorePilot: Chrome Web Store Automation
+This document mirrors the StorePilot Options > Reference tab. Use it as the pasteable project-structure contract when asking Codex or another assistant to prepare Chrome Web Store automation files for StorePilot.
 
-Import flat locale listing files and use them in extension store dashboards.
+Run `scripts\test-reference-sync.ps1` after changing this file or the in-app Reference tab.
 
-Last updated on 09:01:39 17.06.2026.
-Active project
-Preferences
-
-Shows Fill current language in the popup and dashboard panel for debugging or one-off manual fills.
-Show advanced fill actions
-Reference
-Project import reference
-Project import reference
+## Project Import Reference
 
 Start with one locale file if the extension only has one Chrome Web Store language today. Keep media, category, additional fields, and privacy files beside it so the same project can grow into more locales later.
 
+```text
 my-extension/
 manifest.json
 src/
@@ -36,49 +30,76 @@ docs/
   chrome-web-store-additional-fields.md
   chrome-web-store-category.md
   chrome-web-store-privacy-form.md
+```
 
-Detailed description text
+Folder names such as `store-listing`, `chrome-web-store`, `listing`, `media`, `screenshots`, `promo`, `assets`, `store-assets`, and `icons` help StorePilot pick the right files when a project contains extra build output.
 
-store-listing/chrome-web-store/listing/en.md is copied directly into the Chrome Web Store Detailed description field. The file should contain only the final detailed description body users should see in the store listing.
+## Detailed Description Text
 
-Do not include field labels such as Name, Summary, Description, or Detailed Description. Do not include Markdown headings. Do not put the short summary in this file.
+`store-listing/chrome-web-store/listing/en.md` is copied directly into the Chrome Web Store Detailed description field.
 
-Example en.md content:
+The file should contain only the final detailed description body users should see in the store listing.
 
-New Tab: Custom URL lets you choose what opens when you create a new tab. Use a website, local HTML file, browser page, or a quiet blank page.
+Do not include field labels such as `Name`, `Summary`, `Description`, or `Detailed Description`.
 
-    store-listing/chrome-web-store/listing/en.md
-    en.txt, en.md, en_US.md, de.md, pt_BR.md
+Do not include Markdown headings.
 
-Graphic assets
+Do not put the short summary in this file.
 
-    icon-128.png or icon128.png: 128 x 128
-    screenshots/01-name.png: 1280 x 800 or 640 x 400, up to 5
-    promo/small-promo.png: 440 x 280
-    promo/marquee-promo.png: 1400 x 560
-    Accepted image files: .png, .jpg, .jpeg
+Example `en.md` content:
 
-Alternative single-draft import
+```text
+New Tab: Custom URL lets you choose what opens when you create a new tab.
 
-StorePilot also accepts docs/chrome-web-store.md for a single English draft. Only in this draft file, StorePilot may look for a Detailed Description or Description section and import that section as English detailed description text. This section parsing does not apply to store-listing/chrome-web-store/listing/en.md.
-Fields not imported from listing/en.md
+Use a website, local HTML file, browser page, or a quiet blank page.
+```
 
-    Name
-    Summary
-    Category
-    Homepage URL
-    Support URL
-    Official URL
-    Mature content
-    Privacy fields
+Accepted detailed-description file examples:
 
-These belong in the Chrome Web Store dashboard or in dedicated automation documents, not in locale listing files.
+- `store-listing/chrome-web-store/listing/en.md`
+- `en.txt`
+- `en.md`
+- `en_US.md`
+- `de.md`
+- `pt_BR.md`
 
-Folder names such as store-listing, chrome-web-store, listing, media, screenshots, promo, assets, store-assets, and icons help StorePilot pick the right files when a project contains extra build output.
-Additional fields document reference
+## Alternative Single-Draft Import
+
+StorePilot also accepts `docs/chrome-web-store.md` for a single English draft.
+
+Only in this draft file, StorePilot may look for a `Detailed Description` or `Description` section and import that section as English detailed description text.
+
+This section parsing does not apply to `store-listing/chrome-web-store/listing/en.md`.
+
+## Fields Not Imported From `listing/en.md`
+
+These fields belong in the Chrome Web Store dashboard or in dedicated automation documents, not in locale listing files:
+
+- Name
+- Summary
+- Category
+- Homepage URL
+- Support URL
+- Official URL
+- Mature content
+- Privacy fields
+
+## Graphic Assets
+
+Use `.png`, `.jpg`, or `.jpeg` files.
+
+- `icon-128.png` or `icon128.png`: 128 x 128
+- `screenshots/01-name.png`: 1280 x 800 or 640 x 400, up to 5
+- `promo/small-promo.png`: 440 x 280
+- `promo/marquee-promo.png`: 1400 x 560
+
+## Additional Fields Document Reference
 
 StorePilot can scan one project document for Chrome Web Store Additional fields values. Keep these outside locale listing files so the detailed description body stays clean.
 
+Recommended filename: `docs/chrome-web-store-additional-fields.md`.
+
+```text
 [additional_fields]
 official_url:
 none
@@ -91,50 +112,66 @@ https://example.com/support
 
 mature_content:
 no
+```
 
-Recommended filename: docs/chrome-web-store-additional-fields.md. Omit a key or leave it blank when StorePilot should not touch that dashboard field. Use none for URL fields only when you want StorePilot to clear/select no URL. For mature_content, use yes to turn the switch on or no to turn it off; none, blank, or omitted means do not touch the switch.
-Category automation document reference
+Omit a key or leave it blank when StorePilot should not touch that dashboard field.
+
+Use `none` for URL fields only when you want StorePilot to clear or select no URL.
+
+For `mature_content`, use `yes` to turn the switch on or `no` to turn it off. `none`, blank, or omitted means do not touch the switch.
+
+## Category Automation Document Reference
 
 StorePilot can scan one project document for the Chrome Web Store category. Use an explicit Selected category line so the scanner does not infer from notes or option lists.
 
+Recommended filename: `docs/chrome-web-store-category.md`.
+
+```text
 Chrome Web Store Category Decision
 Selected category: Functionality and UI
 
 Reason:
 The extension changes browser new-tab behavior and gives users a small interface for configuring that behavior.
+```
 
-Recommended filename: docs/chrome-web-store-category.md. The file should contain Selected category: followed by one visible Chrome Web Store category label.
-Productivity
+The file should contain `Selected category:` followed by one visible Chrome Web Store category label.
 
-    Communication
-    Developer Tools
-    Education
-    Tools
-    Workflow and planning
+### Chrome Web Store Category Labels
 
-Lifestyle
+Productivity:
 
-    Art & Design
-    Entertainment
-    Games
-    Household
-    Just for fun
-    News & Weather
-    Shopping
-    Social Networking
-    Travel
-    Wellbeing
+- Communication
+- Developer Tools
+- Education
+- Tools
+- Workflow and planning
 
-Make Chrome Yours
+Lifestyle:
 
-    Accessibility
-    Functionality and UI
-    Privacy & Security
+- Art & Design
+- Entertainment
+- Games
+- Household
+- Just for fun
+- News & Weather
+- Shopping
+- Social Networking
+- Travel
+- Wellbeing
 
-Privacy automation document reference
+Make Chrome Yours:
+
+- Accessibility
+- Functionality and UI
+- Privacy & Security
+
+## Privacy Automation Document Reference
 
 StorePilot can scan one project document for Chrome Web Store privacy fields. Use these canonical keys so the scanner can route text without guessing.
 
+Recommended filename: `docs/chrome-web-store-privacy-form.md`.
+
+```text
 [privacy]
 single_purpose:
 ...
@@ -171,56 +208,70 @@ yes
 
 certification.no_creditworthiness:
 yes
+```
 
-For permission justifications, use permission.<manifest permission code>. The suffix should match the code in your manifest permissions, optional_permissions, host_permissions, or content_scripts.matches.
+For permission justifications, use `permission.<manifest permission code>`. The suffix should match the code in your manifest `permissions`, `optional_permissions`, `host_permissions`, or `content_scripts.matches`.
 
-For remote code, use remote_code as the Chrome Web Store yes/no answer. Use no when all code is packaged locally, and do not include remote_code_justification for that case. Use yes only when the extension uses remote code, and then provide remote_code_justification for the required justification textarea.
+If a permission is not listed here, use the same pattern anyway, for example `permission.bookmarks` or `permission.system.display`. StorePilot should treat the manifest code itself as the source of truth.
 
-For data usage checkboxes, answer the Chrome Web Store public disclosure question: what user data the extension collects now or may collect later. These keys are not permission justifications; do not set a category to yes only because a permission can access that data, such as history for local-only history features. Choose yes only when your privacy policy and Chrome Web Store interpretation say the extension collects that category. StorePilot only checks explicit yes; no, none, blank, or omitted means it will not click that checkbox.
+For remote code, use `remote_code` as the Chrome Web Store yes/no answer.
 
-Recommended filenames: docs/chrome-web-store-privacy-form.md or STORE_JUSTIFICATIONS.md. StorePilot also accepts other .md or .txt files when the content contains a [privacy] block, canonical keys, or recognizable store-justification headings.
-Core keys
+Use `no` when all code is packaged locally, and do not include `remote_code_justification` for that case.
 
-    single_purpose
-    remote_code
-    privacy_policy_url
-    host_permission
-    remote_code_justification
+Use `yes` only when the extension uses remote code, and then provide `remote_code_justification` for the required justification textarea.
 
-Data Usage
+For data usage checkboxes, answer the exact Chrome Web Store public disclosure question: what user data do you plan to collect from users now or in the future?
 
-    data_usage.personally_identifiable_information
-    data_usage.health_information
-    data_usage.financial_payment_information
-    data_usage.authentication_information
-    data_usage.personal_communications
-    data_usage.location
-    data_usage.web_history
-    data_usage.user_activity
-    data_usage.website_content
-    certification.no_sell_or_transfer
-    certification.no_unrelated_use
-    certification.no_creditworthiness
+Treat collect as data that leaves local-only browser/device processing and is received, uploaded, logged, reviewed, or otherwise made available to the developer, a product backend, analytics, support, or a third-party service.
 
-Common permission keys
+These keys are not permission justifications and are not a list of data the extension can access or store locally.
 
-    permission.storage
-    permission.alarms
-    permission.downloads
-    permission.activeTab
-    permission.scripting
-    permission.tabs
-    permission.notifications
-    permission.contextMenus
-    permission.declarativeNetRequest
-    permission.declarativeNetRequestWithHostAccess
-    permission.sidePanel
-    permission.cookies
-    permission.webRequest
-    permission.webNavigation
-    permission.identity
-    permission.offscreen
-    permission.nativeMessaging
-    permission.debugger
+Use `yes` only for developer or third-party collection cases.
 
-If a permission is not listed here, use the same pattern anyway, for example permission.bookmarks or permission.system.display. StorePilot should treat the manifest code itself as the source of truth.
+For local-only features where data stays on the user's device, use `no`; for example, a local history vault can need `permission.history` while still using `data_usage.web_history: no`.
+
+StorePilot applies explicit `yes`/`no` values: `yes` checks a box, `no` unchecks it; `none`, blank, or omitted leaves it unchanged.
+
+### Core Keys
+
+- `single_purpose`
+- `remote_code`
+- `remote_code_justification`
+- `privacy_policy_url`
+- `host_permission`
+
+### Data Usage Keys
+
+- `data_usage.personally_identifiable_information`
+- `data_usage.health_information`
+- `data_usage.financial_payment_information`
+- `data_usage.authentication_information`
+- `data_usage.personal_communications`
+- `data_usage.location`
+- `data_usage.web_history`
+- `data_usage.user_activity`
+- `data_usage.website_content`
+- `certification.no_sell_or_transfer`
+- `certification.no_unrelated_use`
+- `certification.no_creditworthiness`
+
+### Common Permission Keys
+
+- `permission.storage`
+- `permission.alarms`
+- `permission.downloads`
+- `permission.activeTab`
+- `permission.scripting`
+- `permission.tabs`
+- `permission.notifications`
+- `permission.contextMenus`
+- `permission.declarativeNetRequest`
+- `permission.declarativeNetRequestWithHostAccess`
+- `permission.sidePanel`
+- `permission.cookies`
+- `permission.webRequest`
+- `permission.webNavigation`
+- `permission.identity`
+- `permission.offscreen`
+- `permission.nativeMessaging`
+- `permission.debugger`

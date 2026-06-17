@@ -37,6 +37,7 @@ const requiredFiles = [
   "docs/decision-records.md",
   "docs/repository-metadata.md",
   "docs/storepilot-project-structure.md",
+  "docs/source-inventory.md",
   "docs/chrome-web-store-additional-fields.md",
   "docs/chrome-web-store-category.md",
   "docs/chrome-web-store-privacy-form.md",
@@ -294,6 +295,33 @@ for (const expected of [
   assert(docsReadme.includes(expected), `Docs README missing playbook reference: ${expected}`);
 }
 
+const extensionModularizationPlaybook = fs.readFileSync(path.join(root, "docs", "extension-modularization-playbook.md"), "utf8");
+for (const expected of [
+  "This is a prescriptive target",
+  "Treat this playbook as the architecture standard",
+  "Do not copy transitional folders",
+  "use generated output to satisfy manifest, CSP, or browser-extension loading rules",
+  "Do not let native-support gaps decide source organization",
+  "Wrap browser listener registration"
+]) {
+  assert(extensionModularizationPlaybook.includes(expected), `Local modularization playbook missing current DaD guidance: ${expected}`);
+}
+
+const codeStructure = fs.readFileSync(path.join(root, "docs", "code-structure.md"), "utf8");
+assert(
+  codeStructure.includes("it does not redefine the playbook's target architecture"),
+  "Code structure doc must not soften the modularization playbook target."
+);
+
+const sourceInventory = fs.readFileSync(path.join(root, "docs", "source-inventory.md"), "utf8");
+for (const expected of [
+  "tooling-reference snapshots",
+  "refreshed from `settings/StorePilot/docs/reference.md`",
+  "prompted the first snapshot"
+]) {
+  assert(sourceInventory.includes(expected), `Source inventory missing refreshed StorePilot provenance: ${expected}`);
+}
+
 const storePilotStructure = fs.readFileSync(path.join(root, "docs", "storepilot-project-structure.md"), "utf8");
 for (const expected of [
   "StorePilot Project Reference",
@@ -412,6 +440,15 @@ for (const key of [
   "certification.no_creditworthiness"
 ]) {
   assert(storePilotPrivacy.includes(`${key}:`), `Missing StorePilot privacy key: ${key}`);
+}
+
+const storePilotReferenceSnapshot = fs.readFileSync(path.join(root, "docs", "raw-sources", "storepilot-chrome-web-store-reference.txt"), "utf8");
+for (const expected of [
+  "Treat collect as data that leaves local-only browser/device processing",
+  "StorePilot applies explicit `yes`/`no` values",
+  "a local history vault can need `permission.history` while still using `data_usage.web_history: no`"
+]) {
+  assert(storePilotReferenceSnapshot.includes(expected), `StorePilot reference snapshot missing current privacy guidance: ${expected}`);
 }
 
 const appHtml = fs.readFileSync(path.join(root, "src/app.html"), "utf8");
