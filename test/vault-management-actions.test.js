@@ -297,6 +297,66 @@ test("retention cleanup previews and deletes eligible old records", async () => 
   ]);
 });
 
+test("duplicate cleanup previews and deletes duplicate vault records", async () => {
+  const activity = [];
+  const marked = [];
+  const candidates = [
+    { id: "duplicate-1" },
+    { id: "duplicate-2" }
+  ];
+  const { actions, appState, calls, statuses } = createHarness({
+    selectedIds: ["visible"],
+    services: {
+      appendActivityLog: async (...args) => activity.push(args),
+      getDuplicateCleanupCandidates: async () => candidates,
+      markDeletedByIds: async (ids) => {
+        marked.push(ids);
+        return ids.length;
+      }
+    }
+  });
+
+  await actions.previewDuplicateCleanup();
+  await actions.cleanupDuplicates();
+
+  assert.deepEqual(marked, [["duplicate-1", "duplicate-2"]]);
+  assert.equal(appState.selectedIds.size, 0);
+  assert.deepEqual(calls, ["refreshStats", "runSearch"]);
+  assert.deepEqual(statuses, [
+    "2 duplicate vault records can be cleaned up. One record per URL and visit time is kept.",
+    "Cleaned up 2 duplicate vault records"
+  ]);
+  assert.deepEqual(activity, [[{
+    type: "cleanup",
+    label: "Duplicate cleanup",
+    count: 2,
+    detail: "Same URL and visit time"
+  }]]);
+});
+
+test("duplicate cleanup handles empty and canceled states", async () => {
+  const empty = createHarness({
+    services: {
+      getDuplicateCleanupCandidates: async () => []
+    }
+  });
+  await empty.actions.previewDuplicateCleanup();
+  await empty.actions.cleanupDuplicates();
+  assert.deepEqual(empty.statuses, [
+    "No duplicate vault records found",
+    "No duplicate vault records found"
+  ]);
+
+  const canceled = createHarness({
+    services: {
+      confirmAction: () => false,
+      getDuplicateCleanupCandidates: async () => [{ id: "duplicate-1" }]
+    }
+  });
+  await canceled.actions.cleanupDuplicates();
+  assert.deepEqual(canceled.statuses, ["Duplicate cleanup canceled"]);
+});
+
 test("retention cleanup validates input and handles empty previews", async () => {
   const { actions, elements, statuses } = createHarness({
     services: {

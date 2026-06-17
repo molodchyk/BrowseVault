@@ -283,6 +283,19 @@
             </div>
             <p class="hint">Moves matching old vault records to undoable deletion. Whitelisted domains are kept during retention cleanup.</p>
           </section>
+          <section class="retention-cleanup" aria-label="Duplicate cleanup">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Duplicates</p>
+                <h3>Clean repeated vault records</h3>
+              </div>
+            </div>
+            <div class="retention-row compact-actions">
+              <p class="hint">Finds active records with the same URL and visit time, keeps the richest record, and moves the rest to undoable deletion.</p>
+              <button id="preview-duplicates" class="ghost" type="button">Preview</button>
+              <button id="cleanup-duplicates" class="danger" type="button">Clean Up</button>
+            </div>
+          </section>
         </section>
       </section>
 

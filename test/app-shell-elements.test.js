@@ -80,6 +80,8 @@ const singularSelectors = [
   "retention-days",
   "preview-retention",
   "cleanup-retention",
+  "preview-duplicates",
+  "cleanup-duplicates",
   "pref-theme",
   "pref-accent",
   "pref-date-format",

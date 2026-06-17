@@ -117,6 +117,8 @@ export function bindAppEvents({ elements, document, root, handlers }) {
   bindAsync(elements.addWhitelist, "click", handlers.addWhitelistRule, setStatus);
   bindAsync(elements.previewRetention, "click", handlers.previewRetentionCleanup, setStatus);
   bindAsync(elements.cleanupRetention, "click", handlers.cleanupByRetention, setStatus);
+  bindAsync(elements.previewDuplicates, "click", handlers.previewDuplicateCleanup, setStatus);
+  bindAsync(elements.cleanupDuplicates, "click", handlers.cleanupDuplicates, setStatus);
   bindAsync(elements.resetVault, "click", handlers.resetVault, setStatus);
   bindAsync(elements.openNativeHistory, "click", handlers.openNativeChromeHistory, setStatus);
 }

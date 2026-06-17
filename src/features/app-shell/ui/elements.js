@@ -81,6 +81,8 @@ export function collectAppElements(document) {
     retentionDays: document.querySelector("#retention-days"),
     previewRetention: document.querySelector("#preview-retention"),
     cleanupRetention: document.querySelector("#cleanup-retention"),
+    previewDuplicates: document.querySelector("#preview-duplicates"),
+    cleanupDuplicates: document.querySelector("#cleanup-duplicates"),
     prefTheme: document.querySelector("#pref-theme"),
     prefAccent: document.querySelector("#pref-accent"),
     prefDateFormat: document.querySelector("#pref-date-format"),

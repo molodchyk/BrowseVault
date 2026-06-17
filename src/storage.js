@@ -356,6 +356,67 @@ function visitMatchesWhitelist(visit, whitelist) {
   return Boolean(domain && whitelist.some((rule) => hostMatchesRule(domain, rule)));
 }
 
+function duplicateVisitKey(visit) {
+  const url = String(visit.normalizedUrl || visit.url || "").trim().toLowerCase();
+  const visitTime = Number(visit.visitTime);
+  if (!url || !Number.isFinite(visitTime)) {
+    return "";
+  }
+
+  return `${url}\n${Math.round(visitTime)}`;
+}
+
+function duplicateVisitQuality(visit) {
+  return (
+    String(visit.title || "").trim().length +
+    (visit.chromeId ? 1000 : 0) +
+    (visit.visitId ? 100 : 0) +
+    Number(visit.visitCount || 0)
+  );
+}
+
+function compareDuplicateKeepers(left, right) {
+  const qualityDelta = duplicateVisitQuality(right) - duplicateVisitQuality(left);
+  if (qualityDelta) {
+    return qualityDelta;
+  }
+
+  const updatedDelta = Date.parse(right.updatedAt || "") - Date.parse(left.updatedAt || "");
+  if (Number.isFinite(updatedDelta) && updatedDelta) {
+    return updatedDelta;
+  }
+
+  return String(left.id || "").localeCompare(String(right.id || ""));
+}
+
+export function duplicateCleanupCandidates(visits) {
+  const groups = new Map();
+
+  for (const visit of Array.isArray(visits) ? visits : []) {
+    if (!visit || visit.deletedAt) {
+      continue;
+    }
+
+    const key = duplicateVisitKey(visit);
+    if (!key) {
+      continue;
+    }
+
+    if (!groups.has(key)) {
+      groups.set(key, []);
+    }
+    groups.get(key).push(visit);
+  }
+
+  return [...groups.values()]
+    .filter((group) => group.length > 1)
+    .flatMap((group) => [...group].sort(compareDuplicateKeepers).slice(1));
+}
+
+export async function getDuplicateCleanupCandidates() {
+  return duplicateCleanupCandidates(await getAllVisits());
+}
+
 export function retentionCleanupCandidates(visits, rules, options = {}) {
   const retentionDays = Number(options.retentionDays);
   const now = Number(options.now ?? Date.now());

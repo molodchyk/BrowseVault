@@ -186,6 +186,7 @@ function bindEvents() {
       loadMoreResults: historySearchActions.loadMoreResults,
       openSelected: bulkActions.openSelected,
       openNativeChromeHistory,
+      previewDuplicateCleanup: vaultActions.previewDuplicateCleanup,
       previewRetentionCleanup: vaultActions.previewRetentionCleanup,
       resetVault: vaultActions.resetVault,
       runQuickSearch: () => {
@@ -201,6 +202,7 @@ function bindEvents() {
       setStatus,
       switchTab: appNavigation.switchTab,
       syncChromeHistory,
+      cleanupDuplicates: vaultActions.cleanupDuplicates,
       deleteSavedSearch: savedSearchActions.deleteSelectedSearch,
       undoVaultDelete: vaultActions.undoVaultDelete
     }

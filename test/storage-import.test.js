@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  duplicateCleanupCandidates,
   makeVisitId,
   mergeImportedVisits,
   normalizeHistoryItem,
@@ -218,6 +219,56 @@ test("retentionCleanupCandidates skips deleted, recent, and whitelisted visits",
       { retentionDays: 30, now }
     ).map((visit) => visit.id),
     ["old"]
+  );
+});
+
+test("duplicateCleanupCandidates keeps the richest active record per URL and visit time", () => {
+  const visitTime = Date.parse("2026-06-16T12:00:00.000Z");
+  const sparse = {
+    id: "sparse",
+    url: "https://example.com/page",
+    normalizedUrl: "https://example.com/page",
+    title: "",
+    visitTime,
+    visitCount: 1,
+    updatedAt: "2026-06-16T12:00:00.000Z"
+  };
+  const rich = {
+    id: "rich",
+    url: "https://example.com/page",
+    normalizedUrl: "https://example.com/page",
+    title: "Useful title",
+    chromeId: "chrome-1",
+    visitId: "visit-1",
+    visitTime,
+    visitCount: 4,
+    updatedAt: "2026-06-16T12:01:00.000Z"
+  };
+  const separateVisit = {
+    id: "separate",
+    url: "https://example.com/page",
+    normalizedUrl: "https://example.com/page",
+    title: "Separate visit",
+    visitTime: visitTime + 1,
+    visitCount: 1
+  };
+  const deletedDuplicate = {
+    id: "deleted",
+    url: "https://example.com/page",
+    normalizedUrl: "https://example.com/page",
+    title: "Deleted duplicate",
+    visitTime,
+    deletedAt: "2026-06-17T00:00:00.000Z"
+  };
+  const invalid = {
+    id: "invalid",
+    url: "",
+    visitTime
+  };
+
+  assert.deepEqual(
+    duplicateCleanupCandidates([sparse, rich, separateVisit, deletedDuplicate, invalid]).map((visit) => visit.id),
+    ["sparse"]
   );
 });
 

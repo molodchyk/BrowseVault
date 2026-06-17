@@ -360,6 +360,11 @@ code {
   gap: 5px;
 }
 
+.retention-row .hint {
+  align-self: center;
+  margin: 0;
+}
+
 .backup-actions,
 .bulk-actions {
   display: flex;

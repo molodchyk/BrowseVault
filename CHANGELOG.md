@@ -23,7 +23,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - History result rows expose exact ISO visit timestamps in their time metadata while preserving the selected visible date format.
 - Import preview and import support for BrowseVault JSON, CSV, TSV, Google Takeout Browser History, Google My Activity, and common competitor history exports.
 - Recent activity log for completed backup, export, import, cleanup, delete, restore, rule, and reset actions.
-- Domain blacklist and whitelist rules, selected-domain blacklisting, manual retention cleanup, and full local vault reset.
+- Domain blacklist and whitelist rules, selected-domain blacklisting, manual retention cleanup, duplicate cleanup, and full local vault reset.
 - Settings for system, light, and dark themes, accent color, date format, default result limit, backup reminder cadence, and backup filename prefix.
 
 ### Data Safety
@@ -36,6 +36,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Imports are staged behind a preview with row counts, duplicate estimates, existing/new visit counts, rule counts, and checksum health where available.
 - Imports merge with matching existing vault visits and preserve local vault deletion markers, Chrome-deletion markers, and original creation metadata.
 - Imports merge duplicate archive rows into unique restored records and report duplicate rows in the final import status and activity log.
+- Duplicate cleanup moves repeated active vault records with the same URL and visit time to undoable deletion while keeping the richest record.
 
 ### Trust And Permissions
 

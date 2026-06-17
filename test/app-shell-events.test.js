@@ -90,6 +90,8 @@ function createElements() {
     addWhitelist: fakeElement(),
     previewRetention: fakeElement(),
     cleanupRetention: fakeElement(),
+    previewDuplicates: fakeElement(),
+    cleanupDuplicates: fakeElement(),
     prefTheme: fakeElement(),
     prefAccent: fakeElement(),
     openNativeHistory: fakeElement()
@@ -128,6 +130,7 @@ function createHandlers(calls) {
     "openSelected",
     "openNativeChromeHistory",
     "previewRetentionCleanup",
+    "previewDuplicateCleanup",
     "resetVault",
     "runQuickSearch",
     "runSearchesNow",
@@ -138,6 +141,7 @@ function createHandlers(calls) {
     "selectVisible",
     "switchTab",
     "syncChromeHistory",
+    "cleanupDuplicates",
     "deleteSavedSearch",
     "undoVaultDelete"
   ];
@@ -302,6 +306,8 @@ test("bindAppEvents wires bulk and rules actions", () => {
   elements.addWhitelist.dispatch("click");
   elements.previewRetention.dispatch("click");
   elements.cleanupRetention.dispatch("click");
+  elements.previewDuplicates.dispatch("click");
+  elements.cleanupDuplicates.dispatch("click");
   elements.openNativeHistory.dispatch("click");
   elements.cancelImport.dispatch("click");
 
@@ -317,6 +323,8 @@ test("bindAppEvents wires bulk and rules actions", () => {
     ["addWhitelistRule"],
     ["previewRetentionCleanup"],
     ["cleanupByRetention"],
+    ["previewDuplicateCleanup"],
+    ["cleanupDuplicates"],
     ["openNativeChromeHistory"],
     ["cancelStagedImport"]
   ]);
