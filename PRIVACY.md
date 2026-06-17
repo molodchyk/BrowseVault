@@ -12,7 +12,7 @@ Current extension behavior:
 - Exports JSON, CSV, or HTML only when the user clicks an export button.
 - Adds a local SHA-256 checksum to JSON backups so later imports can warn about changed archive payloads.
 - Stores user-created domain blacklist, whitelist, and category rules locally.
-- Stores display preferences locally in Chrome extension storage.
+- Stores display preferences and archive metadata in Chrome local extension storage, not sync, session, or managed storage.
 - Does not automatically read page contents.
 - Does not take screenshots.
 - Does not make remote network requests.
@@ -25,7 +25,7 @@ Current permissions:
 - `bookmarks`: searches bookmark titles and URLs in Quick Open.
 - `downloads`: searches download URLs and filenames in Quick Open.
 - `sessions`: searches recently closed tabs in Quick Open.
-- `storage`: saves local extension state and archive metadata.
+- `storage`: saves local extension preferences, UI state, and archive metadata in Chrome local extension storage.
 - `tabs`: opens the BrowseVault page from the extension action.
 
 Future product direction:

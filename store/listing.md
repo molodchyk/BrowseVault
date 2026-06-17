@@ -58,3 +58,8 @@ Private local-first browser history search, backup, export, and preservation ext
 - privacy-first
 - export-history
 - manifest-v3
+
+## Store Footer
+
+Open source under the GPL-3.0 license:
+https://github.com/molodchyk/BrowseVault

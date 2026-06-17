@@ -15,3 +15,6 @@ Use Quick Open to search tabs, bookmarks, downloads, recently closed tabs, and c
 Control what gets saved and how it is organized with domain blacklist, whitelist, and manual category rules, selected-domain blacklisting, manual retention cleanup that keeps whitelisted domains, local display preferences for theme, contrast, text size, dates, and default result limits, plus explicit destructive actions with undo where the vault can support it.
 
 BrowseVault stores its archive locally in your browser profile. It does not include analytics, ads, tracking scripts, remote code, or automatic page-content capture. It also keeps Chrome's native history page available from Settings instead of silently replacing it.
+
+Open source under the GPL-3.0 license:
+https://github.com/molodchyk/BrowseVault

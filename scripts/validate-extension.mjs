@@ -6,6 +6,7 @@ const requiredFiles = [
   "manifest.json",
   "README.md",
   "CHANGELOG.md",
+  "LICENSE",
   "PRIVACY.md",
   "src/background.js",
   "src/storage.js",
@@ -22,6 +23,7 @@ const requiredFiles = [
   "store-listing/chrome-web-store/media/promo/.gitkeep",
   "store-listing/chrome-web-store/media/screenshots/.gitkeep",
   "docs/README.md",
+  "docs/reviewer-notes.md",
   "docs/chrome-web-store-additional-fields.md",
   "docs/chrome-web-store-category.md",
   "docs/chrome-web-store-privacy-form.md",
@@ -91,6 +93,7 @@ assert(manifest.commands?.["open-browsevault"], "Missing open-browsevault comman
 
 const packageJson = readJson("package.json");
 assert(packageJson.version === manifest.version, "package.json version must match manifest version.");
+assert(packageJson.license === "GPL-3.0-only", "package.json license must follow the extension playbook.");
 assert(packageJson.keywords.includes("browser-history"), "Missing browser-history keyword.");
 assert(packageJson.keywords.includes("history-backup"), "Missing history-backup keyword.");
 assert(packageJson.scripts.check.includes("check-folder-density.mjs"), "Check script must enforce folder density.");
@@ -106,6 +109,26 @@ assert(
   /No default Chrome history replacement/i.test(changelog),
   "Changelog must disclose default Chrome history replacement behavior."
 );
+
+const license = fs.readFileSync(path.join(root, "LICENSE"), "utf8");
+assert(/GNU GENERAL PUBLIC LICENSE/.test(license), "LICENSE must contain the GPLv3 text.");
+assert(/Version 3, 29 June 2007/.test(license), "LICENSE must be GPL version 3.");
+
+const readme = fs.readFileSync(path.join(root, "README.md"), "utf8");
+for (const expected of [
+  "PRIVACY.md",
+  "Open source under the GPL-3.0 license:",
+  "https://github.com/molodchyk/BrowseVault",
+  "Buy Me a Coffee",
+  "https://buymeacoffee.com/molodchyk",
+  "Patreon",
+  "https://www.patreon.com/OMolodchyk"
+]) {
+  assert(readme.includes(expected), `README missing playbook-required text: ${expected}`);
+}
+
+const privacy = fs.readFileSync(path.join(root, "PRIVACY.md"), "utf8");
+assert(privacy.includes("Chrome local extension storage"), "Privacy policy must name the storage area used for settings.");
 
 for (const size of [16, 32, 48, 128]) {
   const icon = fs.readFileSync(path.join(root, "assets", "icons", `icon${size}.png`));
@@ -130,6 +153,27 @@ assert(
   !/^\s*(Name|Summary|Short Description|Description|Detailed Description)\s*:/im.test(storePilotListing),
   "StorePilot listing/en.md should not include dashboard field labels."
 );
+assert(
+  storePilotListing.includes("Open source under the GPL-3.0 license:\nhttps://github.com/molodchyk/BrowseVault"),
+  "StorePilot listing must include the open-source footer."
+);
+
+const storeDraft = fs.readFileSync(path.join(root, "store", "listing.md"), "utf8");
+assert(
+  storeDraft.includes("Open source under the GPL-3.0 license:\nhttps://github.com/molodchyk/BrowseVault"),
+  "Human store listing draft must include the open-source footer."
+);
+
+const reviewerNotes = fs.readFileSync(path.join(root, "docs", "reviewer-notes.md"), "utf8");
+for (const expected of [
+  "cannot recover visits Chrome already deleted",
+  "does not replace Chrome's native history page by default",
+  "does not make network requests by default",
+  "`history`",
+  "`tabs`"
+]) {
+  assert(reviewerNotes.includes(expected), `Reviewer notes missing: ${expected}`);
+}
 
 const storePilotCategory = fs.readFileSync(path.join(root, "docs", "chrome-web-store-category.md"), "utf8");
 assert(/Selected category:\s*\S/i.test(storePilotCategory), "Chrome Web Store category document needs a selected category.");

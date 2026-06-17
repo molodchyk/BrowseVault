@@ -204,6 +204,24 @@ Backup and export filenames use the configured prefix and template. The default 
 
 Backup status is advanced only by the integrity-checked JSON archive export after its self-test verifies checksum, raw row count, and restorable row count. CSV and HTML files are portability/report exports and appear in recent activity without replacing the last restorable backup metadata.
 
+## Privacy And Permissions
+
+BrowseVault stores its archive locally in the user's browser profile and does not include analytics, ads, tracking scripts, remote code, or automatic page-content capture. Permission details and data-handling behavior are documented in [`PRIVACY.md`](PRIVACY.md).
+
+## Open Source And License
+
+Open source under the GPL-3.0 license:
+https://github.com/molodchyk/BrowseVault
+
+The full license text is in [`LICENSE`](LICENSE).
+
+## Support
+
+If this extension saves you time and you want to support its development:
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-FFDD00?logo=buymeacoffee&logoColor=000)](https://buymeacoffee.com/molodchyk)
+[![Patreon](https://img.shields.io/badge/Patreon-support-F96854?logo=patreon&logoColor=fff)](https://www.patreon.com/OMolodchyk)
+
 ## GitHub Description
 
 ```text

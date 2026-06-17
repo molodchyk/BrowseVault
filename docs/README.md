@@ -10,6 +10,7 @@ This folder captures the critical market research, user feedback, product direct
 - `implementation-notes.md` - Chrome extension constraints, architecture, storage/search/backup design, and testing risks.
 - `extension-modularization-playbook.md` - reusable extension modularization rules copied from Defense against Distractions.
 - `code-structure.md` - BrowseVault-specific ownership map and next split candidates.
+- `reviewer-notes.md` - browser-store reviewer notes for limitations, permissions, package behavior, and user-data handling.
 - `source-inventory.md` - index of raw source snapshots and how they map to the research notes.
 - `raw-sources/` - preserved Chrome Web Store listing/review text snapshots used as evidence.
 
