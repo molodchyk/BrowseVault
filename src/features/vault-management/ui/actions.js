@@ -12,12 +12,13 @@ import {
   restoreDeletedByIds,
   searchVisits
 } from "../../../storage.js";
-import { BACKGROUND_MESSAGE_TYPES } from "../../background-runtime/core/messages.js";
 import {
   uniqueDomainsForItems,
   uniqueUrlsForItems
 } from "../../history-results/core/results.js";
 import { sendRuntimeMessage } from "../../../platform/chrome/runtime.js";
+import { deleteChromeUrls } from "./chrome-delete.js";
+import { renderRuleList } from "./render-rules.js";
 
 const defaultServices = {
   addCategoryRule,
@@ -44,19 +45,6 @@ function retentionDaysFromInput(value) {
   return Number.isInteger(days) && days >= 1 ? days : null;
 }
 
-function ruleDisplayType(rule) {
-  if (rule?.type === "blacklist") {
-    return "Blacklist";
-  }
-  if (rule?.type === "whitelist") {
-    return "Whitelist";
-  }
-  if (rule?.type === "category") {
-    return "Category";
-  }
-  return "Rule";
-}
-
 export function createVaultManagementActions({
   appState,
   elements,
@@ -81,44 +69,11 @@ export function createVaultManagementActions({
 
   async function renderRules() {
     const { rules } = await deps.getRules();
-    elements.rulesList.replaceChildren();
-
-    if (!rules.length) {
-      const empty = deps.document.createElement("li");
-      empty.className = "rule-item";
-      empty.textContent = "No domain rules yet.";
-      elements.rulesList.append(empty);
-      return;
-    }
-
-    for (const rule of rules) {
-      const item = deps.document.createElement("li");
-      item.className = `rule-item rule-item-${rule.type}`;
-
-      const label = deps.document.createElement("span");
-      label.className = "rule-label";
-
-      const type = deps.document.createElement("span");
-      type.className = "rule-pill";
-      type.textContent = ruleDisplayType(rule);
-
-      const value = deps.document.createElement("span");
-      value.className = "rule-value";
-      value.textContent = rule.value;
-
-      label.append(type, value);
-      if (rule.type === "category" && rule.category) {
-        const category = deps.document.createElement("span");
-        category.className = "rule-detail";
-        category.textContent = rule.category;
-        label.append(category);
-      }
-
-      const remove = deps.document.createElement("button");
-      remove.className = "ghost";
-      remove.type = "button";
-      remove.textContent = "Remove";
-      remove.addEventListener("click", async () => {
+    renderRuleList({
+      document: deps.document,
+      rules,
+      rulesList: elements.rulesList,
+      onRemove: async (rule) => {
         await deps.removeRule(rule.id);
         await recordActivity({
           type: "rule",
@@ -131,11 +86,8 @@ export function createVaultManagementActions({
         await runSearch();
         setStatus(`Removed ${rule.value}`);
         notifyVaultChanged("rule-removed");
-      });
-
-      item.append(label, remove);
-      elements.rulesList.append(item);
-    }
+      }
+    });
   }
 
   async function blacklistSelectedDomains() {
@@ -265,15 +217,7 @@ export function createVaultManagementActions({
       return;
     }
 
-    const response = await deps.sendRuntimeMessage({
-      type: BACKGROUND_MESSAGE_TYPES.DELETE_CHROME_URLS,
-      urls
-    });
-
-    if (!response?.ok) {
-      throw new Error(response?.error || "Chrome deletion failed.");
-    }
-
+    await deleteChromeUrls(deps, urls);
     const deleted = await deps.markDeletedByIds(results.map((visit) => visit.id));
     await recordActivity({
       type: "delete",
@@ -301,15 +245,7 @@ export function createVaultManagementActions({
       return;
     }
 
-    const response = await deps.sendRuntimeMessage({
-      type: BACKGROUND_MESSAGE_TYPES.DELETE_CHROME_URLS,
-      urls
-    });
-
-    if (!response?.ok) {
-      throw new Error(response?.error || "Chrome deletion failed.");
-    }
-
+    await deleteChromeUrls(deps, urls);
     const deleted = await deps.markDeletedByIds(items.map((item) => item.id));
     await recordActivity({
       type: "delete",
