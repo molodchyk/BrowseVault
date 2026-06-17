@@ -67,7 +67,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - sticky result controls with incremental Load More, one-click Show All, and Top/Bottom jumps for large result sets;
 - undo for the last BrowseVault vault deletion;
 - optional URL-level deletion from Chrome history for selected records or the current filtered result set;
-- full local BrowseVault data reset without touching Chrome history;
+- visible `Reset Vault` action for full local BrowseVault data reset without touching Chrome history;
 - domain blacklist, whitelist, and manual category rules;
 - manual retention cleanup that previews old vault records and keeps whitelisted domains;
 - duplicate cleanup that previews repeated active vault records and moves extras to undoable deletion;

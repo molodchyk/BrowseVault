@@ -19,6 +19,17 @@ export function validatePlaybookCompliance(root, assert) {
   const readme = fs.readFileSync(path.join(root, "README.md"), "utf8");
   for (const expected of [
     "PRIVACY.md",
+    "BrowseVault: History Search & Backup",
+    "Search, back up, export, and preserve your browser history locally.",
+    "## Load Unpacked",
+    "chrome://extensions",
+    "Developer mode",
+    "Load unpacked",
+    "Select this repository folder",
+    "npm run validate",
+    "npm run check",
+    "npm test",
+    "npm run package",
     "Open source under the GPL-3.0 license:",
     "https://github.com/molodchyk/BrowseVault",
     "Buy Me a Coffee",
@@ -49,6 +60,7 @@ export function validatePlaybookCompliance(root, assert) {
   ]) {
     assert(readme.includes(expected), `README project structure missing current tree entry: ${expected}`);
   }
+  assert(readme.includes("Reset Vault"), "README must document the visible reset path before uninstall.");
 
   const privacy = fs.readFileSync(path.join(root, "PRIVACY.md"), "utf8");
   assert(privacy.includes("Chrome local extension storage"), "Privacy policy must name the storage area used for settings.");
@@ -128,6 +140,11 @@ export function validatePlaybookCompliance(root, assert) {
 
   const storeDraft = fs.readFileSync(path.join(root, "store", "listing.md"), "utf8");
   const storePilotListing = fs.readFileSync(path.join(root, "store-listing", "chrome-web-store", "listing", "en.md"), "utf8");
+  assert(!/^#/m.test(storePilotListing), "StorePilot listing body must not contain Markdown headings.");
+  assert(
+    !/^\s*(Name|Summary|Short Description|Description|Detailed Description|Category|Homepage URL|Support URL|Official URL|Mature content)\s*:/im.test(storePilotListing),
+    "StorePilot listing body must not contain dashboard-only field labels."
+  );
   for (const source of [
     { label: "Human store listing draft", text: storeDraft },
     { label: "StorePilot listing body", text: storePilotListing }
@@ -161,5 +178,18 @@ export function validatePlaybookCompliance(root, assert) {
     "Chrome history deletion uses Chrome's URL-level history API"
   ]) {
     assert(reviewerNotes.includes(expected), `Reviewer notes missing browser-store limit detail: ${expected}`);
+  }
+
+  const releaseQa = fs.readFileSync(path.join(root, "docs", "release", "release-qa.md"), "utf8");
+  for (const expected of [
+    "Load the unpacked extension in the target browser",
+    "npm run validate",
+    "npm run check",
+    "npm test",
+    "npm run package",
+    "npm run verify:package",
+    "git diff --check"
+  ]) {
+    assert(releaseQa.includes(expected), `Release QA missing browser-extension playbook check: ${expected}`);
   }
 }

@@ -31,6 +31,8 @@ Expected results:
 
 The browser-extension playbook requires loading the unpacked extension in the target browser before release.
 
+Required: Load the unpacked extension in the target browser before release.
+
 Current workstation note:
 
 - Automated Chrome/Playwright launches may be closed by local focus-blocking tools such as Cold Turkey or FocusMe before the extension service worker can be inspected.
