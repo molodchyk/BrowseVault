@@ -1,0 +1,250 @@
+.rule-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(140px, 0.55fr) auto;
+  align-items: end;
+  gap: 10px;
+}
+
+.rule-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.rule-actions button {
+  flex: 0 0 auto;
+}
+
+.retention-cleanup {
+  display: grid;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.retention-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto auto;
+  align-items: end;
+  gap: 10px;
+}
+
+.retention-row label {
+  display: grid;
+  gap: 5px;
+}
+
+.retention-row .hint {
+  align-self: center;
+  margin: 0;
+}
+
+.retention-row button {
+  justify-self: start;
+}
+
+.backup-actions,
+.bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.backup-actions {
+  justify-content: flex-start;
+}
+
+.bulk-more {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.bulk-more[open] {
+  flex-basis: 100%;
+}
+
+.bulk-more summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--control-text);
+  cursor: pointer;
+  font-weight: 750;
+  list-style: none;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.bulk-more summary:hover {
+  background: var(--surface-alt);
+}
+
+.bulk-more summary::-webkit-details-marker {
+  display: none;
+}
+
+.bulk-menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+.backup-status {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-alt);
+  padding: 12px;
+}
+
+.backup-health {
+  color: var(--accent);
+  font-weight: 850;
+}
+
+.backup-health.is-warning {
+  color: var(--danger);
+}
+
+.activity-log {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.activity-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: baseline;
+  min-width: 0;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+.activity-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.activity-item strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.activity-item span {
+  color: var(--muted);
+  font-size: var(--font-tiny);
+  white-space: nowrap;
+}
+
+.activity-item.is-empty {
+  display: block;
+  color: var(--muted);
+}
+
+.import-health {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: var(--font-small);
+  font-weight: 800;
+  padding: 9px 11px;
+}
+
+.import-health.is-ok {
+  border-color: color-mix(in srgb, var(--accent), var(--border) 45%);
+  color: var(--accent);
+}
+
+.import-health.is-warning {
+  border-color: color-mix(in srgb, var(--danger), var(--border) 35%);
+  color: var(--danger);
+}
+
+.backup-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.backup-meta div {
+  min-width: 0;
+}
+
+.backup-meta dt {
+  color: var(--muted);
+  font-size: var(--font-tiny);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.backup-meta dd {
+  margin: 2px 0 0;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.trust-list,
+.limit-list {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+  margin: 0;
+}
+
+.trust-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 18px;
+}
+
+.limit-list {
+  padding: 0;
+  list-style: none;
+}
+
+.trust-list div,
+.limit-list li {
+  min-width: 0;
+  border-top: 1px solid var(--border);
+  padding: 10px 0;
+}
+
+.trust-list div:nth-child(-n + 2),
+.limit-list li:first-child {
+  border-top: 0;
+}
+
+.trust-list dt,
+.limit-list strong {
+  color: var(--text);
+  font-size: var(--font-small);
+  font-weight: 850;
+}
+
+.trust-list dd,
+.limit-list span {
+  display: block;
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: var(--font-small);
+  overflow-wrap: anywhere;
+}
+

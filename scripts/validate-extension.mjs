@@ -119,12 +119,14 @@ for (const expected of [
   "knownDebtCaps",
   "soft target",
   "hard max",
-  "src/app.css",
   "src/storage.js",
   "split follow-up expected"
 ]) {
   assert(fileSizeScript.includes(expected), `File-size audit missing modularization guardrail: ${expected}`);
 }
+
+const importCheckScript = fs.readFileSync(path.join(root, "scripts", "check-imports.mjs"), "utf8");
+for (const expected of ["cssImportPattern", "stylesheet link", "stylesheet import", "stylesheets"]) assert(importCheckScript.includes(expected), `Import audit missing stylesheet guardrail: ${expected}`);
 
 const localeCheckScript = fs.readFileSync(path.join(root, "scripts", "check-locales.mjs"), "utf8");
 for (const expected of ["manifest.default_locale", "appShellLocalization", "backgroundRuntimeLocalization", "UI bindings", "missing locale key", "unused locale key", "__MSG_*__ references are only supported in manifest.json", "Locale coverage checked"]) {

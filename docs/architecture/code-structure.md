@@ -4,7 +4,8 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 
 ## Current Ownership
 
-- `src/app.html`, `src/app.css`, and `src/app.js` own the extension page runtime shell while the UI is being split.
+- `src/app.html`, `src/app.css`, and `src/app.js` own the extension page runtime shell; `src/app.css` is now a thin stylesheet entrypoint.
+- `src/styles/` owns surface-level extension page styles split into tokens, layout, backup/rules/trust, results, and responsive layers.
 - `src/background.js` owns MV3 service worker listener wiring, extension-page opening, and startup/install metadata.
 - `src/storage.js` owns IndexedDB vault records, backup metadata, domain/category rules, and vault mutations.
 - `src/browser-memory.js` owns read-only search over tabs, bookmarks, downloads, and recently closed sessions.
@@ -32,7 +33,6 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 ## Next Split Candidates
 
 - Move remaining app composition/bootstrap glue out of `src/app.js` only when a clearer owner emerges.
-- Split `src/app.css` into feature-owned or surface-owned styles; it is capped as current file-size hard-limit debt by `scripts/check-file-sizes.mjs`.
 - Split `src/storage.js` into feature storage models and a thinner IndexedDB platform/storage layer; it is capped as current file-size hard-limit debt by `scripts/check-file-sizes.mjs`.
 
 ## Rules For Future Edits
@@ -42,5 +42,5 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - Keep compatibility barrels export-only.
 - Add or update focused tests when pure logic moves.
 - Keep test files grouped by feature or responsibility rather than adding new root-level `test/*.test.js` files.
-- Run `npm run check` after structure changes; it fails when static imports, extension-page module script paths, locale references, manifest-owned paths, or privacy/permission disclosures break, when known file-size debt grows beyond its cap, or when runtime/support/docs folders exceed 12 files or feature/test-feature folders exceed 15 files.
+- Run `npm run check` after structure changes; it fails when static JavaScript imports, stylesheet imports, extension-page module script or stylesheet paths, locale references, manifest-owned paths, or privacy/permission disclosures break, when known file-size debt grows beyond its cap, or when runtime/support/docs folders exceed 12 files or feature/test-feature folders exceed 15 files.
 - Update this file when ownership changes.

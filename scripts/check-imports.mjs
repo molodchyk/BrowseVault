@@ -3,9 +3,12 @@ import path from "node:path";
 
 const root = process.cwd();
 const roots = ["src", "scripts", "test"];
-const allowedLocalExtensions = new Set([".js", ".mjs"]);
+const allowedJavaScriptExtensions = new Set([".js", ".mjs"]);
+const allowedStylesheetExtensions = new Set([".css"]);
 const importPattern = /(?:^|[;\n\r])\s*import\s+(?:[^'"]*?\s+from\s*)?["']([^"']+)["']/gm;
 const exportPattern = /(?:^|[;\n\r])\s*export\s+[^'"]*?\s+from\s*["']([^"']+)["']/gm;
+const cssImportPattern = /@import\s+(?:url\(\s*)?["']([^"']+)["']\s*\)?/gim;
+const linkTagPattern = /<link\b[^>]*>/gi;
 const scriptTagPattern = /<script\b[^>]*>/gi;
 
 function collectFiles(entry, extensions) {
@@ -34,10 +37,24 @@ function isRemoteSpecifier(specifier) {
   return /^[a-z][a-z0-9+.-]*:\/\//i.test(specifier);
 }
 
-function resolveLocalSpecifier(fromFile, specifier) {
+function normalizeStylesheetSpecifier(specifier) {
+  if (
+    specifier.startsWith("#")
+    || specifier.startsWith("/")
+    || isRelativeSpecifier(specifier)
+    || isRemoteSpecifier(specifier)
+  ) {
+    return specifier;
+  }
+
+  return `./${specifier}`;
+}
+
+function resolveLocalSpecifier(fromFile, specifier, allowedExtensions, kind) {
   const [specifierPath] = specifier.split(/[?#]/, 1);
-  if (!allowedLocalExtensions.has(path.extname(specifierPath))) {
-    fail(`${fromFile}: relative import must include a .js or .mjs extension: ${specifier}`);
+  const allowed = [...allowedExtensions].join(" or ");
+  if (!allowedExtensions.has(path.extname(specifierPath))) {
+    fail(`${fromFile}: relative ${kind} must include a ${allowed} extension: ${specifier}`);
     return;
   }
 
@@ -49,26 +66,29 @@ function resolveLocalSpecifier(fromFile, specifier) {
   }
 
   if (!fs.existsSync(resolved) || !fs.statSync(resolved).isFile()) {
-    fail(`${fromFile}: unresolved import: ${specifier}`);
+    fail(`${fromFile}: unresolved ${kind}: ${specifier}`);
   }
 }
 
-function checkSpecifier(fromFile, specifier) {
+function checkSpecifier(fromFile, specifier, allowedExtensions = allowedJavaScriptExtensions, kind = "import") {
   if (specifier.startsWith("node:")) {
+    if (kind !== "import") {
+      fail(`${fromFile}: node: specifiers are not valid ${kind} paths: ${specifier}`);
+    }
     return;
   }
 
   if (isRemoteSpecifier(specifier)) {
-    fail(`${fromFile}: remote imports are not allowed: ${specifier}`);
+    fail(`${fromFile}: remote ${kind}s are not allowed: ${specifier}`);
     return;
   }
 
   if (!isRelativeSpecifier(specifier)) {
-    fail(`${fromFile}: bare imports are not allowed in this extension repo: ${specifier}`);
+    fail(`${fromFile}: bare ${kind}s are not allowed in this extension repo: ${specifier}`);
     return;
   }
 
-  resolveLocalSpecifier(fromFile, specifier);
+  resolveLocalSpecifier(fromFile, specifier, allowedExtensions, kind);
 }
 
 function collectStaticSpecifiers(source) {
@@ -89,6 +109,14 @@ function checkJavaScriptFile(file) {
   }
 }
 
+function checkStylesheetFile(file) {
+  const source = fs.readFileSync(path.join(root, file), "utf8");
+  cssImportPattern.lastIndex = 0;
+  for (const match of source.matchAll(cssImportPattern)) {
+    checkSpecifier(file, normalizeStylesheetSpecifier(match[1]), allowedStylesheetExtensions, "stylesheet import");
+  }
+}
+
 function checkHtmlFile(file) {
   const source = fs.readFileSync(path.join(root, file), "utf8");
   for (const match of source.matchAll(scriptTagPattern)) {
@@ -102,16 +130,34 @@ function checkHtmlFile(file) {
       checkSpecifier(file, srcMatch[1]);
     }
   }
+
+  for (const match of source.matchAll(linkTagPattern)) {
+    const tag = match[0];
+    if (!/\brel\s*=\s*["'][^"']*\bstylesheet\b[^"']*["']/i.test(tag)) {
+      continue;
+    }
+
+    const hrefMatch = tag.match(/\bhref\s*=\s*["']([^"']+)["']/i);
+    if (hrefMatch) {
+      checkSpecifier(file, normalizeStylesheetSpecifier(hrefMatch[1]), allowedStylesheetExtensions, "stylesheet link");
+    }
+  }
 }
 
 const scriptFiles = roots
   .flatMap((entry) => collectFiles(entry, new Set([".js", ".mjs"])))
+  .sort((left, right) => left.localeCompare(right));
+const stylesheetFiles = collectFiles("src", new Set([".css"]))
   .sort((left, right) => left.localeCompare(right));
 const htmlFiles = collectFiles("src", new Set([".html"]))
   .sort((left, right) => left.localeCompare(right));
 
 for (const file of scriptFiles) {
   checkJavaScriptFile(file);
+}
+
+for (const file of stylesheetFiles) {
+  checkStylesheetFile(file);
 }
 
 for (const file of htmlFiles) {
@@ -122,4 +168,6 @@ if (process.exitCode) {
   process.exit(process.exitCode);
 }
 
-console.log(`Static imports checked ${scriptFiles.length} scripts and ${htmlFiles.length} HTML files.`);
+console.log(
+  `Static imports checked ${scriptFiles.length} scripts, ${stylesheetFiles.length} stylesheets, and ${htmlFiles.length} HTML files.`
+);

@@ -7,13 +7,6 @@ const escalationLines = 600;
 const defaultHardLines = 900;
 const knownDebtCaps = new Map([
   [
-    "src/app.css",
-    {
-      maxLines: 1080,
-      reason: "entry stylesheet still being split into feature-owned styles"
-    }
-  ],
-  [
     "src/storage.js",
     {
       maxLines: 1051,

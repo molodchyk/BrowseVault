@@ -1,0 +1,184 @@
+@media (max-width: 860px) {
+  .header {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .stats-grid,
+  .preview-grid,
+  .filters,
+  .settings-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .section-heading,
+  .bulkbar,
+  .summary {
+    display: grid;
+  }
+
+  .section-heading > button,
+  .retention-row button {
+    justify-self: start;
+    width: auto;
+  }
+
+  .rule-row {
+    grid-template-columns: 1fr;
+  }
+
+  .rule-actions {
+    grid-column: 1 / -1;
+  }
+
+  .bulkbar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .backup-actions,
+  .bulk-actions {
+    justify-content: flex-start;
+  }
+
+  .bulk-menu {
+    justify-content: flex-start;
+  }
+
+  .backup-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .trust-list {
+    grid-template-columns: 1fr;
+  }
+
+  .trust-list div:nth-child(-n + 2) {
+    border-top: 1px solid var(--border);
+  }
+
+  .trust-list div:first-child {
+    border-top: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .shell {
+    padding: 12px;
+  }
+
+  .search-line {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .saved-search-line {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .saved-search-line select {
+    grid-column: 1 / -1;
+  }
+
+  .query-wrap {
+    grid-column: 1 / -1;
+  }
+
+  .rule-row,
+  .retention-row,
+  .filters,
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .backup-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-item {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+
+  .activity-item span {
+    white-space: normal;
+  }
+
+  .stat {
+    padding: 8px 10px;
+  }
+
+  .stat span {
+    font-size: calc(var(--font-stat) - 3px);
+  }
+
+  .stat p {
+    font-size: var(--font-tiny);
+  }
+
+  .bulk-actions {
+    gap: 6px;
+  }
+
+  .search-line button,
+  .saved-search-line button {
+    width: 100%;
+  }
+
+  .backup-actions button,
+  .backup-actions .file-button {
+    width: auto;
+  }
+
+  .quick-result {
+    grid-template-columns: 1fr;
+  }
+
+  .source-pill,
+  .quick-actions {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 480px) {
+  .bulk-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .bulk-actions button {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .bulk-more summary {
+    width: 100%;
+  }
+
+  .bulk-more[open] {
+    grid-column: 1 / -1;
+  }
+
+  .bulk-menu {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bulk-menu button {
+    min-width: 0;
+    width: 100%;
+  }
+
+  #delete-vault,
+  #delete-chrome,
+  #delete-results,
+  #delete-results-chrome,
+  #open-selected,
+  #blacklist-selected {
+    grid-column: 1 / -1;
+  }
+}
