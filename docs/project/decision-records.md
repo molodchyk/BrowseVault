@@ -38,6 +38,12 @@ References:
 
 ## ADR-006: Do Not Automate Against Live Chrome Profiles
 
-Automated browser QA must not launch or attach to the active Chrome profile, including the real Chrome user-data directory or named folders such as `Default`, `Profile`, or `Profile 1`.
+Automated browser QA must not launch or attach to the active Chrome profile, including the real Chrome user-data directory, named folders such as `Default`, `Profile`, or `Profile 1`, or named personal profiles such as `Your Chrome`.
 
 Reason: profile-level automation can collide with focus-blocking tools, active sessions, and Chrome's profile registry. BrowseVault release checks should stay repo-only unless a browser run is explicitly confirmed, and browser automation must use a disposable temporary user-data directory.
+
+## ADR-007: Do Not Enforce One Global BrowseVault Tab
+
+Toolbar and keyboard-command opening reuses BrowseVault only when the current active tab is already the BrowseVault app. Otherwise, it creates a new BrowseVault tab.
+
+Reason: users complained about incumbents with one-tab limitations. BrowseVault should not steal focus from an existing inactive app tab or make users hunt for a previous BrowseVault tab before starting another history task. Cross-tab vault invalidation keeps open BrowseVault tabs refreshed after deletes, imports, cleanup, reset, rules, manual sync, live capture, and native history removals.

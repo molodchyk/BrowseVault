@@ -156,7 +156,6 @@ for (const expected of [
 ]) {
   assert(privacyPermissionScript.includes(expected), `Privacy/permission audit missing guardrail: ${expected}`);
 }
-
 const changelog = fs.readFileSync(path.join(root, "CHANGELOG.md"), "utf8");
 assert(changelog.includes(`## ${manifest.version} -`), "Changelog must include the current manifest version.");
 for (const topic of ["backup", "delete", "Chrome history", "permissions", "network"]) {
@@ -232,6 +231,7 @@ for (const expected of [
   "does not replace Chrome's native history page by default",
   "does not make network requests by default",
   "does not request `file://` host access",
+  "instead of enforcing one global app tab",
   "`history`",
   "`tabs`"
 ]) {
@@ -320,6 +320,7 @@ for (const expected of [
   "Do Not Replace Chrome History By Default",
   "Separate Vault Deletion From Chrome History Deletion",
   "Do Not Automate Against Live Chrome Profiles",
+  "Do Not Enforce One Global BrowseVault Tab",
   "StorePilot Project Reference"
 ]) {
   assert(decisionRecords.includes(expected), `Decision records missing: ${expected}`);

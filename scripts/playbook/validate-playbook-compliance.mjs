@@ -85,6 +85,7 @@ export function validatePlaybookCompliance(root, assert) {
   const qaReadme = fs.readFileSync(path.join(root, "scripts", "qa", "README.md"), "utf8");
   for (const expected of [
     "Do not add scripts here that launch, attach to, or mutate an active Chrome profile.",
+    "Your Chrome",
     "manual",
     "disposable temporary browser profile",
     "npm run validate",

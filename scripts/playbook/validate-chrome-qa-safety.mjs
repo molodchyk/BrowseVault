@@ -8,6 +8,7 @@ const forbiddenAutomationPatterns = [
   /chrome\.exe/i,
   /Google[\\/]+Chrome[\\/]+User Data/i,
   /AppData[\\/]+Local[\\/]+Google[\\/]+Chrome/i,
+  /\bYour Chrome\b/i,
   /%LOCALAPPDATA%/i,
   /\$env:LOCALAPPDATA/i
 ];
@@ -39,6 +40,7 @@ export function validateChromeQaSafety(root, packageJson, assert) {
   for (const expected of [
     "Never use the active Chrome profile for automated QA.",
     "Do not use `%LOCALAPPDATA%\\\\Google\\\\Chrome\\\\User Data`, `Default`, `Profile`, or `Profile 1` as an automated QA profile.",
+    "Do not create or target named personal Chrome profiles such as `Your Chrome` for automated QA.",
     "Automated browser QA must use a disposable temporary user-data directory, or stay manual.",
     "Do not add npm scripts that launch Chrome, Playwright, or a remote-debugging session against a real user profile.",
     "Validation scans package scripts, repository scripts, and tests for live Chrome profile automation patterns."

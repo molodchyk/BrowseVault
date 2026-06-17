@@ -70,3 +70,31 @@ test("openExtensionPage creates the app tab when none is open", async () => {
     ["createTab", { url: "chrome-extension://id/src/app.html" }]
   ]);
 });
+
+test("openExtensionPage does not enforce one global BrowseVault tab", async () => {
+  const calls = [];
+  const opener = createExtensionPageOpener({
+    activateTab: async (tabId) => calls.push(["activateTab", tabId]),
+    createTab: async (createProperties) => {
+      calls.push(["createTab", createProperties]);
+      return { id: 100 };
+    },
+    focusWindow: async (windowId) => calls.push(["focusWindow", windowId]),
+    queryTabs: async (queryInfo) => {
+      calls.push(["queryTabs", queryInfo]);
+      assert.deepEqual(queryInfo, { active: true, currentWindow: true });
+      return [{ id: 4, windowId: 7, url: "https://example.com/" }];
+    }
+  }, {
+    appUrl: "chrome-extension://id/src/app.html"
+  });
+
+  assert.deepEqual(await opener.openExtensionPage(), {
+    reused: false,
+    tabId: 100
+  });
+  assert.deepEqual(calls, [
+    ["queryTabs", { active: true, currentWindow: true }],
+    ["createTab", { url: "chrome-extension://id/src/app.html" }]
+  ]);
+});

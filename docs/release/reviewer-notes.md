@@ -15,6 +15,7 @@ These notes summarize behavior that browser-store reviewers should not need to i
 
 - BrowseVault does not replace Chrome's native history page by default.
 - The app opens from the toolbar action or keyboard command.
+- Opening BrowseVault reuses the tab only when the current active tab is already BrowseVault; otherwise it creates a new BrowseVault tab instead of enforcing one global app tab.
 - Settings includes an explicit link to open Chrome's native history page.
 - Deleting records from the BrowseVault vault is separate from deleting URLs from Chrome history.
 - Chrome history deletion uses Chrome's URL-level history API, so deleting a URL can affect all native Chrome visits for that URL.
