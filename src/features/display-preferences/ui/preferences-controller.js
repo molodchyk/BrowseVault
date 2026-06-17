@@ -1,6 +1,7 @@
 import {
   DEFAULT_PREFERENCES,
   PREFERENCES_KEY,
+  archiveHealthDetails,
   backupStatusDetails,
   clampResultLimit,
   formatShortDate,
@@ -13,6 +14,7 @@ import {
 } from "../../../platform/chrome/storage.js";
 
 const defaultServices = {
+  archiveHealthDetails,
   backupStatusDetails,
   clampResultLimit,
   formatShortDate,
@@ -61,6 +63,19 @@ export function createDisplayPreferencesController({
     elements.backupChecksum.textContent = status.checksumText;
   }
 
+  function renderArchiveHealth(meta) {
+    const status = deps.archiveHealthDetails(meta, {
+      dateFormat: appState.preferences.dateFormat
+    });
+
+    elements.archiveHealth.textContent = status.healthText;
+    elements.archiveHealth.classList.toggle("is-warning", status.isWarning);
+    elements.archiveHealth.classList.toggle("is-ok", status.isOk);
+    elements.archiveStartup.textContent = status.startupText;
+    elements.archiveSync.textContent = status.syncText;
+    elements.archiveCapture.textContent = status.captureText;
+  }
+
   function applyPreferences() {
     root.dataset.theme = deps.themeDatasetValue(appState.preferences.theme);
     root.dataset.accent = appState.preferences.accent;
@@ -92,6 +107,7 @@ export function createDisplayPreferencesController({
       ? deps.formatShortDate(Date.parse(stats.meta.lastBackup.exportedAt), appState.preferences.dateFormat)
       : "Never";
     renderBackupStatus(stats.meta.lastBackup);
+    renderArchiveHealth(stats.meta);
   }
 
   async function savePreferences() {
@@ -119,6 +135,7 @@ export function createDisplayPreferencesController({
     loadPreferences,
     quickResultLimit,
     refreshStats,
+    renderArchiveHealth,
     renderBackupStatus,
     requestedResultLimit,
     savePreferences

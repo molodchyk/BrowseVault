@@ -162,7 +162,9 @@ test("bootstrapChromeHistory searches, syncs expanded visits, and stores sync me
 
 test("recordVisitedItem archives only allowed live visits", async () => {
   const { calls, deps } = createDeps();
-  const sync = createChromeHistorySync(deps);
+  const sync = createChromeHistorySync(deps, {
+    now: () => "2026-06-16T12:00:00.000Z"
+  });
 
   assert.equal(await sync.recordVisitedItem({ url: "https://blocked.example/page" }), false);
   assert.equal(await sync.recordVisitedItem({ url: "https://useful.example/page", title: "Useful" }), true);
@@ -173,6 +175,15 @@ test("recordVisitedItem archives only allowed live visits", async () => {
       "recordChromeVisit",
       { url: "https://useful.example/page", title: "Useful" },
       { source: "chrome-history-live" }
+    ],
+    [
+      "setMeta",
+      "lastLiveCapture",
+      {
+        capturedAt: "2026-06-16T12:00:00.000Z",
+        title: "Useful",
+        url: "https://useful.example/page"
+      }
     ]
   ]);
 });

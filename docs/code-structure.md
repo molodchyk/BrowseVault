@@ -13,7 +13,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `src/features/backup-import/` owns archive import/export actions, export filename rules, file parsing, integrity metadata, import-preview display state, and restore-flow rendering.
 - `src/features/background-runtime/` owns background message routing, payload validation, privileged action dispatch, Chrome history bootstrap, archive filtering, live-visit capture, native Chrome history removal reconciliation, and extension-page actions that coordinate with background runtime messages.
 - `src/features/browser-memory/` owns extension-page quick-open rendering and actions for tabs, bookmarks, downloads, and recently closed sessions.
-- `src/features/display-preferences/` owns preference normalization, result-limit clamping, date/count formatting, backup reminder cadence, backup status summaries, settings persistence orchestration, and extension-page preference/stat rendering.
+- `src/features/display-preferences/` owns preference normalization, result-limit clamping, date/count formatting, archive health summaries, backup reminder cadence, backup status summaries, settings persistence orchestration, and extension-page preference/stat rendering.
 - `src/features/history-export/core/export-format.js` owns pure CSV and HTML export formatting.
 - `src/features/history-results/core/` owns pure result selection, URL/domain extraction, grouping, count labels, load-more state, and search form query composition.
 - `src/features/history-results/ui/` owns search form field state, local history search/load-more orchestration, selected-record lookup, history result DOM rendering, rendering orchestration, search-hit highlighting, and selected-result bulk actions.

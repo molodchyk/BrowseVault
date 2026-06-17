@@ -186,6 +186,42 @@ export function formatBackupSelfTest(selfTest) {
   return "Failed";
 }
 
+function timestampFromIso(value) {
+  const timestamp = Date.parse(value || "");
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function domainFromUrl(url) {
+  try {
+    return new URL(url).hostname.toLowerCase().replace(/^www\./, "");
+  } catch {
+    return "";
+  }
+}
+
+export function archiveHealthDetails(meta = {}, options = {}) {
+  const dateFormat = options.dateFormat || DEFAULT_PREFERENCES.dateFormat;
+  const sync = meta.lastChromeSync || null;
+  const syncTimestamp = timestampFromIso(sync?.syncedAt);
+  const startupTimestamp = timestampFromIso(meta.lastStartedAt) || timestampFromIso(meta.installedAt);
+  const capture = meta.lastLiveCapture || null;
+  const captureTimestamp = timestampFromIso(capture?.capturedAt);
+  const hasSync = Boolean(syncTimestamp);
+
+  return {
+    healthText: hasSync ? "Archive recording ready" : "Archive sync not run yet",
+    isWarning: !hasSync,
+    isOk: hasSync,
+    startupText: startupTimestamp ? formatDate(startupTimestamp, dateFormat) : "Not recorded",
+    syncText: hasSync
+      ? `${formatDate(syncTimestamp, dateFormat)} · ${formatCount(sync.stored)} stored`
+      : "Not synced yet",
+    captureText: captureTimestamp
+      ? `${formatDate(captureTimestamp, dateFormat)}${domainFromUrl(capture.url) ? ` · ${domainFromUrl(capture.url)}` : ""}`
+      : "Waiting for next visit"
+  };
+}
+
 export function backupTimestamp(backup) {
   if (!backup?.exportedAt) {
     return 0;

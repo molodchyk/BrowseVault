@@ -60,6 +60,10 @@ const singularSelectors = [
   "backup-size",
   "backup-self-test",
   "backup-checksum",
+  "archive-health",
+  "archive-startup",
+  "archive-sync",
+  "archive-capture",
   "rule-domain",
   "add-blacklist",
   "add-whitelist",
@@ -106,6 +110,7 @@ test("collectAppElements queries the app shell selectors", () => {
   assert.equal(elements.backupNext.selector, "#backup-next");
   assert.equal(elements.backupSize.selector, "#backup-size");
   assert.equal(elements.backupSelfTest.selector, "#backup-self-test");
+  assert.equal(elements.archiveHealth.selector, "#archive-health");
   assert.equal(elements.savePreferences.selector, "#save-preferences");
   assert.equal(elements.tabs.length, 2);
   assert.equal(elements.panels.length, 2);

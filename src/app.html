@@ -162,6 +162,23 @@
               </div>
             </dl>
           </section>
+          <section class="backup-status archive-status" aria-label="Archive recorder health">
+            <div id="archive-health" class="backup-health" aria-live="polite">Archive sync not run yet</div>
+            <dl class="backup-meta">
+              <div>
+                <dt>Startup</dt>
+                <dd id="archive-startup">Not recorded</dd>
+              </div>
+              <div>
+                <dt>Chrome sync</dt>
+                <dd id="archive-sync">Not synced yet</dd>
+              </div>
+              <div>
+                <dt>Live capture</dt>
+                <dd id="archive-capture">Waiting for next visit</dd>
+              </div>
+            </dl>
+          </section>
           <div class="backup-actions">
             <button id="export-json" type="button">Export JSON</button>
             <button id="export-csv" type="button">Export CSV</button>

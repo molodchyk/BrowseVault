@@ -51,10 +51,18 @@ function createHarness({
   const statusMessages = [];
   const refreshAfterSaveCalls = [];
   const backupHealthClassList = classListHarness();
+  const archiveHealthClassList = classListHarness();
   const appState = {
     preferences: { ...preferences }
   };
   const elements = {
+    archiveCapture: output(),
+    archiveHealth: {
+      textContent: "",
+      classList: archiveHealthClassList
+    },
+    archiveStartup: output(),
+    archiveSync: output(),
     backupChecksum: output(),
     backupFormat: output(),
     backupHealth: {
@@ -98,7 +106,7 @@ function createHarness({
     setStatus: (message) => statusMessages.push(message)
   });
 
-  return { appState, backupHealthClassList, controller, elements, refreshAfterSaveCalls, root, statusMessages, storageWrites };
+  return { appState, archiveHealthClassList, backupHealthClassList, controller, elements, refreshAfterSaveCalls, root, statusMessages, storageWrites };
 }
 
 test("loadPreferences normalizes stored preferences and applies them to UI state", async () => {
@@ -165,7 +173,7 @@ test("savePreferences persists normalized values, refreshes stats, reruns search
 
 test("refreshStats renders stat cards and backup health details", async () => {
   const exportedAt = "2026-06-01T00:00:00.000Z";
-  const { backupHealthClassList, controller, elements } = createHarness({
+  const { archiveHealthClassList, backupHealthClassList, controller, elements } = createHarness({
     preferences: {
       theme: "system",
       accent: "teal",
@@ -178,6 +186,15 @@ test("refreshStats renders stat cards and backup health details", async () => {
       domains: 7,
       newestVisitTime: Date.parse("2026-06-16T12:00:00.000Z"),
       meta: {
+        lastChromeSync: {
+          stored: 41,
+          syncedAt: "2026-06-16T11:00:00.000Z"
+        },
+        lastLiveCapture: {
+          capturedAt: "2026-06-16T12:05:00.000Z",
+          url: "https://docs.example.com/page"
+        },
+        lastStartedAt: "2026-06-16T10:00:00.000Z",
         lastBackup: {
           exportedAt,
           format: "json",
@@ -208,6 +225,12 @@ test("refreshStats renders stat cards and backup health details", async () => {
   assert.equal(elements.backupChecksum.textContent, "1234567890ab...90abcdef");
   assert.equal(backupHealthClassList.classes.has("is-ok"), true);
   assert.equal(backupHealthClassList.classes.has("is-warning"), false);
+  assert.equal(elements.archiveHealth.textContent, "Archive recording ready");
+  assert.match(elements.archiveStartup.textContent, /^2026-06-16 \d{2}:00$/);
+  assert.match(elements.archiveSync.textContent, /^2026-06-16 \d{2}:00 · 41 stored$/);
+  assert.match(elements.archiveCapture.textContent, /^2026-06-16 \d{2}:05 · docs\.example\.com$/);
+  assert.equal(archiveHealthClassList.classes.has("is-ok"), true);
+  assert.equal(archiveHealthClassList.classes.has("is-warning"), false);
 });
 
 test("requested limits respect current field values and quick-open cap", () => {

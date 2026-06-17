@@ -115,6 +115,11 @@ export function createChromeHistorySync(deps, options = {}) {
     await deps.recordChromeVisit(item, {
       source: "chrome-history-live"
     });
+    await deps.setMeta("lastLiveCapture", {
+      capturedAt: now(),
+      title: item.title || "",
+      url: item.url
+    });
     return true;
   }
 

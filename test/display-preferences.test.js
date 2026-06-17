@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  archiveHealthDetails,
   backupStatusDetails,
   clampBackupReminderDays,
   clampResultLimit,
@@ -76,6 +77,43 @@ test("formatBackupSelfTest summarizes passed, failed, and missing checks", () =>
 test("themeDatasetValue leaves system theme to CSS media queries", () => {
   assert.equal(themeDatasetValue("system"), "");
   assert.equal(themeDatasetValue("dark"), "dark");
+});
+
+test("archiveHealthDetails summarizes startup, sync, and live capture metadata", () => {
+  assert.deepEqual(
+    archiveHealthDetails({}, { dateFormat: "iso" }),
+    {
+      healthText: "Archive sync not run yet",
+      isWarning: true,
+      isOk: false,
+      startupText: "Not recorded",
+      syncText: "Not synced yet",
+      captureText: "Waiting for next visit"
+    }
+  );
+
+  const status = archiveHealthDetails(
+    {
+      lastStartedAt: "2026-06-16T08:00:00.000Z",
+      lastChromeSync: {
+        stored: 42,
+        syncedAt: "2026-06-16T09:00:00.000Z"
+      },
+      lastLiveCapture: {
+        capturedAt: "2026-06-16T10:00:00.000Z",
+        url: "https://www.example.com/page"
+      }
+    },
+    {
+      dateFormat: "iso"
+    }
+  );
+
+  assert.equal(status.healthText, "Archive recording ready");
+  assert.equal(status.isOk, true);
+  assert.match(status.startupText, /^2026-06-16 \d{2}:00$/);
+  assert.match(status.syncText, /^2026-06-16 \d{2}:00 · 42 stored$/);
+  assert.match(status.captureText, /^2026-06-16 \d{2}:00 · example\.com$/);
 });
 
 test("backupStatusDetails summarizes missing, fresh, and stale backups", () => {
