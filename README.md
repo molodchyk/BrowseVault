@@ -35,7 +35,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - keyboard-first search with autofocus, global query focus, Enter search, and debounced live refresh;
 - local-date grouped vault results for easier timeline scanning;
 - Quick Open search across open tabs, bookmarks, downloads, and recently closed tabs, with source-aware switch/open/restore actions;
-- a keyboard command for opening BrowseVault;
+- toolbar and keyboard-command opening that reuses an already open BrowseVault tab;
 - JSON backup export and import;
 - CSV export with ISO timestamp, local date/time, visit id, and Chrome id fields;
 - HTML exports;

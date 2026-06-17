@@ -21,10 +21,11 @@ import {
   onStartup
 } from "./platform/chrome/runtime.js";
 import { restoreSession } from "./platform/chrome/sessions.js";
-import { activateTab, createTab } from "./platform/chrome/tabs.js";
+import { activateTab, createTab, queryTabs } from "./platform/chrome/tabs.js";
 import { focusWindow } from "./platform/chrome/windows.js";
 import { createChromeHistoryRemovalReconciler } from "./features/background-runtime/background/chrome-history-removal.js";
 import { createChromeHistorySync } from "./features/background-runtime/background/chrome-history-sync.js";
+import { createExtensionPageOpener } from "./features/background-runtime/background/extension-page-opener.js";
 import { createBackgroundMessageRouter } from "./features/background-runtime/background/message-router.js";
 
 const APP_URL = "src/app.html";
@@ -57,6 +58,15 @@ const chromeHistoryRemoval = createChromeHistoryRemovalReconciler({
   now
 });
 
+const extensionPageOpener = createExtensionPageOpener({
+  activateTab,
+  createTab,
+  focusWindow,
+  queryTabs
+}, {
+  appUrl: getExtensionUrl(APP_URL)
+});
+
 onInstalled(async () => {
   await setMeta("installedAt", now());
   await chromeHistorySync.bootstrapChromeHistory("installed");
@@ -68,9 +78,7 @@ onStartup(async () => {
 });
 
 onActionClicked(async () => {
-  await createTab({
-    url: getExtensionUrl(APP_URL)
-  });
+  await extensionPageOpener.openExtensionPage();
 });
 
 onCommand(async (command) => {
@@ -78,9 +86,7 @@ onCommand(async (command) => {
     return;
   }
 
-  await createTab({
-    url: getExtensionUrl(APP_URL)
-  });
+  await extensionPageOpener.openExtensionPage();
 });
 
 onHistoryVisited(async (item) => {
