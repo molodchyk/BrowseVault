@@ -17,6 +17,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Saved searches, match highlighting, local-date grouped results, incremental loading, keyboard-first search focus, and keyboard navigation for visible history rows.
 - Quick Open search across open tabs, bookmarks, downloads, and recently closed tabs, with keyboard navigation for source results and readable source-unavailable warnings.
 - JSON, CSV, and HTML export for all records, selected records, and current filtered results.
+- Bare `after:YYYY-MM-DD` and `before:YYYY-MM-DD` search filters use local calendar-day boundaries instead of browser-dependent UTC parsing.
 - JSON backup integrity metadata and backup self-test before full JSON export.
 - Backup reminder status follows the configured reminder interval and warns when the next reminder date is reached.
 - History result rows expose exact ISO visit timestamps in their time metadata while preserving the selected visible date format.

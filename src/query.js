@@ -83,12 +83,18 @@ export function parseQuery(input = "") {
     }
 
     if (value && field === "after") {
-      query.after = Date.parse(value);
+      const timestamp = parseDateBoundary(value, "start");
+      if (timestamp !== null) {
+        query.after = timestamp;
+      }
       continue;
     }
 
     if (value && field === "before") {
-      query.before = Date.parse(value);
+      const timestamp = parseDateBoundary(value, "end");
+      if (timestamp !== null) {
+        query.before = timestamp;
+      }
       continue;
     }
 
@@ -178,6 +184,16 @@ function parseLocalDayRange(value) {
     start: start.getTime(),
     end: new Date(year, month - 1, day + 1).getTime() - 1
   };
+}
+
+function parseDateBoundary(value, boundary) {
+  const range = parseLocalDayRange(value);
+  if (range) {
+    return boundary === "end" ? range.end : range.start;
+  }
+
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) ? timestamp : null;
 }
 
 function normalizeSiteFilter(value) {
@@ -444,11 +460,11 @@ export function matchesVisitQuery(visit, query) {
   const visitCount = Number(visit.visitCount || 0);
   const haystack = `${title} ${url} ${domain}`;
 
-  if (query.after && visit.visitTime < query.after) {
+  if (query.after !== null && visit.visitTime < query.after) {
     return false;
   }
 
-  if (query.before && visit.visitTime > query.before + 86400000 - 1) {
+  if (query.before !== null && visit.visitTime > query.before) {
     return false;
   }
 

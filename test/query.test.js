@@ -50,9 +50,16 @@ describe("parseQuery", () => {
   it("parses date filters and invalid regex safely", () => {
     const query = parseQuery("after:2026-06-01 before:2026-06-30 regex:[");
 
-    assert.equal(query.after, Date.parse("2026-06-01"));
-    assert.equal(query.before, Date.parse("2026-06-30"));
+    assert.equal(query.after, new Date(2026, 5, 1).getTime());
+    assert.equal(query.before, new Date(2026, 5, 31).getTime() - 1);
     assert.equal(query.regex, null);
+  });
+
+  it("ignores invalid after and before date boundaries", () => {
+    const query = parseQuery("after:not-a-date before:2026-99-99");
+
+    assert.equal(query.after, null);
+    assert.equal(query.before, null);
   });
 
   it("parses exact day aliases as local calendar ranges", () => {
@@ -130,6 +137,25 @@ describe("matchesVisitQuery", () => {
   it("matches inclusive date ranges", () => {
     assert.equal(matchesVisitQuery(visit, parseQuery("after:2026-06-01 before:2026-06-10")), true);
     assert.equal(matchesVisitQuery(visit, parseQuery("after:2026-06-11")), false);
+  });
+
+  it("matches bare after and before dates as local calendar boundaries", () => {
+    const startOfDay = {
+      ...visit,
+      visitTime: new Date(2026, 5, 10, 0, 0, 0, 0).getTime()
+    };
+    const endOfDay = {
+      ...visit,
+      visitTime: new Date(2026, 5, 10, 23, 59, 59, 999).getTime()
+    };
+    const nextDay = {
+      ...visit,
+      visitTime: new Date(2026, 5, 11, 0, 0, 0, 0).getTime()
+    };
+
+    assert.equal(matchesVisitQuery(startOfDay, parseQuery("after:2026-06-10")), true);
+    assert.equal(matchesVisitQuery(endOfDay, parseQuery("before:2026-06-10")), true);
+    assert.equal(matchesVisitQuery(nextDay, parseQuery("before:2026-06-10")), false);
   });
 
   it("matches exact local calendar days", () => {
