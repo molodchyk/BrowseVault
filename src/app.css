@@ -78,7 +78,7 @@
 html,
 body {
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
@@ -257,10 +257,15 @@ code {
 }
 
 .sticky-panel {
+  align-self: start;
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 3;
+  background: var(--bg);
   box-shadow: 0 8px 18px color-mix(in srgb, var(--bg), transparent 35%);
+  max-height: calc(100vh - 8px);
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
 .section-heading,
@@ -371,6 +376,49 @@ code {
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 8px;
+}
+
+.bulk-more {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.bulk-more[open] {
+  flex-basis: 100%;
+}
+
+.bulk-more summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 750;
+  list-style: none;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.bulk-more summary:hover {
+  background: var(--surface-alt);
+}
+
+.bulk-more summary::-webkit-details-marker {
+  display: none;
+}
+
+.bulk-menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
 }
 
 .backup-status {
@@ -756,6 +804,10 @@ code {
     justify-content: flex-start;
   }
 
+  .bulk-menu {
+    justify-content: flex-start;
+  }
+
   .backup-meta {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -864,19 +916,29 @@ code {
     width: 100%;
   }
 
-  #delete-vault,
-  #delete-chrome,
-  #delete-results,
-  #load-more,
-  #open-selected,
-  #blacklist-selected {
+  .bulk-more summary {
+    width: 100%;
+  }
+
+  .bulk-more[open] {
     grid-column: 1 / -1;
   }
 
-  #undo-delete {
+  .bulk-menu {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bulk-menu button {
+    min-width: 0;
+    width: 100%;
+  }
+
+  #delete-vault,
+  #delete-chrome,
+  #delete-results,
+  #open-selected,
+  #blacklist-selected {
     grid-column: 1 / -1;
-    justify-self: start;
-    min-width: 92px;
-    width: auto;
   }
 }

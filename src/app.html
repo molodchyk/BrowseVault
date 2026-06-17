@@ -46,7 +46,7 @@
       </section>
 
       <section id="tab-history" class="tab-panel" data-panel="history">
-        <section class="panel search-panel sticky-panel" aria-label="History search">
+        <section class="panel search-panel" aria-label="History search">
           <div class="search-line">
             <label class="query-wrap" for="query">
               <span>Search history</span>
@@ -97,7 +97,7 @@
           </details>
         </section>
 
-        <section class="bulkbar" aria-label="Bulk actions">
+        <section class="bulkbar sticky-panel" aria-label="Bulk actions">
           <div class="result-state">
             <strong id="result-count">0 results</strong>
             <span id="selected-count">0 selected</span>
@@ -106,22 +106,27 @@
             <button id="select-visible" class="ghost" type="button">Select Visible</button>
             <button id="invert-visible" class="ghost" type="button">Invert Visible</button>
             <button id="select-filtered" class="ghost" type="button">Select All Results</button>
-            <button id="export-results" class="ghost" type="button">Export Results</button>
-            <button id="export-results-csv" class="ghost" type="button">CSV Results</button>
-            <button id="export-results-html" class="ghost" type="button">HTML Results</button>
-            <button id="delete-results" class="danger" type="button">Delete Results From Vault</button>
             <button id="load-more" class="ghost" type="button" hidden>Load More</button>
             <button id="load-all" class="ghost" type="button" hidden>Show All</button>
             <button id="clear-selection" class="ghost requires-selection" type="button" hidden>Clear</button>
             <button id="open-selected" class="requires-selection" type="button" hidden>Open Selected</button>
-            <button id="copy-selected" class="ghost requires-selection" type="button" hidden>Copy URLs</button>
-            <button id="export-selected" class="requires-selection" type="button" hidden>Export JSON</button>
-            <button id="export-selected-csv" class="requires-selection" type="button" hidden>Export CSV</button>
-            <button id="export-selected-html" class="requires-selection" type="button" hidden>Export HTML</button>
-            <button id="blacklist-selected" class="ghost requires-selection" type="button" hidden>Blacklist Domains</button>
-            <button id="delete-vault" class="danger requires-selection" type="button" hidden>Delete From Vault</button>
-            <button id="delete-chrome" class="danger requires-selection" type="button" hidden>Delete URLs From Chrome</button>
             <button id="undo-delete" class="ghost" type="button">Undo</button>
+            <details class="bulk-more">
+              <summary>More</summary>
+              <div class="bulk-menu">
+                <button id="export-results" class="ghost" type="button">Export Results</button>
+                <button id="export-results-csv" class="ghost" type="button">CSV Results</button>
+                <button id="export-results-html" class="ghost" type="button">HTML Results</button>
+                <button id="delete-results" class="danger" type="button">Delete Results From Vault</button>
+                <button id="copy-selected" class="ghost requires-selection" type="button" hidden>Copy URLs</button>
+                <button id="export-selected" class="requires-selection" type="button" hidden>Export JSON</button>
+                <button id="export-selected-csv" class="requires-selection" type="button" hidden>Export CSV</button>
+                <button id="export-selected-html" class="requires-selection" type="button" hidden>Export HTML</button>
+                <button id="blacklist-selected" class="ghost requires-selection" type="button" hidden>Blacklist Domains</button>
+                <button id="delete-vault" class="danger requires-selection" type="button" hidden>Delete From Vault</button>
+                <button id="delete-chrome" class="danger requires-selection" type="button" hidden>Delete URLs From Chrome</button>
+              </div>
+            </details>
           </div>
         </section>
 
