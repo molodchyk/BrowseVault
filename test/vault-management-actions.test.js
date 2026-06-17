@@ -65,6 +65,7 @@ function createHarness({
     searchVisits: async () => ({ results: [], total: 0 }),
     selectedResults: async () => selected,
     services: {
+      appendActivityLog: async () => {},
       confirmAction: () => true,
       document: fakeDocument(),
       getRules: async () => ({ rules: [], blacklist: [], whitelist: [] }),
@@ -166,10 +167,12 @@ test("deleteFromChrome requests native deletion and marks selected vault records
 });
 
 test("deleteFromVault and undoVaultDelete handle selected and missing states", async () => {
+  const activity = [];
   const marked = [];
   const { actions, appState, calls, statuses } = createHarness({
     selectedIds: ["visit-1", "visit-2"],
     services: {
+      appendActivityLog: async (...args) => activity.push(args),
       getStats: async () => ({ meta: { lastVaultDelete: { ids: ["visit-1"] } } }),
       markDeletedByIds: async (ids) => {
         marked.push(ids);
@@ -191,6 +194,19 @@ test("deleteFromVault and undoVaultDelete handle selected and missing states", a
   assert.deepEqual(statuses, [
     "Deleted 2 records from vault",
     "Restored 1 vault record"
+  ]);
+  assert.deepEqual(activity, [
+    [{
+      type: "delete",
+      label: "Vault records deleted",
+      count: 2,
+      detail: "Selected records"
+    }],
+    [{
+      type: "restore",
+      label: "Vault delete undone",
+      count: 1
+    }]
   ]);
 });
 

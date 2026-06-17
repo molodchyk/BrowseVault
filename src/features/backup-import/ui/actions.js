@@ -1,5 +1,6 @@
 import {
   analyzeImportArchive,
+  appendActivityLog,
   exportArchive,
   importArchive,
   setMeta
@@ -16,6 +17,7 @@ import { renderImportPreview as renderImportPreviewUi } from "./render-import-pr
 
 const defaultServices = {
   analyzeImportArchive,
+  appendActivityLog,
   archiveFromFileText,
   attachArchiveIntegrity,
   backupExportFilename,
@@ -94,6 +96,11 @@ export function createBackupActions({
     return deps.backupExportFilename(appState.preferences?.backupFilenamePrefix, kind, exportedAt, extension);
   }
 
+  async function recordActivity(event) {
+    await deps.appendActivityLog(event);
+    await refreshStats();
+  }
+
   async function matchingResultsForExport() {
     const { results } = await searchVisits(getSearchText(), {
       limit: "all"
@@ -119,7 +126,13 @@ export function createBackupActions({
       selfTest,
       sha256: archive.integrity.sha256
     });
-    await refreshStats();
+    await recordActivity({
+      type: "backup",
+      label: "JSON backup exported",
+      count: archive.counts.visits,
+      detail: `${sizeBytes} bytes`,
+      occurredAt: archive.exportedAt
+    });
     setStatus("Exported archive");
   }
 
@@ -137,7 +150,13 @@ export function createBackupActions({
       records: archive.counts.visits,
       sizeBytes
     });
-    await refreshStats();
+    await recordActivity({
+      type: "backup",
+      label: "CSV backup exported",
+      count: archive.counts.visits,
+      detail: `${sizeBytes} bytes`,
+      occurredAt: archive.exportedAt
+    });
     setStatus("Exported CSV");
   }
 
@@ -155,7 +174,13 @@ export function createBackupActions({
       records: archive.counts.visits,
       sizeBytes
     });
-    await refreshStats();
+    await recordActivity({
+      type: "backup",
+      label: "HTML backup exported",
+      count: archive.counts.visits,
+      detail: `${sizeBytes} bytes`,
+      occurredAt: archive.exportedAt
+    });
     setStatus("Exported HTML");
   }
 
@@ -168,6 +193,12 @@ export function createBackupActions({
 
     const archive = await deps.attachArchiveIntegrity(await deps.exportArchive(items));
     deps.downloadJson(exportFilename("selected", archive.exportedAt, "json"), archive);
+    await recordActivity({
+      type: "export",
+      label: "Selected JSON exported",
+      count: items.length,
+      occurredAt: archive.exportedAt
+    });
     setStatus(`Exported ${items.length} selected records as JSON`);
   }
 
@@ -184,6 +215,12 @@ export function createBackupActions({
       "text/csv",
       deps.visitsToCsv(items)
     );
+    await recordActivity({
+      type: "export",
+      label: "Selected CSV exported",
+      count: items.length,
+      occurredAt: exportedAt
+    });
     setStatus(`Exported ${items.length} selected records as CSV`);
   }
 
@@ -200,6 +237,12 @@ export function createBackupActions({
       "text/html",
       deps.visitsToHtml(items, exportedAt)
     );
+    await recordActivity({
+      type: "export",
+      label: "Selected HTML exported",
+      count: items.length,
+      occurredAt: exportedAt
+    });
     setStatus(`Exported ${items.length} selected records as HTML`);
   }
 
@@ -213,6 +256,13 @@ export function createBackupActions({
 
     const archive = await deps.attachArchiveIntegrity(await deps.exportArchive(items));
     deps.downloadJson(exportFilename("results", archive.exportedAt, "json"), archive);
+    await recordActivity({
+      type: "export",
+      label: "Current results JSON exported",
+      count: items.length,
+      detail: getSearchText().trim(),
+      occurredAt: archive.exportedAt
+    });
     setStatus(`Exported ${items.length} matching records as JSON`);
   }
 
@@ -230,6 +280,13 @@ export function createBackupActions({
       "text/csv",
       deps.visitsToCsv(items)
     );
+    await recordActivity({
+      type: "export",
+      label: "Current results CSV exported",
+      count: items.length,
+      detail: getSearchText().trim(),
+      occurredAt: exportedAt
+    });
     setStatus(`Exported ${items.length} matching records as CSV`);
   }
 
@@ -247,6 +304,13 @@ export function createBackupActions({
       "text/html",
       deps.visitsToHtml(items, exportedAt)
     );
+    await recordActivity({
+      type: "export",
+      label: "Current results HTML exported",
+      count: items.length,
+      detail: getSearchText().trim(),
+      occurredAt: exportedAt
+    });
     setStatus(`Exported ${items.length} matching records as HTML`);
   }
 
@@ -295,7 +359,6 @@ export function createBackupActions({
     const result = await deps.importArchive(archive);
     appState.stagedImport = null;
     renderImportPreview();
-    await refreshStats();
     await renderRules();
     await runSearch();
     const integrityLabel = integrity.checked
@@ -304,6 +367,13 @@ export function createBackupActions({
         : " after checksum warning"
       : "";
     const ruleLabel = result.rules ? ` and ${result.rules} rule${result.rules === 1 ? "" : "s"}` : "";
+    await recordActivity({
+      type: "import",
+      label: "Archive imported",
+      count: result.visits,
+      detail: ruleLabel ? `${result.rules} rule${result.rules === 1 ? "" : "s"}` : "",
+      occurredAt: result.importedAt
+    });
     setStatus(`Imported ${result.visits} records${ruleLabel}${integrityLabel}`);
   }
 

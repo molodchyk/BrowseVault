@@ -12,6 +12,7 @@ import {
   getLocalStorage,
   setLocalStorage
 } from "../../../platform/chrome/storage.js";
+import { renderActivityLog } from "../../activity-log/ui/render-activity-log.js";
 
 const defaultServices = {
   archiveHealthDetails,
@@ -20,6 +21,7 @@ const defaultServices = {
   formatShortDate,
   getLocalStorage,
   normalizePreferences,
+  renderActivityLog,
   setLocalStorage,
   themeDatasetValue
 };
@@ -108,6 +110,9 @@ export function createDisplayPreferencesController({
       : "Never";
     renderBackupStatus(stats.meta.lastBackup);
     renderArchiveHealth(stats.meta);
+    deps.renderActivityLog(elements.activityLog, stats.meta.activityLog, {
+      formatDate: (timestamp) => deps.formatShortDate(timestamp, appState.preferences.dateFormat)
+    });
   }
 
   async function savePreferences() {

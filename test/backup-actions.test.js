@@ -43,6 +43,7 @@ function createHarness({
     searchVisits,
     selectedResults: async () => selected,
     services: {
+      appendActivityLog: async () => {},
       renderImportPreview: (...args) => calls.push(["renderImportPreview", ...args]),
       ...services
     },
@@ -98,8 +99,10 @@ test("exportAll downloads an integrity-protected archive and records backup meta
   };
   const downloaded = [];
   const metadata = [];
+  const activity = [];
   const { actions, calls, statuses } = createHarness({
     services: {
+      appendActivityLog: async (...args) => activity.push(args),
       attachArchiveIntegrity: async (input) => ({
         ...input,
         integrity: { sha256: "abc123" }
@@ -149,6 +152,13 @@ test("exportAll downloads an integrity-protected archive and records backup meta
       sha256: "abc123"
     }
   ]]);
+  assert.deepEqual(activity, [[{
+    type: "backup",
+    label: "JSON backup exported",
+    count: 2,
+    detail: "2048 bytes",
+    occurredAt: archive.exportedAt
+  }]]);
   assert.deepEqual(calls, ["refreshStats"]);
 });
 
@@ -399,16 +409,18 @@ test("importFromFile stages valid archives and switches to the backup panel", as
 
 test("confirmStagedImport imports after checksum confirmation and clears staged state", async () => {
   const archive = { visits: [{ id: "visit-1" }] };
+  const activity = [];
   const { actions, appState, calls, statuses } = createHarness({
     stagedImport: {
       archive,
       integrity: { checked: true, ok: false }
     },
     services: {
+      appendActivityLog: async (...args) => activity.push(args),
       confirmAction: () => true,
       importArchive: async (input) => {
         assert.equal(input, archive);
-        return { visits: 3, rules: 1 };
+        return { importedAt: "2026-06-16T12:00:00.000Z", visits: 3, rules: 1 };
       }
     }
   });
@@ -422,8 +434,15 @@ test("confirmStagedImport imports after checksum confirmation and clears staged 
   ]);
   assert.deepEqual(calls.map((call) => Array.isArray(call) ? call[0] : call), [
     "renderImportPreview",
-    "refreshStats",
     "renderRules",
-    "runSearch"
+    "runSearch",
+    "refreshStats"
   ]);
+  assert.deepEqual(activity, [[{
+    type: "import",
+    label: "Archive imported",
+    count: 3,
+    detail: "1 rule",
+    occurredAt: "2026-06-16T12:00:00.000Z"
+  }]]);
 });

@@ -1,4 +1,10 @@
 import {
+  ACTIVITY_LOG_META,
+  MAX_ACTIVITY_EVENTS,
+  normalizeActivityEvent,
+  normalizeActivityLog
+} from "./features/activity-log/core/activity-log.js";
+import {
   extractImportVisits,
   importArchiveSource
 } from "./features/backup-import/core/import-normalization.js";
@@ -232,6 +238,24 @@ export async function getAllMeta() {
 
 export async function getSavedSearches() {
   return normalizeSavedSearches(await getMeta(SAVED_SEARCHES_META, []));
+}
+
+export async function getActivityLog() {
+  return normalizeActivityLog(await getMeta(ACTIVITY_LOG_META, []));
+}
+
+export async function appendActivityLog(event) {
+  const normalized = normalizeActivityEvent(event);
+  if (!normalized) {
+    return getActivityLog();
+  }
+
+  const current = await getActivityLog();
+  const next = normalizeActivityLog([normalized, ...current], {
+    limit: MAX_ACTIVITY_EVENTS
+  });
+  await setMeta(ACTIVITY_LOG_META, next);
+  return next;
 }
 
 export async function saveSavedSearch(input) {

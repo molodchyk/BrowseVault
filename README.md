@@ -42,6 +42,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - CSV export with ISO timestamp, local date/time, visit id, and Chrome id fields;
 - HTML exports;
 - visible backup status with freshness, format, record count, file size, backup self-test, and checksum details;
+- recent activity log for completed backup, export, import, cleanup, delete, restore, rule, and reset operations;
 - SHA-256 integrity metadata for JSON backups;
 - staged import preview with valid row, duplicate row, existing visit, new visit, rule, and restore-check health status;
 - JSON, CSV, TSV, Google Takeout Browser History, Google My Activity, and common competitor-export import handling;

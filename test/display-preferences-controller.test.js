@@ -50,12 +50,14 @@ function createHarness({
   const storageWrites = [];
   const statusMessages = [];
   const refreshAfterSaveCalls = [];
+  const renderedActivity = [];
   const backupHealthClassList = classListHarness();
   const archiveHealthClassList = classListHarness();
   const appState = {
     preferences: { ...preferences }
   };
   const elements = {
+    activityLog: { id: "activity-log" },
     archiveCapture: output(),
     archiveHealth: {
       textContent: "",
@@ -101,12 +103,13 @@ function createHarness({
         now: Date.parse("2026-06-16T00:00:00.000Z")
       }),
       getLocalStorage: async (key) => ({ [key]: storedPreferences }),
+      renderActivityLog: (...args) => renderedActivity.push(args),
       setLocalStorage: async (record) => storageWrites.push(record)
     },
     setStatus: (message) => statusMessages.push(message)
   });
 
-  return { appState, archiveHealthClassList, backupHealthClassList, controller, elements, refreshAfterSaveCalls, root, statusMessages, storageWrites };
+  return { appState, archiveHealthClassList, backupHealthClassList, controller, elements, refreshAfterSaveCalls, renderedActivity, root, statusMessages, storageWrites };
 }
 
 test("loadPreferences normalizes stored preferences and applies them to UI state", async () => {
@@ -173,7 +176,7 @@ test("savePreferences persists normalized values, refreshes stats, reruns search
 
 test("refreshStats renders stat cards and backup health details", async () => {
   const exportedAt = "2026-06-01T00:00:00.000Z";
-  const { archiveHealthClassList, backupHealthClassList, controller, elements } = createHarness({
+  const { archiveHealthClassList, backupHealthClassList, controller, elements, renderedActivity } = createHarness({
     preferences: {
       theme: "system",
       accent: "teal",
@@ -205,7 +208,14 @@ test("refreshStats renders stat cards and backup health details", async () => {
             status: "passed"
           },
           sha256: "1234567890abcdef1234567890abcdef"
-        }
+        },
+        activityLog: [{
+          id: "backup-1",
+          type: "backup",
+          label: "JSON backup exported",
+          count: 42,
+          occurredAt: exportedAt
+        }]
       }
     }
   });
@@ -231,6 +241,11 @@ test("refreshStats renders stat cards and backup health details", async () => {
   assert.match(elements.archiveCapture.textContent, /^2026-06-16 \d{2}:05 · docs\.example\.com$/);
   assert.equal(archiveHealthClassList.classes.has("is-ok"), true);
   assert.equal(archiveHealthClassList.classes.has("is-warning"), false);
+  assert.equal(renderedActivity.length, 1);
+  assert.equal(renderedActivity[0][0], elements.activityLog);
+  assert.equal(renderedActivity[0][1].length, 1);
+  assert.equal(renderedActivity[0][1][0].label, "JSON backup exported");
+  assert.equal(renderedActivity[0][2].formatDate(Date.parse(exportedAt)), "2026-06-01");
 });
 
 test("requested limits respect current field values and quick-open cap", () => {

@@ -1,5 +1,6 @@
 import {
   addDomainRule,
+  appendActivityLog,
   clearVaultData,
   getRetentionCleanupCandidates,
   getRules,
@@ -18,6 +19,7 @@ import { sendRuntimeMessage } from "../../../platform/chrome/runtime.js";
 
 const defaultServices = {
   addDomainRule,
+  appendActivityLog,
   clearVaultData,
   confirmAction: (message) => globalThis.confirm(message),
   document: globalThis.document,
@@ -55,6 +57,10 @@ export function createVaultManagementActions({
     ...services
   };
 
+  async function recordActivity(event) {
+    await deps.appendActivityLog(event);
+  }
+
   async function renderRules() {
     const { rules } = await deps.getRules();
     elements.rulesList.replaceChildren();
@@ -82,7 +88,14 @@ export function createVaultManagementActions({
       remove.textContent = "Remove";
       remove.addEventListener("click", async () => {
         await deps.removeRule(rule.id);
+        await recordActivity({
+          type: "rule",
+          label: "Domain rule removed",
+          count: 1,
+          detail: rule.value
+        });
         await renderRules();
+        await refreshStats();
         setStatus(`Removed ${rule.value}`);
       });
 
@@ -118,6 +131,13 @@ export function createVaultManagementActions({
     const movedLabel = movedFromWhitelist
       ? ` ${movedFromWhitelist} moved from whitelist.`
       : "";
+    await recordActivity({
+      type: "rule",
+      label: "Domains blacklisted",
+      count: domains.length,
+      detail: movedFromWhitelist ? `${movedFromWhitelist} moved from whitelist` : ""
+    });
+    await refreshStats();
     setStatus(`Blacklisted ${domains.length} domain${domains.length === 1 ? "" : "s"} for future archiving.${movedLabel}`);
   }
 
@@ -133,6 +153,12 @@ export function createVaultManagementActions({
     }
 
     const deleted = await deps.markDeletedByIds(ids);
+    await recordActivity({
+      type: "delete",
+      label: "Vault records deleted",
+      count: deleted,
+      detail: "Selected records"
+    });
     appState.selectedIds.clear();
     await refreshStats();
     await runSearch();
@@ -162,6 +188,12 @@ export function createVaultManagementActions({
     }
 
     const deleted = await deps.markDeletedByIds(results.map((visit) => visit.id));
+    await recordActivity({
+      type: "delete",
+      label: "Current results deleted",
+      count: deleted,
+      detail: queryText
+    });
     appState.selectedIds.clear();
     await refreshStats();
     await runSearch();
@@ -191,6 +223,12 @@ export function createVaultManagementActions({
     }
 
     const deleted = await deps.markDeletedByIds(items.map((item) => item.id));
+    await recordActivity({
+      type: "delete",
+      label: "Chrome URLs and vault records deleted",
+      count: deleted,
+      detail: `${urls.length} URL${urls.length === 1 ? "" : "s"}`
+    });
     appState.selectedIds.clear();
     await refreshStats();
     await runSearch();
@@ -207,15 +245,28 @@ export function createVaultManagementActions({
     }
 
     const restored = await deps.restoreDeletedByIds(ids);
+    await recordActivity({
+      type: "restore",
+      label: "Vault delete undone",
+      count: restored
+    });
     await refreshStats();
     await runSearch();
     setStatus(`Restored ${restored} vault record${restored === 1 ? "" : "s"}`);
   }
 
   async function addRule(type) {
+    const value = elements.ruleDomain.value;
     await deps.addDomainRule(type, elements.ruleDomain.value);
+    await recordActivity({
+      type: "rule",
+      label: `${type} rule added`,
+      count: 1,
+      detail: value
+    });
     elements.ruleDomain.value = "";
     await renderRules();
+    await refreshStats();
     setStatus(`Added ${type} rule`);
   }
 
@@ -255,6 +306,12 @@ export function createVaultManagementActions({
     }
 
     const deleted = await deps.markDeletedByIds(candidates.map((visit) => visit.id));
+    await recordActivity({
+      type: "cleanup",
+      label: "Retention cleanup",
+      count: deleted,
+      detail: `${retentionDays} days`
+    });
     appState.selectedIds.clear();
     await refreshStats();
     await runSearch();
@@ -267,6 +324,11 @@ export function createVaultManagementActions({
     }
 
     await deps.clearVaultData();
+    await recordActivity({
+      type: "reset",
+      label: "Local vault reset",
+      detail: "Chrome history untouched"
+    });
     appState.currentResults = [];
     appState.currentTotal = 0;
     appState.selectedIds.clear();

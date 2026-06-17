@@ -387,6 +387,45 @@ code {
   color: var(--danger);
 }
 
+.activity-log {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.activity-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: baseline;
+  min-width: 0;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+.activity-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.activity-item strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.activity-item span {
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.activity-item.is-empty {
+  display: block;
+  color: var(--muted);
+}
+
 .import-health {
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -758,6 +797,15 @@ code {
 
   .backup-meta {
     grid-template-columns: 1fr;
+  }
+
+  .activity-item {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+
+  .activity-item span {
+    white-space: normal;
   }
 
   .stat {
