@@ -13,6 +13,7 @@ This folder captures the critical market research, user feedback, product direct
 - `reviewer-notes.md` - browser-store reviewer notes for limitations, permissions, package behavior, and user-data handling.
 - `release-notes.md` - docs-level release summary that points to the canonical root changelog.
 - `decision-records.md` - product, privacy, packaging, and release decisions to preserve across future edits.
+- `repository-metadata.md` - intended GitHub repository description and topic/tag values.
 - `storepilot-project-structure.md` - checklist that maps BrowseVault files to the StorePilot Chrome Web Store import reference.
 - `source-inventory.md` - index of raw source snapshots and how they map to the research notes.
 - `raw-sources/` - preserved Chrome Web Store listing/review text snapshots used as evidence.

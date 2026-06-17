@@ -34,6 +34,7 @@ const requiredFiles = [
   "docs/reviewer-notes.md",
   "docs/release-notes.md",
   "docs/decision-records.md",
+  "docs/repository-metadata.md",
   "docs/storepilot-project-structure.md",
   "docs/chrome-web-store-additional-fields.md",
   "docs/chrome-web-store-category.md",
@@ -262,6 +263,7 @@ const docsReadme = fs.readFileSync(path.join(root, "docs", "README.md"), "utf8")
 for (const expected of [
   "release-notes.md",
   "decision-records.md",
+  "repository-metadata.md",
   "storepilot-project-structure.md",
   "Browser Extension Playbook",
   "StorePilot Project Reference"
@@ -310,6 +312,21 @@ for (const expected of [
   "StorePilot Project Reference"
 ]) {
   assert(decisionRecords.includes(expected), `Decision records missing: ${expected}`);
+}
+
+const repositoryMetadata = fs.readFileSync(path.join(root, "docs", "repository-metadata.md"), "utf8");
+for (const expected of [
+  packageJson.description,
+  "chrome-extension",
+  "browser-history",
+  "history-search",
+  "history-backup",
+  "local-first",
+  "privacy-first",
+  "export-history",
+  "manifest-v3"
+]) {
+  assert(repositoryMetadata.includes(expected), `Repository metadata missing: ${expected}`);
 }
 
 const storePilotReadme = fs.readFileSync(path.join(root, "store-listing", "chrome-web-store", "README.md"), "utf8");

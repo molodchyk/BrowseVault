@@ -231,18 +231,6 @@ If this extension saves you time and you want to support its development:
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-FFDD00?logo=buymeacoffee&logoColor=000)](https://buymeacoffee.com/molodchyk)
 [![Patreon](https://img.shields.io/badge/Patreon-support-F96854?logo=patreon&logoColor=fff)](https://www.patreon.com/OMolodchyk)
 
-## GitHub Description
-
-```text
-Private local-first browser history search, backup, export, and preservation extension.
-```
-
-## GitHub Topics
-
-```text
-chrome-extension, browser-history, history-search, history-backup, local-first, privacy-first, export-history, manifest-v3
-```
-
 ## Product Notes
 
 BrowseVault and Research Replay should stay separate products at the user-facing level:
