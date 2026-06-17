@@ -45,6 +45,7 @@ function createHarness({
 } = {}) {
   const statuses = [];
   const calls = [];
+  const notifications = [];
   const appState = {
     currentResults: [{ id: "visible" }],
     currentTotal: 1,
@@ -61,6 +62,7 @@ function createHarness({
     appState,
     elements,
     getSearchText,
+    notifyVaultChanged: (reason) => notifications.push(reason),
     refreshStats: async () => calls.push("refreshStats"),
     runSearch: async () => calls.push("runSearch"),
     searchVisits: async () => ({ results: [], total: 0 }),
@@ -75,7 +77,7 @@ function createHarness({
     setStatus: (message) => statuses.push(message)
   });
 
-  return { actions, appState, calls, elements, statuses };
+  return { actions, appState, calls, elements, notifications, statuses };
 }
 
 test("renderRules renders empty and removable rule states", async () => {
@@ -203,7 +205,7 @@ test("blacklistSelectedDomains adds unique selected domains and reports whitelis
 test("deleteFromChrome requests native deletion and marks selected vault records", async () => {
   const runtimeMessages = [];
   const marked = [];
-  const { actions, appState, calls, statuses } = createHarness({
+  const { actions, appState, calls, notifications, statuses } = createHarness({
     selected: [
       { id: "visit-1", url: "https://example.com/a" },
       { id: "visit-2", url: "https://example.com/a" },
@@ -231,13 +233,14 @@ test("deleteFromChrome requests native deletion and marks selected vault records
   assert.deepEqual(marked, [["visit-1", "visit-2", "visit-3"]]);
   assert.equal(appState.selectedIds.size, 0);
   assert.deepEqual(calls, ["refreshStats", "runSearch"]);
+  assert.deepEqual(notifications, ["chrome-and-vault-delete"]);
   assert.deepEqual(statuses, ["Deleted 3 records from Chrome and vault"]);
 });
 
 test("deleteFromVault and undoVaultDelete handle selected and missing states", async () => {
   const activity = [];
   const marked = [];
-  const { actions, appState, calls, statuses } = createHarness({
+  const { actions, appState, calls, notifications, statuses } = createHarness({
     selectedIds: ["visit-1", "visit-2"],
     services: {
       appendActivityLog: async (...args) => activity.push(args),
@@ -259,6 +262,7 @@ test("deleteFromVault and undoVaultDelete handle selected and missing states", a
   assert.deepEqual(marked, [["visit-1", "visit-2"]]);
   assert.equal(appState.selectedIds.size, 0);
   assert.deepEqual(calls, ["refreshStats", "runSearch", "refreshStats", "runSearch"]);
+  assert.deepEqual(notifications, ["vault-delete", "vault-restore"]);
   assert.deepEqual(statuses, [
     "Deleted 2 records from vault",
     "Restored 1 vault record"
@@ -281,7 +285,7 @@ test("deleteFromVault and undoVaultDelete handle selected and missing states", a
 test("deleteCurrentResultsFromVault deletes the current filtered result set", async () => {
   const marked = [];
   const searched = [];
-  const { actions, appState, calls, statuses } = createHarness({
+  const { actions, appState, calls, notifications, statuses } = createHarness({
     selectedIds: ["visible"],
     services: {
       markDeletedByIds: async (ids) => {
@@ -304,6 +308,7 @@ test("deleteCurrentResultsFromVault deletes the current filtered result set", as
   assert.deepEqual(marked, [["filtered-1", "filtered-2"]]);
   assert.equal(appState.selectedIds.size, 0);
   assert.deepEqual(calls, ["refreshStats", "runSearch"]);
+  assert.deepEqual(notifications, ["vault-delete"]);
   assert.deepEqual(statuses, ["Deleted 2 current results from vault"]);
 });
 
@@ -312,7 +317,7 @@ test("deleteCurrentResultsFromChrome deletes matching Chrome URLs and vault reco
   const marked = [];
   const runtimeMessages = [];
   const searched = [];
-  const { actions, appState, calls, statuses } = createHarness({
+  const { actions, appState, calls, notifications, statuses } = createHarness({
     selectedIds: ["visible"],
     services: {
       appendActivityLog: async (...args) => activity.push(args),
@@ -348,6 +353,7 @@ test("deleteCurrentResultsFromChrome deletes matching Chrome URLs and vault reco
   assert.deepEqual(marked, [["filtered-1", "filtered-2", "filtered-3"]]);
   assert.equal(appState.selectedIds.size, 0);
   assert.deepEqual(calls, ["refreshStats", "runSearch"]);
+  assert.deepEqual(notifications, ["chrome-and-vault-delete"]);
   assert.deepEqual(statuses, ["Deleted 3 current results from Chrome and vault"]);
   assert.deepEqual(activity, [[{
     type: "delete",

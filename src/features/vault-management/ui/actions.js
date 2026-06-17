@@ -61,6 +61,7 @@ export function createVaultManagementActions({
   appState,
   elements,
   getSearchText = () => "",
+  notifyVaultChanged = () => false,
   refreshStats,
   runSearch,
   searchVisits: searchVisitRecords = searchVisits,
@@ -129,6 +130,7 @@ export function createVaultManagementActions({
         await refreshStats();
         await runSearch();
         setStatus(`Removed ${rule.value}`);
+        notifyVaultChanged("rule-removed");
       });
 
       item.append(label, remove);
@@ -171,6 +173,7 @@ export function createVaultManagementActions({
     });
     await refreshStats();
     setStatus(`Blacklisted ${domains.length} domain${domains.length === 1 ? "" : "s"} for future archiving.${movedLabel}`);
+    notifyVaultChanged("rule-added");
   }
 
   async function deleteFromVault() {
@@ -195,6 +198,7 @@ export function createVaultManagementActions({
     await refreshStats();
     await runSearch();
     setStatus(`Deleted ${deleted} records from vault`);
+    notifyVaultChanged("vault-delete");
   }
 
   async function deleteCurrentResultsFromVault() {
@@ -230,6 +234,7 @@ export function createVaultManagementActions({
     await refreshStats();
     await runSearch();
     setStatus(`Deleted ${deleted} current result${deleted === 1 ? "" : "s"} from vault`);
+    notifyVaultChanged("vault-delete");
   }
 
   async function deleteCurrentResultsFromChrome() {
@@ -280,6 +285,7 @@ export function createVaultManagementActions({
     await refreshStats();
     await runSearch();
     setStatus(`Deleted ${deleted} current result${deleted === 1 ? "" : "s"} from Chrome and vault`);
+    notifyVaultChanged("chrome-and-vault-delete");
   }
 
   async function deleteFromChrome() {
@@ -315,6 +321,7 @@ export function createVaultManagementActions({
     await refreshStats();
     await runSearch();
     setStatus(`Deleted ${deleted} records from Chrome and vault`);
+    notifyVaultChanged("chrome-and-vault-delete");
   }
 
   async function undoVaultDelete() {
@@ -335,6 +342,7 @@ export function createVaultManagementActions({
     await refreshStats();
     await runSearch();
     setStatus(`Restored ${restored} vault record${restored === 1 ? "" : "s"}`);
+    notifyVaultChanged("vault-restore");
   }
 
   async function addRule(type) {
@@ -350,6 +358,7 @@ export function createVaultManagementActions({
     await renderRules();
     await refreshStats();
     setStatus(`Added ${type} rule`);
+    notifyVaultChanged("rule-added");
   }
 
   async function addCategoryRuleAction() {
@@ -368,6 +377,7 @@ export function createVaultManagementActions({
     await refreshStats();
     await runSearch();
     setStatus(`Categorized ${rule.value} as ${rule.category}`);
+    notifyVaultChanged("rule-added");
   }
 
   async function previewRetentionCleanup() {
@@ -416,6 +426,7 @@ export function createVaultManagementActions({
     await refreshStats();
     await runSearch();
     setStatus(`Cleaned up ${deleted} old vault record${deleted === 1 ? "" : "s"}. Whitelisted domains kept.`);
+    notifyVaultChanged("vault-cleanup");
   }
 
   async function previewDuplicateCleanup() {
@@ -452,6 +463,7 @@ export function createVaultManagementActions({
     await refreshStats();
     await runSearch();
     setStatus(`Cleaned up ${deleted} duplicate vault record${deleted === 1 ? "" : "s"}`);
+    notifyVaultChanged("vault-cleanup");
   }
 
   async function resetVault() {
@@ -473,6 +485,7 @@ export function createVaultManagementActions({
     await renderRules();
     await runSearch();
     setStatus("BrowseVault local data erased");
+    notifyVaultChanged("vault-reset");
   }
 
   return {

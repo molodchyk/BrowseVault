@@ -5,9 +5,11 @@ import { createChromeHistorySyncAction } from "../../../src/features/background-
 function createHarness({ response } = {}) {
   const calls = [];
   const messages = [];
+  const notifications = [];
   const statuses = [];
   const hasResponse = arguments[0] && Object.hasOwn(arguments[0], "response");
   const syncChromeHistory = createChromeHistorySyncAction({
+    notifyVaultChanged: (reason) => notifications.push(reason),
     refreshStats: async () => calls.push("refreshStats"),
     runSearch: async () => calls.push("runSearch"),
     services: {
@@ -22,11 +24,11 @@ function createHarness({ response } = {}) {
     setStatus: (message) => statuses.push(message)
   });
 
-  return { calls, messages, statuses, syncChromeHistory };
+  return { calls, messages, notifications, statuses, syncChromeHistory };
 }
 
 test("syncChromeHistory sends bootstrap message, refreshes UI, and reports stored count", async () => {
-  const { calls, messages, statuses, syncChromeHistory } = createHarness();
+  const { calls, messages, notifications, statuses, syncChromeHistory } = createHarness();
 
   await syncChromeHistory();
 
@@ -34,6 +36,7 @@ test("syncChromeHistory sends bootstrap message, refreshes UI, and reports store
     type: "browseVault.bootstrapChromeHistory"
   }]);
   assert.deepEqual(calls, ["refreshStats", "runSearch"]);
+  assert.deepEqual(notifications, ["chrome-history-sync"]);
   assert.deepEqual(statuses, [
     "Syncing Chrome history",
     "Synced 12 records"

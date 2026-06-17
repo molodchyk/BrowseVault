@@ -129,6 +129,7 @@ export function createBackupActions({
   elements,
   getSortOrder = () => "newest",
   getSearchText = () => "",
+  notifyVaultChanged = () => false,
   refreshStats,
   renderRules,
   runSearch,
@@ -448,6 +449,7 @@ export function createBackupActions({
       occurredAt: result.importedAt
     });
     setStatus(`Imported ${result.visits} record${result.visits === 1 ? "" : "s"}${ruleLabel}${integrityLabel}${duplicateLabel}`);
+    notifyVaultChanged("vault-import");
   }
 
   return {

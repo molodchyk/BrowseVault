@@ -6,6 +6,7 @@ const defaultServices = {
 };
 
 export function createChromeHistorySyncAction({
+  notifyVaultChanged = () => false,
   refreshStats,
   runSearch,
   services = {},
@@ -29,5 +30,6 @@ export function createChromeHistorySyncAction({
     await refreshStats();
     await runSearch();
     setStatus(`Synced ${response.result.stored} records`);
+    notifyVaultChanged("chrome-history-sync");
   };
 }

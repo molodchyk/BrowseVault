@@ -34,6 +34,7 @@ function createHarness({
 } = {}) {
   const statuses = [];
   const calls = [];
+  const notifications = [];
   const appState = {
     preferences: {
       backupSaveMode: "downloads",
@@ -46,6 +47,7 @@ function createHarness({
     elements: previewElements(),
     getSortOrder,
     getSearchText,
+    notifyVaultChanged: (reason) => notifications.push(reason),
     refreshStats: async () => calls.push("refreshStats"),
     renderRules: async () => calls.push("renderRules"),
     runSearch: async () => calls.push("runSearch"),
@@ -60,7 +62,7 @@ function createHarness({
     switchTab: (tabName) => calls.push(["switchTab", tabName])
   });
 
-  return { actions, appState, calls, statuses };
+  return { actions, appState, calls, notifications, statuses };
 }
 
 test("backupImportPreviewElements maps app shell elements for import preview rendering", () => {
@@ -472,7 +474,7 @@ test("importFromFile stages valid archives and switches to the backup panel", as
     name: "browsevault.json",
     text: async () => "{\"visits\":[]}"
   };
-  const { actions, appState, calls, statuses } = createHarness({
+  const { actions, appState, calls, notifications, statuses } = createHarness({
     services: {
       analyzeImportArchive: async (input) => {
         assert.equal(input, archive);
@@ -507,7 +509,7 @@ test("importFromFile stages valid archives and switches to the backup panel", as
 test("confirmStagedImport imports after checksum confirmation and clears staged state", async () => {
   const archive = { visits: [{ id: "visit-1" }] };
   const activity = [];
-  const { actions, appState, calls, statuses } = createHarness({
+  const { actions, appState, calls, notifications, statuses } = createHarness({
     stagedImport: {
       archive,
       integrity: { checked: true, ok: false }
@@ -541,6 +543,7 @@ test("confirmStagedImport imports after checksum confirmation and clears staged 
     "runSearch",
     "refreshStats"
   ]);
+  assert.deepEqual(notifications, ["vault-import"]);
   assert.deepEqual(activity, [[{
     type: "import",
     label: "Archive imported",

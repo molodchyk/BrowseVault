@@ -10,6 +10,7 @@ import { collectAppElements } from "./features/app-shell/ui/elements.js";
 import { bindAppEvents } from "./features/app-shell/ui/events.js";
 import { createAppNavigation } from "./features/app-shell/ui/navigation.js";
 import { createSearchCoordinator } from "./features/app-shell/ui/search-coordinator.js";
+import { createVaultInvalidationController } from "./features/app-shell/ui/vault-invalidation.js";
 import { createBackupActions } from "./features/backup-import/ui/actions.js";
 import { createQuickOpenActions } from "./features/browser-memory/ui/quick-open-actions.js";
 import { createChromeHistorySyncAction } from "./features/background-runtime/ui/chrome-history-sync-action.js";
@@ -45,6 +46,8 @@ const historySearchForm = createHistorySearchForm({
 const selectedResultLookup = createSelectedResultLookup({
   appState
 });
+
+let notifyVaultChanged = () => false;
 
 const appNavigation = createAppNavigation({
   elements
@@ -85,6 +88,7 @@ const vaultActions = createVaultManagementActions({
   elements,
   getSortOrder: historySearchForm.getSortOrder,
   getSearchText: historySearchForm.getSearchText,
+  notifyVaultChanged: (reason) => notifyVaultChanged(reason),
   refreshStats: displayPreferences.refreshStats,
   runSearch: historySearchActions.runSearch,
   searchVisits,
@@ -96,6 +100,7 @@ const backupActions = createBackupActions({
   appState,
   elements,
   getSearchText: historySearchForm.getSearchText,
+  notifyVaultChanged: (reason) => notifyVaultChanged(reason),
   refreshStats: displayPreferences.refreshStats,
   renderRules: vaultActions.renderRules,
   runSearch: historySearchActions.runSearch,
@@ -150,6 +155,7 @@ const savedSearchActions = createSavedSearchActions({
 });
 
 const syncChromeHistory = createChromeHistorySyncAction({
+  notifyVaultChanged: (reason) => notifyVaultChanged(reason),
   refreshStats: displayPreferences.refreshStats,
   runSearch: historySearchActions.runSearch,
   setStatus
@@ -158,6 +164,17 @@ const syncChromeHistory = createChromeHistorySyncAction({
 const openNativeChromeHistory = createNativeHistoryAction({
   setStatus
 });
+
+const vaultInvalidation = createVaultInvalidationController({
+  refreshVault: async () => {
+    await displayPreferences.refreshStats();
+    await vaultActions.renderRules();
+    await historySearchActions.runSearch();
+  },
+  setStatus
+});
+
+notifyVaultChanged = vaultInvalidation.notifyVaultChanged;
 
 function bindEvents() {
   bindAppEvents({
