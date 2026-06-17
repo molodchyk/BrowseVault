@@ -29,6 +29,7 @@ import { createChromeHistoryRemovalReconciler } from "./features/background-runt
 import { createChromeHistorySync } from "./features/background-runtime/background/chrome-history-sync.js";
 import { createExtensionPageOpener } from "./features/background-runtime/background/extension-page-opener.js";
 import { createBackgroundMessageRouter } from "./features/background-runtime/background/message-router.js";
+import { createVaultChangeNotifier } from "./features/app-shell/core/vault-invalidation.js";
 
 const APP_URL = "src/app.html";
 const EXTENSION_URL_PREFIX = getExtensionUrl("");
@@ -42,6 +43,10 @@ function isAllowedBackgroundMessageSender(sender) {
   return senderUrl.startsWith(EXTENSION_URL_PREFIX);
 }
 
+const vaultInvalidation = createVaultChangeNotifier({
+  sourceId: "background"
+});
+
 const chromeHistorySync = createChromeHistorySync({
   getHistoryVisits,
   getRules,
@@ -52,6 +57,7 @@ const chromeHistorySync = createChromeHistorySync({
   syncChromeHistoryItems,
   syncChromeHistoryItemsWithSyncMetadata
 }, {
+  notifyVaultChanged: (reason) => vaultInvalidation.notifyVaultChanged(reason),
   now
 });
 
@@ -59,6 +65,7 @@ const chromeHistoryRemoval = createChromeHistoryRemovalReconciler({
   markChromeDeletedByUrls,
   setMeta
 }, {
+  notifyVaultChanged: (reason) => vaultInvalidation.notifyVaultChanged(reason),
   now
 });
 

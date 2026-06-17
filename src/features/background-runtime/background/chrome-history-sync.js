@@ -30,6 +30,7 @@ export function shouldArchiveUrlWithRules(url, rules) {
 
 export function createChromeHistorySync(deps, options = {}) {
   const bootstrapUrlLimit = options.bootstrapUrlLimit || DEFAULT_BOOTSTRAP_URL_LIMIT;
+  const notifyVaultChanged = options.notifyVaultChanged || (() => false);
   const visitExpansionConcurrency = options.visitExpansionConcurrency || DEFAULT_VISIT_EXPANSION_CONCURRENCY;
   const now = options.now || (() => new Date().toISOString());
 
@@ -110,6 +111,7 @@ export function createChromeHistorySync(deps, options = {}) {
       });
     }
 
+    notifyVaultChanged("chrome-history-sync");
     return result;
   }
 
@@ -133,6 +135,7 @@ export function createChromeHistorySync(deps, options = {}) {
         url: item.url
       });
     }
+    notifyVaultChanged("chrome-history-live");
     return true;
   }
 

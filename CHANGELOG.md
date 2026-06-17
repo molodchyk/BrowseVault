@@ -12,7 +12,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Manual sync from currently available Chrome history, expanded to individual visits where Chrome exposes them.
 - Chrome sync and live-capture recorder metadata are committed with their related vault records where the storage layer can do so atomically.
 - Full-page tabbed app with History, Quick Open, Backup, Rules, and Settings areas.
-- Open BrowseVault tabs refresh when another BrowseVault tab changes vault data through delete, import, cleanup, reset, rule, restore, or manual Chrome-history sync actions.
+- Open BrowseVault tabs refresh when another BrowseVault tab or the background service worker changes vault data through delete, import, cleanup, reset, rule, restore, manual sync, live Chrome-history capture, or native history removal actions.
 - Advanced local search for site, host, domain, title, URL, manual category/tag, source, transition, visit count, exact day, date range, local hour, exclusions, wildcards, phrases, and regex.
 - Limited history searches keep only the top visible results while counting the full match set, reducing memory and sort work on large archives.
 - One-click Today, Yesterday, 7 Days, 30 Days, and All Dates shortcuts using ISO-style date filters.

@@ -19,8 +19,44 @@ function messageFromEvent(event) {
   return event?.data || event;
 }
 
-function isVaultChangedMessage(message, sourceId) {
+export function isVaultChangedMessage(message, sourceId) {
   return message?.type === VAULT_CHANGED_MESSAGE && message.sourceId !== sourceId;
+}
+
+function postVaultChanged(channel, sourceId, reason) {
+  if (!channel?.postMessage) {
+    return false;
+  }
+
+  channel.postMessage({
+    type: VAULT_CHANGED_MESSAGE,
+    sourceId,
+    reason,
+    sentAt: new Date().toISOString()
+  });
+  return true;
+}
+
+export function createVaultChangeNotifier({
+  channelFactory = defaultChannelFactory,
+  channelName = VAULT_INVALIDATION_CHANNEL,
+  sourceId = defaultSourceId()
+} = {}) {
+  const channel = channelFactory(channelName);
+
+  function notifyVaultChanged(reason) {
+    return postVaultChanged(channel, sourceId, reason);
+  }
+
+  function destroy() {
+    channel?.close?.();
+  }
+
+  return {
+    destroy,
+    notifyVaultChanged,
+    sourceId
+  };
 }
 
 export function createVaultInvalidationController({
@@ -73,17 +109,7 @@ export function createVaultInvalidationController({
   }
 
   function notifyVaultChanged(reason) {
-    if (!channel?.postMessage) {
-      return false;
-    }
-
-    channel.postMessage({
-      type: VAULT_CHANGED_MESSAGE,
-      sourceId,
-      reason,
-      sentAt: new Date().toISOString()
-    });
-    return true;
+    return postVaultChanged(channel, sourceId, reason);
   }
 
   function destroy() {

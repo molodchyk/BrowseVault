@@ -1,4 +1,5 @@
 export function createChromeHistoryRemovalReconciler(deps, options = {}) {
+  const notifyVaultChanged = options.notifyVaultChanged || (() => false);
   const now = options.now || (() => new Date().toISOString());
 
   async function reconcileHistoryRemoval(removed) {
@@ -6,6 +7,7 @@ export function createChromeHistoryRemovalReconciler(deps, options = {}) {
       await deps.setMeta("lastNativeHistoryClear", {
         clearedAt: now()
       });
+      notifyVaultChanged("native-history-clear");
       return {
         type: "allHistory"
       };
@@ -29,6 +31,7 @@ export function createChromeHistoryRemovalReconciler(deps, options = {}) {
 
     const deletedAt = now();
     await deps.markChromeDeletedByUrls(urls, deletedAt);
+    notifyVaultChanged("native-history-delete");
     return {
       type: "urls",
       urls,

@@ -4,6 +4,7 @@ import { createChromeHistoryRemovalReconciler } from "../../../src/features/back
 
 function createReconciler() {
   const calls = [];
+  const notifications = [];
   const reconciler = createChromeHistoryRemovalReconciler(
     {
       markChromeDeletedByUrls: async (urls, deletedAt) => {
@@ -14,15 +15,16 @@ function createReconciler() {
       }
     },
     {
+      notifyVaultChanged: (reason) => notifications.push(reason),
       now: () => "2026-06-16T12:00:00.000Z"
     }
   );
 
-  return { calls, reconciler };
+  return { calls, notifications, reconciler };
 }
 
 test("reconcileHistoryRemoval records full native history clears", async () => {
-  const { calls, reconciler } = createReconciler();
+  const { calls, notifications, reconciler } = createReconciler();
 
   assert.deepEqual(await reconciler.reconcileHistoryRemoval({ allHistory: true }), {
     type: "allHistory"
@@ -36,10 +38,11 @@ test("reconcileHistoryRemoval records full native history clears", async () => {
       }
     ]
   ]);
+  assert.deepEqual(notifications, ["native-history-clear"]);
 });
 
 test("reconcileHistoryRemoval marks deduplicated URL removals", async () => {
-  const { calls, reconciler } = createReconciler();
+  const { calls, notifications, reconciler } = createReconciler();
 
   assert.deepEqual(
     await reconciler.reconcileHistoryRemoval({
@@ -64,10 +67,11 @@ test("reconcileHistoryRemoval marks deduplicated URL removals", async () => {
       "2026-06-16T12:00:00.000Z"
     ]
   ]);
+  assert.deepEqual(notifications, ["native-history-delete"]);
 });
 
 test("reconcileHistoryRemoval ignores empty native removal payloads", async () => {
-  const { calls, reconciler } = createReconciler();
+  const { calls, notifications, reconciler } = createReconciler();
 
   assert.deepEqual(await reconciler.reconcileHistoryRemoval({ urls: [] }), {
     type: "empty"
@@ -79,4 +83,5 @@ test("reconcileHistoryRemoval ignores empty native removal payloads", async () =
     type: "empty"
   });
   assert.deepEqual(calls, []);
+  assert.deepEqual(notifications, []);
 });

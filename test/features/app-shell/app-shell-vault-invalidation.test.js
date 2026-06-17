@@ -4,7 +4,7 @@ import {
   createVaultInvalidationController,
   VAULT_CHANGED_MESSAGE,
   VAULT_INVALIDATION_CHANNEL
-} from "../../../src/features/app-shell/ui/vault-invalidation.js";
+} from "../../../src/features/app-shell/core/vault-invalidation.js";
 
 function fakeChannel() {
   const listeners = new Set();

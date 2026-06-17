@@ -10,7 +10,7 @@ import { collectAppElements } from "./features/app-shell/ui/elements.js";
 import { bindAppEvents } from "./features/app-shell/ui/events.js";
 import { createAppNavigation } from "./features/app-shell/ui/navigation.js";
 import { createSearchCoordinator } from "./features/app-shell/ui/search-coordinator.js";
-import { createVaultInvalidationController } from "./features/app-shell/ui/vault-invalidation.js";
+import { createVaultInvalidationController } from "./features/app-shell/core/vault-invalidation.js";
 import { createBackupActions } from "./features/backup-import/ui/actions.js";
 import { createQuickOpenActions } from "./features/browser-memory/ui/quick-open-actions.js";
 import { createChromeHistorySyncAction } from "./features/background-runtime/ui/chrome-history-sync-action.js";
@@ -155,7 +155,6 @@ const savedSearchActions = createSavedSearchActions({
 });
 
 const syncChromeHistory = createChromeHistorySyncAction({
-  notifyVaultChanged: (reason) => notifyVaultChanged(reason),
   refreshStats: displayPreferences.refreshStats,
   runSearch: historySearchActions.runSearch,
   setStatus

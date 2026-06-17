@@ -129,8 +129,10 @@ test("bootstrapChromeHistory searches, syncs expanded visits, and stores sync me
       return [{ visitId: "v1", visitTime: 1780000000000 }];
     }
   });
+  const notifications = [];
   const sync = createChromeHistorySync(deps, {
     bootstrapUrlLimit: 7,
+    notifyVaultChanged: (reason) => notifications.push(reason),
     visitExpansionConcurrency: 1,
     now: () => "2026-06-16T12:00:00.000Z"
   });
@@ -160,11 +162,14 @@ test("bootstrapChromeHistory searches, syncs expanded visits, and stores sync me
       }
     ]
   ]);
+  assert.deepEqual(notifications, ["chrome-history-sync"]);
 });
 
 test("recordVisitedItem archives only allowed live visits", async () => {
   const { calls, deps } = createDeps();
+  const notifications = [];
   const sync = createChromeHistorySync(deps, {
+    notifyVaultChanged: (reason) => notifications.push(reason),
     now: () => "2026-06-16T12:00:00.000Z"
   });
 
@@ -182,4 +187,5 @@ test("recordVisitedItem archives only allowed live visits", async () => {
       }
     ]
   ]);
+  assert.deepEqual(notifications, ["chrome-history-live"]);
 });
