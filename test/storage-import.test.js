@@ -151,7 +151,7 @@ test("mergeImportedVisits preserves existing local tombstones and creation metad
   }]);
 });
 
-test("mergeImportedVisits carries tombstones across duplicate rows in one import", () => {
+test("mergeImportedVisits collapses duplicate rows and carries tombstones across them", () => {
   const first = {
     id: "visit-1",
     title: "First",
@@ -165,13 +165,21 @@ test("mergeImportedVisits carries tombstones across duplicate rows in one import
     chromeDeletedAt: "2026-06-02T00:00:00.000Z"
   };
 
-  assert.deepEqual(mergeImportedVisits([], [first, second]), [
-    first,
-    {
-      ...second,
-      deletedAt: "2026-06-01T00:00:00.000Z",
-      chromeDeletedAt: "2026-06-02T00:00:00.000Z"
-    }
+  assert.deepEqual(mergeImportedVisits([], [first, second]), [{
+    ...second,
+    deletedAt: "2026-06-01T00:00:00.000Z",
+    chromeDeletedAt: "2026-06-02T00:00:00.000Z"
+  }]);
+});
+
+test("mergeImportedVisits returns unique imported records in first-seen order", () => {
+  assert.deepEqual(mergeImportedVisits([], [
+    { id: "a", title: "First A" },
+    { id: "b", title: "First B" },
+    { id: "a", title: "Second A" }
+  ]), [
+    { id: "a", title: "Second A", deletedAt: null, chromeDeletedAt: null },
+    { id: "b", title: "First B" }
   ]);
 });
 

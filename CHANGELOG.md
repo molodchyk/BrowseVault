@@ -31,6 +31,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Reset Vault clears BrowseVault local archive data, rules, and backup metadata without deleting Chrome history.
 - Imports are staged behind a preview with row counts, duplicate estimates, existing/new visit counts, rule counts, and checksum health where available.
 - Imports merge with matching existing vault visits and preserve local vault deletion markers, Chrome-deletion markers, and original creation metadata.
+- Imports merge duplicate archive rows into unique restored records and report duplicate rows in the final import status and activity log.
 
 ### Trust And Permissions
 

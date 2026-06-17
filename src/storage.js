@@ -475,12 +475,18 @@ function normalizeImportVisits(archive) {
 
 export function mergeImportedVisits(existingVisits, importedVisits) {
   const currentById = new Map((Array.isArray(existingVisits) ? existingVisits : []).map((visit) => [visit.id, visit]));
+  const mergedImportById = new Map();
+  const importedOrder = [];
 
-  return (Array.isArray(importedVisits) ? importedVisits : []).map((record) => {
+  for (const record of Array.isArray(importedVisits) ? importedVisits : []) {
     const previous = currentById.get(record.id);
     if (!previous) {
       currentById.set(record.id, record);
-      return record;
+      if (!mergedImportById.has(record.id)) {
+        importedOrder.push(record.id);
+      }
+      mergedImportById.set(record.id, record);
+      continue;
     }
 
     const merged = {
@@ -493,8 +499,13 @@ export function mergeImportedVisits(existingVisits, importedVisits) {
       merged.createdAt = previous.createdAt || record.createdAt;
     }
     currentById.set(record.id, merged);
-    return merged;
-  });
+    if (!mergedImportById.has(record.id)) {
+      importedOrder.push(record.id);
+    }
+    mergedImportById.set(record.id, merged);
+  }
+
+  return importedOrder.map((id) => mergedImportById.get(id));
 }
 
 function normalizeImportRules(archive, importedAt = new Date().toISOString()) {
@@ -554,6 +565,7 @@ export async function importArchive(archive) {
   const importedAt = new Date().toISOString();
   const normalized = normalizeImportVisits(archive);
   const records = mergeImportedVisits(await getAllVisits({ includeDeleted: true }), normalized);
+  const duplicateRows = normalized.length - records.length;
   const rules = normalizeImportRules(archive, importedAt);
 
   await putMany(VISIT_STORE, records);
@@ -563,13 +575,17 @@ export async function importArchive(archive) {
     importedAt,
     sourceApp: importArchiveSource(archive),
     schemaVersion: archive?.schemaVersion || null,
-    visits: normalized.length,
+    visits: records.length,
+    validRows: normalized.length,
+    duplicateRows,
     rules: rules.length
   });
 
   return {
     importedAt,
-    visits: normalized.length,
+    visits: records.length,
+    validRows: normalized.length,
+    duplicateRows,
     rules: rules.length
   };
 }

@@ -420,7 +420,13 @@ test("confirmStagedImport imports after checksum confirmation and clears staged 
       confirmAction: () => true,
       importArchive: async (input) => {
         assert.equal(input, archive);
-        return { importedAt: "2026-06-16T12:00:00.000Z", visits: 3, rules: 1 };
+        return {
+          importedAt: "2026-06-16T12:00:00.000Z",
+          visits: 2,
+          validRows: 3,
+          duplicateRows: 1,
+          rules: 1
+        };
       }
     }
   });
@@ -430,7 +436,7 @@ test("confirmStagedImport imports after checksum confirmation and clears staged 
   assert.equal(appState.stagedImport, null);
   assert.deepEqual(statuses, [
     "Importing archive",
-    "Imported 3 records and 1 rule after checksum warning"
+    "Imported 2 records and 1 rule after checksum warning; 1 duplicate row merged"
   ]);
   assert.deepEqual(calls.map((call) => Array.isArray(call) ? call[0] : call), [
     "renderImportPreview",
@@ -441,8 +447,8 @@ test("confirmStagedImport imports after checksum confirmation and clears staged 
   assert.deepEqual(activity, [[{
     type: "import",
     label: "Archive imported",
-    count: 3,
-    detail: "1 rule",
+    count: 2,
+    detail: "1 rule; 1 duplicate row merged",
     occurredAt: "2026-06-16T12:00:00.000Z"
   }]]);
 });

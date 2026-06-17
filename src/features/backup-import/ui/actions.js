@@ -367,14 +367,21 @@ export function createBackupActions({
         : " after checksum warning"
       : "";
     const ruleLabel = result.rules ? ` and ${result.rules} rule${result.rules === 1 ? "" : "s"}` : "";
+    const duplicateLabel = result.duplicateRows
+      ? `; ${result.duplicateRows} duplicate row${result.duplicateRows === 1 ? "" : "s"} merged`
+      : "";
+    const activityDetail = [
+      result.rules ? `${result.rules} rule${result.rules === 1 ? "" : "s"}` : "",
+      result.duplicateRows ? `${result.duplicateRows} duplicate row${result.duplicateRows === 1 ? "" : "s"} merged` : ""
+    ].filter(Boolean).join("; ");
     await recordActivity({
       type: "import",
       label: "Archive imported",
       count: result.visits,
-      detail: ruleLabel ? `${result.rules} rule${result.rules === 1 ? "" : "s"}` : "",
+      detail: activityDetail,
       occurredAt: result.importedAt
     });
-    setStatus(`Imported ${result.visits} records${ruleLabel}${integrityLabel}`);
+    setStatus(`Imported ${result.visits} record${result.visits === 1 ? "" : "s"}${ruleLabel}${integrityLabel}${duplicateLabel}`);
   }
 
   return {
