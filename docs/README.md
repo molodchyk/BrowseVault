@@ -23,6 +23,7 @@ This folder captures the critical market research, user feedback, product direct
 ## Related Playbooks
 
 - [Browser Extension Playbook](../../browser-extension-playbook.md) - shared product, release, repository, privacy, store listing, and reviewer standards for browser extensions.
+- [Defense against Distractions Localization Reference](../../Defense_against_Distractions/docs/localization.md) - canonical workflow for future Chrome Web Store visible-language coverage, locale-code, and right-to-left checks.
 - [StorePilot Project Reference](../../StorePilot/docs/reference.md) - shared Chrome Web Store automation file layout used by StorePilot import flows.
 
 ## Core Insight

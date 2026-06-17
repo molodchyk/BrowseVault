@@ -62,6 +62,11 @@ export function validatePlaybookCompliance(root, assert) {
   ]) {
     assert(docsReadme.includes(expected), `Docs README missing playbook reference: ${expected}`);
   }
+  assert(
+    docsReadme.includes("Defense against Distractions Localization Reference") &&
+      docsReadme.includes("../../Defense_against_Distractions/docs/localization.md"),
+    "Docs README must link the shared localization workflow reference."
+  );
 
   const playbookCompliance = fs.readFileSync(
     path.join(root, "docs", "release", "browser-extension-playbook-compliance.md"),
@@ -73,6 +78,7 @@ export function validatePlaybookCompliance(root, assert) {
     "Repository Shape",
     "Store Listing Copy",
     "Localization",
+    "UI Expectations",
     "Privacy And Permissions",
     "Reviewer Notes And Release Checks",
     "manifest key allowlist",
@@ -80,6 +86,15 @@ export function validatePlaybookCompliance(root, assert) {
     "manual check"
   ]) {
     assert(playbookCompliance.includes(expected), `Playbook compliance matrix missing: ${expected}`);
+  }
+  for (const expected of [
+    "First screen performs the main job",
+    "Options/settings expose main preferences immediately",
+    "Browser-native vocabulary is used when Chrome owns behavior",
+    "Destructive actions are explicit and guarded",
+    "Dark, light, and blank states are intentional"
+  ]) {
+    assert(playbookCompliance.includes(expected), `Playbook UI expectations matrix missing: ${expected}`);
   }
 
   const storeDraft = fs.readFileSync(path.join(root, "store", "listing.md"), "utf8");

@@ -39,6 +39,17 @@ This file maps BrowseVault release evidence to the shared browser-extension play
 | --- | --- |
 | English UI strings are externalized before broader localization. | `_locales/en/messages.json`; `src/features/app-shell/ui/localization.js`; `scripts/check-locales.mjs`. |
 | Store-visible manifest strings use Chrome localization. | `manifest.json` uses `__MSG_*__` values and `default_locale: "en"`. |
+| Shared localization workflow is recorded for future language expansion. | `docs/README.md` links to the Defense against Distractions localization reference; `scripts/check-locales.mjs` enforces Chrome `_locales` and UI binding coverage. |
+
+## UI Expectations
+
+| Playbook expectation | BrowseVault evidence |
+| --- | --- |
+| First screen performs the main job instead of marketing. | `src/app.html` opens on the History tab with search, saved searches, date shortcuts, result state, and results list. |
+| Options/settings expose main preferences immediately. | Settings starts with `Display and search defaults`, `Save Settings`, theme/accent/contrast/text/date/result-limit/backup controls, and the native-history escape hatch. |
+| Browser-native vocabulary is used when Chrome owns behavior. | Labels distinguish `Delete From Vault`, `Delete URLs From Chrome`, `Delete Results From Chrome`, and `Open Chrome History`; reviewer notes document URL-level Chrome deletion. |
+| Destructive actions are explicit and guarded. | `src/features/vault-management/ui/actions.js` uses confirmations, undoable vault deletion where possible, and cross-tab vault-change notifications; tests cover empty/canceled destructive states. |
+| Dark, light, and blank states are intentional. | Settings includes system/light/dark themes, contrast and text-size preferences; activity/rules/quick-result tests cover empty states. |
 
 ## Privacy And Permissions
 

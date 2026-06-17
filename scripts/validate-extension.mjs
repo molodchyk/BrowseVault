@@ -399,13 +399,30 @@ for (const expected of [
 
 const appHtml = fs.readFileSync(path.join(root, "src/app.html"), "utf8");
 assert(appHtml.includes('type="module"'), "App script should load as a module.");
+assert(appHtml.includes("History Search & Backup"), "First screen should open on the core history-search job.");
+assert(appHtml.includes('data-panel="history"'), "History panel should be the default visible app panel.");
+assert(appHtml.includes("Display and search defaults"), "Settings should expose the main display/search preferences immediately.");
 assert(appHtml.includes("Permissions and limits"), "Settings should disclose permissions and product limits.");
 assert(appHtml.includes("cannot recover visits Chrome already deleted"), "Settings should disclose old-history recovery limits.");
+assert(appHtml.includes("No activity logged yet."), "Activity log should include an intentional empty state.");
+for (const expected of [
+  'id="pref-theme"',
+  '<option value="system">System</option>',
+  '<option value="light">Light</option>',
+  '<option value="dark">Dark</option>',
+  'id="pref-contrast"',
+  'id="pref-text-size"',
+  'id="pref-date-format"',
+  'id="pref-limit"'
+]) {
+  assert(appHtml.includes(expected), `Settings UI missing playbook-required control: ${expected}`);
+}
 
 const appJs = fs.readFileSync(path.join(root, "src/app.js"), "utf8");
 assert(appJs.includes("localizeAppShell") && appJs.includes("getChromeMessage"), "App shell must initialize extension-page localization.");
 
 for (const [id, label] of [
+  ["open-native-history", "Open Chrome History"],
   ["delete-results", "Delete Results From Vault"],
   ["delete-results-chrome", "Delete Results From Chrome"],
   ["delete-vault", "Delete From Vault"],
