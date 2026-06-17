@@ -36,5 +36,5 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - Keep compatibility barrels export-only.
 - Add or update focused tests when pure logic moves.
 - Keep test files grouped by feature or responsibility rather than adding new root-level `test/*.test.js` files.
-- Run `npm run check` after structure changes; it fails when runtime/support folders exceed 12 files or feature/test-feature folders exceed 15 files.
+- Run `npm run check` after structure changes; it fails when static imports or extension-page module script paths break, or when runtime/support folders exceed 12 files or feature/test-feature folders exceed 15 files.
 - Update this file when ownership changes.

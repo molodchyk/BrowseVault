@@ -46,6 +46,7 @@ const requiredFiles = [
   "assets/icons/icon32.png",
   "assets/icons/icon48.png",
   "assets/icons/icon128.png",
+  "scripts/check-imports.mjs",
   "scripts/check-syntax.mjs",
   "scripts/generate-icons.mjs",
   "scripts/package-extension.mjs",
@@ -173,10 +174,21 @@ assert(packageJson.version === manifest.version, "package.json version must matc
 assert(packageJson.license === "GPL-3.0-only", "package.json license must follow the extension playbook.");
 assert(packageJson.keywords.includes("browser-history"), "Missing browser-history keyword.");
 assert(packageJson.keywords.includes("history-backup"), "Missing history-backup keyword.");
+assert(packageJson.scripts.check.includes("check-syntax.mjs"), "Check script must verify JavaScript syntax.");
+assert(packageJson.scripts.check.includes("check-imports.mjs"), "Check script must verify static import resolution.");
 assert(packageJson.scripts.check.includes("check-folder-density.mjs"), "Check script must enforce folder density.");
 assert(packageJson.scripts.icons, "Missing icons script.");
 assert(packageJson.scripts.package?.includes("verify-package.mjs"), "Package script must verify the final ZIP output.");
 assert(packageJson.scripts["verify:package"]?.includes("verify-package.mjs"), "Missing verify:package script.");
+
+const verifyPackageScript = fs.readFileSync(path.join(root, "scripts", "verify-package.mjs"), "utf8");
+for (const expected of [
+  "Package import missing target",
+  "Package module script missing target",
+  "Packaged extension entry must not use bare imports"
+]) {
+  assert(verifyPackageScript.includes(expected), `Package verifier missing import-resolution guardrail: ${expected}`);
+}
 
 const changelog = fs.readFileSync(path.join(root, "CHANGELOG.md"), "utf8");
 assert(changelog.includes(`## ${manifest.version} -`), "Changelog must include the current manifest version.");

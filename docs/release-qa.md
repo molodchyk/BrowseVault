@@ -18,10 +18,10 @@ git diff --check
 Expected results:
 
 - extension validation passes;
-- JavaScript syntax and folder-density checks pass;
+- JavaScript syntax, static import resolution, extension-page module script path, and folder-density checks pass;
 - unit tests pass;
 - `dist/browsevault-1.0.0.zip` is produced;
-- package ZIP verification passes;
+- package ZIP verification passes, including packaged static import and module script target checks;
 - package contains runtime extension files, root user-facing docs, and `_locales/en/messages.json`;
 - package excludes repository research, tests, scripts, docs, StorePilot files, and build metadata.
 

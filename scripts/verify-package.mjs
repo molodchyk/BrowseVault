@@ -5,6 +5,10 @@ import { crc32 } from "./zip-utils.mjs";
 const root = process.cwd();
 const manifest = JSON.parse(fs.readFileSync(path.join(root, "manifest.json"), "utf8"));
 const packagePath = path.join(root, "dist", `browsevault-${manifest.version}.zip`);
+const allowedLocalImportExtensions = new Set([".js", ".mjs"]);
+const importPattern = /(?:^|[;\n\r])\s*import\s+(?:[^'"]*?\s+from\s*)?["']([^"']+)["']/gm;
+const exportPattern = /(?:^|[;\n\r])\s*export\s+[^'"]*?\s+from\s*["']([^"']+)["']/gm;
+const scriptTagPattern = /<script\b[^>]*>/gi;
 const requiredEntries = [
   "manifest.json",
   "_locales/en/messages.json",
@@ -92,6 +96,51 @@ function readZipEntries(buffer) {
   return entries;
 }
 
+function isRelativeSpecifier(specifier) {
+  return specifier.startsWith("./") || specifier.startsWith("../");
+}
+
+function isRemoteSpecifier(specifier) {
+  return /^[a-z][a-z0-9+.-]*:\/\//i.test(specifier);
+}
+
+function resolvePackagedSpecifier(fromEntry, specifier) {
+  if (specifier.startsWith("node:")) {
+    throw new Error(`Packaged extension entry must not import Node built-ins: ${fromEntry} imports ${specifier}`);
+  }
+
+  if (isRemoteSpecifier(specifier)) {
+    throw new Error(`Packaged extension entry must not import remote code: ${fromEntry} imports ${specifier}`);
+  }
+
+  if (!isRelativeSpecifier(specifier)) {
+    throw new Error(`Packaged extension entry must not use bare imports: ${fromEntry} imports ${specifier}`);
+  }
+
+  const [specifierPath] = specifier.split(/[?#]/, 1);
+  if (!allowedLocalImportExtensions.has(path.posix.extname(specifierPath))) {
+    throw new Error(`Packaged extension import must include a .js or .mjs extension: ${fromEntry} imports ${specifier}`);
+  }
+
+  const resolved = path.posix.normalize(path.posix.join(path.posix.dirname(fromEntry), specifierPath));
+  if (resolved.startsWith("../") || resolved === ".." || path.posix.isAbsolute(resolved)) {
+    throw new Error(`Packaged extension import escapes package root: ${fromEntry} imports ${specifier}`);
+  }
+
+  return resolved;
+}
+
+function collectStaticSpecifiers(source) {
+  const specifiers = [];
+  for (const pattern of [importPattern, exportPattern]) {
+    pattern.lastIndex = 0;
+    for (const match of source.matchAll(pattern)) {
+      specifiers.push(match[1]);
+    }
+  }
+  return specifiers;
+}
+
 assert(fs.existsSync(packagePath), `Missing package: ${packagePath}`);
 
 const entries = readZipEntries(fs.readFileSync(packagePath));
@@ -135,6 +184,30 @@ for (const entry of entries) {
   const source = entry.data.toString("utf8");
   for (const { pattern, message } of forbiddenPackagedSourcePatterns) {
     assert(!pattern.test(source), `Unexpected packaged ${message} in ${entry.name}`);
+  }
+
+  if (/\.m?js$/i.test(entry.name)) {
+    for (const specifier of collectStaticSpecifiers(source)) {
+      const resolved = resolvePackagedSpecifier(entry.name, specifier);
+      assert(entrySet.has(resolved), `Package import missing target: ${entry.name} imports ${specifier}`);
+    }
+  }
+
+  if (/\.html$/i.test(entry.name)) {
+    for (const match of source.matchAll(scriptTagPattern)) {
+      const tag = match[0];
+      if (!/\btype\s*=\s*["']module["']/i.test(tag)) {
+        continue;
+      }
+
+      const srcMatch = tag.match(/\bsrc\s*=\s*["']([^"']+)["']/i);
+      if (!srcMatch) {
+        continue;
+      }
+
+      const resolved = resolvePackagedSpecifier(entry.name, srcMatch[1]);
+      assert(entrySet.has(resolved), `Package module script missing target: ${entry.name} references ${srcMatch[1]}`);
+    }
   }
 }
 
