@@ -62,9 +62,35 @@ test("summarizeImportArchive recognizes Google Takeout browser history rows", ()
 
   const summary = summarizeImportArchive(archive);
 
-  assert.equal(summary.sourceApp, "unknown");
+  assert.equal(summary.sourceApp, "google-takeout");
   assert.equal(summary.rows, 1);
   assert.equal(summary.validRows, 1);
+  assert.equal(summary.newVisits, 1);
+});
+
+test("summarizeImportArchive recognizes Google My Activity arrays", () => {
+  const archive = [
+    {
+      header: "Chrome",
+      title: "Visited Account History",
+      titleUrl: "https://activity.example/page",
+      time: "2026-06-16T12:00:00.000Z",
+      products: ["Chrome"]
+    },
+    {
+      header: "Search",
+      title: "Search result without URL",
+      time: "2026-06-16T12:01:00.000Z",
+      products: ["Search"]
+    }
+  ];
+
+  const summary = summarizeImportArchive(archive);
+
+  assert.equal(summary.sourceApp, "google-my-activity");
+  assert.equal(summary.rows, 2);
+  assert.equal(summary.validRows, 1);
+  assert.equal(summary.invalidRows, 1);
   assert.equal(summary.newVisits, 1);
 });
 

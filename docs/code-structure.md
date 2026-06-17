@@ -6,11 +6,11 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 
 - `src/app.html`, `src/app.css`, and `src/app.js` own the extension page runtime shell while the UI is being split.
 - `src/background.js` owns MV3 service worker listener wiring, extension-page opening, and startup/install metadata.
-- `src/storage.js` owns IndexedDB vault records, import normalization, backup metadata, rules, and vault mutations.
+- `src/storage.js` owns IndexedDB vault records, backup metadata, rules, and vault mutations.
 - `src/browser-memory.js` owns read-only search over tabs, bookmarks, downloads, and recently closed sessions.
 - `src/query.js` owns search parsing and matching.
 - `src/features/app-shell/` owns extension-page shell state, element collection, tab navigation/focus helpers, shared search scheduling, event wiring, and shared shell UI behavior.
-- `src/features/backup-import/` owns archive import/export actions, export filename rules, file parsing, integrity metadata, import-preview display state, and restore-flow rendering.
+- `src/features/backup-import/` owns archive import/export actions, export filename rules, file parsing, import normalization, integrity metadata, import-preview display state, and restore-flow rendering.
 - `src/features/background-runtime/` owns background message routing, payload validation, privileged action dispatch, Chrome history bootstrap, archive filtering, live-visit capture, native Chrome history removal reconciliation, and extension-page actions that coordinate with background runtime messages.
 - `src/features/browser-memory/` owns extension-page quick-open rendering and actions for tabs, bookmarks, downloads, and recently closed sessions.
 - `src/features/display-preferences/` owns preference normalization, result-limit clamping, date/count formatting, archive health summaries, backup reminder cadence, backup status summaries, settings persistence orchestration, and extension-page preference/stat rendering.

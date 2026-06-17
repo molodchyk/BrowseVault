@@ -1,3 +1,5 @@
+import { normalizeImportVisitCandidates } from "./import-normalization.js";
+
 export function parseDelimitedRows(text, delimiter) {
   const rows = [];
   let row = [];
@@ -56,18 +58,10 @@ function normalizeHeader(value) {
 export function delimitedArchiveFromText(text, delimiter, source) {
   const rows = parseDelimitedRows(text, delimiter);
   const headers = (rows.shift() || []).map(normalizeHeader);
-  const visits = rows
-    .map((row) => Object.fromEntries(headers.map((header, index) => [header, row[index] || ""])))
-    .map((row) => ({
-      id: row.visitid,
-      chromeId: row.chromeid,
-      url: row.url || row.uri || row.link || "",
-      title: row.title || row.name || row.pagetitle || "",
-      visitTime: row.visittimestampms || row.visittimeiso || row.visittime || row.lastvisittime || row.time || row.timestamp || row.date || row.datetime,
-      visitCount: row.visitcount || row.visits || 1,
-      transition: row.transition,
-      source
-    }));
+  const rowsAsObjects = rows.map((row) =>
+    Object.fromEntries(headers.map((header, index) => [header, row[index] || ""]))
+  );
+  const visits = normalizeImportVisitCandidates(rowsAsObjects, source);
 
   return {
     app: source,

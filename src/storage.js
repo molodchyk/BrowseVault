@@ -1,4 +1,8 @@
 import { matchesVisitQuery, parseQuery } from "./query.js";
+import {
+  extractImportVisits,
+  importArchiveSource
+} from "./features/backup-import/core/import-normalization.js";
 
 const DB_NAME = "browsevault";
 const DB_VERSION = 1;
@@ -428,7 +432,7 @@ export function summarizeImportArchive(archive, existingVisitIds = []) {
   }
 
   return {
-    sourceApp: archive?.app || "unknown",
+    sourceApp: importArchiveSource(archive),
     schemaVersion: archive?.schemaVersion || null,
     rows: rawVisits.length,
     validRows: normalized.length,
@@ -456,7 +460,7 @@ export async function importArchive(archive) {
 
   await setMeta("lastImport", {
     importedAt,
-    sourceApp: archive?.app || "unknown",
+    sourceApp: importArchiveSource(archive),
     schemaVersion: archive?.schemaVersion || null,
     visits: normalized.length,
     rules: rules.length
@@ -467,31 +471,6 @@ export async function importArchive(archive) {
     visits: normalized.length,
     rules: rules.length
   };
-}
-
-function extractImportVisits(archive) {
-  if (Array.isArray(archive?.visits)) {
-    return archive.visits;
-  }
-
-  if (Array.isArray(archive?.items)) {
-    return archive.items;
-  }
-
-  if (Array.isArray(archive?.["Browser History"])) {
-    return archive["Browser History"].map((item) => ({
-      url: item.url,
-      title: item.title,
-      visitTime: item.time_usec,
-      source: "google-takeout"
-    }));
-  }
-
-  if (Array.isArray(archive?.browserHistory)) {
-    return archive.browserHistory;
-  }
-
-  return [];
 }
 
 export async function getStats() {
