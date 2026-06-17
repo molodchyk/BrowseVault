@@ -53,7 +53,7 @@ const appNavigation = createAppNavigation({
 const displayPreferences = createDisplayPreferencesController({
   appState,
   elements,
-  getStats,
+  getStats: () => getStats({ runStorageSelfCheck: true }),
   refreshAfterSave: () => searchCoordinator.runSearchesNow(),
   root: document.documentElement,
   setStatus

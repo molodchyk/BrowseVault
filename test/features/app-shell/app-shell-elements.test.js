@@ -76,6 +76,7 @@ const singularSelectors = [
   "archive-startup",
   "archive-sync",
   "archive-capture",
+  "archive-storage",
   "archive-vault",
   "archive-tombstones",
   "rule-domain",
@@ -136,6 +137,7 @@ test("collectAppElements queries the app shell selectors", () => {
   assert.equal(elements.backupSize.selector, "#backup-size");
   assert.equal(elements.backupSelfTest.selector, "#backup-self-test");
   assert.equal(elements.archiveHealth.selector, "#archive-health");
+  assert.equal(elements.archiveStorage.selector, "#archive-storage");
   assert.equal(elements.activityLog.selector, "#activity-log");
   assert.equal(elements.exportResults.selector, "#export-results");
   assert.equal(elements.savePreferences.selector, "#save-preferences");

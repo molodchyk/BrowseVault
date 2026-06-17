@@ -66,6 +66,7 @@ function createHarness({
       textContent: "",
       classList: archiveHealthClassList
     },
+    archiveStorage: output(),
     archiveStartup: output(),
     archiveSync: output(),
     archiveVault: output(),
@@ -234,6 +235,10 @@ test("refreshStats renders stat cards and backup health details", async () => {
           capturedAt: "2026-06-16T12:05:00.000Z",
           url: "https://docs.example.com/page"
         },
+        lastStorageSelfCheck: {
+          checkedAt: "2026-06-16T12:06:00.000Z",
+          status: "passed"
+        },
         lastStartedAt: "2026-06-16T10:00:00.000Z",
         lastBackup: {
           exportedAt,
@@ -276,6 +281,7 @@ test("refreshStats renders stat cards and backup health details", async () => {
   assert.match(elements.archiveStartup.textContent, /^2026-06-16 \d{2}:00$/);
   assert.match(elements.archiveSync.textContent, /^2026-06-16 \d{2}:00 · 41 stored$/);
   assert.match(elements.archiveCapture.textContent, /^2026-06-16 \d{2}:05 · docs\.example\.com$/);
+  assert.match(elements.archiveStorage.textContent, /^Passed 2026-06-16 \d{2}:06$/);
   assert.equal(elements.archiveVault.textContent, "42 active · 44 stored");
   assert.equal(elements.archiveTombstones.textContent, "2 deleted tombstones");
   assert.equal(archiveHealthClassList.classes.has("is-ok"), true);

@@ -225,6 +225,9 @@ export function archiveHealthDetails(meta = {}, options = {}) {
   const startupTimestamp = timestampFromIso(meta.lastStartedAt) || timestampFromIso(meta.installedAt);
   const capture = meta.lastLiveCapture || null;
   const captureTimestamp = timestampFromIso(capture?.capturedAt);
+  const storageCheck = meta.lastStorageSelfCheck || null;
+  const storageCheckTimestamp = timestampFromIso(storageCheck?.checkedAt);
+  const storageCheckOk = storageCheck?.status === "passed" && Boolean(storageCheckTimestamp);
   const hasSync = Boolean(syncTimestamp);
   const issueRecords = Number(vaultHealth.issueRecords || 0);
   const hasVaultIssues = issueRecords > 0;
@@ -244,11 +247,13 @@ export function archiveHealthDetails(meta = {}, options = {}) {
   return {
     healthText: hasVaultIssues
       ? "Vault data needs review"
-      : hasSync
-        ? "Archive recording ready"
-        : "Archive sync not run yet",
-    isWarning: hasVaultIssues || !hasSync,
-    isOk: !hasVaultIssues && hasSync,
+      : !storageCheckOk && hasSync
+        ? "Storage check not run"
+        : hasSync
+          ? "Archive recording ready"
+          : "Archive sync not run yet",
+    isWarning: hasVaultIssues || !hasSync || !storageCheckOk,
+    isOk: !hasVaultIssues && hasSync && storageCheckOk,
     startupText: startupTimestamp ? formatDate(startupTimestamp, dateFormat) : "Not recorded",
     syncText: hasSync
       ? `${formatDate(syncTimestamp, dateFormat)} · ${formatCount(sync.stored)} stored`
@@ -256,6 +261,11 @@ export function archiveHealthDetails(meta = {}, options = {}) {
     captureText: captureTimestamp
       ? `${formatDate(captureTimestamp, dateFormat)}${domainFromUrl(capture.url) ? ` · ${domainFromUrl(capture.url)}` : ""}`
       : "Waiting for next visit",
+    storageText: storageCheckOk
+      ? `Passed ${formatDate(storageCheckTimestamp, dateFormat)}`
+      : storageCheck?.status === "failed"
+        ? "Failed"
+        : "Not checked yet",
     vaultText: hasVaultIssues
       ? issueDetails.join(" · ")
       : `${formatCount(activeRecords)} active · ${formatCount(storedRows)} stored`,

@@ -22,6 +22,7 @@ const META_STORE = "meta";
 const RULE_STORE = "rules";
 const DEFAULT_RESULT_LIMIT = 500;
 const SAVED_SEARCHES_META = "savedSearches";
+const STORAGE_SELF_CHECK_META = "lastStorageSelfCheck";
 const DAY_MS = 86400000;
 
 let dbPromise;
@@ -591,6 +592,24 @@ export async function exportArchive(items = null) {
   };
 }
 
+export async function runStorageSelfCheck(checkedAt = new Date().toISOString()) {
+  const nonce = `${checkedAt}-${Math.random().toString(36).slice(2)}`;
+  const result = {
+    checkedAt,
+    status: "passed",
+    nonce
+  };
+
+  await setMeta(STORAGE_SELF_CHECK_META, result);
+
+  const stored = await getMeta(STORAGE_SELF_CHECK_META);
+  if (stored?.nonce !== nonce || stored?.status !== "passed") {
+    throw new Error("Storage self-check failed.");
+  }
+
+  return stored;
+}
+
 function normalizeImportVisits(archive) {
   const visits = extractImportVisits(archive);
 
@@ -727,7 +746,11 @@ export async function importArchive(archive) {
   };
 }
 
-export async function getStats() {
+export async function getStats(options = {}) {
+  if (options.runStorageSelfCheck) {
+    await runStorageSelfCheck();
+  }
+
   const allVisits = await getAllVisits({ includeDeleted: true });
   const visits = allVisits.filter((visit) => !visit.deletedAt);
   const domains = new Set(visits.map((visit) => visit.domain).filter(Boolean));

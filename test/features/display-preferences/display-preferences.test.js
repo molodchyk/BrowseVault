@@ -120,6 +120,7 @@ test("archiveHealthDetails summarizes startup, sync, and live capture metadata",
       startupText: "Not recorded",
       syncText: "Not synced yet",
       captureText: "Waiting for next visit",
+      storageText: "Not checked yet",
       vaultText: "0 active · 0 stored",
       tombstoneText: "No deleted tombstones"
     }
@@ -135,6 +136,10 @@ test("archiveHealthDetails summarizes startup, sync, and live capture metadata",
       lastLiveCapture: {
         capturedAt: "2026-06-16T10:00:00.000Z",
         url: "https://www.example.com/page"
+      },
+      lastStorageSelfCheck: {
+        checkedAt: "2026-06-16T09:30:00.000Z",
+        status: "passed"
       }
     },
     {
@@ -147,8 +152,23 @@ test("archiveHealthDetails summarizes startup, sync, and live capture metadata",
   assert.match(status.startupText, /^2026-06-16 \d{2}:00$/);
   assert.match(status.syncText, /^2026-06-16 \d{2}:00 · 42 stored$/);
   assert.match(status.captureText, /^2026-06-16 \d{2}:00 · example\.com$/);
+  assert.match(status.storageText, /^Passed 2026-06-16 \d{2}:30$/);
   assert.equal(status.vaultText, "0 active · 0 stored");
   assert.equal(status.tombstoneText, "No deleted tombstones");
+});
+
+test("archiveHealthDetails warns when synced archive has no storage self-check", () => {
+  const status = archiveHealthDetails({
+    lastChromeSync: {
+      stored: 12,
+      syncedAt: "2026-06-16T09:00:00.000Z"
+    }
+  });
+
+  assert.equal(status.healthText, "Storage check not run");
+  assert.equal(status.isWarning, true);
+  assert.equal(status.isOk, false);
+  assert.equal(status.storageText, "Not checked yet");
 });
 
 test("archiveHealthDetails warns about vault data issues", () => {
@@ -175,6 +195,7 @@ test("archiveHealthDetails warns about vault data issues", () => {
   assert.equal(status.healthText, "Vault data needs review");
   assert.equal(status.isWarning, true);
   assert.equal(status.isOk, false);
+  assert.equal(status.storageText, "Not checked yet");
   assert.equal(status.vaultText, "1 missing URL · 1 bad time · 3 duplicate active");
   assert.equal(status.tombstoneText, "2 deleted tombstones");
 });

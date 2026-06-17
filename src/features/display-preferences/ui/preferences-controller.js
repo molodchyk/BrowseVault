@@ -84,6 +84,7 @@ export function createDisplayPreferencesController({
     elements.archiveStartup.textContent = status.startupText;
     elements.archiveSync.textContent = status.syncText;
     elements.archiveCapture.textContent = status.captureText;
+    elements.archiveStorage.textContent = status.storageText;
     elements.archiveVault.textContent = status.vaultText;
     elements.archiveTombstones.textContent = status.tombstoneText;
   }

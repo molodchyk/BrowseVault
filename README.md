@@ -44,6 +44,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - deterministic newest-first exports, including formula-safe CSV with ISO timestamp, local date/time, visit id, and Chrome id fields;
 - offline HTML exports with summary metrics, exact timestamps, in-file filtering, sortable columns, and safer link handling;
 - visible backup status with freshness, format, record count, file size, backup self-test, and checksum details;
+- visible storage self-check status for the local vault metadata layer;
 - recent activity log for completed backup, export, import, cleanup, delete, restore, rule, and reset operations;
 - SHA-256 integrity metadata for JSON backups;
 - staged import preview with valid row, duplicate row, existing visit, new visit, rule, and restore-check health status;

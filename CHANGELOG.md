@@ -20,6 +20,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Bare `after:YYYY-MM-DD` and `before:YYYY-MM-DD` search filters use local calendar-day boundaries instead of browser-dependent UTC parsing.
 - JSON backup integrity metadata and backup self-test before full JSON export.
 - Backup reminder status follows the configured reminder interval and warns when the next reminder date is reached.
+- Storage self-check metadata is written and read during extension-page stats refresh, then shown in the Backup tab's archive health panel.
 - History result rows expose exact ISO visit timestamps in their time metadata while preserving the selected visible date format.
 - Automated folder-density checks for runtime/support folders and feature/test-feature folders, matching the modularization playbook budgets.
 - Import preview and import support for BrowseVault JSON, CSV, TSV, Google Takeout Browser History, Google My Activity, and common competitor history exports.
