@@ -23,6 +23,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `src/export-format.js` is a compatibility barrel for existing import paths.
 - `test/features/` mirrors feature-owned tests by product area so no single flat test folder becomes a dumping ground.
 - `test/platform/`, `test/query/`, and `test/storage/` own cross-feature platform, query-parser, and storage tests.
+- `scripts/check-folder-density.mjs` enforces the folder-density budgets from the modularization playbook for `src/`, `test/`, and `scripts/`.
 
 ## Next Split Candidates
 
@@ -35,4 +36,5 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - Keep compatibility barrels export-only.
 - Add or update focused tests when pure logic moves.
 - Keep test files grouped by feature or responsibility rather than adding new root-level `test/*.test.js` files.
+- Run `npm run check` after structure changes; it fails when runtime/support folders exceed 12 files or feature/test-feature folders exceed 15 files.
 - Update this file when ownership changes.

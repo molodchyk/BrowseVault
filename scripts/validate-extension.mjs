@@ -25,6 +25,7 @@ const requiredFiles = [
   "docs/chrome-web-store-additional-fields.md",
   "docs/chrome-web-store-category.md",
   "docs/chrome-web-store-privacy-form.md",
+  "scripts/check-folder-density.mjs",
   "assets/icons/icon16.png",
   "assets/icons/icon32.png",
   "assets/icons/icon48.png",
@@ -92,6 +93,7 @@ const packageJson = readJson("package.json");
 assert(packageJson.version === manifest.version, "package.json version must match manifest version.");
 assert(packageJson.keywords.includes("browser-history"), "Missing browser-history keyword.");
 assert(packageJson.keywords.includes("history-backup"), "Missing history-backup keyword.");
+assert(packageJson.scripts.check.includes("check-folder-density.mjs"), "Check script must enforce folder density.");
 assert(packageJson.scripts.icons, "Missing icons script.");
 assert(packageJson.scripts.package, "Missing package script.");
 

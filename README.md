@@ -70,6 +70,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - exact ISO visit timestamps in history result metadata while visible rows follow the selected date format;
 - in-app trust, permission, and product-limit disclosures;
 - local-first privacy documentation;
+- automated folder-density checks that enforce the modularization playbook's 12-file runtime/support and 15-file feature-folder budgets;
 - versioned release notes in [`CHANGELOG.md`](CHANGELOG.md), including trust-sensitive behavior changes;
 - generated PNG extension icons;
 - deterministic runtime-only local ZIP packaging that excludes repo research, tests, scripts, StorePilot files, and feature docs;
@@ -88,6 +89,8 @@ This repository contains a working Manifest V3 extension implementation. It incl
 ├── assets/
 │   └── icons/
 ├── scripts/
+│   ├── check-folder-density.mjs
+│   ├── check-syntax.mjs
 │   ├── generate-icons.mjs
 │   ├── package-extension.mjs
 │   └── validate-extension.mjs
@@ -149,6 +152,8 @@ npm run package
 ```
 
 `npm run validate` also enforces the current trust baseline: exact manifest permissions, no host permissions, no optional permission prompts, no content scripts, no web-accessible resources, no external extension messaging surface, no remote source URLs, no source-level network APIs or dynamic code loaders, and no default `chrome_url_overrides` replacement of Chrome history.
+
+`npm run check` verifies JavaScript syntax and folder-density budgets so flat runtime/support folders stay at 12 files or fewer, while feature folders and feature test folders stay at 15 files or fewer before being split again.
 
 `npm run package` writes `dist/browsevault-0.1.0.zip`.
 
