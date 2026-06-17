@@ -36,6 +36,17 @@ export function createHistoryResultsController({
     elements.loadMore.hidden = !state.canLoadMore;
     if (state.canLoadMore) {
       elements.loadMore.textContent = `Load ${state.nextCount} More`;
+    } else {
+      elements.loadMore.textContent = "";
+    }
+
+    elements.loadAll.hidden = !state.canLoadMore;
+    if (state.canLoadMore) {
+      elements.loadAll.textContent = appState.currentTotal > maxResultLimit
+        ? `Show First ${maxResultLimit.toLocaleString()}`
+        : "Show All";
+    } else {
+      elements.loadAll.textContent = "";
     }
   }
 

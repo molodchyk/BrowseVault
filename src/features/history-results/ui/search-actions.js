@@ -76,7 +76,39 @@ export function createHistorySearchActions({
     setStatus(`Showing ${results.length} of ${total} results`);
   }
 
+  async function loadAllResults() {
+    const targetLimit = Math.min(appState.currentTotal, maxResultLimit);
+    if (appState.currentResults.length >= targetLimit) {
+      setStatus("All loaded results are visible");
+      updateLoadMoreButton();
+      return;
+    }
+
+    appState.currentShownLimit = targetLimit;
+    const maxResultLabel = maxResultLimit.toLocaleString();
+    setStatus(appState.currentTotal > maxResultLimit
+      ? `Loading first ${maxResultLabel} results`
+      : "Loading all results"
+    );
+    const requestId = deps.nextHistorySearchRequestId(appState);
+
+    const { results, total } = await searchVisits(getSearchText(), {
+      limit: appState.currentShownLimit
+    });
+
+    if (!deps.isCurrentHistorySearchRequestId(appState, requestId)) {
+      return;
+    }
+
+    renderResults(results, total);
+    setStatus(total > maxResultLimit
+      ? `Showing first ${results.length} of ${total} results`
+      : `Showing all ${results.length} results`
+    );
+  }
+
   return {
+    loadAllResults,
     loadMoreResults,
     runSearch
   };

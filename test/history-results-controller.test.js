@@ -16,6 +16,10 @@ function createHarness({
     selectedIds: new Set(selectedIds)
   };
   const elements = {
+    loadAll: {
+      hidden: true,
+      textContent: ""
+    },
     loadMore: {
       hidden: true,
       textContent: ""
@@ -79,6 +83,8 @@ test("renderResults stores current results and delegates to the history renderer
   assert.deepEqual(elements.selectionActions.map((action) => action.hidden), [false, false]);
   assert.equal(elements.loadMore.hidden, false);
   assert.equal(elements.loadMore.textContent, "Load 10 More");
+  assert.equal(elements.loadAll.hidden, false);
+  assert.equal(elements.loadAll.textContent, "Show All");
 });
 
 test("updateLoadMoreButton hides the button when all results are shown", () => {
@@ -91,6 +97,23 @@ test("updateLoadMoreButton hides the button when all results are shown", () => {
 
   assert.equal(elements.loadMore.hidden, true);
   assert.equal(elements.loadMore.textContent, "");
+  assert.equal(elements.loadAll.hidden, true);
+  assert.equal(elements.loadAll.textContent, "");
+});
+
+test("updateLoadMoreButton labels capped show-all results when matches exceed the max", () => {
+  const { appState, controller, elements } = createHarness({
+    currentResults: Array.from({ length: 10 }, (_value, index) => ({ id: `visit-${index}` })),
+    currentTotal: 75
+  });
+
+  appState.currentTotal = 75;
+  controller.updateLoadMoreButton();
+
+  assert.equal(elements.loadMore.hidden, false);
+  assert.equal(elements.loadMore.textContent, "Load 10 More");
+  assert.equal(elements.loadAll.hidden, false);
+  assert.equal(elements.loadAll.textContent, "Show First 50");
 });
 
 test("applyResultSelection updates count or rerenders current results", () => {

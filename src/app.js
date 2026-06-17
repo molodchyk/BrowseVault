@@ -183,6 +183,7 @@ function bindEvents() {
       focusSearchInput: appNavigation.focusSearchInput,
       importFromFile: backupActions.importFromFile,
       invertVisibleSelection: bulkActions.invertVisibleSelection,
+      loadAllResults: historySearchActions.loadAllResults,
       loadMoreResults: historySearchActions.loadMoreResults,
       openSelected: bulkActions.openSelected,
       openNativeChromeHistory,

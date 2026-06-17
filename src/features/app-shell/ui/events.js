@@ -101,6 +101,7 @@ export function bindAppEvents({ elements, document, root, handlers }) {
   bindAsync(elements.exportResultsHtml, "click", handlers.exportFilteredResultsHtml, setStatus);
   bindAsync(elements.deleteResults, "click", handlers.deleteCurrentResultsFromVault, setStatus);
   bindAsync(elements.loadMore, "click", handlers.loadMoreResults, setStatus);
+  bindAsync(elements.loadAll, "click", handlers.loadAllResults, setStatus);
   elements.clearSelection.addEventListener("click", () => handlers.clearSelection());
 
   elements.importArchive.addEventListener("change", (event) => {

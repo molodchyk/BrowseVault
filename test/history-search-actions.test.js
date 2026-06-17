@@ -166,3 +166,90 @@ test("loadMoreResults expands visible limit, renders fresh results, and ignores 
   assert.deepEqual(stale.renderCalls, []);
   assert.deepEqual(stale.statusMessages, ["Loading more results"]);
 });
+
+test("loadAllResults reports all-visible state without searching", async () => {
+  const { actions, statusMessages, updateLoadMoreCalls } = createHarness({
+    currentResults: [{ id: "visit-1" }, { id: "visit-2" }],
+    currentTotal: 2,
+    searchVisits: async () => {
+      throw new Error("should not search");
+    }
+  });
+
+  await actions.loadAllResults();
+
+  assert.deepEqual(statusMessages, ["All loaded results are visible"]);
+  assert.deepEqual(updateLoadMoreCalls, [true]);
+});
+
+test("loadAllResults expands current results to the total match count", async () => {
+  const searchCalls = [];
+  const { actions, appState, renderCalls, statusMessages } = createHarness({
+    currentResults: [{ id: "visit-1" }],
+    currentTotal: 12,
+    searchVisits: async (query, options) => {
+      searchCalls.push({ query, options });
+      return {
+        results: Array.from({ length: 12 }, (_value, index) => ({ id: `visit-${index + 1}` })),
+        total: 12
+      };
+    }
+  });
+
+  await actions.loadAllResults();
+
+  assert.equal(appState.currentShownLimit, 12);
+  assert.deepEqual(searchCalls, [
+    {
+      query: "docs site:example.com",
+      options: { limit: 12 }
+    }
+  ]);
+  assert.equal(renderCalls.length, 1);
+  assert.equal(renderCalls[0].results.length, 12);
+  assert.equal(renderCalls[0].total, 12);
+  assert.deepEqual(statusMessages, ["Loading all results", "Showing all 12 results"]);
+});
+
+test("loadAllResults respects the maximum result cap and ignores stale responses", async () => {
+  const searchCalls = [];
+  const capped = createHarness({
+    currentResults: [{ id: "visit-1" }],
+    currentTotal: 120,
+    searchVisits: async (query, options) => {
+      searchCalls.push({ query, options });
+      return {
+        results: Array.from({ length: 50 }, (_value, index) => ({ id: `visit-${index + 1}` })),
+        total: 120
+      };
+    }
+  });
+
+  await capped.actions.loadAllResults();
+
+  assert.equal(capped.appState.currentShownLimit, 50);
+  assert.deepEqual(searchCalls, [
+    {
+      query: "docs site:example.com",
+      options: { limit: 50 }
+    }
+  ]);
+  assert.equal(capped.renderCalls.length, 1);
+  assert.equal(capped.renderCalls[0].results.length, 50);
+  assert.deepEqual(capped.statusMessages, ["Loading first 50 results", "Showing first 50 of 120 results"]);
+
+  const stale = createHarness({
+    currentResults: [{ id: "visit-1" }],
+    currentTotal: 12,
+    isCurrentHistorySearchRequestId: () => false,
+    searchVisits: async () => ({
+      results: [{ id: "visit-1" }, { id: "visit-2" }],
+      total: 12
+    })
+  });
+
+  await stale.actions.loadAllResults();
+
+  assert.deepEqual(stale.renderCalls, []);
+  assert.deepEqual(stale.statusMessages, ["Loading all results"]);
+});

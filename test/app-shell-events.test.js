@@ -85,6 +85,7 @@ function createElements() {
     exportResultsHtml: fakeElement(),
     deleteResults: fakeElement(),
     loadMore: fakeElement(),
+    loadAll: fakeElement(),
     clearSelection: fakeElement(),
     addBlacklist: fakeElement(),
     addWhitelist: fakeElement(),
@@ -126,6 +127,7 @@ function createHandlers(calls) {
     "focusSearchInput",
     "importFromFile",
     "invertVisibleSelection",
+    "loadAllResults",
     "loadMoreResults",
     "openSelected",
     "openNativeChromeHistory",
@@ -302,6 +304,8 @@ test("bindAppEvents wires bulk and rules actions", () => {
   elements.exportResultsCsv.dispatch("click");
   elements.exportResultsHtml.dispatch("click");
   elements.deleteResults.dispatch("click");
+  elements.loadMore.dispatch("click");
+  elements.loadAll.dispatch("click");
   elements.addBlacklist.dispatch("click");
   elements.addWhitelist.dispatch("click");
   elements.previewRetention.dispatch("click");
@@ -319,6 +323,8 @@ test("bindAppEvents wires bulk and rules actions", () => {
     ["exportFilteredResultsCsv"],
     ["exportFilteredResultsHtml"],
     ["deleteCurrentResultsFromVault"],
+    ["loadMoreResults"],
+    ["loadAllResults"],
     ["addBlacklistRule"],
     ["addWhitelistRule"],
     ["previewRetentionCleanup"],

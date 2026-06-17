@@ -48,6 +48,7 @@ const singularSelectors = [
   "export-results-html",
   "delete-results",
   "load-more",
+  "load-all",
   "clear-selection",
   "result-count",
   "selected-count",
