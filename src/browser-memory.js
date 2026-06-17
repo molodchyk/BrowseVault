@@ -156,19 +156,37 @@ async function searchRecentlyClosedRecords() {
   );
 }
 
+const SOURCE_SEARCHES = [
+  { label: "Tabs", run: searchTabRecords },
+  { label: "Bookmarks", run: searchBookmarkRecords },
+  { label: "Downloads", run: searchDownloadRecords },
+  { label: "Recently closed", run: searchRecentlyClosedRecords }
+];
+
+function sourceWarning(label, reason) {
+  const message = reason?.message || "";
+  if (
+    message === "Chrome extension API is unavailable."
+    || message.includes("Cannot read properties of undefined")
+    || message.includes("is not a function")
+  ) {
+    return `${label} unavailable in this context.`;
+  }
+
+  return `${label}: ${message || "Unknown source error"}`;
+}
+
 export async function searchBrowserMemory(input = "", options = {}) {
   const limit = Number(options.limit || DEFAULT_LIMIT);
   const query = parseQuery(input);
-  const settled = await Promise.allSettled([
-    searchTabRecords(),
-    searchBookmarkRecords(),
-    searchDownloadRecords(),
-    searchRecentlyClosedRecords()
-  ]);
+  const settled = await Promise.allSettled(SOURCE_SEARCHES.map((source) => source.run()));
 
   const warnings = settled
-    .filter((result) => result.status === "rejected")
-    .map((result) => result.reason?.message || "Unknown source error");
+    .map((result, index) => result.status === "rejected"
+      ? sourceWarning(SOURCE_SEARCHES[index].label, result.reason)
+      : null
+    )
+    .filter(Boolean);
 
   const records = settled
     .filter((result) => result.status === "fulfilled")

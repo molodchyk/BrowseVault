@@ -14,7 +14,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Advanced local search for site, host, domain, title, URL, source, transition, visit count, exact day, date range, local hour, exclusions, wildcards, phrases, and regex.
 - One-click Today, Yesterday, 7 Days, 30 Days, and All Dates shortcuts using ISO-style date filters.
 - Saved searches, match highlighting, local-date grouped results, incremental loading, keyboard-first search focus, and keyboard navigation for visible history rows.
-- Quick Open search across open tabs, bookmarks, downloads, and recently closed tabs.
+- Quick Open search across open tabs, bookmarks, downloads, and recently closed tabs, with keyboard navigation for source results and readable source-unavailable warnings.
 - JSON, CSV, and HTML export for all records, selected records, and current filtered results.
 - JSON backup integrity metadata and backup self-test before full JSON export.
 - Import preview and import support for BrowseVault JSON, CSV, TSV, Google Takeout Browser History, Google My Activity, and common competitor history exports.

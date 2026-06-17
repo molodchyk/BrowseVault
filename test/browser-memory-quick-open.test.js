@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   createQuickOpenActions,
+  handleQuickResultKeyDown,
   quickBackgroundActionMessage,
   quickBackgroundActionStatusLabel,
   quickActionLabel,
@@ -11,17 +12,33 @@ import {
 
 function fakeNode() {
   return {
+    dataset: {},
     href: "",
     listeners: {},
+    tabIndex: null,
     textContent: "",
     addEventListener(type, handler) {
       this.listeners[type] = handler;
+    },
+    click() {
+      return this.listeners.click?.();
+    },
+    closest() {
+      return null;
+    },
+    focus() {
+      this.focused = true;
+    },
+    querySelector() {
+      return null;
     }
   };
 }
 
 function fakeFragment() {
+  const result = fakeNode();
   const nodes = {
+    ".quick-result": result,
     ".source-pill": fakeNode(),
     ".result-title": fakeNode(),
     ".url": fakeNode(),
@@ -30,6 +47,8 @@ function fakeFragment() {
     ".quick-background": fakeNode(),
     ".quick-copy": fakeNode()
   };
+  result.closest = (selector) => (selector === ".quick-result[data-quick-index]" ? result : null);
+  result.querySelector = (selector) => nodes[selector] || null;
 
   return {
     nodes,
@@ -44,6 +63,14 @@ function fakeList() {
     children: [],
     append(...children) {
       this.children.push(...children);
+    },
+    querySelectorAll(selector) {
+      if (selector !== ".quick-result[data-quick-index]") {
+        return [];
+      }
+      return this.children
+        .map((child) => child.nodes?.[".quick-result"])
+        .filter((row) => row?.dataset?.quickIndex !== undefined);
     },
     replaceChildren(...children) {
       this.children = [...children];
@@ -171,6 +198,8 @@ test("runQuickSearch renders results and wires quick action and copy buttons", a
   assert.equal(quickResults.children.length, 1);
   assert.equal(fragments[0].nodes[".source-pill"].textContent, "tab");
   assert.equal(fragments[0].nodes[".result-title"].href, "https://example.com/docs");
+  assert.equal(fragments[0].nodes[".quick-result"].dataset.quickIndex, "0");
+  assert.equal(fragments[0].nodes[".quick-result"].tabIndex, 0);
   assert.equal(fragments[0].nodes[".result-title"].textContent, "Docs");
   assert.equal(fragments[0].nodes[".url"].textContent, "https://example.com/docs");
   assert.equal(fragments[0].nodes[".meta"].textContent, "Open tab · example.com · iso:123");
@@ -228,4 +257,77 @@ test("renderQuickResults shows source warnings in the empty state", () => {
   assert.equal(quickResults.children.length, 1);
   assert.equal(quickResults.children[0].className, "quick-result");
   assert.equal(quickResults.children[0].textContent, "No source results. Bookmarks unavailable");
+});
+
+function fakeQuickRow(id, calls) {
+  const action = {
+    click: () => calls.push(`action:${id}`)
+  };
+  const row = {
+    id,
+    dataset: { quickIndex: id },
+    closest: (selector) => (selector === ".quick-result[data-quick-index]" ? row : null),
+    focus: () => calls.push(`focus:${id}`),
+    querySelector: (selector) => (selector === ".quick-action" ? action : null),
+    tabIndex: null
+  };
+  return row;
+}
+
+function fakeKeyEvent(key, target) {
+  const calls = [];
+  return {
+    calls,
+    event: {
+      key,
+      target,
+      preventDefault: () => calls.push("prevent")
+    }
+  };
+}
+
+test("quick result keyboard navigation moves roving focus and runs primary action", () => {
+  const calls = [];
+  const rows = [
+    fakeQuickRow("a", calls),
+    fakeQuickRow("b", calls),
+    fakeQuickRow("c", calls)
+  ];
+  const quickResults = {
+    querySelectorAll: (selector) => (selector === ".quick-result[data-quick-index]" ? rows : [])
+  };
+
+  const down = fakeKeyEvent("ArrowDown", rows[0]);
+  assert.equal(handleQuickResultKeyDown(down.event, quickResults), true);
+  assert.deepEqual(down.calls, ["prevent"]);
+  assert.deepEqual(calls, ["focus:b"]);
+  assert.deepEqual(rows.map((row) => row.tabIndex), [-1, 0, -1]);
+
+  const home = fakeKeyEvent("Home", rows[2]);
+  assert.equal(handleQuickResultKeyDown(home.event, quickResults), true);
+  assert.deepEqual(calls, ["focus:b", "focus:a"]);
+  assert.deepEqual(rows.map((row) => row.tabIndex), [0, -1, -1]);
+
+  const enter = fakeKeyEvent("Enter", rows[0]);
+  assert.equal(handleQuickResultKeyDown(enter.event, quickResults), true);
+  assert.deepEqual(calls, ["focus:b", "focus:a", "action:a"]);
+});
+
+test("quick result keyboard handler leaves nested controls alone", () => {
+  const calls = [];
+  const row = fakeQuickRow("a", calls);
+  const childTarget = {
+    closest: (selector) => (selector === ".quick-result[data-quick-index]" ? row : null)
+  };
+  const quickResults = {
+    querySelectorAll: (selector) => (selector === ".quick-result[data-quick-index]" ? [row] : [])
+  };
+
+  const childEnter = fakeKeyEvent("Enter", childTarget);
+  assert.equal(handleQuickResultKeyDown(childEnter.event, quickResults), false);
+  assert.deepEqual(calls, []);
+
+  const space = fakeKeyEvent(" ", row);
+  assert.equal(handleQuickResultKeyDown(space.event, quickResults), true);
+  assert.deepEqual(calls, ["action:a"]);
 });

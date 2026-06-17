@@ -36,7 +36,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - keyboard-first search with autofocus, global query focus, Enter search, and debounced live refresh;
 - keyboard navigation for visible history results with arrow keys, Enter-to-open, and Space-to-select;
 - local-date grouped vault results for easier timeline scanning;
-- Quick Open search across open tabs, bookmarks, downloads, and recently closed tabs, with source-aware switch/open/open-in-background/restore actions;
+- Quick Open search across open tabs, bookmarks, downloads, and recently closed tabs, with source-aware switch/open/open-in-background/restore actions, keyboard navigation, and readable source-unavailable warnings;
 - toolbar and keyboard-command opening that reuses an already open BrowseVault tab;
 - Settings escape hatch for opening Chrome's native history page without making BrowseVault a default-history override;
 - JSON backup export and import;

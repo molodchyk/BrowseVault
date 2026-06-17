@@ -22,6 +22,74 @@ const defaultServices = {
   sendRuntimeMessage
 };
 
+const QUICK_RESULT_SELECTOR = ".quick-result[data-quick-index]";
+
+function quickResultItems(resultsElement) {
+  return Array.from(resultsElement.querySelectorAll(QUICK_RESULT_SELECTOR));
+}
+
+function targetQuickResult(target) {
+  return target?.closest?.(QUICK_RESULT_SELECTOR) || null;
+}
+
+function focusQuickResultByIndex(resultsElement, index) {
+  const items = quickResultItems(resultsElement);
+  if (!items.length) {
+    return null;
+  }
+
+  const boundedIndex = Math.max(0, Math.min(index, items.length - 1));
+  const next = items[boundedIndex];
+  items.forEach((item) => {
+    item.tabIndex = item === next ? 0 : -1;
+  });
+  next.focus();
+  return next;
+}
+
+export function handleQuickResultKeyDown(event, resultsElement) {
+  const current = targetQuickResult(event.target);
+  if (!current) {
+    return false;
+  }
+
+  const items = quickResultItems(resultsElement);
+  const index = items.indexOf(current);
+  if (index < 0) {
+    return false;
+  }
+
+  const moves = {
+    ArrowDown: index + 1,
+    ArrowUp: index - 1,
+    Home: 0,
+    End: items.length - 1
+  };
+
+  if (Object.prototype.hasOwnProperty.call(moves, event.key)) {
+    event.preventDefault();
+    focusQuickResultByIndex(resultsElement, moves[event.key]);
+    return true;
+  }
+
+  if (event.target !== current) {
+    return false;
+  }
+
+  if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
+    const action = current.querySelector(".quick-action");
+    if (!action) {
+      return false;
+    }
+
+    event.preventDefault();
+    action.click();
+    return true;
+  }
+
+  return false;
+}
+
 export function quickActionMessage(item) {
   const action = item.action || { type: "open-url", url: item.url };
   const messageByType = {
@@ -99,8 +167,11 @@ export function createQuickOpenActions({
       return;
     }
 
-    for (const item of results) {
+    elements.quickResults.onkeydown = (event) => handleQuickResultKeyDown(event, elements.quickResults);
+
+    results.forEach((item, index) => {
       const fragment = elements.quickResultTemplate.content.cloneNode(true);
+      const result = fragment.querySelector(".quick-result");
       const source = fragment.querySelector(".source-pill");
       const title = fragment.querySelector(".result-title");
       const url = fragment.querySelector(".url");
@@ -109,6 +180,8 @@ export function createQuickOpenActions({
       const background = fragment.querySelector(".quick-background");
       const copy = fragment.querySelector(".quick-copy");
 
+      result.dataset.quickIndex = String(index);
+      result.tabIndex = index === 0 ? 0 : -1;
       source.textContent = item.type;
       title.href = item.url;
       deps.appendHighlightedText(title, item.title || item.url, titleTokens, query.regex);
@@ -125,7 +198,7 @@ export function createQuickOpenActions({
       copy.addEventListener("click", () => copyQuickUrl(item).catch((error) => setStatus(error.message)));
 
       elements.quickResults.append(fragment);
-    }
+    });
 
   }
 
