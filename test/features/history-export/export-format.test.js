@@ -29,6 +29,25 @@ test("visitsToCsv includes spreadsheet-friendly date/time and identity columns",
   assert.match(row, /,"Report, Q2",https:\/\/example\.com\/report,3,typed,fixture,chrome\|1$/);
 });
 
+test("visitsToCsv does not throw on malformed timestamps", () => {
+  const csv = visitsToCsv([
+    {
+      id: "visit-1",
+      chromeId: "chrome|1",
+      url: "https://example.com/report",
+      title: "Report",
+      domain: "example.com",
+      visitTime: "not-a-date",
+      visitCount: 1,
+      transition: "link",
+      source: "fixture"
+    }
+  ]);
+
+  const [, row] = csv.split("\n");
+  assert.match(row, /^visit-1,,,,not-a-date,example\.com,Report,/);
+});
+
 test("visitsToHtml escapes visit fields", () => {
   const html = visitsToHtml(
     [
@@ -44,9 +63,58 @@ test("visitsToHtml escapes visit fields", () => {
     "2026-06-16T12:35:00.000Z"
   );
 
-  assert.match(html, /BrowseVault Export/);
+  assert.match(html, /BrowseVault History Export/);
   assert.match(html, /Report &quot;Q2&quot; &lt;draft&gt;/);
   assert.match(html, /https:\/\/example\.com\/\?q=&lt;script&gt;/);
   assert.doesNotMatch(html, /<draft>/);
-  assert.doesNotMatch(html, /<script>/);
+  assert.doesNotMatch(html, /q=<script>/);
+});
+
+test("visitsToHtml creates a filterable sortable audit report", () => {
+  const visitTime = Date.parse("2026-06-16T12:34:56Z");
+  const html = visitsToHtml(
+    [
+      {
+        id: "visit-1",
+        chromeId: "chrome|1",
+        url: "https://example.com/report",
+        title: "Report",
+        domain: "example.com",
+        visitTime,
+        visitCount: 3,
+        transition: "typed",
+        source: "fixture"
+      }
+    ],
+    "2026-06-16T12:35:00.000Z"
+  );
+
+  assert.match(html, /id="report-filter"/);
+  assert.match(html, /data-sort-type="number">Visited/);
+  assert.match(html, /2026-06-16T12:34:56\.000Z/);
+  assert.match(html, new RegExp(`data-sort="${visitTime}"`));
+  assert.match(html, /data-label="Visits" data-sort="3">3<\/td>/);
+  assert.match(html, /Click a column heading to sort/);
+});
+
+test("visitsToHtml disables unsupported link schemes", () => {
+  const html = visitsToHtml(
+    [
+      {
+        id: "visit-1",
+        chromeId: "chrome|1",
+        url: "javascript:alert(1)",
+        title: "Script URL",
+        domain: "example.com",
+        visitTime: Date.parse("2026-06-16T12:34:56Z"),
+        visitCount: 1,
+        transition: "link",
+        source: "fixture"
+      }
+    ],
+    "2026-06-16T12:35:00.000Z"
+  );
+
+  assert.match(html, /Link disabled for unsupported URL scheme/);
+  assert.doesNotMatch(html, /href="javascript:/i);
 });

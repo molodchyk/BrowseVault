@@ -42,7 +42,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - Settings escape hatch for opening Chrome's native history page without making BrowseVault a default-history override;
 - JSON backup export and import;
 - CSV export with ISO timestamp, local date/time, visit id, and Chrome id fields;
-- HTML exports;
+- offline HTML exports with summary metrics, exact timestamps, in-file filtering, sortable columns, and safer link handling;
 - visible backup status with freshness, format, record count, file size, backup self-test, and checksum details;
 - recent activity log for completed backup, export, import, cleanup, delete, restore, rule, and reset operations;
 - SHA-256 integrity metadata for JSON backups;

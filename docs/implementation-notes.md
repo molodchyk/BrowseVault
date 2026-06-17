@@ -134,7 +134,7 @@ CSV export should include:
 - source;
 - tags/categories if present.
 
-HTML export should produce clickable links and be sortable if feasible.
+HTML export should produce clickable links, exact timestamps, summary metrics, in-file filtering, sortable columns, and safe handling for unsupported URL schemes.
 
 ## Bulk Actions
 
@@ -220,4 +220,3 @@ Mitigations:
 - honest onboarding copy;
 - no default history override unless deliberately chosen;
 - import validation report.
-

@@ -16,7 +16,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - One-click Today, Yesterday, 7 Days, 30 Days, and All Dates shortcuts using ISO-style date filters.
 - Saved searches, match highlighting, local-date grouped results, sticky result controls, incremental loading, one-click Show All expansion, keyboard-first search focus, and keyboard navigation for visible history rows.
 - Quick Open search across open tabs, bookmarks, downloads, recently closed tabs, and closed windows, with keyboard navigation for source results and readable source-unavailable warnings.
-- JSON, CSV, and HTML export for all records, selected records, and current filtered results.
+- JSON, CSV, and offline HTML export for all records, selected records, and current filtered results, with HTML summary metrics, exact timestamps, in-file filtering, sortable columns, and safer link handling.
 - Bare `after:YYYY-MM-DD` and `before:YYYY-MM-DD` search filters use local calendar-day boundaries instead of browser-dependent UTC parsing.
 - JSON backup integrity metadata and backup self-test before full JSON export.
 - Backup reminder status follows the configured reminder interval and warns when the next reminder date is reached.
