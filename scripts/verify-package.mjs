@@ -8,6 +8,7 @@ const packagePath = path.join(root, "dist", `browsevault-${manifest.version}.zip
 const allowedLocalImportExtensions = new Set([".js", ".mjs"]);
 const importPattern = /(?:^|[;\n\r])\s*import\s+(?:[^'"]*?\s+from\s*)?["']([^"']+)["']/gm;
 const exportPattern = /(?:^|[;\n\r])\s*export\s+[^'"]*?\s+from\s*["']([^"']+)["']/gm;
+const messageReferencePattern = /__MSG_([A-Za-z0-9_@]+?)__/g;
 const scriptTagPattern = /<script\b[^>]*>/gi;
 const requiredEntries = [
   "manifest.json",
@@ -141,6 +142,22 @@ function collectStaticSpecifiers(source) {
   return specifiers;
 }
 
+function collectMessageReferences(value) {
+  if (typeof value === "string") {
+    return [...value.matchAll(messageReferencePattern)].map((match) => match[1]);
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => collectMessageReferences(item));
+  }
+
+  if (value && typeof value === "object") {
+    return Object.values(value).flatMap((child) => collectMessageReferences(child));
+  }
+
+  return [];
+}
+
 assert(fs.existsSync(packagePath), `Missing package: ${packagePath}`);
 
 const entries = readZipEntries(fs.readFileSync(packagePath));
@@ -175,6 +192,19 @@ assert(packagedManifest.background?.service_worker === "src/background.js", "Pac
 assert(!packagedManifest.host_permissions?.length, "Packaged manifest must not request host permissions.");
 assert(!packagedManifest.content_scripts?.length, "Packaged manifest must not include content scripts.");
 assert(!packagedManifest.chrome_url_overrides, "Packaged manifest must not replace Chrome pages.");
+
+const localeEntryName = `_locales/${packagedManifest.default_locale}/messages.json`;
+assert(entrySet.has(localeEntryName), `Package missing default locale messages: ${localeEntryName}`);
+const packagedLocaleMessages = JSON.parse(entries.find((entry) => entry.name === localeEntryName).data.toString("utf8"));
+const packagedLocaleReferences = new Set(collectMessageReferences(packagedManifest));
+for (const key of packagedLocaleReferences) {
+  const record = packagedLocaleMessages[key];
+  assert(record, `Package locale missing key: ${key}`);
+  assert(typeof record.message === "string" && record.message.trim(), `Package locale key has empty message: ${key}`);
+}
+for (const key of Object.keys(packagedLocaleMessages)) {
+  assert(packagedLocaleReferences.has(key), `Package locale has unused key: ${key}`);
+}
 
 for (const entry of entries) {
   if (!/\.(js|html|css)$/i.test(entry.name)) {

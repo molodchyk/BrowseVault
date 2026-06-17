@@ -48,6 +48,7 @@ const requiredFiles = [
   "assets/icons/icon128.png",
   "scripts/check-file-sizes.mjs",
   "scripts/check-imports.mjs",
+  "scripts/check-locales.mjs",
   "scripts/check-syntax.mjs",
   "scripts/generate-icons.mjs",
   "scripts/package-extension.mjs",
@@ -177,6 +178,7 @@ assert(packageJson.keywords.includes("browser-history"), "Missing browser-histor
 assert(packageJson.keywords.includes("history-backup"), "Missing history-backup keyword.");
 assert(packageJson.scripts.check.includes("check-syntax.mjs"), "Check script must verify JavaScript syntax.");
 assert(packageJson.scripts.check.includes("check-imports.mjs"), "Check script must verify static import resolution.");
+assert(packageJson.scripts.check.includes("check-locales.mjs"), "Check script must verify locale message coverage.");
 assert(packageJson.scripts.check.includes("check-file-sizes.mjs"), "Check script must enforce file-size budgets.");
 assert(packageJson.scripts.check.includes("check-folder-density.mjs"), "Check script must enforce folder density.");
 assert(packageJson.scripts.icons, "Missing icons script.");
@@ -202,6 +204,17 @@ for (const expected of [
   "split follow-up expected"
 ]) {
   assert(fileSizeScript.includes(expected), `File-size audit missing modularization guardrail: ${expected}`);
+}
+
+const localeCheckScript = fs.readFileSync(path.join(root, "scripts", "check-locales.mjs"), "utf8");
+for (const expected of [
+  "manifest.default_locale",
+  "missing locale key",
+  "unused locale key",
+  "__MSG_*__ references are only supported in manifest.json",
+  "Locale coverage checked"
+]) {
+  assert(localeCheckScript.includes(expected), `Locale audit missing coverage guardrail: ${expected}`);
 }
 
 const changelog = fs.readFileSync(path.join(root, "CHANGELOG.md"), "utf8");
