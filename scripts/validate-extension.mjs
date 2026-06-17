@@ -197,6 +197,15 @@ for (const expected of [
 
 const privacy = fs.readFileSync(path.join(root, "PRIVACY.md"), "utf8");
 assert(privacy.includes("Chrome local extension storage"), "Privacy policy must name the storage area used for settings.");
+for (const expected of [
+  "content scripts",
+  "remote code",
+  "Does not sell, share, transfer, upload, review, or collect",
+  "`downloads`: searches download URLs and filenames in Quick Open and can show Chrome's Save As prompt",
+  "`tabs`: lists open tabs for Quick Open"
+]) {
+  assert(privacy.includes(expected), `Privacy policy missing playbook-required detail: ${expected}`);
+}
 
 for (const size of [16, 32, 48, 128]) {
   const icon = fs.readFileSync(path.join(root, "assets", "icons", `icon${size}.png`));
@@ -256,6 +265,7 @@ for (const expected of [
   "cannot recover visits Chrome already deleted",
   "does not replace Chrome's native history page by default",
   "does not make network requests by default",
+  "does not request `file://` host access",
   "`history`",
   "`tabs`"
 ]) {

@@ -98,6 +98,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 │   ├── extension-modularization-playbook.md
 │   ├── release-qa.md
 │   ├── release-notes.md
+│   ├── repository-metadata.md
 │   ├── reviewer-notes.md
 │   └── storepilot-project-structure.md
 ├── assets/
@@ -107,6 +108,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 │   ├── check-syntax.mjs
 │   ├── generate-icons.mjs
 │   ├── package-extension.mjs
+│   ├── verify-package.mjs
 │   └── validate-extension.mjs
 ├── src/
 │   ├── app.css

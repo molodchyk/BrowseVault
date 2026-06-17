@@ -9,6 +9,7 @@ These notes summarize behavior that browser-store reviewers should not need to i
 - Chrome extension APIs generally cannot write arbitrary old imported visits back into Chrome's native history database.
 - Mobile, synced-device, account, or other-profile history depends on what Chrome exposes locally or what the user imports.
 - Incognito history is not captured unless the browser allows the extension to run in incognito and exposes the relevant local history events.
+- Local backup/import files are handled only when the user chooses a file or export action; BrowseVault does not request `file://` host access or crawl local file URLs.
 
 ## Chrome History Behavior
 
