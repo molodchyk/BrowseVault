@@ -75,6 +75,8 @@ export function validatePlaybookCompliance(root, assert) {
     "Localization",
     "Privacy And Permissions",
     "Reviewer Notes And Release Checks",
+    "manifest key allowlist",
+    "chrome_settings_overrides",
     "manual check"
   ]) {
     assert(playbookCompliance.includes(expected), `Playbook compliance matrix missing: ${expected}`);

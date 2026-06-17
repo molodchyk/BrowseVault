@@ -1,62 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
+import { requiredProjectFiles } from "./playbook/required-project-files.mjs";
+import { validateChromeQaSafety } from "./playbook/validate-chrome-qa-safety.mjs";
+import { validateManifestSurface } from "./playbook/validate-manifest-surface.mjs";
 import { validatePlaybookCompliance } from "./playbook/validate-playbook-compliance.mjs";
 
 const root = process.cwd();
-const requiredFiles = [
-  "manifest.json",
-  "_locales/en/messages.json",
-  "README.md",
-  "CHANGELOG.md",
-  "LICENSE",
-  "PRIVACY.md",
-  "src/background.js",
-  "src/storage.js",
-  "src/query.js",
-  "src/browser-memory.js",
-  "src/export-format.js",
-  "src/app.html",
-  "src/app.css",
-  "src/app.js",
-  "src/features/app-shell/ui/localization-map.js", "src/features/app-shell/ui/localization.js", "src/features/background-runtime/ui/localization-keys.js", "src/platform/chrome/i18n.js",
-  "store/listing.md",
-  "store-listing/chrome-web-store/README.md",
-  "store-listing/chrome-web-store/listing/en.md",
-  "store-listing/chrome-web-store/media/icon-128.png",
-  "store-listing/chrome-web-store/media/promo/.gitkeep",
-  "store-listing/chrome-web-store/media/promo/small-promo.png",
-  "store-listing/chrome-web-store/media/promo/marquee-promo.png",
-  "store-listing/chrome-web-store/media/screenshots/.gitkeep",
-  "store-listing/chrome-web-store/media/screenshots/01-history-search.jpg",
-  "store-listing/chrome-web-store/media/screenshots/02-quick-open.jpg",
-  "store-listing/chrome-web-store/media/screenshots/03-backup-health.jpg",
-  "store-listing/chrome-web-store/media/screenshots/04-rules-cleanup.jpg",
-  "store-listing/chrome-web-store/media/screenshots/05-settings-privacy.jpg",
-  "docs/README.md", "docs/architecture/code-structure.md", "docs/architecture/extension-modularization-playbook.md",
-  "docs/project/decision-records.md", "docs/project/repository-metadata.md", "docs/release/reviewer-notes.md",
-  "docs/release/browser-extension-playbook-compliance.md", "docs/release/release-qa.md", "docs/release/release-notes.md", "docs/research/source-inventory.md",
-  "docs/storepilot-project-structure.md",
-  "docs/chrome-web-store-additional-fields.md",
-  "docs/chrome-web-store-category.md",
-  "docs/chrome-web-store-privacy-form.md",
-  "scripts/check-folder-density.mjs",
-  "assets/icons/icon16.png",
-  "assets/icons/icon32.png",
-  "assets/icons/icon48.png",
-  "assets/icons/icon128.png",
-  "scripts/check-file-sizes.mjs",
-  "scripts/check-imports.mjs",
-  "scripts/check-locales.mjs",
-  "scripts/check-manifest-paths.mjs",
-  "scripts/check-privacy-permissions.mjs",
-  "scripts/check-syntax.mjs",
-  "scripts/generate-icons.mjs",
-  "scripts/media/generate-store-media.py",
-  "scripts/package-extension.mjs",
-  "scripts/playbook/validate-playbook-compliance.mjs",
-  "scripts/verify-package.mjs",
-  "scripts/zip-utils.mjs"
-];
 
 function readJson(file) {
   return JSON.parse(fs.readFileSync(path.join(root, file), "utf8"));
@@ -128,50 +77,14 @@ function collectFilesByExtension(entry, extensions) {
     .flatMap((child) => collectFilesByExtension(path.join(entry, child), extensions));
 }
 
-for (const file of requiredFiles) {
+for (const file of requiredProjectFiles) {
   assert(fs.existsSync(path.join(root, file)), `Missing required file: ${file}`);
 }
 
 const manifest = readJson("manifest.json");
 const localeMessages = readJson("_locales/en/messages.json");
 const localeMessage = (key) => localeMessages[key]?.message || "";
-assert(manifest.manifest_version === 3, "Manifest must use version 3.");
-assert(manifest.default_locale === "en", "Manifest must use the English _locales folder for StorePilot-compatible structure.");
-assert(manifest.name === "__MSG_extensionName__", "Manifest name should resolve through _locales/en/messages.json.");
-assert(manifest.short_name === "__MSG_extensionShortName__", "Manifest short_name should resolve through _locales/en/messages.json.");
-assert(manifest.description === "__MSG_extensionDescription__", "Manifest description should resolve through _locales/en/messages.json.");
-assert(localeMessage("extensionName") === "BrowseVault: History Search & Backup", "Unexpected localized extension name.");
-assert(localeMessage("extensionShortName") === "BrowseVault", "Unexpected localized short_name.");
-assert(
-  localeMessage("extensionDescription") === "Search, back up, export, and preserve your browser history locally.",
-  "Unexpected localized extension description."
-);
-assert(localeMessage("extensionDescription").length <= 132, "Manifest description should stay within Chrome Web Store summary length.");
-assert(manifest.background?.type === "module", "Background script should be an ES module.");
-for (const size of ["16", "32", "48", "128"]) {
-  assert(manifest.icons?.[size] === `assets/icons/icon${size}.png`, `Missing manifest icon ${size}.`);
-  assert(manifest.action?.default_icon?.[size] === `assets/icons/icon${size}.png`, `Missing action icon ${size}.`);
-}
-
-const expectedPermissions = ["bookmarks", "downloads", "history", "sessions", "storage", "tabs"];
-assert(Array.isArray(manifest.permissions), "Manifest permissions must be explicit.");
-assert(
-  JSON.stringify([...manifest.permissions].sort()) === JSON.stringify([...expectedPermissions].sort()),
-  `Manifest permissions changed; expected exactly: ${expectedPermissions.join(", ")}.`
-);
-assert(!manifest.optional_permissions?.length, "Manifest should not request optional permissions.");
-assert(!manifest.host_permissions?.length, "Manifest should not request host permissions.");
-assert(!manifest.optional_host_permissions?.length, "Manifest should not request optional host permissions.");
-assert(!manifest.chrome_url_overrides, "Manifest must not replace Chrome history by default.");
-assert(!manifest.content_scripts?.length, "Manifest should not inject content scripts.");
-assert(!manifest.externally_connectable, "Manifest should not expose externally_connectable messaging.");
-assert(!manifest.web_accessible_resources?.length, "Manifest should not expose web-accessible resources.");
-assert(manifest.commands?.["open-browsevault"], "Missing open-browsevault command.");
-assert(
-  manifest.commands["open-browsevault"].description === "__MSG_openCommandDescription__",
-  "Command description should resolve through _locales/en/messages.json."
-);
-assert(localeMessage("openCommandDescription") === "Open BrowseVault", "Unexpected localized open command description.");
+validateManifestSurface(manifest, localeMessage, assert);
 
 const packageJson = readJson("package.json");
 assert(packageJson.version === manifest.version, "package.json version must match manifest version.");
@@ -400,12 +313,14 @@ for (const expected of [
 ]) {
   assert(releaseQa.includes(expected), `Release QA notes missing: ${expected}`);
 }
+validateChromeQaSafety(root, packageJson, assert);
 
 const decisionRecords = fs.readFileSync(path.join(root, "docs", "project", "decision-records.md"), "utf8");
 for (const expected of [
   "local-first",
   "Do Not Replace Chrome History By Default",
   "Separate Vault Deletion From Chrome History Deletion",
+  "Do Not Automate Against Live Chrome Profiles",
   "StorePilot Project Reference"
 ]) {
   assert(decisionRecords.includes(expected), `Decision records missing: ${expected}`);

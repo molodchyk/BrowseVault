@@ -35,3 +35,9 @@ References:
 - [Browser Extension Playbook](../../browser-extension-playbook.md)
 - [Extension Modularization Playbook](../architecture/extension-modularization-playbook.md)
 - [StorePilot Project Reference](../../StorePilot/docs/reference.md)
+
+## ADR-006: Do Not Automate Against Live Chrome Profiles
+
+Automated browser QA must not launch or attach to the active Chrome profile, including the real Chrome user-data directory or named folders such as `Default`, `Profile`, or `Profile 1`.
+
+Reason: profile-level automation can collide with focus-blocking tools, active sessions, and Chrome's profile registry. BrowseVault release checks should stay repo-only unless a browser run is explicitly confirmed, and browser automation must use a disposable temporary user-data directory.
