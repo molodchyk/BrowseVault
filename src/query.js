@@ -195,6 +195,45 @@ function includesAll(text, tokens) {
   return tokens.every((token) => text.includes(token));
 }
 
+function escapeRegexLiteral(value) {
+  return value.replace(/[\\^$+?.()|[\]{}]/g, "\\$&");
+}
+
+function hasWildcard(token) {
+  return /[*?]/.test(token) && /[\p{L}\p{N}]/u.test(token);
+}
+
+function wildcardPattern(token) {
+  let pattern = "";
+  for (const character of token) {
+    if (character === "*") {
+      pattern += ".*";
+    } else if (character === "?") {
+      pattern += ".";
+    } else {
+      pattern += escapeRegexLiteral(character);
+    }
+  }
+
+  return new RegExp(pattern, "u");
+}
+
+function wildcardIncludes(text, token) {
+  if (!hasWildcard(token)) {
+    return text.includes(token);
+  }
+
+  try {
+    return wildcardPattern(token).test(text);
+  } catch {
+    return false;
+  }
+}
+
+function includesAllWildcard(text, tokens) {
+  return tokens.every((token) => wildcardIncludes(text, token));
+}
+
 function searchableWords(text) {
   return text.match(/[\p{L}\p{N}]+/gu) || [];
 }
@@ -315,6 +354,10 @@ function editDistanceWithin(first, second, limit) {
 }
 
 function fuzzyIncludes(text, token) {
+  if (hasWildcard(token)) {
+    return wildcardIncludes(text, token);
+  }
+
   if (text.includes(token)) {
     return true;
   }
@@ -421,19 +464,19 @@ export function matchesVisitQuery(visit, query) {
     return false;
   }
 
-  if (query.title.length && !includesAll(title, query.title)) {
+  if (query.title.length && !includesAllWildcard(title, query.title)) {
     return false;
   }
 
-  if (query.url.length && !includesAll(url, query.url)) {
+  if (query.url.length && !includesAllWildcard(url, query.url)) {
     return false;
   }
 
-  if (query.source.length && !query.source.some((token) => source.includes(token))) {
+  if (query.source.length && !query.source.some((token) => wildcardIncludes(source, token))) {
     return false;
   }
 
-  if (query.transition.length && !query.transition.some((token) => transition.includes(token))) {
+  if (query.transition.length && !query.transition.some((token) => wildcardIncludes(transition, token))) {
     return false;
   }
 
@@ -463,7 +506,7 @@ export function matchesVisitQuery(visit, query) {
     return false;
   }
 
-  if (query.negatives.some((token) => haystack.includes(token))) {
+  if (query.negatives.some((token) => wildcardIncludes(haystack, token))) {
     return false;
   }
 

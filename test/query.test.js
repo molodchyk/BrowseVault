@@ -107,6 +107,20 @@ describe("matchesVisitQuery", () => {
     assert.equal(matchesVisitQuery(visit, parseQuery("chromee")), true);
   });
 
+  it("matches wildcard keyword and scoped filters", () => {
+    assert.equal(matchesVisitQuery(visit, parseQuery("hist*")), true);
+    assert.equal(matchesVisitQuery(visit, parseQuery("gith?b")), true);
+    assert.equal(matchesVisitQuery(visit, parseQuery("title:extens* url:*apps")), true);
+    assert.equal(matchesVisitQuery(visit, parseQuery("source:chrome-* transition:ty?ed")), true);
+    assert.equal(matchesVisitQuery(visit, parseQuery("title:invoice*")), false);
+  });
+
+  it("supports wildcard exclusions without making wildcard-only tokens match everything", () => {
+    assert.equal(matchesVisitQuery(visit, parseQuery("hist* -git*")), false);
+    assert.equal(matchesVisitQuery(visit, parseQuery("hist* -*")), true);
+    assert.equal(matchesVisitQuery(visit, parseQuery("*")), false);
+  });
+
   it("keeps short keywords and exclusions exact", () => {
     assert.equal(matchesVisitQuery(visit, parseQuery("apqs")), false);
     assert.equal(matchesVisitQuery(visit, parseQuery("histroy -githbu")), true);
