@@ -9,6 +9,7 @@ import { visitsToCsv, visitsToHtml } from "../../history-export/core/export-form
 import { archiveFromFileText } from "../core/archive-parser.js";
 import { backupExportFilename } from "../core/backup-filenames.js";
 import { createBackupSelfTest } from "../core/backup-verification.js";
+import { stringifyJson } from "../core/json-stringify.js";
 import {
   attachArchiveIntegrity,
   verifyArchiveIntegrity
@@ -30,6 +31,7 @@ const defaultServices = {
   now: () => new Date(),
   renderImportPreview: renderImportPreviewUi,
   setMeta,
+  stringifyJson,
   verifyArchiveIntegrity,
   visitsToCsv,
   visitsToHtml
@@ -49,8 +51,13 @@ export function backupImportPreviewElements(elements) {
   };
 }
 
-export function downloadJson(filename, data, options = {}, runtime = globalThis) {
-  return downloadText(filename, "application/json", JSON.stringify(data, null, 2), options, runtime);
+export async function downloadJson(filename, data, options = {}, runtime = globalThis) {
+  const text = await stringifyJson(data, {
+    chunkSize: options.jsonChunkSize,
+    scheduler: options.jsonScheduler,
+    space: 2
+  });
+  return downloadText(filename, "application/json", text, options, runtime);
 }
 
 function downloadWithSavePrompt(url, filename, runtime) {

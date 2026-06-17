@@ -42,7 +42,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - toolbar and keyboard-command opening that creates a new BrowseVault tab unless the current active tab is already BrowseVault;
 - cross-tab vault refresh for deletes, imports, cleanup, reset, rules, manual sync, live Chrome-history capture, and native history removals;
 - Settings escape hatch for opening Chrome's native history page without making BrowseVault a default-history override;
-- JSON backup export and import;
+- JSON backup export and import, with chunked JSON serialization for large backup downloads;
 - deterministic newest-first full exports, plus current-result exports that follow the selected newest/oldest result order, including formula-safe CSV with ISO timestamp, local date/time, manual category, visit id, and Chrome id fields;
 - offline HTML exports with summary metrics, exact timestamps, manual category column, in-file filtering, sortable columns, and safer link handling;
 - visible backup status with freshness, format, record count, file size, checksum details, and a backup self-test that verifies restorable rows;

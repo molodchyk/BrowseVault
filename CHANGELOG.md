@@ -21,7 +21,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Toolbar and keyboard-command opening create a new BrowseVault tab unless the current active tab is already BrowseVault, avoiding a global one-tab limitation.
 - Deterministic newest-first full JSON, formula-safe CSV, and offline HTML export with category columns where category rules apply; selected and current filtered result exports; current-result exports follow the selected newest/oldest result order.
 - Bare `after:YYYY-MM-DD` and `before:YYYY-MM-DD` search filters use local calendar-day boundaries instead of browser-dependent UTC parsing.
-- JSON backup integrity metadata and backup self-test before full JSON export, including checksum, row-count, and restorable-row validation.
+- JSON backup integrity metadata and backup self-test before full JSON export, including checksum, row-count, restorable-row validation, and chunked JSON serialization for large backup downloads.
 - Backup reminder status follows the configured reminder interval and warns when the next reminder date is reached.
 - Storage self-check metadata is written and read during extension-page stats refresh, then shown in the Backup tab's archive health panel.
 - Backup tab includes secondary archive insights for top domains, busiest day, active days, and date range.
