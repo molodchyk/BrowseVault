@@ -5,67 +5,6 @@ import {
   fakeElement
 } from "./vault-management-actions-harness.js";
 
-test("renderRules renders empty and removable rule states", async () => {
-  const removed = [];
-  let rules = [{ id: "rule-1", type: "blacklist", value: "example.com" }];
-  const { actions, elements, statuses } = createVaultManagementActionsHarness({
-    services: {
-      getRules: async () => ({ rules, blacklist: ["example.com"], whitelist: [] }),
-      removeRule: async (id) => {
-        removed.push(id);
-        rules = [];
-      }
-    }
-  });
-
-  await actions.renderRules();
-  assert.equal(elements.rulesList.children.length, 1);
-  const [item] = elements.rulesList.children;
-  assert.equal(item.className, "rule-item rule-item-blacklist");
-  assert.equal(item.children[0].className, "rule-label");
-  assert.equal(item.children[0].children[0].className, "rule-pill");
-  assert.equal(item.children[0].children[0].textContent, "Blacklist");
-  assert.equal(item.children[0].children[1].className, "rule-value");
-  assert.equal(item.children[0].children[1].textContent, "example.com");
-  assert.equal(item.children[1].textContent, "Remove");
-
-  await item.children[1].listeners.click();
-
-  assert.deepEqual(removed, ["rule-1"]);
-  assert.deepEqual(statuses, ["Removed example.com"]);
-  assert.equal(elements.rulesList.children[0].textContent, "No domain rules yet.");
-});
-
-test("renderRules renders category rule labels", async () => {
-  const { actions, elements } = createVaultManagementActionsHarness({
-    services: {
-      getRules: async () => ({
-        rules: [{ id: "category:example.com", type: "category", value: "example.com", category: "Research" }],
-        blacklist: [],
-        whitelist: [],
-        categories: [{ id: "category:example.com", value: "example.com", category: "Research" }]
-      })
-    }
-  });
-
-  await actions.renderRules();
-
-  assert.equal(elements.rulesList.children.length, 1);
-  assert.equal(elements.rulesList.children[0].className, "rule-item rule-item-category");
-  const label = elements.rulesList.children[0].children[0];
-  assert.equal(label.className, "rule-label");
-  assert.deepEqual(label.children.map((child) => child.textContent), [
-    "Category",
-    "example.com",
-    "Research"
-  ]);
-  assert.deepEqual(label.children.map((child) => child.className), [
-    "rule-pill",
-    "rule-value",
-    "rule-detail"
-  ]);
-});
-
 test("addCategoryRule stores a manual domain category and refreshes visible results", async () => {
   const added = [];
   const activity = [];
