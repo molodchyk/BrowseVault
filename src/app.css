@@ -592,6 +592,11 @@ code {
   padding: 12px;
 }
 
+.result:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .result-day {
   display: flex;
   align-items: center;

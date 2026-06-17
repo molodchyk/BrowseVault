@@ -13,7 +13,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Full-page tabbed app with History, Quick Open, Backup, Rules, and Settings areas.
 - Advanced local search for site, host, domain, title, URL, source, transition, visit count, exact day, date range, local hour, exclusions, wildcards, phrases, and regex.
 - One-click Today, Yesterday, 7 Days, 30 Days, and All Dates shortcuts using ISO-style date filters.
-- Saved searches, match highlighting, local-date grouped results, incremental loading, and keyboard-first search focus.
+- Saved searches, match highlighting, local-date grouped results, incremental loading, keyboard-first search focus, and keyboard navigation for visible history rows.
 - Quick Open search across open tabs, bookmarks, downloads, and recently closed tabs.
 - JSON, CSV, and HTML export for all records, selected records, and current filtered results.
 - JSON backup integrity metadata and backup self-test before full JSON export.

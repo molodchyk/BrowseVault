@@ -18,6 +18,7 @@ import {
   highlightRanges,
   highlightTokensForScope
 } from "../src/features/history-results/ui/text-highlighting.js";
+import { handleHistoryResultKeyDown } from "../src/features/history-results/ui/render-results.js";
 
 const results = [
   { id: "a", url: "https://www.example.com/a", domain: "example.com", day: "2026-06-16" },
@@ -90,4 +91,84 @@ test("highlight helpers choose scoped tokens and merge overlapping ranges", () =
     [0, 5],
     [6, 22]
   ]);
+});
+
+function fakeResultRow(id, calls) {
+  const row = {
+    id,
+    closest: (selector) => (selector === ".result" ? row : null),
+    focus: () => calls.push(`focus:${id}`),
+    querySelector: (selector) => {
+      if (selector === ".result-title") {
+        return {
+          click: () => calls.push(`open:${id}`)
+        };
+      }
+      if (selector === ".result-check") {
+        return {
+          click: () => calls.push(`select:${id}`)
+        };
+      }
+      return null;
+    }
+  };
+  return row;
+}
+
+function fakeKeyEvent(key, target) {
+  const calls = [];
+  return {
+    calls,
+    event: {
+      key,
+      target,
+      preventDefault: () => calls.push("prevent")
+    }
+  };
+}
+
+test("history result keyboard navigation moves focus and opens focused rows", () => {
+  const calls = [];
+  const rows = [
+    fakeResultRow("a", calls),
+    fakeResultRow("b", calls),
+    fakeResultRow("c", calls)
+  ];
+  const resultsElement = {
+    querySelectorAll: (selector) => (selector === ".result" ? rows : [])
+  };
+
+  const arrow = fakeKeyEvent("ArrowDown", rows[0]);
+  assert.equal(handleHistoryResultKeyDown(arrow.event, resultsElement), true);
+  assert.deepEqual(arrow.calls, ["prevent"]);
+  assert.deepEqual(calls, ["focus:b"]);
+  assert.deepEqual(rows.map((row) => row.tabIndex), [-1, 0, -1]);
+
+  const end = fakeKeyEvent("End", rows[0]);
+  assert.equal(handleHistoryResultKeyDown(end.event, resultsElement), true);
+  assert.deepEqual(calls, ["focus:b", "focus:c"]);
+  assert.deepEqual(rows.map((row) => row.tabIndex), [-1, -1, 0]);
+
+  const enter = fakeKeyEvent("Enter", rows[2]);
+  assert.equal(handleHistoryResultKeyDown(enter.event, resultsElement), true);
+  assert.deepEqual(calls, ["focus:b", "focus:c", "open:c"]);
+});
+
+test("history result keyboard selection uses row focus without hijacking child controls", () => {
+  const calls = [];
+  const row = fakeResultRow("a", calls);
+  const childTarget = {
+    closest: (selector) => (selector === ".result" ? row : null)
+  };
+  const resultsElement = {
+    querySelectorAll: (selector) => (selector === ".result" ? [row] : [])
+  };
+
+  const space = fakeKeyEvent(" ", row);
+  assert.equal(handleHistoryResultKeyDown(space.event, resultsElement), true);
+  assert.deepEqual(calls, ["select:a"]);
+
+  const childEnter = fakeKeyEvent("Enter", childTarget);
+  assert.equal(handleHistoryResultKeyDown(childEnter.event, resultsElement), false);
+  assert.deepEqual(calls, ["select:a"]);
 });

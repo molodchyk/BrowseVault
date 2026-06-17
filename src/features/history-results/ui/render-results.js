@@ -15,6 +15,85 @@ import {
   highlightTokensForScope
 } from "./text-highlighting.js";
 
+const RESULT_SELECTOR = ".result";
+
+function historyResultItems(resultsElement) {
+  return Array.from(resultsElement.querySelectorAll(RESULT_SELECTOR));
+}
+
+function targetResult(target) {
+  return target?.closest?.(RESULT_SELECTOR) || null;
+}
+
+function focusResultByIndex(resultsElement, index) {
+  const items = historyResultItems(resultsElement);
+  if (!items.length) {
+    return null;
+  }
+
+  const boundedIndex = Math.max(0, Math.min(index, items.length - 1));
+  const next = items[boundedIndex];
+  items.forEach((item) => {
+    item.tabIndex = item === next ? 0 : -1;
+  });
+  next.focus();
+  return next;
+}
+
+export function handleHistoryResultKeyDown(event, resultsElement) {
+  const current = targetResult(event.target);
+  if (!current) {
+    return false;
+  }
+
+  const items = historyResultItems(resultsElement);
+  const index = items.indexOf(current);
+  if (index < 0) {
+    return false;
+  }
+
+  const moves = {
+    ArrowDown: index + 1,
+    ArrowUp: index - 1,
+    Home: 0,
+    End: items.length - 1
+  };
+
+  if (Object.prototype.hasOwnProperty.call(moves, event.key)) {
+    event.preventDefault();
+    focusResultByIndex(resultsElement, moves[event.key]);
+    return true;
+  }
+
+  if (event.target !== current) {
+    return false;
+  }
+
+  if (event.key === "Enter") {
+    const link = current.querySelector(".result-title");
+    if (!link) {
+      return false;
+    }
+
+    event.preventDefault();
+    link.click();
+    return true;
+  }
+
+  if (event.key === " " || event.key === "Spacebar") {
+    const checkbox = current.querySelector(".result-check");
+    if (!checkbox) {
+      return false;
+    }
+
+    event.preventDefault();
+    checkbox.click();
+    return true;
+  }
+
+  return false;
+}
+
 function renderDayHeading({ resultsElement, visitTime, dayCount, dateFormat }) {
   const ownerDocument = resultsElement.ownerDocument;
   const day = ownerDocument.createElement("li");
@@ -54,6 +133,8 @@ function renderResultItem({
   const meta = fragment.querySelector(".meta");
 
   result.dataset.id = item.id;
+  result.dataset.resultIndex = String(index);
+  result.tabIndex = index === 0 ? 0 : -1;
   checkbox.checked = selectedIds.has(item.id);
   checkbox.addEventListener("click", (event) => {
     const state = getSelectionState();
@@ -104,6 +185,7 @@ export function renderHistoryResults({
   let currentDayKey = "";
 
   elements.resultCount.textContent = resultCountLabel(total, results.length);
+  elements.results.onkeydown = (event) => handleHistoryResultKeyDown(event, elements.results);
   elements.results.replaceChildren();
 
   results.forEach((item, index) => {

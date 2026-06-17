@@ -34,6 +34,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - saved searches for repeated local history queries and date/limit filter sets;
 - highlighted matches in vault and Quick Open search results;
 - keyboard-first search with autofocus, global query focus, Enter search, and debounced live refresh;
+- keyboard navigation for visible history results with arrow keys, Enter-to-open, and Space-to-select;
 - local-date grouped vault results for easier timeline scanning;
 - Quick Open search across open tabs, bookmarks, downloads, and recently closed tabs, with source-aware switch/open/open-in-background/restore actions;
 - toolbar and keyboard-command opening that reuses an already open BrowseVault tab;
