@@ -198,6 +198,27 @@ test("full CSV and HTML exports use the configured backup filename prefix", asyn
   assert.deepEqual(calls, ["refreshStats", "refreshStats"]);
 });
 
+test("exports use the configured backup filename template", async () => {
+  const downloaded = [];
+  const selected = [{ id: "visit-1" }];
+  const { actions } = createHarness({
+    preferences: {
+      backupFilenamePrefix: "Client Reports",
+      backupFilenameTemplate: "{date}-{time}-{prefix}-{kind}"
+    },
+    selected,
+    services: {
+      downloadText: (...args) => downloaded.push(args),
+      now: () => new Date("2026-06-16T12:34:56.000Z"),
+      visitsToCsv: () => "csv"
+    }
+  });
+
+  await actions.exportSelectedCsv();
+
+  assert.equal(downloaded[0][0], "2026-06-16-123456-Client-Reports-selected.csv");
+});
+
 test("selected exports use the configured backup filename prefix", async () => {
   const downloadedJson = [];
   const downloadedText = [];

@@ -21,7 +21,8 @@ test("normalizePreferences falls back for unsupported values and clamps limits",
       dateFormat: "dmy",
       defaultLimit: "999999",
       backupReminderDays: "999",
-      backupFilenamePrefix: "Team Backup:/2026"
+      backupFilenamePrefix: "Team Backup:/2026",
+      backupFilenameTemplate: "{date}/{prefix}/{kind}"
     }),
     {
       theme: "system",
@@ -29,7 +30,8 @@ test("normalizePreferences falls back for unsupported values and clamps limits",
       dateFormat: "dmy",
       defaultLimit: 50000,
       backupReminderDays: 365,
-      backupFilenamePrefix: "Team-Backup-2026"
+      backupFilenamePrefix: "Team-Backup-2026",
+      backupFilenameTemplate: "{date}-{prefix}-{kind}"
     }
   );
 });

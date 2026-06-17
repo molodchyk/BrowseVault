@@ -88,6 +88,7 @@ const singularSelectors = [
   "pref-limit",
   "pref-backup-reminder",
   "pref-backup-prefix",
+  "pref-backup-template",
   "open-native-history",
   "save-preferences"
 ];

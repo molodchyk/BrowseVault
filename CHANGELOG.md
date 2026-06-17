@@ -24,7 +24,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - Import preview and import support for BrowseVault JSON, CSV, TSV, Google Takeout Browser History, Google My Activity, and common competitor history exports.
 - Recent activity log for completed backup, export, import, cleanup, delete, restore, rule, and reset actions.
 - Domain blacklist and whitelist rules, selected-domain blacklisting, manual retention cleanup, duplicate cleanup, and full local vault reset.
-- Settings for system, light, and dark themes, accent color, date format, default result limit, backup reminder cadence, and backup filename prefix.
+- Settings for system, light, and dark themes, accent color, date format, default result limit, backup reminder cadence, backup filename prefix, and backup filename template.
 
 ### Data Safety
 
@@ -52,4 +52,4 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 - BrowseVault cannot recover visits Chrome already deleted unless the user imports older data from another source.
 - Browser APIs generally cannot write arbitrary old imported visits back into Chrome's native history.
 - Mobile, account, synced-device, or other-profile history depends on what Chrome exposes locally or what the user imports.
-- Backup destination control is limited by browser download behavior; BrowseVault supports local filename prefix control but does not yet provide WebDAV, cloud, or user-owned remote backup destinations.
+- Backup destination control is limited by browser download behavior; BrowseVault supports local filename prefix and template control but does not yet provide WebDAV, cloud, or user-owned remote backup destinations.

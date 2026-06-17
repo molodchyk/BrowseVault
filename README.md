@@ -65,7 +65,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - domain blacklist and whitelist rules;
 - manual retention cleanup that previews old vault records and keeps whitelisted domains;
 - duplicate cleanup that previews repeated active vault records and moves extras to undoable deletion;
-- local preferences for system/light/dark theme, accent color, date format, default result limit, backup reminders, and backup filename prefix;
+- local preferences for system/light/dark theme, accent color, date format, default result limit, backup reminders, backup filename prefix, and backup filename template;
 - backup reminder status follows the configured reminder interval and warns when the next reminder date is reached;
 - exact ISO visit timestamps in history result metadata while visible rows follow the selected date format;
 - in-app trust, permission, and product-limit disclosures;
@@ -174,6 +174,10 @@ The Rules tab supports manual vault retention cleanup. Enter a number of days, p
 The Rules tab also supports duplicate cleanup. It finds active vault records with the same URL and visit time, keeps the richest record, and moves extra duplicates to undoable deletion. It does not delete Chrome history.
 
 The History tab also supports direct current-result deletion for targeted cleanup by query, domain, date, or hour. Enter a query or date filter first, then use Delete Results From Vault. This action only removes records from BrowseVault, does not delete Chrome history, and can be undone.
+
+## Backup Filenames
+
+Backup and export filenames use the configured prefix and template. The default template is `{prefix}-{kind}-{date}`. Templates are filename bases without the extension and can use `{prefix}`, `{kind}`, `{date}`, and `{time}` tokens. Browser download settings still control the destination folder.
 
 ## GitHub Description
 

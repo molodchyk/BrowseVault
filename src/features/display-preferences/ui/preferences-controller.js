@@ -89,6 +89,7 @@ export function createDisplayPreferencesController({
     elements.prefLimit.value = String(appState.preferences.defaultLimit);
     elements.prefBackupReminder.value = String(appState.preferences.backupReminderDays);
     elements.prefBackupPrefix.value = appState.preferences.backupFilenamePrefix;
+    elements.prefBackupTemplate.value = appState.preferences.backupFilenameTemplate;
 
     if (!elements.limit.value || Number(elements.limit.value) === DEFAULT_PREFERENCES.defaultLimit) {
       elements.limit.value = String(appState.preferences.defaultLimit);
@@ -123,7 +124,8 @@ export function createDisplayPreferencesController({
       dateFormat: elements.prefDateFormat.value,
       defaultLimit: elements.prefLimit.value,
       backupReminderDays: elements.prefBackupReminder.value,
-      backupFilenamePrefix: elements.prefBackupPrefix.value
+      backupFilenamePrefix: elements.prefBackupPrefix.value,
+      backupFilenameTemplate: elements.prefBackupTemplate.value
     });
 
     await deps.setLocalStorage({

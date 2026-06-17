@@ -93,7 +93,13 @@ export function createBackupActions({
   }
 
   function exportFilename(kind, exportedAt, extension) {
-    return deps.backupExportFilename(appState.preferences?.backupFilenamePrefix, kind, exportedAt, extension);
+    return deps.backupExportFilename(
+      appState.preferences?.backupFilenamePrefix,
+      kind,
+      exportedAt,
+      extension,
+      appState.preferences?.backupFilenameTemplate
+    );
   }
 
   async function recordActivity(event) {
