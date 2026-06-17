@@ -28,6 +28,9 @@ function createDeps(overrides = {}) {
       recordChromeVisit: async (item, options) => {
         calls.push(["recordChromeVisit", item, options]);
       },
+      recordChromeVisitWithCaptureMetadata: async (item, options) => {
+        calls.push(["recordChromeVisitWithCaptureMetadata", item, options]);
+      },
       searchHistory: async (query) => {
         calls.push(["searchHistory", query]);
         return [];
@@ -37,6 +40,10 @@ function createDeps(overrides = {}) {
       },
       syncChromeHistoryItems: async (items, options) => {
         calls.push(["syncChromeHistoryItems", items, options]);
+        return { stored: items.length };
+      },
+      syncChromeHistoryItemsWithSyncMetadata: async (items, options) => {
+        calls.push(["syncChromeHistoryItemsWithSyncMetadata", items, options]);
         return { stored: items.length };
       },
       ...overrides
@@ -134,7 +141,7 @@ test("bootstrapChromeHistory searches, syncs expanded visits, and stores sync me
     ["getRules"],
     ["getHistoryVisits", { url: "https://useful.example/page" }],
     [
-      "syncChromeHistoryItems",
+      "syncChromeHistoryItemsWithSyncMetadata",
       [
         {
           id: "https://useful.example/page|v1",
@@ -146,13 +153,8 @@ test("bootstrapChromeHistory searches, syncs expanded visits, and stores sync me
           referringVisitId: ""
         }
       ],
-      { source: "chrome-history", reason: "manual" }
-    ],
-    [
-      "setMeta",
-      "lastChromeSync",
       {
-        stored: 1,
+        source: "chrome-history",
         reason: "manual",
         syncedAt: "2026-06-16T12:00:00.000Z"
       }
@@ -172,17 +174,11 @@ test("recordVisitedItem archives only allowed live visits", async () => {
     ["getRules"],
     ["getRules"],
     [
-      "recordChromeVisit",
+      "recordChromeVisitWithCaptureMetadata",
       { url: "https://useful.example/page", title: "Useful" },
-      { source: "chrome-history-live" }
-    ],
-    [
-      "setMeta",
-      "lastLiveCapture",
       {
-        capturedAt: "2026-06-16T12:00:00.000Z",
-        title: "Useful",
-        url: "https://useful.example/page"
+        source: "chrome-history-live",
+        capturedAt: "2026-06-16T12:00:00.000Z"
       }
     ]
   ]);

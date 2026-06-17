@@ -10,6 +10,7 @@ The changelog must call out trust-sensitive behavior changes: deletion behavior,
 
 - Local BrowseVault history archive with background capture for new Chrome history visits.
 - Manual sync from currently available Chrome history, expanded to individual visits where Chrome exposes them.
+- Chrome sync and live-capture recorder metadata are committed with their related vault records where the storage layer can do so atomically.
 - Full-page tabbed app with History, Quick Open, Backup, Rules, and Settings areas.
 - Advanced local search for site, host, domain, title, URL, source, transition, visit count, exact day, date range, local hour, exclusions, wildcards, phrases, and regex.
 - Limited history searches keep only the top visible results while counting the full match set, reducing memory and sort work on large archives.

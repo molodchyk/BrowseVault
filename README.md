@@ -26,6 +26,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - local IndexedDB archive storage;
 - background capture for new Chrome history visits;
 - manual sync from currently available Chrome history, expanded to individual visits where Chrome exposes them;
+- atomic Chrome sync and live-capture metadata commits so recorder health matches recorded rows;
 - visible archive health for startup, Chrome sync, live capture status, malformed vault rows, tombstones, and duplicate active records;
 - query syntax for site/host/domain, title, URL, source, transition, visit count, exact-day/date ranges, local-hour filters, exclusions, wildcards, phrases, and regex;
 - bounded typo-tolerant matching for longer plain keyword searches;

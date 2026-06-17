@@ -176,9 +176,31 @@ export async function recordChromeVisit(item, options = {}) {
   return record;
 }
 
-export async function syncChromeHistoryItems(items, options = {}) {
-  const existing = await getAllVisits({ includeDeleted: true });
+export async function recordChromeVisitWithCaptureMetadata(item, options = {}) {
+  const record = normalizeHistoryItem(item, options);
+  const capturedAt = options.capturedAt || new Date().toISOString();
+  const db = await openVaultDb();
+  const tx = db.transaction([VISIT_STORE, META_STORE], "readwrite");
+
+  tx.objectStore(VISIT_STORE).put(record);
+  tx.objectStore(META_STORE).put({
+    key: "lastLiveCapture",
+    value: {
+      capturedAt,
+      title: item.title || "",
+      url: item.url
+    },
+    updatedAt: capturedAt
+  });
+
+  await transactionDone(tx);
+  return record;
+}
+
+export function createChromeHistorySyncPlan(items, existingVisits = [], options = {}) {
+  const existing = Array.isArray(existingVisits) ? existingVisits : [];
   const existingById = new Map(existing.map((record) => [record.id, record]));
+  const nextById = new Map(existingById);
   const records = [];
 
   for (const item of items) {
@@ -195,15 +217,70 @@ export async function syncChromeHistoryItems(items, options = {}) {
       createdAt: previous?.createdAt || record.createdAt,
       deletedAt: previous?.deletedAt || null
     });
+    nextById.set(record.id, records[records.length - 1]);
   }
-
-  await putMany(VISIT_STORE, records);
 
   return {
     scanned: items.length,
     stored: records.length,
-    total: await countVisits()
+    total: [...nextById.values()].filter((visit) => !visit.deletedAt).length,
+    records
   };
+}
+
+async function writeChromeHistorySyncPlan(plan, metadata = null) {
+  if (!plan.records.length && !metadata) {
+    return;
+  }
+
+  const db = await openVaultDb();
+  const tx = metadata
+    ? db.transaction([VISIT_STORE, META_STORE], "readwrite")
+    : db.transaction(VISIT_STORE, "readwrite");
+  const visitStore = tx.objectStore(VISIT_STORE);
+
+  for (const record of plan.records) {
+    visitStore.put(record);
+  }
+
+  if (metadata) {
+    tx.objectStore(META_STORE).put({
+      key: "lastChromeSync",
+      value: metadata,
+      updatedAt: metadata.syncedAt
+    });
+  }
+
+  await transactionDone(tx);
+}
+
+export async function syncChromeHistoryItems(items, options = {}) {
+  const plan = createChromeHistorySyncPlan(items, await getAllVisits({ includeDeleted: true }), options);
+  await writeChromeHistorySyncPlan(plan);
+
+  return {
+    scanned: plan.scanned,
+    stored: plan.stored,
+    total: plan.total
+  };
+}
+
+export async function syncChromeHistoryItemsWithSyncMetadata(items, options = {}) {
+  const syncedAt = options.syncedAt || new Date().toISOString();
+  const plan = createChromeHistorySyncPlan(items, await getAllVisits({ includeDeleted: true }), options);
+  const result = {
+    scanned: plan.scanned,
+    stored: plan.stored,
+    total: plan.total
+  };
+
+  await writeChromeHistorySyncPlan(plan, {
+    ...result,
+    reason: options.reason || "",
+    syncedAt
+  });
+
+  return result;
 }
 
 export async function getAllVisits(options = {}) {

@@ -2,8 +2,10 @@ import {
   getRules,
   markChromeDeletedByUrls,
   recordChromeVisit,
+  recordChromeVisitWithCaptureMetadata,
   setMeta,
-  syncChromeHistoryItems
+  syncChromeHistoryItems,
+  syncChromeHistoryItemsWithSyncMetadata
 } from "./storage.js";
 import { onActionClicked } from "./platform/chrome/action.js";
 import { onCommand } from "./platform/chrome/commands.js";
@@ -44,9 +46,11 @@ const chromeHistorySync = createChromeHistorySync({
   getHistoryVisits,
   getRules,
   recordChromeVisit,
+  recordChromeVisitWithCaptureMetadata,
   searchHistory,
   setMeta,
-  syncChromeHistoryItems
+  syncChromeHistoryItems,
+  syncChromeHistoryItemsWithSyncMetadata
 }, {
   now
 });

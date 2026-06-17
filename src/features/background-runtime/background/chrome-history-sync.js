@@ -93,16 +93,22 @@ export function createChromeHistorySync(deps, options = {}) {
     });
 
     const expandedItems = await expandHistoryItems(items);
-    const result = await deps.syncChromeHistoryItems(expandedItems, {
+    const syncOptions = {
       source: "chrome-history",
-      reason
-    });
-
-    await deps.setMeta("lastChromeSync", {
-      ...result,
       reason,
       syncedAt: now()
-    });
+    };
+    const result = deps.syncChromeHistoryItemsWithSyncMetadata
+      ? await deps.syncChromeHistoryItemsWithSyncMetadata(expandedItems, syncOptions)
+      : await deps.syncChromeHistoryItems(expandedItems, syncOptions);
+
+    if (!deps.syncChromeHistoryItemsWithSyncMetadata) {
+      await deps.setMeta("lastChromeSync", {
+        ...result,
+        reason,
+        syncedAt: syncOptions.syncedAt
+      });
+    }
 
     return result;
   }
@@ -112,14 +118,21 @@ export function createChromeHistorySync(deps, options = {}) {
       return false;
     }
 
-    await deps.recordChromeVisit(item, {
-      source: "chrome-history-live"
-    });
-    await deps.setMeta("lastLiveCapture", {
-      capturedAt: now(),
-      title: item.title || "",
-      url: item.url
-    });
+    const captureOptions = {
+      source: "chrome-history-live",
+      capturedAt: now()
+    };
+
+    if (deps.recordChromeVisitWithCaptureMetadata) {
+      await deps.recordChromeVisitWithCaptureMetadata(item, captureOptions);
+    } else {
+      await deps.recordChromeVisit(item, captureOptions);
+      await deps.setMeta("lastLiveCapture", {
+        capturedAt: captureOptions.capturedAt,
+        title: item.title || "",
+        url: item.url
+      });
+    }
     return true;
   }
 

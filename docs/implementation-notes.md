@@ -26,6 +26,7 @@ Likely extension pieces:
 Important concerns:
 
 - service workers are not always alive, so capture logic must be event-driven and resilient;
+- recorder metadata should be committed with related captured/synced rows so health status does not drift from stored data;
 - long imports and indexing should not depend on a service worker staying alive;
 - UI thread must not scan or sort huge datasets synchronously;
 - large exports should stream or chunk work where possible.

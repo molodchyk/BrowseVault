@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   archiveVisitsForExport,
+  createChromeHistorySyncPlan,
   createImportArchivePlan,
   duplicateCleanupCandidates,
   makeVisitId,
@@ -125,6 +126,55 @@ test("normalizeHistoryItem keeps BrowseVault ids separate from Chrome ids", () =
   assert.equal(csvImport.chromeId, "chrome|visit");
   assert.equal(chromeImport.id, makeVisitId("https://example.com/chrome", visitTime));
   assert.equal(chromeImport.chromeId, "123");
+});
+
+test("createChromeHistorySyncPlan preserves tombstones and computes active totals", () => {
+  const visitTime = Date.parse("2026-06-16T12:00:00.000Z");
+  const existingDeleted = {
+    id: makeVisitId("https://example.com/deleted", visitTime),
+    url: "https://example.com/deleted",
+    visitTime,
+    createdAt: "2026-06-01T00:00:00.000Z",
+    deletedAt: "2026-06-10T00:00:00.000Z"
+  };
+  const existingActive = {
+    id: "existing-active",
+    url: "https://existing.example/page",
+    visitTime: visitTime - 1
+  };
+  const plan = createChromeHistorySyncPlan(
+    [
+      {
+        url: "https://example.com/deleted",
+        title: "Deleted seen again",
+        visitTime
+      },
+      {
+        url: "https://new.example/page",
+        title: "New",
+        visitTime: visitTime + 1
+      },
+      {
+        title: "Missing URL",
+        visitTime
+      }
+    ],
+    [existingDeleted, existingActive],
+    {
+      source: "chrome-history",
+      reason: "manual"
+    }
+  );
+
+  assert.equal(plan.scanned, 3);
+  assert.equal(plan.stored, 2);
+  assert.equal(plan.total, 2);
+  assert.equal(plan.records[0].id, existingDeleted.id);
+  assert.equal(plan.records[0].createdAt, existingDeleted.createdAt);
+  assert.equal(plan.records[0].deletedAt, existingDeleted.deletedAt);
+  assert.equal(plan.records[0].source, "chrome-history");
+  assert.equal(plan.records[0].sourceReason, "manual");
+  assert.equal(plan.records[1].url, "https://new.example/page");
 });
 
 test("archiveVisitsForExport orders visits newest first with stable tie-breakers", () => {
