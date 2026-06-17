@@ -173,9 +173,54 @@ assert(appHtml.includes("Permissions and limits"), "Settings should disclose per
 assert(appHtml.includes("cannot recover visits Chrome already deleted"), "Settings should disclose old-history recovery limits.");
 
 const sourceFiles = collectFilesByExtension("src", new Set([".js", ".html", ".css"]));
+const forbiddenSourcePatterns = [
+  {
+    pattern: /https?:\/\//i,
+    message: "remote URL"
+  },
+  {
+    pattern: /\bfetch\s*\(/,
+    message: "fetch network call"
+  },
+  {
+    pattern: /\bXMLHttpRequest\b/,
+    message: "XMLHttpRequest network API"
+  },
+  {
+    pattern: /\bWebSocket\b/,
+    message: "WebSocket network API"
+  },
+  {
+    pattern: /\bEventSource\b/,
+    message: "EventSource network API"
+  },
+  {
+    pattern: /\bnavigator\.sendBeacon\b/,
+    message: "sendBeacon network API"
+  },
+  {
+    pattern: /\bimportScripts\s*\(/,
+    message: "importScripts remote-code loader"
+  },
+  {
+    pattern: /\beval\s*\(/,
+    message: "eval remote-code risk"
+  },
+  {
+    pattern: /\bnew\s+Function\s*\(/,
+    message: "Function constructor remote-code risk"
+  },
+  {
+    pattern: /\bimport\s*\(/,
+    message: "dynamic import remote-code risk"
+  }
+];
+
 for (const file of sourceFiles) {
   const source = fs.readFileSync(path.join(root, file), "utf8");
-  assert(!/https?:\/\//i.test(source), `Unexpected remote URL in ${file}`);
+  for (const { pattern, message } of forbiddenSourcePatterns) {
+    assert(!pattern.test(source), `Unexpected ${message} in ${file}`);
+  }
 }
 
 console.log("BrowseVault extension validated.");

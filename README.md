@@ -137,7 +137,7 @@ npm run icons
 npm run package
 ```
 
-`npm run validate` also enforces the current trust baseline: exact manifest permissions, no host permissions, no optional permission prompts, no content scripts, no web-accessible resources, no external extension messaging surface, no remote source URLs, and no default `chrome_url_overrides` replacement of Chrome history.
+`npm run validate` also enforces the current trust baseline: exact manifest permissions, no host permissions, no optional permission prompts, no content scripts, no web-accessible resources, no external extension messaging surface, no remote source URLs, no source-level network APIs or dynamic code loaders, and no default `chrome_url_overrides` replacement of Chrome history.
 
 `npm run package` writes `dist/browsevault-0.1.0.zip`.
 
