@@ -38,5 +38,6 @@ Current workstation note:
 - Do not use `%LOCALAPPDATA%\\Google\\Chrome\\User Data`, `Default`, `Profile`, or `Profile 1` as an automated QA profile.
 - Automated browser QA must use a disposable temporary user-data directory, or stay manual.
 - Do not add npm scripts that launch Chrome, Playwright, or a remote-debugging session against a real user profile.
+- Validation scans package scripts, repository scripts, and tests for live Chrome profile automation patterns.
 - Do not treat that process-level closure as a BrowseVault product failure without reproducing it in a normal Chrome session.
 - Manual release check: pause the local focus blockers, open `chrome://extensions`, enable Developer mode, load this repository folder unpacked, then verify the toolbar action opens BrowseVault, a second non-BrowseVault active tab creates another BrowseVault tab, and deleting a vault record in one BrowseVault tab refreshes the other BrowseVault tab.

@@ -40,7 +40,8 @@ export function validateChromeQaSafety(root, packageJson, assert) {
     "Never use the active Chrome profile for automated QA.",
     "Do not use `%LOCALAPPDATA%\\\\Google\\\\Chrome\\\\User Data`, `Default`, `Profile`, or `Profile 1` as an automated QA profile.",
     "Automated browser QA must use a disposable temporary user-data directory, or stay manual.",
-    "Do not add npm scripts that launch Chrome, Playwright, or a remote-debugging session against a real user profile."
+    "Do not add npm scripts that launch Chrome, Playwright, or a remote-debugging session against a real user profile.",
+    "Validation scans package scripts, repository scripts, and tests for live Chrome profile automation patterns."
   ]) {
     assert(releaseQa.includes(expected), `Release QA notes missing Chrome profile safety invariant: ${expected}`);
   }
@@ -49,11 +50,13 @@ export function validateChromeQaSafety(root, packageJson, assert) {
     assertNoForbiddenAutomation(`package script "${name}"`, command, assert);
   }
 
-  for (const fullPath of scriptFiles(root, "scripts")) {
-    const relativePath = projectPath(root, fullPath);
-    if (relativePath.startsWith("scripts/playbook/")) {
-      continue;
+  for (const entry of ["scripts", "test"]) {
+    for (const fullPath of scriptFiles(root, entry)) {
+      const relativePath = projectPath(root, fullPath);
+      if (relativePath.startsWith("scripts/playbook/")) {
+        continue;
+      }
+      assertNoForbiddenAutomation(relativePath, fs.readFileSync(fullPath, "utf8"), assert);
     }
-    assertNoForbiddenAutomation(relativePath, fs.readFileSync(fullPath, "utf8"), assert);
   }
 }
