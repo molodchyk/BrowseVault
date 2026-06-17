@@ -17,7 +17,7 @@ Private, unlimited browser memory with fast search, safe cleanup, and reliable b
 ## Product Promise
 
 - Never lose a page again from the point of installation onward.
-- Find anything instantly across history, tabs, bookmarks, downloads, and closed tabs.
+- Find anything instantly across history, tabs, bookmarks, downloads, closed tabs, and closed windows.
 - Clean or export exactly the items you intend.
 - Keep data local unless the user explicitly configures a backup/sync destination.
 

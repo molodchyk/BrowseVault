@@ -18,7 +18,7 @@ This folder captures the critical market research, user feedback, product direct
 Users are not mainly asking for more charts or decorative UI. They want a trustworthy local-first browser memory tool that can:
 
 - keep history beyond Chrome's retention limits from the moment it is installed;
-- search history, tabs, bookmarks, downloads, and closed tabs accurately;
+- search history, tabs, bookmarks, downloads, closed tabs, and closed windows accurately;
 - bulk delete/export selected history without repetitive clicking;
 - avoid slowing or crashing Chrome;
 - never lose years of data through database corruption;

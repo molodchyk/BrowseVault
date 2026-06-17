@@ -2,7 +2,7 @@ StorePilot dashboard helper only. The extension's default public privacy policy 
 
 [privacy]
 single_purpose:
-BrowseVault provides a local-first browser history vault for searching, preserving, backing up, exporting, and explicitly cleaning browsing history, plus Quick Open access to tabs, bookmarks, downloads, and recently closed pages.
+BrowseVault provides a local-first browser history vault for searching, preserving, backing up, exporting, and explicitly cleaning browsing history, plus Quick Open access to tabs, bookmarks, downloads, recently closed tabs, and closed windows.
 
 permission.bookmarks:
 Used only for Quick Open bookmark search. BrowseVault reads bookmark titles and URLs locally so users can find and reopen saved pages.

@@ -22,17 +22,42 @@ function domainFromUrl(url) {
   }
 }
 
-function memoryRecord({ id, type, title, url, visitTime = Date.now(), detail = "", action = null }) {
+function uniqueStrings(values) {
+  return [...new Set(values.filter(Boolean))];
+}
+
+function titleOrUrl(item) {
+  return item.title || item.url || "Untitled";
+}
+
+function memoryRecord({
+  id,
+  type,
+  title,
+  url,
+  visitTime = Date.now(),
+  detail = "",
+  action = null,
+  source = type,
+  searchTitle = "",
+  searchUrl = "",
+  domains = []
+}) {
+  const normalizedUrl = normalizeUrl(url);
+  const primaryDomain = domainFromUrl(url);
+  const recordDomains = uniqueStrings(domains.length ? domains : [primaryDomain]);
+
   return {
     id,
     type,
     title: title || url || "Untitled",
-    normalizedTitle: (title || "").toLowerCase(),
-    url: normalizeUrl(url),
-    normalizedUrl: normalizeUrl(url).toLowerCase(),
-    domain: domainFromUrl(url),
+    normalizedTitle: (searchTitle || title || "").toLowerCase(),
+    url: normalizedUrl,
+    normalizedUrl: (searchUrl || normalizedUrl).toLowerCase(),
+    domain: primaryDomain,
+    domains: recordDomains,
     visitTime,
-    source: type,
+    source,
     detail,
     action
   };
@@ -118,16 +143,86 @@ async function searchDownloadRecords() {
     );
 }
 
-function sessionEntries(session) {
-  if (session.tab) {
-    return [session.tab];
+function sessionVisitTime(session) {
+  return session.lastModified ? session.lastModified * 1000 : Date.now();
+}
+
+function tabDomains(tabs) {
+  return uniqueStrings(tabs.map((tab) => domainFromUrl(tab.url)));
+}
+
+function tabSearchTitle(tabs, prefix = "") {
+  return [prefix, ...tabs.map(titleOrUrl)].filter(Boolean).join(" ");
+}
+
+function tabSearchUrl(tabs) {
+  return tabs.map((tab) => normalizeUrl(tab.url)).join(" ");
+}
+
+function closedTabRecord(session, sessionIndex, tab, tabIndex, detail = "Closed tab") {
+  return memoryRecord({
+    id: `session:${sessionIndex}:${tabIndex}`,
+    type: "closed tab",
+    source: "recent closed-tab",
+    title: tab.title,
+    url: tab.url,
+    visitTime: sessionVisitTime(session),
+    detail,
+    action: {
+      type: session.sessionId ? "restore-session" : "open-url",
+      sessionId: session.sessionId || "",
+      url: tab.url
+    }
+  });
+}
+
+function closedWindowTitle(tabs) {
+  const shown = tabs.slice(0, 3).map(titleOrUrl);
+  const extraCount = tabs.length - shown.length;
+  const suffix = extraCount > 0 ? `, +${extraCount} more` : "";
+  return `Closed window (${tabs.length} tabs): ${shown.join(", ")}${suffix}`;
+}
+
+function closedWindowRecord(session, sessionIndex, tabs) {
+  const primaryTab = tabs[0];
+  const title = closedWindowTitle(tabs);
+
+  return memoryRecord({
+    id: `session-window:${session.sessionId || sessionIndex}`,
+    type: "closed window",
+    source: "recent closed-window",
+    title,
+    url: primaryTab.url,
+    visitTime: sessionVisitTime(session),
+    detail: `Closed window · ${tabs.length} tabs`,
+    searchTitle: tabSearchTitle(tabs, title),
+    searchUrl: tabSearchUrl(tabs),
+    domains: tabDomains(tabs),
+    action: {
+      type: session.sessionId ? "restore-session" : "open-url",
+      sessionId: session.sessionId || "",
+      url: primaryTab.url
+    }
+  });
+}
+
+function sessionRecords(session, sessionIndex) {
+  if (session.tab?.url) {
+    return [closedTabRecord(session, sessionIndex, session.tab, 0)];
   }
 
-  if (session.window?.tabs?.length) {
-    return session.window.tabs;
+  const tabs = (session.window?.tabs || []).filter((tab) => tab.url);
+  if (!tabs.length) {
+    return [];
   }
 
-  return [];
+  if (session.sessionId) {
+    return [closedWindowRecord(session, sessionIndex, tabs)];
+  }
+
+  return tabs.map((tab, tabIndex) =>
+    closedTabRecord(session, sessionIndex, tab, tabIndex, "Closed window tab")
+  );
 }
 
 async function searchRecentlyClosedRecords() {
@@ -135,25 +230,7 @@ async function searchRecentlyClosedRecords() {
     maxResults: 25
   });
 
-  return sessions.flatMap((session, sessionIndex) =>
-    sessionEntries(session)
-      .filter((tab) => tab.url)
-      .map((tab, tabIndex) =>
-        memoryRecord({
-          id: `session:${sessionIndex}:${tabIndex}`,
-          type: "recent",
-          title: tab.title,
-          url: tab.url,
-          visitTime: session.lastModified ? session.lastModified * 1000 : Date.now(),
-          detail: "Recently closed",
-          action: {
-            type: session.sessionId ? "restore-session" : "open-url",
-            sessionId: session.sessionId || "",
-            url: tab.url
-          }
-        })
-      )
-  );
+  return sessions.flatMap(sessionRecords);
 }
 
 const SOURCE_SEARCHES = [

@@ -455,10 +455,13 @@ export function matchesVisitQuery(visit, query) {
   const title = visit.normalizedTitle || visit.title?.toLowerCase() || "";
   const url = visit.normalizedUrl || visit.url?.toLowerCase() || "";
   const domain = (visit.domain || "").toLowerCase();
+  const domains = Array.isArray(visit.domains) && visit.domains.length
+    ? visit.domains.map((value) => String(value || "").toLowerCase()).filter(Boolean)
+    : [domain].filter(Boolean);
   const source = (visit.source || "").toLowerCase();
   const transition = (visit.transition || "").toLowerCase();
   const visitCount = Number(visit.visitCount || 0);
-  const haystack = `${title} ${url} ${domain}`;
+  const haystack = `${title} ${url} ${domains.join(" ")}`;
 
   if (query.after !== null && visit.visitTime < query.after) {
     return false;
@@ -476,7 +479,10 @@ export function matchesVisitQuery(visit, query) {
     return false;
   }
 
-  if (query.site.length && !query.site.some((site) => domain === site || domain.endsWith(`.${site}`))) {
+  if (
+    query.site.length &&
+    !query.site.some((site) => domains.some((item) => item === site || item.endsWith(`.${site}`)))
+  ) {
     return false;
   }
 

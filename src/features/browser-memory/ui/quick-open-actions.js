@@ -121,7 +121,13 @@ export function quickActionLabel(item) {
 
 export function quickActionStatusLabel(item) {
   const action = item.action || { type: "open-url" };
-  return `${action.type === "activate-tab" ? "Switched to" : "Opened"} ${item.title || item.url}`;
+  const verbByAction = {
+    "activate-tab": "Switched to",
+    "restore-session": "Restored",
+    "open-url": "Opened"
+  };
+
+  return `${verbByAction[action.type] || "Opened"} ${item.title || item.url}`;
 }
 
 export function quickBackgroundActionMessage(item) {

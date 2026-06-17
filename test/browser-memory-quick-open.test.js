@@ -171,7 +171,7 @@ test("quick action helpers map browser-memory actions to background messages and
   assert.equal(quickActionLabel(recent), "Restore");
   assert.equal(quickActionLabel(plain), "Open");
   assert.equal(quickActionStatusLabel(tab), "Switched to Docs");
-  assert.equal(quickActionStatusLabel(recent), "Opened Recent");
+  assert.equal(quickActionStatusLabel(recent), "Restored Recent");
   assert.equal(quickBackgroundActionStatusLabel(plain), "Opened Plain in background");
 });
 

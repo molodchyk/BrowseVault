@@ -37,7 +37,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - keyboard-first search with autofocus, global query focus, Enter search, and debounced live refresh;
 - keyboard navigation for visible history results with arrow keys, Enter-to-open, and Space-to-select;
 - local-date grouped vault results for easier timeline scanning;
-- Quick Open search across open tabs, bookmarks, downloads, and recently closed tabs, with source-aware switch/open/open-in-background/restore actions, keyboard navigation, and readable source-unavailable warnings;
+- Quick Open search across open tabs, bookmarks, downloads, recently closed tabs, and closed windows, with source-aware switch/open/open-in-background/restore actions, keyboard navigation, and readable source-unavailable warnings;
 - toolbar and keyboard-command opening that reuses an already open BrowseVault tab;
 - Settings escape hatch for opening Chrome's native history page without making BrowseVault a default-history override;
 - JSON backup export and import;
@@ -163,7 +163,7 @@ url:docs -youtube
 regex:github|gitlab
 ```
 
-The main vault search is used for archived history management. Quick Open uses the same query text to search current browser sources such as open tabs, bookmarks, downloads, and recently closed tabs. Quick Open results are read-only and are not affected by vault delete/export actions. Longer plain keywords use a bounded fuzzy fallback, so common one-character typos such as `histroy` can still find `history`; short keywords, phrases, regex, and structured filters stay exact unless they include `*` or `?` wildcards. Wildcards work in plain keywords, exclusions, and `title:`, `url:`, `source:`, or `transition:` filters.
+The main vault search is used for archived history management. Quick Open uses the same query text to search current browser sources such as open tabs, bookmarks, downloads, recently closed tabs, and closed windows. Quick Open results are read-only and are not affected by vault delete/export actions. Longer plain keywords use a bounded fuzzy fallback, so common one-character typos such as `histroy` can still find `history`; short keywords, phrases, regex, and structured filters stay exact unless they include `*` or `?` wildcards. Wildcards work in plain keywords, exclusions, and `title:`, `url:`, `source:`, or `transition:` filters.
 
 Date filters use `YYYY-MM-DD` text fields to avoid browser-specific date input formatting. Use `date:`, `day:`, or `on:` for one local calendar day, and `after:` / `before:` for ranges. Bare `after:YYYY-MM-DD` starts at local midnight, and bare `before:YYYY-MM-DD` includes the full local day. Use `hour:14` for one local hour or `hour:9-17` / `hour:9..17` for an inclusive local-hour range. Domain filters accept `site:`, `host:`, or `domain:`. Visit count filters accept exact values, comparisons such as `visits:>=10`, ranges such as `count:5..12`, and minimum shorthand such as `visits:7+`. Displayed dates can be switched between system locale, ISO, day/month/year, month/day/year, and year/month/day in Settings.
 
