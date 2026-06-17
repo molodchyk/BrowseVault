@@ -181,7 +181,10 @@ function bindEvents() {
       openSelected: bulkActions.openSelected,
       previewRetentionCleanup: vaultActions.previewRetentionCleanup,
       resetVault: vaultActions.resetVault,
-      runQuickSearch: quickOpenActions.runQuickSearch,
+      runQuickSearch: () => {
+        searchCoordinator.clearSearchDebounce();
+        return quickOpenActions.runQuickSearch();
+      },
       runSearchesNow: searchCoordinator.runSearchesNow,
       savePreferences: displayPreferences.savePreferences,
       saveCurrentSearch: savedSearchActions.saveCurrentSearch,

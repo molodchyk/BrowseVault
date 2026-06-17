@@ -56,6 +56,17 @@ export function quickActionStatusLabel(item) {
   return `${action.type === "activate-tab" ? "Switched to" : "Opened"} ${item.title || item.url}`;
 }
 
+export function quickBackgroundActionMessage(item) {
+  return {
+    type: BACKGROUND_MESSAGE_TYPES.OPEN_URL_BACKGROUND,
+    url: item.url
+  };
+}
+
+export function quickBackgroundActionStatusLabel(item) {
+  return `Opened ${item.title || item.url} in background`;
+}
+
 export function createQuickOpenActions({
   appState,
   copyText,
@@ -95,6 +106,7 @@ export function createQuickOpenActions({
       const url = fragment.querySelector(".url");
       const meta = fragment.querySelector(".meta");
       const action = fragment.querySelector(".quick-action");
+      const background = fragment.querySelector(".quick-background");
       const copy = fragment.querySelector(".quick-copy");
 
       source.textContent = item.type;
@@ -109,14 +121,12 @@ export function createQuickOpenActions({
       );
       action.textContent = quickActionLabel(item);
       action.addEventListener("click", () => performQuickAction(item).catch((error) => setStatus(error.message)));
+      background.addEventListener("click", () => openQuickUrlInBackground(item).catch((error) => setStatus(error.message)));
       copy.addEventListener("click", () => copyQuickUrl(item).catch((error) => setStatus(error.message)));
 
       elements.quickResults.append(fragment);
     }
 
-    if (warnings.length) {
-      setStatus(`${total} source results; ${warnings.length} source warning${warnings.length === 1 ? "" : "s"}`);
-    }
   }
 
   async function performQuickAction(item) {
@@ -125,6 +135,19 @@ export function createQuickOpenActions({
       throw new Error(response?.error || "Quick action failed.");
     }
     setStatus(quickActionStatusLabel(item));
+  }
+
+  async function openQuickUrlInBackground(item) {
+    if (!item.url) {
+      setStatus("No URL to open");
+      return;
+    }
+
+    const response = await deps.sendRuntimeMessage(quickBackgroundActionMessage(item));
+    if (!response?.ok) {
+      throw new Error(response?.error || "Background open failed.");
+    }
+    setStatus(quickBackgroundActionStatusLabel(item));
   }
 
   async function copyQuickUrl(item) {
@@ -150,14 +173,16 @@ export function createQuickOpenActions({
       return;
     }
 
+    setStatus(warnings.length
+      ? `${total} source results; ${warnings.length} source warning${warnings.length === 1 ? "" : "s"}`
+      : `${total} source result${total === 1 ? "" : "s"}`
+    );
     renderQuickResults(results, total, warnings);
-    if (!warnings.length) {
-      setStatus(`${total} source result${total === 1 ? "" : "s"}`);
-    }
   }
 
   return {
     copyQuickUrl,
+    openQuickUrlInBackground,
     performQuickAction,
     renderQuickResults,
     runQuickSearch

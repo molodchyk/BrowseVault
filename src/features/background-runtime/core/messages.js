@@ -4,6 +4,7 @@ export const BACKGROUND_MESSAGE_TYPES = {
   ACTIVATE_TAB: "browseVault.activateTab",
   RESTORE_SESSION: "browseVault.restoreSession",
   OPEN_URL: "browseVault.openUrl",
+  OPEN_URL_BACKGROUND: "browseVault.openUrlBackground",
   OPEN_URLS: "browseVault.openUrls"
 };
 
@@ -97,6 +98,20 @@ export function normalizeBackgroundMessage(message) {
         ok: true,
         action: {
           type: "openUrl",
+          url: message.url.trim()
+        }
+      };
+
+    case BACKGROUND_MESSAGE_TYPES.OPEN_URL_BACKGROUND:
+      if (!isNonEmptyString(message.url)) {
+        return invalidMessage(message.type, "url must be a non-empty string.");
+      }
+
+      return {
+        handled: true,
+        ok: true,
+        action: {
+          type: "openUrlBackground",
           url: message.url.trim()
         }
       };

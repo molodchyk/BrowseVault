@@ -592,6 +592,7 @@ code {
 }
 
 .quick-action,
+.quick-background,
 .quick-copy {
   align-self: center;
 }

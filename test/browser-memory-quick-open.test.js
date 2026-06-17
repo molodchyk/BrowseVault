@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   createQuickOpenActions,
+  quickBackgroundActionMessage,
+  quickBackgroundActionStatusLabel,
   quickActionLabel,
   quickActionMessage,
   quickActionStatusLabel
@@ -25,6 +27,7 @@ function fakeFragment() {
     ".url": fakeNode(),
     ".meta": fakeNode(),
     ".quick-action": fakeNode(),
+    ".quick-background": fakeNode(),
     ".quick-copy": fakeNode()
   };
 
@@ -133,11 +136,16 @@ test("quick action helpers map browser-memory actions to background messages and
     type: "browseVault.openUrl",
     url: "https://example.com/plain"
   });
+  assert.deepEqual(quickBackgroundActionMessage(plain), {
+    type: "browseVault.openUrlBackground",
+    url: "https://example.com/plain"
+  });
   assert.equal(quickActionLabel(tab), "Switch");
   assert.equal(quickActionLabel(recent), "Restore");
   assert.equal(quickActionLabel(plain), "Open");
   assert.equal(quickActionStatusLabel(tab), "Switched to Docs");
   assert.equal(quickActionStatusLabel(recent), "Opened Recent");
+  assert.equal(quickBackgroundActionStatusLabel(plain), "Opened Plain in background");
 });
 
 test("runQuickSearch renders results and wires quick action and copy buttons", async () => {
@@ -170,16 +178,24 @@ test("runQuickSearch renders results and wires quick action and copy buttons", a
   assert.deepEqual(statuses, ["Searching browser sources", "1 source result"]);
 
   await fragments[0].nodes[".quick-action"].listeners.click();
+  await fragments[0].nodes[".quick-background"].listeners.click();
   await fragments[0].nodes[".quick-copy"].listeners.click();
 
-  assert.deepEqual(runtimeMessages, [{
-    type: "browseVault.activateTab",
-    tabId: 7,
-    windowId: 2
-  }]);
+  assert.deepEqual(runtimeMessages, [
+    {
+      type: "browseVault.activateTab",
+      tabId: 7,
+      windowId: 2
+    },
+    {
+      type: "browseVault.openUrlBackground",
+      url: "https://example.com/docs"
+    }
+  ]);
   assert.deepEqual(copied, ["https://example.com/docs"]);
   assert.deepEqual(statuses.slice(2), [
     "Switched to Docs",
+    "Opened Docs in background",
     "Copied URL for Docs"
   ]);
 });

@@ -79,6 +79,15 @@ export function createBackgroundMessageRouter(actions, options = {}) {
       );
     }
 
+    if (action.type === "openUrlBackground") {
+      return respondWithTask(
+        async () => {
+          await actions.createTab({ url: action.url, active: false });
+        },
+        sendResponse
+      );
+    }
+
     if (action.type === "openUrls") {
       return respondWithTask(
         async () => {

@@ -52,6 +52,21 @@ test("normalizeBackgroundMessage rejects unknown messages and validates payload 
     }).error,
     /url must be/
   );
+
+  assert.deepEqual(
+    normalizeBackgroundMessage({
+      type: BACKGROUND_MESSAGE_TYPES.OPEN_URL_BACKGROUND,
+      url: " https://example.com/background "
+    }),
+    {
+      handled: true,
+      ok: true,
+      action: {
+        type: "openUrlBackground",
+        url: "https://example.com/background"
+      }
+    }
+  );
 });
 
 test("normalizeBackgroundMessage trims and deduplicates URL arrays", () => {
@@ -134,6 +149,13 @@ test("createBackgroundMessageRouter dispatches validated messages", async () => 
   );
   assert.deepEqual(
     await send({
+      type: BACKGROUND_MESSAGE_TYPES.OPEN_URL_BACKGROUND,
+      url: " https://example.com/background "
+    }),
+    { ok: true }
+  );
+  assert.deepEqual(
+    await send({
       type: BACKGROUND_MESSAGE_TYPES.OPEN_URLS,
       urls: ["https://example.com/one", "https://example.com/two"]
     }),
@@ -147,6 +169,7 @@ test("createBackgroundMessageRouter dispatches validated messages", async () => 
     ["activateTab", 2],
     ["restoreSession", "session-1"],
     ["createTab", { url: "https://example.com/open" }],
+    ["createTab", { url: "https://example.com/background", active: false }],
     ["createTab", { url: "https://example.com/one" }],
     ["createTab", { url: "https://example.com/two" }]
   ]);
