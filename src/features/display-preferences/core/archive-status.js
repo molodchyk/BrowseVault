@@ -64,24 +64,24 @@ export function archiveHealthDetails(meta = {}, options = {}) {
           : "Archive sync not run yet",
     isWarning: hasVaultIssues || !hasSync || !storageCheckOk,
     isOk: !hasVaultIssues && hasSync && storageCheckOk,
-    startupText: startupTimestamp ? formatDate(startupTimestamp, dateFormat) : "Not recorded",
+    startupText: startupTimestamp ? formatDate(startupTimestamp, dateFormat) : label(options, "archiveNotRecorded", "Not recorded"),
     syncText: hasSync
       ? `${formatDate(syncTimestamp, dateFormat)} · ${formatCount(sync.stored)} stored`
-      : "Not synced yet",
+      : label(options, "archiveNotSynced", "Not synced yet"),
     captureText: captureTimestamp
       ? `${formatDate(captureTimestamp, dateFormat)}${domainFromUrl(capture.url) ? ` · ${domainFromUrl(capture.url)}` : ""}`
-      : "Waiting for next visit",
+      : label(options, "archiveWaitingForVisit", "Waiting for next visit"),
     storageText: storageCheckOk
       ? `Passed ${formatDate(storageCheckTimestamp, dateFormat)}`
       : storageCheck?.status === "failed"
         ? "Failed"
-        : "Not checked yet",
+        : label(options, "archiveNotChecked", "Not checked yet"),
     vaultText: hasVaultIssues
       ? issueDetails.join(" · ")
       : `${formatCount(activeRecords)} active · ${formatCount(storedRows)} stored`,
     tombstoneText: deletedRecords
       ? `${formatCount(deletedRecords)} deleted tombstone${deletedRecords === 1 ? "" : "s"}`
-      : "No deleted tombstones"
+      : label(options, "archiveNoTombstones", "No deleted tombstones")
   };
 }
 

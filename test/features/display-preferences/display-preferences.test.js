@@ -175,6 +175,24 @@ test("archiveHealthDetails warns when synced archive has no storage self-check",
   assert.equal(status.storageText, "Not checked yet");
 });
 
+test("archiveHealthDetails accepts localized empty recorder labels", () => {
+  const status = archiveHealthDetails({}, {
+    labels: {
+      archiveNoTombstones: "Keine geloeschten Merker",
+      archiveNotChecked: "Noch nicht geprueft",
+      archiveNotRecorded: "Nicht aufgezeichnet",
+      archiveNotSynced: "Noch nicht synchronisiert",
+      archiveWaitingForVisit: "Wartet auf naechsten Besuch"
+    }
+  });
+
+  assert.equal(status.startupText, "Nicht aufgezeichnet");
+  assert.equal(status.syncText, "Noch nicht synchronisiert");
+  assert.equal(status.captureText, "Wartet auf naechsten Besuch");
+  assert.equal(status.storageText, "Noch nicht geprueft");
+  assert.equal(status.tombstoneText, "Keine geloeschten Merker");
+});
+
 test("archiveHealthDetails warns about vault data issues", () => {
   const status = archiveHealthDetails(
     {

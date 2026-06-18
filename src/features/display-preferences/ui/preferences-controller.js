@@ -85,6 +85,13 @@ export function createDisplayPreferencesController({
   function renderArchiveHealth(meta) {
     const status = deps.archiveHealthDetails(meta, {
       dateFormat: appState.preferences.dateFormat,
+      labels: {
+        archiveNoTombstones: getMessage("archiveNoTombstones") || "No deleted tombstones",
+        archiveNotChecked: getMessage("archiveNotChecked") || "Not checked yet",
+        archiveNotRecorded: getMessage("archiveNotRecorded") || "Not recorded",
+        archiveNotSynced: getMessage("archiveNotSynced") || "Not synced yet",
+        archiveWaitingForVisit: getMessage("archiveWaitingForVisit") || "Waiting for next visit"
+      },
       vaultHealth: appState.vaultHealth
     });
 

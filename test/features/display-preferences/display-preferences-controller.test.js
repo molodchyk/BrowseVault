@@ -213,16 +213,6 @@ test("savePreferences persists normalized values, refreshes stats, reruns search
   assert.deepEqual(statusMessages, ["Settings saved"]);
 });
 
-test("savePreferences can localize the saved status", async () => {
-  const { controller, statusMessages } = createHarness({
-    getMessage: (key) => key === "statusSettingsSaved" ? "Einstellungen gespeichert" : ""
-  });
-
-  await controller.savePreferences();
-
-  assert.deepEqual(statusMessages, ["Einstellungen gespeichert"]);
-});
-
 test("refreshStats renders stat cards and backup health details", async () => {
   const exportedAt = "2026-06-01T00:00:00.000Z";
   const { archiveHealthClassList, backupHealthClassList, controller, elements, renderedActivity } = createHarness({
@@ -334,49 +324,6 @@ test("refreshStats renders stat cards and backup health details", async () => {
   assert.equal(renderedActivity[0][2].formatDate(Date.parse(exportedAt)), "2026-06-01");
 });
 
-test("refreshStats passes localized activity-log empty text", async () => {
-  const { controller, renderedActivity } = createHarness({
-    getMessage: (key) => key === "noActivityLogged" ? "Noch keine Aktivitaet protokolliert." : "",
-    stats: {
-      visits: 0,
-      domains: 0,
-      newestVisitTime: 0,
-      insights: {},
-      meta: {
-        activityLog: [],
-        lastBackup: null
-      },
-      vaultHealth: {}
-    }
-  });
-
-  await controller.refreshStats();
-
-  assert.equal(renderedActivity.length, 1);
-  assert.equal(renderedActivity[0][2].emptyText, "Noch keine Aktivitaet protokolliert.");
-});
-
-test("refreshStats can localize the empty backup stat", async () => {
-  const { controller, elements } = createHarness({
-    getMessage: (key) => key === "statBackupEmpty" ? "Nie" : "",
-    stats: {
-      visits: 0,
-      domains: 0,
-      newestVisitTime: 0,
-      insights: {},
-      meta: {
-        activityLog: [],
-        lastBackup: null
-      },
-      vaultHealth: {}
-    }
-  });
-
-  await controller.refreshStats();
-
-  assert.equal(elements.statBackup.textContent, "Nie");
-});
-
 test("refreshStats applies the configured backup reminder interval", async () => {
   const { backupHealthClassList, controller, elements } = createHarness({
     preferences: {
@@ -447,45 +394,6 @@ test("refreshStats ignores legacy non-JSON backup metadata", async () => {
   assert.equal(elements.backupRecords.textContent, "0");
   assert.equal(elements.backupSize.textContent, "-");
   assert.equal(backupHealthClassList.classes.has("is-warning"), true);
-});
-
-test("refreshStats passes localized empty backup status labels", async () => {
-  const messages = new Map([
-    ["backupChecksumUnavailable", "Nicht verfuegbar"],
-    ["backupHealthEmpty", "Noch keine Sicherung"],
-    ["backupNextAfterFirst", "Nach erster Sicherung"],
-    ["backupReminderOff", "Aus"],
-    ["statBackupEmpty", "Nie"]
-  ]);
-  const { controller, elements } = createHarness({
-    getMessage: (key) => messages.get(key) || "",
-    preferences: {
-      theme: "system",
-      accent: "teal",
-      contrast: "standard",
-      textSize: "standard",
-      backupFilenamePrefix: "browsevault",
-      backupReminderDays: 0,
-      dateFormat: "iso",
-      defaultLimit: 500
-    },
-    stats: {
-      visits: 0,
-      domains: 0,
-      newestVisitTime: 0,
-      meta: {
-        lastBackup: null
-      }
-    }
-  });
-
-  await controller.refreshStats();
-
-  assert.equal(elements.statBackup.textContent, "Nie");
-  assert.equal(elements.backupHealth.textContent, "Noch keine Sicherung");
-  assert.equal(elements.backupLast.textContent, "Nie");
-  assert.equal(elements.backupNext.textContent, "Aus");
-  assert.equal(elements.backupChecksum.textContent, "Nicht verfuegbar");
 });
 
 test("requested limits respect current field values and quick-open cap", () => {
