@@ -23,7 +23,7 @@ The raw files are preserved in [`raw-sources/`](raw-sources/) so future product,
 - These files are committed because they are small public/store-text snapshots and are useful provenance for product decisions.
 - Absolute local attachment paths are intentionally not stored here.
 - Treat these files as evidence snapshots, not current market truth. Re-check Chrome Web Store pages before launch-sensitive claims about ratings, users, or recent reviews.
-- Treat the StorePilot reference as launch tooling documentation and re-check it before changing the automation-facing file layout.
+- Treat the StorePilot reference as launch tooling documentation and re-check it before changing the automation-facing file layout. `npm run check:reference-sync` compares the committed snapshot against `settings/StorePilot/docs/reference.md` when that sibling project is available.
 - Summaries derived from these sources live in:
   - [`browser-history-extension-research.md`](browser-history-extension-research.md)
   - [`user-feedback-taxonomy.md`](user-feedback-taxonomy.md)

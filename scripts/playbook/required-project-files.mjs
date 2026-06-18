@@ -84,7 +84,9 @@ export const requiredProjectFiles = [
   "scripts/media/generate-store-media.py",
   "scripts/package-extension.mjs",
   "scripts/playbook/check-chrome-qa-safety.mjs",
+  "scripts/playbook/check-reference-sync.mjs",
   "scripts/playbook/check-release-readiness.mjs",
+  "scripts/playbook/reference-sync-core.mjs",
   "scripts/playbook/release-readiness-core.mjs",
   "scripts/playbook/required-project-files.mjs",
   "scripts/playbook/validate-chrome-qa-safety.mjs",
@@ -94,5 +96,6 @@ export const requiredProjectFiles = [
   "scripts/verify-package.mjs",
   "scripts/zip-utils.mjs",
   "test/scripts/chrome-qa-safety.test.js",
+  "test/scripts/reference-sync.test.js",
   "test/scripts/release-readiness.test.js"
 ];

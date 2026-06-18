@@ -94,6 +94,7 @@ assert(packageJson.scripts.check.includes("check-imports.mjs"), "Check script mu
 assert(packageJson.scripts.check.includes("check-locales.mjs"), "Check script must verify locale message coverage.");
 assert(packageJson.scripts.check.includes("check-manifest-paths.mjs"), "Check script must verify manifest-referenced file paths.");
 assert(packageJson.scripts.check.includes("check-privacy-permissions.mjs"), "Check script must verify privacy/permission parity.");
+assert(packageJson.scripts.check.includes("check-reference-sync.mjs"), "Check script must verify shared reference sync.");
 assert(packageJson.scripts.check.includes("check-file-sizes.mjs"), "Check script must enforce file-size budgets.");
 assert(packageJson.scripts.check.includes("check-folder-density.mjs"), "Check script must enforce folder density.");
 assert(packageJson.scripts.icons, "Missing icons script.");
