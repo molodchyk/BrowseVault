@@ -66,6 +66,16 @@ export function createDisplayPreferencesController({
       dateFormat: appState.preferences.dateFormat,
       labels: {
         backupChecksumUnavailable: localizedLabel(getMessage, "backupChecksumUnavailable", "Not available"),
+        backupConfidenceChecksumMissing: localizedLabel(getMessage, "backupConfidenceChecksumMissing", "Limited - checksum not included"),
+        backupConfidenceChecksumRisk: localizedLabel(getMessage, "backupConfidenceChecksumRisk", "Risk - checksum mismatch"),
+        backupConfidenceCountRisk: localizedLabel(getMessage, "backupConfidenceCountRisk", "Risk - backup count mismatch"),
+        backupConfidenceHigh: localizedLabel(getMessage, "backupConfidenceHigh", "High - checksum and restore rows verified"),
+        backupConfidenceHighRecordMany: localizedLabel(getMessage, "backupConfidenceHighRecordMany", "High - 12 restorable records verified"),
+        backupConfidenceHighRecordOne: localizedLabel(getMessage, "backupConfidenceHighRecordOne", "High - 1 restorable record verified"),
+        backupConfidenceMissing: localizedLabel(getMessage, "backupConfidenceMissing", "No restorable backup yet"),
+        backupConfidenceRestoreRisk: localizedLabel(getMessage, "backupConfidenceRestoreRisk", "Risk - restore row check failed"),
+        backupConfidenceRisk: localizedLabel(getMessage, "backupConfidenceRisk", "Risk - self-test failed"),
+        backupConfidenceUnknown: localizedLabel(getMessage, "backupConfidenceUnknown", "Unknown until a JSON backup self-test runs"),
         backupFormatUnknown: localizedLabel(getMessage, "backupFormatUnknown", "unknown"),
         backupHealthCurrent: localizedLabel(getMessage, "backupHealthCurrent", "Backup current"),
         backupHealthDueMany: localizedLabel(getMessage, "backupHealthDueMany", "Backup due after 30 days"),
@@ -97,6 +107,7 @@ export function createDisplayPreferencesController({
     elements.backupRecords.textContent = status.recordsText;
     elements.backupSize.textContent = status.sizeText;
     elements.backupSelfTest.textContent = status.selfTestText;
+    elements.backupConfidence.textContent = status.confidenceText;
     elements.backupChecksum.textContent = status.checksumText;
   }
 

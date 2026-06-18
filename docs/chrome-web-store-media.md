@@ -10,7 +10,7 @@ The release checklist requires a manual screenshot review because image dimensio
 | --- | --- | --- |
 | `store-listing/chrome-web-store/media/screenshots/01-history-search.jpg` | History search with query, filters, result counts, and contained long URLs/titles. | Local history search, operators, saved/search result workflow, explicit cleanup controls. |
 | `store-listing/chrome-web-store/media/screenshots/02-quick-open.jpg` | Quick Open results for tabs, bookmarks, downloads, recently closed tabs, and closed windows. | Quick Open access to current and recent browser memory sources. |
-| `store-listing/chrome-web-store/media/screenshots/03-backup-health.jpg` | Backup health, export/import actions, archive overview, and self-test status. | Checksum-protected JSON backup, restore health, CSV/HTML export, local-first archive status. |
+| `store-listing/chrome-web-store/media/screenshots/03-backup-health.jpg` | Backup health, restore confidence, export/import actions, archive overview, and self-test status. | Checksum-protected JSON backup, restore health, CSV/HTML export, local-first archive status. |
 | `store-listing/chrome-web-store/media/screenshots/04-rules-cleanup.jpg` | Rules, category, blacklist, whitelist, retention cleanup, and duplicate cleanup controls. | Domain rules, manual categories, explicit destructive actions, undoable vault cleanup where supported. |
 | `store-listing/chrome-web-store/media/screenshots/05-settings-privacy.jpg` | Settings defaults, theme/date/result-limit controls, native-history escape hatch, and reset/privacy copy. | Display preferences, default result limit, local storage posture, no analytics, no host permissions, no remote code. |
 

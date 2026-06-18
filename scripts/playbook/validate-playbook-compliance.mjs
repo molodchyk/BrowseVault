@@ -344,7 +344,7 @@ export function validatePlaybookCompliance(root, assert) {
     "creates another BrowseVault tab instead of enforcing one global app tab",
     "Deleting a vault record in one BrowseVault tab refreshes another open BrowseVault tab",
     "Theme, accent, contrast, text size, date display, and default result-limit settings save and apply",
-    "JSON backup export completes and reports backup health/self-test status",
+    "JSON backup export completes and reports backup health, restore confidence, and self-test status",
     "Chrome Web Store screenshots match the current UI and store listing copy",
     "Result: Not run",
     "git rev-parse --short=7 HEAD",

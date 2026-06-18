@@ -73,6 +73,7 @@ export function collectAppElements(document) {
     backupRecords: document.querySelector("#backup-records"),
     backupSize: document.querySelector("#backup-size"),
     backupSelfTest: document.querySelector("#backup-self-test"),
+    backupConfidence: document.querySelector("#backup-confidence"),
     backupChecksum: document.querySelector("#backup-checksum"),
     activityLog: document.querySelector("#activity-log"),
     archiveHealth: document.querySelector("#archive-health"),

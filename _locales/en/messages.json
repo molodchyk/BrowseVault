@@ -961,6 +961,62 @@
     "message": "Failed",
     "description": "Backup self-test status shown when verification fails without a narrower reason."
   },
+  "backupConfidenceLabel": {
+    "message": "Restore confidence",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "backupConfidenceMissing": {
+    "message": "No restorable backup yet",
+    "description": "Backup restore-confidence status shown before the first restorable JSON backup."
+  },
+  "backupConfidenceUnknown": {
+    "message": "Unknown until a JSON backup self-test runs",
+    "description": "Backup restore-confidence status shown for legacy backup metadata with no self-test."
+  },
+  "backupConfidenceHigh": {
+    "message": "High - checksum and restore rows verified",
+    "description": "Backup restore-confidence status shown when checksum and restore row checks pass but no count is available."
+  },
+  "backupConfidenceHighRecordOne": {
+    "message": "High - $COUNT$ restorable record verified",
+    "description": "Backup restore-confidence status shown when one restorable row was verified.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "backupConfidenceHighRecordMany": {
+    "message": "High - $COUNT$ restorable records verified",
+    "description": "Backup restore-confidence status shown when multiple restorable rows were verified.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
+  },
+  "backupConfidenceChecksumRisk": {
+    "message": "Risk - checksum mismatch",
+    "description": "Backup restore-confidence status shown when backup checksum verification fails."
+  },
+  "backupConfidenceChecksumMissing": {
+    "message": "Limited - checksum not included",
+    "description": "Backup restore-confidence status shown when a legacy self-test has no checksum to verify."
+  },
+  "backupConfidenceCountRisk": {
+    "message": "Risk - backup count mismatch",
+    "description": "Backup restore-confidence status shown when backup record count verification fails."
+  },
+  "backupConfidenceRestoreRisk": {
+    "message": "Risk - restore row check failed",
+    "description": "Backup restore-confidence status shown when restored row count verification fails."
+  },
+  "backupConfidenceRisk": {
+    "message": "Risk - self-test failed",
+    "description": "Backup restore-confidence status shown when a backup self-test fails without a narrower reason."
+  },
   "backupChecksumLabel": {
     "message": "Checksum",
     "description": "Static BrowseVault extension-page UI string."

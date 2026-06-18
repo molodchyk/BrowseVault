@@ -61,6 +61,7 @@ function createHarness({
     archiveActiveDays: output(),
     archiveDateRange: output(),
     backupChecksum: output(),
+    backupConfidence: output(),
     backupFormat: output(),
     backupHealth: { textContent: "", classList: classListHarness() },
     backupLast: output(),
@@ -180,6 +181,7 @@ test("refreshStats can localize the empty newest stat", async () => {
 test("refreshStats passes localized empty backup status labels", async () => {
   const messages = new Map([
     ["backupChecksumUnavailable", "Nicht verfuegbar"],
+    ["backupConfidenceMissing", "Keine wiederherstellbare Sicherung"],
     ["backupHealthEmpty", "Noch keine Sicherung"],
     ["backupNextAfterFirst", "Nach erster Sicherung"],
     ["backupReminderOff", "Aus"],
@@ -205,6 +207,7 @@ test("refreshStats passes localized empty backup status labels", async () => {
   assert.equal(elements.backupHealth.textContent, "Noch keine Sicherung");
   assert.equal(elements.backupLast.textContent, "Nie");
   assert.equal(elements.backupNext.textContent, "Aus");
+  assert.equal(elements.backupConfidence.textContent, "Keine wiederherstellbare Sicherung");
   assert.equal(elements.backupChecksum.textContent, "Nicht verfuegbar");
 });
 
@@ -217,6 +220,10 @@ test("refreshStats passes localized dynamic backup status labels", async () => {
 
       if (key === "backupSelfTestPassedRecordMany") {
         return `${substitutions[0]} Datensaetze bestanden`;
+      }
+
+      if (key === "backupConfidenceHighRecordMany") {
+        return `Hoch - ${substitutions[0]} wiederherstellbare Datensaetze`;
       }
 
       return "";
@@ -235,6 +242,8 @@ test("refreshStats passes localized dynamic backup status labels", async () => {
           sizeBytes: 1536,
           selfTest: {
             records: 12,
+            restorableRecords: 12,
+            checksum: "verified",
             status: "passed"
           }
         }
@@ -247,6 +256,7 @@ test("refreshStats passes localized dynamic backup status labels", async () => {
 
   assert.equal(elements.backupHealth.textContent, "Sicherung faellig nach 30 Tagen");
   assert.equal(elements.backupSelfTest.textContent, "12 Datensaetze bestanden");
+  assert.equal(elements.backupConfidence.textContent, "Hoch - 12 wiederherstellbare Datensaetze");
 });
 
 test("refreshStats passes localized archive recorder empty labels", async () => {

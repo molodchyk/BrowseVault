@@ -341,6 +341,7 @@ assert(appHtml.includes("Display and search defaults"), "Settings should expose 
 assert(appHtml.includes("Permissions and limits"), "Settings should disclose permissions and product limits.");
 assert(appHtml.includes("cannot recover visits Chrome already deleted"), "Settings should disclose old-history recovery limits.");
 assert(appHtml.includes("No activity logged yet."), "Activity log should include an intentional empty state.");
+assert(appHtml.includes("Restore confidence"), "Backup status should expose restore confidence.");
 for (const expected of [
   'id="pref-theme"',
   '<option value="system">System</option>',

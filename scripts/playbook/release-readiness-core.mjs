@@ -30,7 +30,7 @@ export const expectedManualBrowserQaChecks = [
   "Rules list groups Category, Blacklist, and Whitelist rows by type rather than repeating the type on every row.",
   "Theme, accent, contrast, text size, date display, and default result-limit settings save and apply.",
   "Open Chrome History opens the native browser history page.",
-  "JSON backup export completes and reports backup health/self-test status.",
+  "JSON backup export completes and reports backup health, restore confidence, and self-test status.",
   "Import preview appears for a supported archive file and can be canceled safely.",
   "Reset Vault is visible in Settings/Backup workflows and clearly says it does not delete Chrome history.",
   "Chrome Web Store screenshots match the current UI and store listing copy."

@@ -60,6 +60,52 @@ function localizedBackupSelfTest(selfTest, options) {
   return label(options, "backupSelfTestFailed", "Failed");
 }
 
+function localizedRestoreConfidence(backup, options) {
+  if (!backup) {
+    return label(options, "backupConfidenceMissing", "No restorable backup yet");
+  }
+
+  const selfTest = backup.selfTest;
+  if (!selfTest) {
+    return label(options, "backupConfidenceUnknown", "Unknown until a JSON backup self-test runs");
+  }
+
+  if (selfTest.status === "passed" &&
+    selfTest.checksum === "verified" &&
+    selfTest.countMatches !== false &&
+    selfTest.restoreCountMatches !== false) {
+    const restorableRecords = Number(selfTest.restorableRecords ?? selfTest.records ?? backup.records);
+    return Number.isFinite(restorableRecords)
+      ? countMessage(
+        options,
+        restorableRecords,
+        "backupConfidenceHighRecordOne",
+        "backupConfidenceHighRecordMany",
+        "High - 1 restorable record verified",
+        `High - ${formatCount(restorableRecords)} restorable records verified`
+      )
+      : label(options, "backupConfidenceHigh", "High - checksum and restore rows verified");
+  }
+
+  if (selfTest.checksum === "mismatch") {
+    return label(options, "backupConfidenceChecksumRisk", "Risk - checksum mismatch");
+  }
+
+  if (selfTest.checksum === "not-included") {
+    return label(options, "backupConfidenceChecksumMissing", "Limited - checksum not included");
+  }
+
+  if (selfTest.countMatches === false) {
+    return label(options, "backupConfidenceCountRisk", "Risk - backup count mismatch");
+  }
+
+  if (selfTest.restoreCountMatches === false) {
+    return label(options, "backupConfidenceRestoreRisk", "Risk - restore row check failed");
+  }
+
+  return label(options, "backupConfidenceRisk", "Risk - self-test failed");
+}
+
 export function backupStatusDetails(backup, options = {}) {
   const timestamp = backupTimestamp(backup);
   const dateFormat = options.dateFormat || DEFAULT_DATE_FORMAT;
@@ -83,6 +129,7 @@ export function backupStatusDetails(backup, options = {}) {
       recordsText: "0",
       sizeText: "-",
       selfTestText: "-",
+      confidenceText: localizedRestoreConfidence(null, options),
       checksumText: label(options, "backupChecksumUnavailable", "Not available")
     };
   }
@@ -115,6 +162,7 @@ export function backupStatusDetails(backup, options = {}) {
       ? formatFileSize(backup.sizeBytes)
       : label(options, "backupSizeNotRecorded", "Not recorded"),
     selfTestText: localizedBackupSelfTest(backup.selfTest, options),
+    confidenceText: localizedRestoreConfidence(backup, options),
     checksumText: backup.sha256
       ? formatChecksum(backup.sha256)
       : label(options, "backupChecksumUnavailable", "Not available")
