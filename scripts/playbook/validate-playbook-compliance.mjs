@@ -285,6 +285,12 @@ export function validatePlaybookCompliance(root, assert) {
   for (const expected of ["html,", "body", "max-width: 100%", "overflow-x: clip"]) {
     assert(tokensCss.includes(expected), `Global CSS missing horizontal overflow guardrail: ${expected}`);
   }
+  for (const expected of ["--control-text: var(--accent)", "--control-text: color-mix(in srgb, var(--accent), var(--text)", "--accent-soft: color-mix(in srgb, var(--accent), var(--surface)"]) {
+    assert(tokensCss.includes(expected), `Theme tokens missing accent-derived dark/control color: ${expected}`);
+  }
+  for (const staleColor of ["#78dbe2", "#8eeaf0", "#064e56"]) {
+    assert(!tokensCss.includes(staleColor), `Theme tokens must not hard-code stale teal control color: ${staleColor}`);
+  }
 
   const resultsCss = fs.readFileSync(path.join(root, "src", "styles", "results.css"), "utf8");
   for (const expected of [".result-title", ".url", ".meta", "overflow-wrap: anywhere", "word-break: break-word", "text-overflow: ellipsis"]) {

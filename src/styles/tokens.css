@@ -59,7 +59,8 @@
   --text: #eef5f6;
   --muted: #9fb0b6;
   --border: #304146;
-  --accent-soft: #203438;
+  --accent-soft: color-mix(in srgb, var(--accent), var(--surface) 82%);
+  --control-text: color-mix(in srgb, var(--accent), var(--text) 35%);
 }
 
 :root[data-theme="light"] {
@@ -75,8 +76,8 @@
     --text: #eef5f6;
     --muted: #9fb0b6;
     --border: #304146;
-    --accent-soft: #203438;
-    --control-text: #78dbe2;
+    --accent-soft: color-mix(in srgb, var(--accent), var(--surface) 82%);
+    --control-text: color-mix(in srgb, var(--accent), var(--text) 35%);
   }
 }
 
@@ -85,7 +86,7 @@
   --text: #061114;
   --muted: #2a3a40;
   --border: #6c7f87;
-  --control-text: #064e56;
+  --control-text: var(--accent);
 }
 
 :root[data-theme="dark"][data-contrast="high"] {
@@ -95,8 +96,8 @@
   --text: #ffffff;
   --muted: #d4e3e7;
   --border: #758891;
-  --accent-soft: #18333a;
-  --control-text: #8eeaf0;
+  --accent-soft: color-mix(in srgb, var(--accent), var(--surface) 72%);
+  --control-text: color-mix(in srgb, var(--accent), var(--text) 45%);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -107,8 +108,8 @@
     --text: #ffffff;
     --muted: #d4e3e7;
     --border: #758891;
-    --accent-soft: #18333a;
-    --control-text: #8eeaf0;
+    --accent-soft: color-mix(in srgb, var(--accent), var(--surface) 72%);
+    --control-text: color-mix(in srgb, var(--accent), var(--text) 45%);
   }
 }
 
