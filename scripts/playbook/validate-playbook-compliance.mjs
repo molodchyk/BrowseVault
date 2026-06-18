@@ -21,6 +21,10 @@ export function validatePlaybookCompliance(root, assert) {
     packageJson.scripts["release:ready"]?.includes("check-release-readiness.mjs"),
     "package.json must expose release:ready for manual browser QA evidence."
   );
+  assert(
+    packageJson.scripts.check?.includes("check-store-metadata.mjs"),
+    "package.json check script must verify store metadata synchronization."
+  );
 
   const readme = fs.readFileSync(path.join(root, "README.md"), "utf8");
   for (const expected of [
@@ -39,6 +43,7 @@ export function validatePlaybookCompliance(root, assert) {
     "npm run release:ready",
     "chrome-web-store-media.md",
     "shared reference sync",
+    "store metadata sync",
     "screenshot/store-copy review requirements",
     "Open source under the GPL-3.0 license:",
     "https://github.com/molodchyk/BrowseVault",

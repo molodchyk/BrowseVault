@@ -29,6 +29,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `scripts/check-manifest-paths.mjs` verifies manifest-owned extension paths such as icons, service workers, popups, options pages, content scripts, and web-accessible resources.
 - `scripts/check-privacy-permissions.mjs` verifies that manifest permissions, `PRIVACY.md`, and the StorePilot privacy form stay aligned.
 - `scripts/playbook/check-reference-sync.mjs` verifies that workspace reference copies stay in sync with Defense against Distractions and StorePilot when those sibling projects are available.
+- `scripts/playbook/check-store-metadata.mjs` verifies that the human store draft, StorePilot detailed description, localized manifest name/summary, package metadata, and repository metadata stay synchronized.
 - `scripts/check-file-sizes.mjs` audits the file-size budgets from the modularization playbook for `src/`, `test/`, and `scripts/`, reports soft-budget warnings, and caps known hard-limit debt.
 - `scripts/check-folder-density.mjs` enforces folder-density budgets for `src/`, `test/`, `scripts/`, and `docs/`.
 - `scripts/qa/` is reserved for clone-safe QA helpers and currently documents that browser QA must stay manual or use an explicitly approved disposable profile.

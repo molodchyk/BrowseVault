@@ -4,7 +4,7 @@ This folder follows StorePilot's Chrome Web Store import layout.
 
 Reference: [StorePilot Project Reference](../../../StorePilot/docs/reference.md).
 
-- `listing/en.md` is the English Detailed description body only. It should not contain headings, field labels, the extension name, the short summary, category notes, privacy text, or SEO metadata.
+- `listing/en.md` is the English Detailed description body only. It should not contain headings, field labels, the standalone Name field, the short summary, category notes, privacy form text, or SEO metadata.
 - `media/icon-128.png` is the store import copy of the 128 x 128 extension icon.
 - `media/screenshots/` contains five final `1280 x 800` JPG screenshots:
   - `01-history-search.jpg`

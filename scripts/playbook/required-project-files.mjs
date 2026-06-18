@@ -87,9 +87,11 @@ export const requiredProjectFiles = [
   "scripts/playbook/check-chrome-qa-safety.mjs",
   "scripts/playbook/check-reference-sync.mjs",
   "scripts/playbook/check-release-readiness.mjs",
+  "scripts/playbook/check-store-metadata.mjs",
   "scripts/playbook/reference-sync-core.mjs",
   "scripts/playbook/release-readiness-core.mjs",
   "scripts/playbook/required-project-files.mjs",
+  "scripts/playbook/store-metadata-core.mjs",
   "scripts/playbook/validate-chrome-qa-safety.mjs",
   "scripts/playbook/validate-manifest-surface.mjs",
   "scripts/playbook/validate-playbook-compliance.mjs",
@@ -98,5 +100,6 @@ export const requiredProjectFiles = [
   "scripts/zip-utils.mjs",
   "test/scripts/chrome-qa-safety.test.js",
   "test/scripts/reference-sync.test.js",
-  "test/scripts/release-readiness.test.js"
+  "test/scripts/release-readiness.test.js",
+  "test/scripts/store-metadata.test.js"
 ];
