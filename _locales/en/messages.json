@@ -521,6 +521,10 @@
     "message": "After first backup",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "backupReminderOff": {
+    "message": "Off",
+    "description": "Backup reminder status shown when reminder scheduling is disabled."
+  },
   "backupFormatLabel": {
     "message": "Format",
     "description": "Static BrowseVault extension-page UI string."

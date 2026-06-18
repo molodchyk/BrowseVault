@@ -60,6 +60,13 @@ export function createDisplayPreferencesController({
   function renderBackupStatus(backup) {
     const status = deps.backupStatusDetails(backup, {
       dateFormat: appState.preferences.dateFormat,
+      labels: {
+        backupChecksumUnavailable: getMessage("backupChecksumUnavailable") || "Not available",
+        backupHealthEmpty: getMessage("backupHealthEmpty") || "No backup yet",
+        backupNextAfterFirst: getMessage("backupNextAfterFirst") || "After first backup",
+        backupReminderOff: getMessage("backupReminderOff") || "Off",
+        statBackupEmpty: getMessage("statBackupEmpty") || "Never"
+      },
       reminderDays: appState.preferences.backupReminderDays
     });
 

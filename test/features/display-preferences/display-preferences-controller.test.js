@@ -449,6 +449,45 @@ test("refreshStats ignores legacy non-JSON backup metadata", async () => {
   assert.equal(backupHealthClassList.classes.has("is-warning"), true);
 });
 
+test("refreshStats passes localized empty backup status labels", async () => {
+  const messages = new Map([
+    ["backupChecksumUnavailable", "Nicht verfuegbar"],
+    ["backupHealthEmpty", "Noch keine Sicherung"],
+    ["backupNextAfterFirst", "Nach erster Sicherung"],
+    ["backupReminderOff", "Aus"],
+    ["statBackupEmpty", "Nie"]
+  ]);
+  const { controller, elements } = createHarness({
+    getMessage: (key) => messages.get(key) || "",
+    preferences: {
+      theme: "system",
+      accent: "teal",
+      contrast: "standard",
+      textSize: "standard",
+      backupFilenamePrefix: "browsevault",
+      backupReminderDays: 0,
+      dateFormat: "iso",
+      defaultLimit: 500
+    },
+    stats: {
+      visits: 0,
+      domains: 0,
+      newestVisitTime: 0,
+      meta: {
+        lastBackup: null
+      }
+    }
+  });
+
+  await controller.refreshStats();
+
+  assert.equal(elements.statBackup.textContent, "Nie");
+  assert.equal(elements.backupHealth.textContent, "Noch keine Sicherung");
+  assert.equal(elements.backupLast.textContent, "Nie");
+  assert.equal(elements.backupNext.textContent, "Aus");
+  assert.equal(elements.backupChecksum.textContent, "Nicht verfuegbar");
+});
+
 test("requested limits respect current field values and quick-open cap", () => {
   const { controller, elements } = createHarness();
 

@@ -303,3 +303,32 @@ test("backupStatusDetails summarizes missing, fresh, and stale backups", () => {
   assert.equal(disabled.nextText, "Off");
   assert.equal(disabled.isOk, false);
 });
+
+test("backupStatusDetails accepts localized empty backup labels", () => {
+  const status = backupStatusDetails(null, {
+    labels: {
+      backupChecksumUnavailable: "Nicht verfuegbar",
+      backupHealthEmpty: "Noch keine Sicherung",
+      backupNextAfterFirst: "Nach erster Sicherung",
+      backupReminderOff: "Aus",
+      statBackupEmpty: "Nie"
+    },
+    reminderDays: 0
+  });
+
+  assert.equal(status.healthText, "Noch keine Sicherung");
+  assert.equal(status.lastText, "Nie");
+  assert.equal(status.nextText, "Aus");
+  assert.equal(status.checksumText, "Nicht verfuegbar");
+
+  const disabled = backupStatusDetails(
+    { exportedAt: "2026-06-01T00:00:00.000Z", format: "json", records: 12 },
+    {
+      labels: {
+        backupReminderOff: "Aus"
+      },
+      reminderDays: 0
+    }
+  );
+  assert.equal(disabled.nextText, "Aus");
+});

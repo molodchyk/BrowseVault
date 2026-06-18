@@ -10,6 +10,10 @@ import {
 const DEFAULT_DATE_FORMAT = "system";
 const DEFAULT_BACKUP_REMINDER_DAYS = 30;
 
+function label(options, key, fallback) {
+  return options.labels?.[key] || fallback;
+}
+
 function timestampFromIso(value) {
   const timestamp = Date.parse(value || "");
   return Number.isFinite(timestamp) ? timestamp : 0;
@@ -161,16 +165,18 @@ export function backupStatusDetails(backup, options = {}) {
 
   if (!timestamp) {
     return {
-      healthText: "No backup yet",
+      healthText: label(options, "backupHealthEmpty", "No backup yet"),
       isWarning: true,
       isOk: false,
-      lastText: "Never",
-      nextText: reminderDays > 0 ? "After first backup" : "Off",
+      lastText: label(options, "statBackupEmpty", "Never"),
+      nextText: reminderDays > 0
+        ? label(options, "backupNextAfterFirst", "After first backup")
+        : label(options, "backupReminderOff", "Off"),
       formatText: "-",
       recordsText: "0",
       sizeText: "-",
       selfTestText: "-",
-      checksumText: "Not available"
+      checksumText: label(options, "backupChecksumUnavailable", "Not available")
     };
   }
 
@@ -186,7 +192,7 @@ export function backupStatusDetails(backup, options = {}) {
     isWarning: isDue,
     isOk: remindersEnabled && !isDue,
     lastText: formatDate(timestamp, dateFormat),
-    nextText: remindersEnabled ? formatDate(nextTimestamp, dateFormat) : "Off",
+    nextText: remindersEnabled ? formatDate(nextTimestamp, dateFormat) : label(options, "backupReminderOff", "Off"),
     formatText: String(backup.format || "unknown").toUpperCase(),
     recordsText: formatCount(backup.records),
     sizeText: formatFileSize(backup.sizeBytes),
