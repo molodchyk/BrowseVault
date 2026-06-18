@@ -29,6 +29,7 @@ export const requiredProjectFiles = [
   "src/features/browser-memory/ui/localization-keys.js",
   "src/features/display-preferences/core/archive-status.js",
   "src/features/display-preferences/core/formatting.js",
+  "src/features/display-preferences/ui/localization-keys.js",
   "src/features/history-export/core/csv-format.js",
   "src/features/history-export/core/html-format.js",
   "src/features/history-export/core/shared-format.js",

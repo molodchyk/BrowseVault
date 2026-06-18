@@ -657,6 +657,10 @@
     "message": "No activity logged yet.",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "statusSettingsSaved": {
+    "message": "Settings saved",
+    "description": "Status shown after BrowseVault saves display and search preference changes."
+  },
   "buttonImportArchive": {
     "message": "Import Archive",
     "description": "Static BrowseVault extension-page UI string."

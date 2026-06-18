@@ -3,6 +3,7 @@ import path from "node:path";
 import { appShellLocalization } from "../src/features/app-shell/ui/localization-map.js";
 import { backgroundRuntimeLocalization } from "../src/features/background-runtime/ui/localization-keys.js";
 import { browserMemoryLocalization } from "../src/features/browser-memory/ui/localization-keys.js";
+import { displayPreferencesLocalization } from "../src/features/display-preferences/ui/localization-keys.js";
 import { historyResultsLocalization } from "../src/features/history-results/ui/localization-keys.js";
 
 const root = process.cwd();
@@ -75,6 +76,7 @@ const uiLocalizationBindings = [
   ...appShellLocalization,
   ...backgroundRuntimeLocalization,
   ...browserMemoryLocalization,
+  ...displayPreferencesLocalization,
   ...historyResultsLocalization
 ];
 for (const { key } of uiLocalizationBindings) {

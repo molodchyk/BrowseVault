@@ -213,6 +213,16 @@ test("savePreferences persists normalized values, refreshes stats, reruns search
   assert.deepEqual(statusMessages, ["Settings saved"]);
 });
 
+test("savePreferences can localize the saved status", async () => {
+  const { controller, statusMessages } = createHarness({
+    getMessage: (key) => key === "statusSettingsSaved" ? "Einstellungen gespeichert" : ""
+  });
+
+  await controller.savePreferences();
+
+  assert.deepEqual(statusMessages, ["Einstellungen gespeichert"]);
+});
+
 test("refreshStats renders stat cards and backup health details", async () => {
   const exportedAt = "2026-06-01T00:00:00.000Z";
   const { archiveHealthClassList, backupHealthClassList, controller, elements, renderedActivity } = createHarness({

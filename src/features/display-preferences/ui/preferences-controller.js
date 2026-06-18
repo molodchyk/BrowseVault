@@ -171,7 +171,7 @@ export function createDisplayPreferencesController({
     applyPreferences();
     await refreshStats();
     await refreshAfterSave();
-    setStatus("Settings saved");
+    setStatus(getMessage("statusSettingsSaved") || "Settings saved");
   }
 
   return {

@@ -132,15 +132,17 @@ export function validatePlaybookCompliance(root, assert) {
   const codeStructure = fs.readFileSync(path.join(root, "docs", "architecture", "code-structure.md"), "utf8");
   assert(
     codeStructure.includes("dynamic Quick Open keys") &&
+      codeStructure.includes("dynamic display-preference status keys") &&
       codeStructure.includes("dynamic history-result UI status keys"),
-    "Code structure doc must document dynamic Quick Open and history-results localization coverage."
+    "Code structure doc must document dynamic Quick Open, display-preference, and history-results localization coverage."
   );
 
   const localeCheckScript = fs.readFileSync(path.join(root, "scripts", "check-locales.mjs"), "utf8");
   assert(
     localeCheckScript.includes("browserMemoryLocalization") &&
+      localeCheckScript.includes("displayPreferencesLocalization") &&
       localeCheckScript.includes("historyResultsLocalization"),
-    "Locale checker must include dynamic Quick Open and history-results UI localization keys."
+    "Locale checker must include dynamic Quick Open, display-preference, and history-results UI localization keys."
   );
 
   const sourceInventory = fs.readFileSync(path.join(root, "docs", "research", "source-inventory.md"), "utf8");
