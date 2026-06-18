@@ -13,7 +13,7 @@ Status terms:
 | --- | --- | --- |
 | Product shape | Verified | `manifest.json`, `_locales/en/messages.json`, `src/app.html`, `PRIVACY.md`, `scripts/playbook/validate-manifest-surface.mjs`, `scripts/playbook/validate-playbook-compliance.mjs` |
 | Repository shape | Verified | `README.md`, `LICENSE`, `PRIVACY.md`, `docs/`, `store-listing/chrome-web-store/`, `scripts/validate-extension.mjs`, `scripts/check-folder-density.mjs` |
-| Store listing copy | Verified | `store/listing.md`, `store-listing/chrome-web-store/listing/en.md`, `docs/chrome-web-store-additional-fields.md`, `docs/chrome-web-store-category.md`, `docs/chrome-web-store-privacy-form.md`, `scripts/validate-extension.mjs` |
+| Store listing copy | Verified | `store/listing.md`, `store-listing/chrome-web-store/listing/en.md`, `docs/chrome-web-store-additional-fields.md`, `docs/chrome-web-store-category.md`, `docs/chrome-web-store-privacy-form.md`, `docs/chrome-web-store-media.md`, `scripts/validate-extension.mjs` |
 | Localization baseline | Verified | `_locales/en/messages.json`, `src/features/app-shell/ui/localization-map.js`, `src/features/app-shell/ui/localization.js`, `scripts/check-locales.mjs`, `docs/README.md` |
 | Open source and license | Verified | `LICENSE`, `package.json`, `README.md`, `store-listing/chrome-web-store/listing/en.md`, `scripts/playbook/validate-playbook-compliance.mjs` |
 | README support block | Verified | `README.md`, `scripts/playbook/validate-playbook-compliance.mjs` |
@@ -36,6 +36,7 @@ Status terms:
 | GPL-3.0 license is present in repo and metadata. | `LICENSE`, `package.json`, README, and store footer are checked. | Verified |
 | StorePilot Chrome Web Store structure follows the shared reference. | `docs/storepilot-project-structure.md`, `store-listing/chrome-web-store/`, and StorePilot field docs match the reference and are validated. | Verified |
 | Store copy is direct, concrete, and free of inflated claims. | Store body has one-sentence purpose, privacy boundary paragraph, examples, feature list, browser/data limits, and GPL GitHub footer. | Verified |
+| Screenshots stay consistent with current UI and store copy. | `docs/chrome-web-store-media.md` maps the screenshots to UI/store-copy claims, and `npm run release:ready` requires manual screenshot review evidence. | Manual required |
 | Localized UI strings are externalized before broader localization. | English `_locales` and UI binding map are checked by `scripts/check-locales.mjs`. | Verified |
 | Privacy copy lists exact permissions, storage, network behavior, analytics/ads/tracking, content scripts, and remote code posture. | `PRIVACY.md` and StorePilot privacy form are checked by `scripts/check-privacy-permissions.mjs`. | Verified |
 | UI uses browser-native vocabulary and explicit destructive actions. | Labels distinguish vault deletion, Chrome URL deletion, native Chrome History, and Reset Vault; tests cover destructive-action guards. | Verified |

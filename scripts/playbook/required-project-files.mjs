@@ -58,6 +58,7 @@ export const requiredProjectFiles = [
   "docs/architecture/extension-modularization-playbook.md",
   "docs/project/decision-records.md",
   "docs/project/repository-metadata.md",
+  "docs/chrome-web-store-media.md",
   "docs/release/reviewer-notes.md",
   "docs/release/browser-extension-playbook-audit.md",
   "docs/release/browser-extension-playbook-compliance.md",

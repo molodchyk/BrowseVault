@@ -15,6 +15,7 @@ Reference: [StorePilot Project Reference](../../../StorePilot/docs/reference.md)
 - `media/promo/small-promo.png` is `440 x 280`.
 - `media/promo/marquee-promo.png` is `1400 x 560`.
 - The promo PNGs can be regenerated with `npm run store:media`.
+- Screenshot release coverage and current-UI review notes live in `docs/chrome-web-store-media.md`.
 - Dashboard-only values live in `docs/chrome-web-store-additional-fields.md`, `docs/chrome-web-store-category.md`, and `docs/chrome-web-store-privacy-form.md`.
 - `docs/chrome-web-store-privacy-form.md` is not the public privacy policy. Keep the default extension privacy policy in `PRIVACY.md`.
 

@@ -1,0 +1,27 @@
+# Chrome Web Store Media Review
+
+This document maps the StorePilot media files to the UI surfaces and store-copy claims they must represent.
+
+The release checklist requires a manual screenshot review because image dimensions alone do not prove that the media still matches the current UI or the Chrome Web Store description.
+
+## Screenshot Coverage
+
+| File | Required UI surface | Store-copy claims covered |
+| --- | --- | --- |
+| `store-listing/chrome-web-store/media/screenshots/01-history-search.jpg` | History search with query, filters, result counts, and contained long URLs/titles. | Local history search, operators, saved/search result workflow, explicit cleanup controls. |
+| `store-listing/chrome-web-store/media/screenshots/02-quick-open.jpg` | Quick Open results for tabs, bookmarks, downloads, recently closed tabs, and closed windows. | Quick Open access to current and recent browser memory sources. |
+| `store-listing/chrome-web-store/media/screenshots/03-backup-health.jpg` | Backup health, export/import actions, archive overview, and self-test status. | Checksum-protected JSON backup, restore health, CSV/HTML export, local-first archive status. |
+| `store-listing/chrome-web-store/media/screenshots/04-rules-cleanup.jpg` | Rules, category, blacklist, whitelist, retention cleanup, and duplicate cleanup controls. | Domain rules, manual categories, explicit destructive actions, undoable vault cleanup where supported. |
+| `store-listing/chrome-web-store/media/screenshots/05-settings-privacy.jpg` | Settings defaults, theme/date/result-limit controls, native-history escape hatch, and reset/privacy copy. | Display preferences, default result limit, local storage posture, no analytics, no host permissions, no remote code. |
+
+## Release Review
+
+Before release, compare each screenshot against the current extension UI and `store-listing/chrome-web-store/listing/en.md`.
+
+The reviewer should record `Pass` in `docs/release/manual-browser-qa-checklist.md` for the screenshot/store-copy check only when:
+
+- every screenshot still shows the intended UI surface;
+- destructive actions and browser-owned behavior use current labels;
+- visible privacy claims still match `PRIVACY.md`, `manifest.json`, and package verification;
+- screenshots do not imply unavailable features or hide browser-controlled limitations;
+- long text, dates, and compact controls still look consistent with the responsive UI.

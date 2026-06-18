@@ -96,6 +96,7 @@ export function validatePlaybookCompliance(root, assert) {
     "release/release-qa.md",
     "project/decision-records.md",
     "project/repository-metadata.md",
+    "chrome-web-store-media.md",
     "research/source-inventory.md",
     "architecture/code-structure.md",
     "Browser Extension Playbook",
@@ -250,6 +251,7 @@ export function validatePlaybookCompliance(root, assert) {
     "Deleting a vault record in one BrowseVault tab refreshes another open BrowseVault tab",
     "Theme, accent, contrast, text size, date display, and default result-limit settings save and apply",
     "JSON backup export completes and reports backup health/self-test status",
+    "Chrome Web Store screenshots match the current UI and store listing copy",
     "Result: Not run",
     "git rev-parse --short=7 HEAD",
     "Run `npm run release:ready` after filling this checklist"
@@ -280,5 +282,22 @@ export function validatePlaybookCompliance(root, assert) {
     "do not create or target named personal Chrome profiles such as `Your Chrome`"
   ]) {
     assert(playbookAudit.includes(expected), `Browser extension playbook audit missing: ${expected}`);
+  }
+
+  const storeMedia = fs.readFileSync(path.join(root, "docs", "chrome-web-store-media.md"), "utf8");
+  for (const expected of [
+    "current UI",
+    "store-listing/chrome-web-store/listing/en.md",
+    "manual-browser-qa-checklist.md",
+    "01-history-search.jpg",
+    "02-quick-open.jpg",
+    "03-backup-health.jpg",
+    "04-rules-cleanup.jpg",
+    "05-settings-privacy.jpg",
+    "no analytics",
+    "no host permissions",
+    "no remote code"
+  ]) {
+    assert(storeMedia.includes(expected), `Chrome Web Store media review doc missing: ${expected}`);
   }
 }

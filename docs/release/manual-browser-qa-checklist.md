@@ -50,6 +50,7 @@ Record `Pass`, `Fail`, or `Not run` plus notes for each item.
 | JSON backup export completes and reports backup health/self-test status. | Not run | |
 | Import preview appears for a supported archive file and can be canceled safely. | Not run | |
 | Reset Vault is visible in Settings/Backup workflows and clearly says it does not delete Chrome history. | Not run | |
+| Chrome Web Store screenshots match the current UI and store listing copy. | Not run | |
 
 ## Release Decision
 
