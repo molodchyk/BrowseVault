@@ -101,6 +101,7 @@ export const requiredProjectFiles = [
   "scripts/playbook/reference-sync-core.mjs",
   "scripts/playbook/release-readiness-core.mjs",
   "scripts/playbook/required-project-files.mjs",
+  "scripts/playbook/storage-ownership/storage-ownership-core.mjs",
   "scripts/playbook/store-metadata-core.mjs",
   "scripts/playbook/validate-chrome-qa-safety.mjs",
   "scripts/playbook/validate-manifest-surface.mjs",

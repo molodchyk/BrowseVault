@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { collectStorageContracts } from "./storage-ownership/storage-ownership-core.mjs";
 
 const canonicalSupportBlock = `## Support
 
@@ -159,23 +160,18 @@ export function validatePlaybookCompliance(root, assert) {
     "Version: `1`",
     "`visits` store",
     "`rules` store",
-    "`meta.activityLog`",
-    "`meta.installedAt`",
-    "`meta.lastBackup`",
-    "`meta.lastChromeSync`",
-    "`meta.lastImport`",
-    "`meta.lastLiveCapture`",
-    "`meta.lastNativeHistoryClear`",
-    "`meta.lastStorageSelfCheck`",
-    "`meta.lastVaultDelete`",
-    "`meta.lastVaultRestore`",
-    "`meta.savedSearches`",
-    "`browseVault.preferences`",
-    "`browseVault.vaultInvalidation`",
+    "derives known metadata and Chrome local-storage keys from source files",
     "migration tests",
     "Quota risk"
   ]) {
     assert(storageOwnership.includes(expected), `Storage ownership doc missing: ${expected}`);
+  }
+  const storageContracts = collectStorageContracts(root);
+  for (const key of storageContracts.metaKeys) {
+    assert(storageOwnership.includes(`\`meta.${key}\``), `Storage ownership doc missing source metadata key: ${key}`);
+  }
+  for (const key of storageContracts.localKeys) {
+    assert(storageOwnership.includes(`\`${key}\``), `Storage ownership doc missing source Chrome local storage key: ${key}`);
   }
   assert(
     storageOwnership.includes("chrome.storage.local") &&

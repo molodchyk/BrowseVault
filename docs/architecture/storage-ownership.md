@@ -23,6 +23,7 @@ Migration path: schema changes must bump `DB_VERSION`, update `openVaultDb()`, a
 | `meta.lastImport` | `src/storage.js` import plan writer | Import metadata with imported timestamp, imported visit count, duplicate row count, and rule count. | Replaced on confirmed archive import. Reset Vault clears it. | Low. |
 | `meta.lastLiveCapture` | `src/storage.js`; fallback writer in `src/features/background-runtime/background/chrome-history-sync.js` | Latest captured visit summary with captured timestamp, title, and URL. | Replaced on each archived live visit. Reset Vault clears it. | Low. |
 | `meta.lastNativeHistoryClear` | `src/features/background-runtime/background/chrome-history-removal.js` | Timestamp for a native Chrome all-history clear event observed through the history API. | Replaced when Chrome reports all history cleared. Reset Vault clears it. | Low. |
+| `meta.lastStartedAt` | `src/background.js` | ISO timestamp string for the latest service-worker startup path. | Replaced on startup. Reset Vault clears it. | Low. |
 | `meta.lastStorageSelfCheck` | `src/storage.js` | Last storage self-check result with checked timestamp, status, and nonce. | Replaced when the storage self-check runs. Reset Vault clears it. | Low. |
 | `meta.lastVaultDelete` | `src/storage.js` | Last undoable vault deletion summary with deleted timestamp, count, and visit ids. | Replaced on selected/current-result/cleanup deletion. Used by Undo. Reset Vault clears it. | Medium when a very large delete stores many ids; bounded by explicit user action. |
 | `meta.lastVaultRestore` | `src/storage.js` | Last restore summary with restored timestamp, count, and visit ids. | Replaced on Undo restore. Reset Vault clears it. | Medium when restoring a very large delete; bounded by explicit user action. |
@@ -43,7 +44,7 @@ Fallback: `browseVault.localPreviewStorage` is a local preview/test fallback onl
 
 ## Review Rules
 
-- New persistent data must name its storage area and owning feature here in the same change.
+- New persistent data must name its storage area and owning feature here in the same change. The playbook compliance validator derives known metadata and Chrome local-storage keys from source files and rejects undocumented keys.
 - New IndexedDB stores or indexes require migration tests and a `DB_VERSION` bump.
 - New Chrome local storage keys require privacy review to confirm they are local extension storage, not sync/session/managed storage.
 - User history, rules, backups, and metadata must not move to sync storage without a separate privacy and quota decision record.
