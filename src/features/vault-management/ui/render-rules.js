@@ -1,14 +1,18 @@
-function ruleDisplayType(rule) {
+function localizedMessage(getMessage, key, fallback, substitutions) {
+  return getMessage?.(key, substitutions) || fallback;
+}
+
+function ruleDisplayType(rule, getMessage = () => "") {
   if (rule?.type === "blacklist") {
-    return "Blacklist";
+    return localizedMessage(getMessage, "ruleTypeBlacklist", "Blacklist");
   }
   if (rule?.type === "whitelist") {
-    return "Whitelist";
+    return localizedMessage(getMessage, "ruleTypeWhitelist", "Whitelist");
   }
   if (rule?.type === "category") {
-    return "Category";
+    return localizedMessage(getMessage, "ruleTypeCategory", "Category");
   }
-  return "Rule";
+  return localizedMessage(getMessage, "ruleTypeGeneric", "Rule");
 }
 
 const ruleGroupOrder = ["category", "blacklist", "whitelist"];
@@ -28,18 +32,18 @@ function groupedRules(rules) {
   ];
 }
 
-function groupHeadingText(type, count) {
-  const label = ruleDisplayType({ type });
-  return `${label} (${count})`;
+function groupHeadingText(type, count, getMessage = () => "") {
+  const label = ruleDisplayType({ type }, getMessage);
+  return localizedMessage(getMessage, "ruleGroupHeading", `${label} (${count})`, [label, String(count)]);
 }
 
-export function renderRuleList({ document, rules, rulesList, onRemove }) {
+export function renderRuleList({ document, getMessage = () => "", rules, rulesList, onRemove }) {
   rulesList.replaceChildren();
 
   if (!rules.length) {
     const empty = document.createElement("li");
     empty.className = "rule-item";
-    empty.textContent = "No domain rules yet.";
+    empty.textContent = localizedMessage(getMessage, "noDomainRulesYet", "No domain rules yet.");
     rulesList.append(empty);
     return;
   }
@@ -47,7 +51,7 @@ export function renderRuleList({ document, rules, rulesList, onRemove }) {
   for (const [type, groupRules] of groupedRules(rules)) {
     const heading = document.createElement("li");
     heading.className = "rule-group-heading";
-    heading.textContent = groupHeadingText(type, groupRules.length);
+    heading.textContent = groupHeadingText(type, groupRules.length, getMessage);
     rulesList.append(heading);
 
     for (const rule of groupRules) {
@@ -59,7 +63,8 @@ export function renderRuleList({ document, rules, rulesList, onRemove }) {
 
       const typeLabel = document.createElement("span");
       typeLabel.className = "rule-kind visually-hidden";
-      typeLabel.textContent = `${ruleDisplayType(rule)} rule`;
+      const typeText = ruleDisplayType(rule, getMessage);
+      typeLabel.textContent = localizedMessage(getMessage, "ruleKindLabel", `${typeText} rule`, [typeText]);
 
       const value = document.createElement("span");
       value.className = "rule-value";
@@ -76,7 +81,7 @@ export function renderRuleList({ document, rules, rulesList, onRemove }) {
       const remove = document.createElement("button");
       remove.className = "ghost";
       remove.type = "button";
-      remove.textContent = "Remove";
+      remove.textContent = localizedMessage(getMessage, "buttonRemoveRule", "Remove");
       remove.addEventListener("click", () => onRemove(rule));
 
       item.append(label, remove);

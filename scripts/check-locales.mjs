@@ -5,6 +5,7 @@ import { backgroundRuntimeLocalization } from "../src/features/background-runtim
 import { browserMemoryLocalization } from "../src/features/browser-memory/ui/localization-keys.js";
 import { displayPreferencesLocalization } from "../src/features/display-preferences/ui/localization-keys.js";
 import { historyResultsLocalization } from "../src/features/history-results/ui/localization-keys.js";
+import { vaultManagementLocalization } from "../src/features/vault-management/ui/localization-keys.js";
 
 const root = process.cwd();
 const messageReferencePattern = /__MSG_([A-Za-z0-9_@]+?)__/g;
@@ -77,7 +78,8 @@ const uiLocalizationBindings = [
   ...backgroundRuntimeLocalization,
   ...browserMemoryLocalization,
   ...displayPreferencesLocalization,
-  ...historyResultsLocalization
+  ...historyResultsLocalization,
+  ...vaultManagementLocalization
 ];
 for (const { key } of uiLocalizationBindings) {
   referencedKeys.add(key);

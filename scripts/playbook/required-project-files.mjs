@@ -41,6 +41,7 @@ export const requiredProjectFiles = [
   "src/features/vault-management/core/history-records.js",
   "src/features/vault-management/core/vault-analysis.js",
   "src/features/vault-management/ui/chrome-delete.js",
+  "src/features/vault-management/ui/localization-keys.js",
   "src/features/vault-management/ui/render-rules.js",
   "src/platform/chrome/i18n.js",
   "src/platform/indexed-db/vault-db.js",

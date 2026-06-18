@@ -2,6 +2,19 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createVaultManagementActionsHarness } from "./vault-management-actions-harness.js";
 
+function messageGetter(messages) {
+  return (key, substitutions = []) => {
+    const value = messages.get(key);
+    if (!value) {
+      return "";
+    }
+    return substitutions.reduce(
+      (text, substitution, index) => text.replace(`$${index + 1}`, substitution),
+      value
+    );
+  };
+}
+
 test("renderRules renders empty and removable rule states", async () => {
   const removed = [];
   let rules = [{ id: "rule-1", type: "blacklist", value: "example.com" }];
@@ -31,6 +44,44 @@ test("renderRules renders empty and removable rule states", async () => {
   assert.deepEqual(removed, ["rule-1"]);
   assert.deepEqual(statuses, ["Removed example.com"]);
   assert.equal(elements.rulesList.children[0].textContent, "No domain rules yet.");
+});
+
+test("renderRules accepts localized rule labels and removal status", async () => {
+  const removed = [];
+  let rules = [{ id: "rule-1", type: "whitelist", value: "docs.example.com" }];
+  const { actions, elements, statuses } = createVaultManagementActionsHarness({
+    getMessage: messageGetter(new Map([
+      ["buttonRemoveRule", "Entfernen"],
+      ["noDomainRulesYet", "Noch keine Domainregeln."],
+      ["ruleGroupHeading", "$1: $2"],
+      ["ruleKindLabel", "$1 Regel"],
+      ["ruleTypeWhitelist", "Erlaubnisliste"],
+      ["statusRemovedRule", "$1 entfernt"]
+    ])),
+    services: {
+      getRules: async () => ({ rules, blacklist: [], whitelist: ["docs.example.com"] }),
+      removeRule: async (id) => {
+        removed.push(id);
+        rules = [];
+      }
+    }
+  });
+
+  await actions.renderRules();
+
+  assert.equal(elements.rulesList.children[0].textContent, "Erlaubnisliste: 1");
+  const item = elements.rulesList.children[1];
+  assert.deepEqual(item.children[0].children.map((child) => [child.className, child.textContent]), [
+    ["rule-kind visually-hidden", "Erlaubnisliste Regel"],
+    ["rule-value", "docs.example.com"]
+  ]);
+  assert.equal(item.children[1].textContent, "Entfernen");
+
+  await item.children[1].listeners.click();
+
+  assert.deepEqual(removed, ["rule-1"]);
+  assert.deepEqual(statuses, ["docs.example.com entfernt"]);
+  assert.equal(elements.rulesList.children[0].textContent, "Noch keine Domainregeln.");
 });
 
 test("renderRules renders category rule labels", async () => {

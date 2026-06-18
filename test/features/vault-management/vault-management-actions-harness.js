@@ -36,6 +36,7 @@ function fakeDocument() {
 }
 
 export function createVaultManagementActionsHarness({
+  getMessage = () => "",
   getSearchText = () => "docs site:example.com",
   selectedIds = [],
   selected = [],
@@ -59,6 +60,7 @@ export function createVaultManagementActionsHarness({
   const actions = createVaultManagementActions({
     appState,
     elements,
+    getMessage,
     getSearchText,
     notifyVaultChanged: (reason) => notifications.push(reason),
     refreshStats: async () => calls.push("refreshStats"),

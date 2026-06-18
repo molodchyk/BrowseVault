@@ -85,6 +85,7 @@ export async function startBrowseVaultApp({ document: documentRef }) {
   const vaultActions = createVaultManagementActions({
     appState,
     elements,
+    getMessage: getChromeMessage,
     getSortOrder: historySearchForm.getSortOrder,
     getSearchText: historySearchForm.getSearchText,
     notifyVaultChanged: (reason) => notifyVaultChanged(reason),

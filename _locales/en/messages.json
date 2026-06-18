@@ -193,6 +193,10 @@
     "message": "Delete",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "buttonRemoveRule": {
+    "message": "Remove",
+    "description": "Button label for removing a saved BrowseVault domain rule."
+  },
   "filtersAndSyntax": {
     "message": "Filters and syntax",
     "description": "Static BrowseVault extension-page UI string."
@@ -713,9 +717,53 @@
     "message": "Domain rules",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "noDomainRulesYet": {
+    "message": "No domain rules yet.",
+    "description": "Rules-list empty state shown before any category, blacklist, or whitelist rule exists."
+  },
   "rulesHeading": {
     "message": "Control what gets archived",
     "description": "Static BrowseVault extension-page UI string."
+  },
+  "ruleGroupHeading": {
+    "message": "$TYPE$ ($COUNT$)",
+    "description": "Rules-list group heading containing a localized rule type and number of rules in that group.",
+    "placeholders": {
+      "type": {
+        "content": "$1",
+        "example": "Blacklist"
+      },
+      "count": {
+        "content": "$2",
+        "example": "3"
+      }
+    }
+  },
+  "ruleKindLabel": {
+    "message": "$TYPE$ rule",
+    "description": "Hidden accessibility label that names the kind of a BrowseVault domain rule.",
+    "placeholders": {
+      "type": {
+        "content": "$1",
+        "example": "Whitelist"
+      }
+    }
+  },
+  "ruleTypeBlacklist": {
+    "message": "Blacklist",
+    "description": "Rules-list type label for domains BrowseVault should not archive in the future."
+  },
+  "ruleTypeCategory": {
+    "message": "Category",
+    "description": "Rules-list type label for domains manually assigned to a category."
+  },
+  "ruleTypeGeneric": {
+    "message": "Rule",
+    "description": "Fallback rules-list type label for an unknown BrowseVault rule type."
+  },
+  "ruleTypeWhitelist": {
+    "message": "Whitelist",
+    "description": "Rules-list type label for domains BrowseVault should keep during retention cleanup."
   },
   "ruleDomainPlaceholder": {
     "message": "example.com",
@@ -780,6 +828,16 @@
   "duplicatesHint": {
     "message": "Finds active records with the same URL and visit time, keeps the richest record, and moves the rest to undoable deletion.",
     "description": "Static BrowseVault extension-page UI string."
+  },
+  "statusRemovedRule": {
+    "message": "Removed $VALUE$",
+    "description": "Status shown after BrowseVault removes a domain rule.",
+    "placeholders": {
+      "value": {
+        "content": "$1",
+        "example": "example.com"
+      }
+    }
   },
   "displaySettingsLabel": {
     "message": "Display settings",

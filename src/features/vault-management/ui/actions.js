@@ -40,6 +40,10 @@ const defaultServices = {
   uniqueUrlsForItems
 };
 
+function localizedMessage(getMessage, key, fallback, substitutions) {
+  return getMessage?.(key, substitutions) || fallback;
+}
+
 function retentionDaysFromInput(value) {
   const days = Number(value);
   return Number.isInteger(days) && days >= 1 ? days : null;
@@ -48,6 +52,7 @@ function retentionDaysFromInput(value) {
 export function createVaultManagementActions({
   appState,
   elements,
+  getMessage = () => "",
   getSearchText = () => "",
   notifyVaultChanged = () => false,
   refreshStats,
@@ -71,6 +76,7 @@ export function createVaultManagementActions({
     const { rules } = await deps.getRules();
     renderRuleList({
       document: deps.document,
+      getMessage,
       rules,
       rulesList: elements.rulesList,
       onRemove: async (rule) => {
@@ -84,7 +90,7 @@ export function createVaultManagementActions({
         await renderRules();
         await refreshStats();
         await runSearch();
-        setStatus(`Removed ${rule.value}`);
+        setStatus(localizedMessage(getMessage, "statusRemovedRule", `Removed ${rule.value}`, [rule.value]));
         notifyVaultChanged("rule-removed");
       }
     });
