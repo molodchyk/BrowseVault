@@ -140,7 +140,7 @@ export function createDisplayPreferencesController({
     const backup = deps.restorableBackupMetadata(stats.meta.lastBackup);
     elements.statBackup.textContent = backup?.exportedAt
       ? deps.formatShortDate(Date.parse(backup.exportedAt), appState.preferences.dateFormat)
-      : "Never";
+      : getMessage("statBackupEmpty") || "Never";
     renderBackupStatus(backup);
     renderArchiveHealth(stats.meta);
     renderArchiveInsights(stats.insights);

@@ -356,6 +356,27 @@ test("refreshStats passes localized activity-log empty text", async () => {
   assert.equal(renderedActivity[0][2].emptyText, "Noch keine Aktivitaet protokolliert.");
 });
 
+test("refreshStats can localize the empty backup stat", async () => {
+  const { controller, elements } = createHarness({
+    getMessage: (key) => key === "statBackupEmpty" ? "Nie" : "",
+    stats: {
+      visits: 0,
+      domains: 0,
+      newestVisitTime: 0,
+      insights: {},
+      meta: {
+        activityLog: [],
+        lastBackup: null
+      },
+      vaultHealth: {}
+    }
+  });
+
+  await controller.refreshStats();
+
+  assert.equal(elements.statBackup.textContent, "Nie");
+});
+
 test("refreshStats applies the configured backup reminder interval", async () => {
   const { backupHealthClassList, controller, elements } = createHarness({
     preferences: {
