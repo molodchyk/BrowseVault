@@ -15,6 +15,17 @@ test("playbook compliance validator runs as a direct CLI command", () => {
   assert.match(result.stdout, /Playbook compliance checked\./);
 });
 
+test("store media validator runs as a direct CLI command", () => {
+  const scriptPath = path.resolve("scripts", "playbook", "validate-store-media.mjs");
+  const result = spawnSync(process.execPath, [scriptPath], {
+    cwd: process.cwd(),
+    encoding: "utf8"
+  });
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.match(result.stdout, /Store media checked\./);
+});
+
 test("storage ownership scanner derives metadata and local storage keys from source", () => {
   const contracts = collectStorageContracts(process.cwd());
 

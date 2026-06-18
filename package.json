@@ -6,10 +6,11 @@
   "description": "Private local-first browser history search, backup, export, and preservation extension.",
   "scripts": {
     "validate": "node scripts/validate-extension.mjs",
-    "check": "node scripts/check-syntax.mjs && node scripts/check-imports.mjs && node scripts/check-locales.mjs && node scripts/check-manifest-paths.mjs && node scripts/check-privacy-permissions.mjs && node scripts/playbook/check-chrome-qa-safety.mjs && node scripts/playbook/check-reference-sync.mjs && node scripts/playbook/check-store-metadata.mjs && npm run check:playbook-compliance && node scripts/check-file-sizes.mjs && node scripts/check-folder-density.mjs",
+    "check": "node scripts/check-syntax.mjs && node scripts/check-imports.mjs && node scripts/check-locales.mjs && node scripts/check-manifest-paths.mjs && node scripts/check-privacy-permissions.mjs && node scripts/playbook/check-chrome-qa-safety.mjs && node scripts/playbook/check-reference-sync.mjs && node scripts/playbook/check-store-metadata.mjs && npm run check:store-media && npm run check:playbook-compliance && node scripts/check-file-sizes.mjs && node scripts/check-folder-density.mjs",
     "check:chrome-qa-safety": "node scripts/playbook/check-chrome-qa-safety.mjs",
     "check:playbook-compliance": "node scripts/playbook/validate-playbook-compliance.mjs",
     "check:reference-sync": "node scripts/playbook/check-reference-sync.mjs",
+    "check:store-media": "node scripts/playbook/validate-store-media.mjs",
     "check:store-metadata": "node scripts/playbook/check-store-metadata.mjs",
     "release:ready": "node scripts/playbook/check-release-readiness.mjs",
     "icons": "node scripts/generate-icons.mjs",

@@ -31,7 +31,7 @@ This file maps BrowseVault release evidence to the shared browser-extension play
 | Direct concrete store copy with browser limitation notes. | `store-listing/chrome-web-store/listing/en.md`, `store/listing.md`, and `docs/release/reviewer-notes.md`. |
 | Claims are provable. | `npm run validate` checks store footer, permissions, privacy disclosures, media dimensions, and no remote/network/dynamic-code claims. |
 | Open-source footer includes license and GitHub link. | `store-listing/chrome-web-store/listing/en.md`; checked by `npm run validate`. |
-| Store media exists at required dimensions and is reviewed against current UI/store copy. | `npm run store:media`; `npm run validate` checks screenshot and promo dimensions; `docs/chrome-web-store-media.md` maps screenshots and promo images to UI/store-copy claims; `npm run release:ready` requires automated gate and manual screenshot/promo review evidence. |
+| Store media exists at required dimensions and is reviewed against current UI/store copy. | `npm run store:media`; `npm run check:store-media` and `npm run validate` check screenshot and promo dimensions; `docs/chrome-web-store-media.md` maps screenshots and promo images to UI/store-copy claims; `npm run release:ready` requires automated gate and manual screenshot/promo review evidence. |
 
 ## Localization
 

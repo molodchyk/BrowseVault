@@ -35,6 +35,11 @@ export function validatePlaybookCompliance(root, assert) {
     packageJson.scripts.check?.includes("check-store-metadata.mjs"),
     "package.json check script must verify store metadata synchronization."
   );
+  assert(
+    packageJson.scripts["check:store-media"]?.includes("validate-store-media.mjs") &&
+      packageJson.scripts.check?.includes("check:store-media"),
+    "package.json check script must expose and run check:store-media."
+  );
 
   const readme = fs.readFileSync(path.join(root, "README.md"), "utf8");
   for (const expected of [
@@ -54,6 +59,7 @@ export function validatePlaybookCompliance(root, assert) {
     "chrome-web-store-media.md",
     "shared reference sync",
     "store metadata sync",
+    "store media dimensions",
     "automated gate, manual target-browser, and screenshot/store-copy review requirements",
     "screenshot/store-copy review requirements",
     "Open source under the GPL-3.0 license:",
@@ -233,6 +239,7 @@ export function validatePlaybookCompliance(root, assert) {
     "Reviewer Notes And Release Checks",
     "Codex Protocol",
     "check:store-metadata",
+    "check:store-media",
     "check:playbook-compliance",
     "manifest key allowlist",
     "chrome_settings_overrides",

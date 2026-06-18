@@ -58,10 +58,12 @@ assert(packageJson.scripts.check.includes("check-locales.mjs"), "Check script mu
 assert(packageJson.scripts.check.includes("check-manifest-paths.mjs"), "Check script must verify manifest-referenced file paths.");
 assert(packageJson.scripts.check.includes("check-privacy-permissions.mjs"), "Check script must verify privacy/permission parity.");
 assert(packageJson.scripts.check.includes("check-reference-sync.mjs"), "Check script must verify shared reference sync.");
+assert(packageJson.scripts.check.includes("check:store-media"), "Check script must verify store media dimensions.");
 assert(packageJson.scripts.check.includes("check-file-sizes.mjs"), "Check script must enforce file-size budgets.");
 assert(packageJson.scripts.check.includes("check-folder-density.mjs"), "Check script must enforce folder density.");
 assert(packageJson.scripts.icons, "Missing icons script.");
 assert(packageJson.scripts["store:media"]?.includes("generate-store-media.py"), "Missing store media generation script.");
+assert(packageJson.scripts["check:store-media"]?.includes("validate-store-media.mjs"), "Missing store media validation script.");
 assert(packageJson.scripts.package?.includes("verify-package.mjs"), "Package script must verify the final ZIP output.");
 assert(packageJson.scripts["verify:package"]?.includes("verify-package.mjs"), "Missing verify:package script.");
 

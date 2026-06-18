@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 function jpegDimensions(buffer) {
   if (buffer[0] !== 0xff || buffer[1] !== 0xd8) {
@@ -80,4 +81,15 @@ export function validateStoreMedia(root, assert) {
     storePilotIcon.readUInt32BE(16) === 128 && storePilotIcon.readUInt32BE(20) === 128,
     "StorePilot icon must be 128 x 128."
   );
+}
+
+function cliAssert(condition, message) {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  validateStoreMedia(process.cwd(), cliAssert);
+  console.log("Store media checked.");
 }
