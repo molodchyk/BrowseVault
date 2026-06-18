@@ -52,6 +52,8 @@ When an extension has localized UI strings, `_locales/` metadata, translated sto
 
 Use it for the non-obvious parts: Chrome Web Store visible-language coverage can differ from older Chrome extension i18n lists, regional locale codes use underscores, and Arabic, Persian, Hebrew, and Urdu need right-to-left checks on extension pages and extension-owned injected surfaces.
 
+For Firefox add-ons and AMO listing work, use the [StorePilot Firefox Localization Reference](C:/Users/molod/Documents/Personal/settings/StorePilot/docs/firefox-localization.md). Keep Firefox runtime `_locales` support separate from AMO listing-language support.
+
 If a project is only partially localized, first externalize the English UI strings into `_locales/en/messages.json` and wire the extension to read them there. Store listing translations or scattered hardcoded English strings are not a complete localization setup.
 
 ## Open Source And License

@@ -15,8 +15,11 @@ function completeChecklist({
   includeLaunchFlagWarning = true,
   includeLiveProfileWarning = true,
   includeNamedProfileWarning = true,
+  notes = "checked",
   result = "Pass",
-  shipDecision = "Ship"
+  shipDecision = "Ship",
+  blockingIssues = "none",
+  followUpIssues = "none"
 } = {}) {
   const liveProfileWarning = includeLiveProfileWarning
     ? "Do not use automated Chrome or Playwright runs against a live Chrome profile for this checklist."
@@ -31,10 +34,10 @@ function completeChecklist({
     ? `Do not add repo scripts that launch Chrome or Chromium executables such as ${"`chrome." + "exe`"}, ${"`google-" + "chrome`"}, ${"`chromium-" + "browser`"}, or ${"`Google " + "Chrome.app`"}.`
     : "";
   const flowRows = expectedManualBrowserQaChecks
-    .map((check) => `| ${check} | ${flowResult} | checked |`)
+    .map((check) => `| ${check} | ${flowResult} | ${notes} |`)
     .join("\n");
   const automatedGateRows = expectedAutomatedGateChecks
-    .map((command) => `| ${command} | ${automatedGateResult} | checked |`)
+    .map((command) => `| ${command} | ${automatedGateResult} | ${notes} |`)
     .join("\n");
 
   return `# Manual Browser QA Checklist
@@ -70,8 +73,8 @@ ${flowRows}
 ## Release Decision
 
 - Ship decision: ${shipDecision}
-- Blocking issues: none
-- Follow-up issues: none
+- Blocking issues: ${blockingIssues}
+- Follow-up issues: ${followUpIssues}
 - Screenshots or notes location: docs/release/manual-browser-qa-checklist.md
 `;
 }
@@ -114,6 +117,27 @@ test("checkReleaseReadinessChecklist rejects incomplete automated gate evidence"
   });
 
   assert(errors.some((error) => error.includes("npm run validate")));
+});
+
+test("checkReleaseReadinessChecklist rejects blank automated and manual notes", () => {
+  const errors = checkReleaseReadinessChecklist(completeChecklist({ notes: "" }), {
+    currentCommit: "abc1234"
+  });
+
+  assert(errors.some((error) => error.includes("preflight command must include notes")));
+  assert(errors.some((error) => error.includes("flow check must include notes")));
+});
+
+test("checkReleaseReadinessChecklist rejects blank release decision issue fields", () => {
+  const errors = checkReleaseReadinessChecklist(completeChecklist({
+    blockingIssues: "",
+    followUpIssues: ""
+  }), {
+    currentCommit: "abc1234"
+  });
+
+  assert(errors.includes("Manual browser QA checklist must include Release Decision value: Blocking issues."));
+  assert(errors.includes("Manual browser QA checklist must include Release Decision value: Follow-up issues."));
 });
 
 test("checkReleaseReadinessChecklist preserves the live-profile automation warning", () => {

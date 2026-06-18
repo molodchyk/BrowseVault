@@ -41,7 +41,7 @@ Set `Result` to `Pass` only after every required flow check is `Pass`.
 
 ## Automated Gate Checks
 
-Record `Pass`, `Fail`, or `Not run` plus notes for each command. These commands must pass on the same commit recorded in the Evidence Header.
+Record `Pass`, `Fail`, or `Not run` plus notes for each command. These commands must pass on the same commit recorded in the Evidence Header. `npm run release:ready` rejects blank Notes cells.
 
 | Command | Result | Notes |
 | --- | --- | --- |
@@ -55,7 +55,7 @@ Record `Pass`, `Fail`, or `Not run` plus notes for each command. These commands 
 
 ## Required Flow Checks
 
-Record `Pass`, `Fail`, or `Not run` plus notes for each item.
+Record `Pass`, `Fail`, or `Not run` plus notes for each item. `npm run release:ready` rejects blank Notes cells.
 
 | Check | Result | Notes |
 | --- | --- | --- |
@@ -82,4 +82,4 @@ Record `Pass`, `Fail`, or `Not run` plus notes for each item.
 - Follow-up issues:
 - Screenshots or notes location:
 
-Set `Ship decision` to `Ship` only when the release is ready. Run `npm run release:ready` after filling this checklist.
+Set `Ship decision` to `Ship` only when the release is ready. Fill `Blocking issues`, `Follow-up issues`, and `Screenshots or notes location`. Run `npm run release:ready` after filling this checklist.

@@ -97,6 +97,10 @@ export function checkReleaseReadinessChecklist(checklist, { currentCommit }) {
     if (row.result.toLowerCase() !== "pass") {
       fail(`Manual browser QA preflight command must be Pass: ${expectedCommand}. Current result: ${row.result || "(blank)"}.`);
     }
+
+    if (!row.notes) {
+      fail(`Manual browser QA preflight command must include notes: ${expectedCommand}.`);
+    }
   }
 
   for (const expectedCheck of expectedManualBrowserQaChecks) {
@@ -109,10 +113,20 @@ export function checkReleaseReadinessChecklist(checklist, { currentCommit }) {
     if (row.result.toLowerCase() !== "pass") {
       fail(`Manual browser QA flow check must be Pass: ${expectedCheck} Current result: ${row.result || "(blank)"}.`);
     }
+
+    if (!row.notes) {
+      fail(`Manual browser QA flow check must include notes: ${expectedCheck}`);
+    }
   }
 
   if (fieldValue(checklist, "Ship decision").toLowerCase() !== "ship") {
     fail("Manual browser QA checklist Ship decision must be set to Ship for release readiness.");
+  }
+
+  for (const label of ["Blocking issues", "Follow-up issues"]) {
+    if (!fieldValue(checklist, label)) {
+      fail(`Manual browser QA checklist must include Release Decision value: ${label}.`);
+    }
   }
 
   if (!fieldValue(checklist, "Screenshots or notes location")) {
