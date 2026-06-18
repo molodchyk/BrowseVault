@@ -39,6 +39,7 @@ Status terms:
 | Store copy is direct, concrete, and free of inflated claims. | Store body has one-sentence purpose, privacy boundary paragraph, examples, feature list, browser/data limits, and GPL GitHub footer. | Verified |
 | Screenshots stay consistent with current UI and store copy. | `docs/chrome-web-store-media.md` maps the screenshots to UI/store-copy claims, and `npm run release:ready` requires manual screenshot review evidence. | Manual required |
 | Localized UI strings are externalized before broader localization. | English `_locales` and UI binding map are checked by `scripts/check-locales.mjs`. | Verified |
+| Toolbar action does not show a marketing popup. | `manifest.json` has no `action.default_popup`; `scripts/playbook/validate-manifest-surface.mjs` enforces that the toolbar action opens the core app surface. | Verified |
 | Privacy copy lists exact permissions, storage, network behavior, analytics/ads/tracking, content scripts, and remote code posture. | `PRIVACY.md` and StorePilot privacy form are checked by `scripts/check-privacy-permissions.mjs`. | Verified |
 | UI uses browser-native vocabulary and explicit destructive actions. | Labels distinguish vault deletion, Chrome URL deletion, native Chrome History, and Reset Vault; tests cover destructive-action guards. | Verified |
 | Reviewer notes document browser-controlled limits. | `docs/release/reviewer-notes.md` covers Chrome retention, imports, incognito, file URLs, URL-level deletion, and native-history behavior. | Verified |

@@ -167,6 +167,7 @@ export function validatePlaybookCompliance(root, assert) {
   }
   for (const expected of [
     "First screen performs the main job",
+    "Popups support quick changes/status, not marketing copy",
     "Options/settings expose main preferences immediately",
     "Browser-native vocabulary is used when Chrome owns behavior",
     "Destructive actions are explicit and guarded",
@@ -174,6 +175,11 @@ export function validatePlaybookCompliance(root, assert) {
   ]) {
     assert(playbookCompliance.includes(expected), `Playbook UI expectations matrix missing: ${expected}`);
   }
+  assert(
+    playbookCompliance.includes("action.default_popup") &&
+      playbookCompliance.includes("validate-manifest-surface.mjs"),
+    "Playbook compliance must document the no-marketing-popup toolbar action guardrail."
+  );
 
   const backupRulesCss = fs.readFileSync(path.join(root, "src", "styles", "backup-rules.css"), "utf8");
   for (const expected of [

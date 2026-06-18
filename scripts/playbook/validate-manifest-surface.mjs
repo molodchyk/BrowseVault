@@ -37,6 +37,8 @@ export function validateManifestSurface(manifest, localeMessage, assert) {
   );
   assert(localeMessage("extensionDescription").length <= 132, "Manifest description should stay within Chrome Web Store summary length.");
   assert(manifest.background?.type === "module", "Background script should be an ES module.");
+  assert(manifest.action?.default_title === "__MSG_extensionShortName__", "Toolbar action title should resolve through _locales/en/messages.json.");
+  assert(!manifest.action?.default_popup, "Toolbar action should open the core app page, not a marketing popup.");
 
   for (const size of ["16", "32", "48", "128"]) {
     assert(manifest.icons?.[size] === `assets/icons/icon${size}.png`, `Missing manifest icon ${size}.`);

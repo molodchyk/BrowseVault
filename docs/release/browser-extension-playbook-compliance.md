@@ -46,6 +46,7 @@ This file maps BrowseVault release evidence to the shared browser-extension play
 | Playbook expectation | BrowseVault evidence |
 | --- | --- |
 | First screen performs the main job instead of marketing. | `src/app.html` opens on the History tab with search, saved searches, date shortcuts, result state, and results list. |
+| Popups support quick changes/status, not marketing copy. | `manifest.json` does not define `action.default_popup`; the toolbar action opens the audited BrowseVault app surface, and `scripts/playbook/validate-manifest-surface.mjs` guards that shape. |
 | Options/settings expose main preferences immediately. | Settings starts with `Display and search defaults`, `Save Settings`, theme/accent/contrast/text/date/result-limit/backup controls, and the native-history escape hatch. |
 | Browser-native vocabulary is used when Chrome owns behavior. | Labels distinguish `Delete From Vault`, `Delete URLs From Chrome`, `Delete Results From Chrome`, and `Open Chrome History`; reviewer notes document URL-level Chrome deletion. |
 | Destructive actions are explicit and guarded. | `src/features/vault-management/ui/actions.js` uses confirmations, undoable vault deletion where possible, and cross-tab vault-change notifications; tests cover empty/canceled destructive states. |
