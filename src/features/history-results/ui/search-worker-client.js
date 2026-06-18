@@ -16,6 +16,7 @@ function defaultWorkerFactory() {
 function cloneableSearchOptions(options) {
   const cloned = { ...options };
   delete cloned.scheduler;
+  delete cloned.signal;
   return cloned;
 }
 
@@ -28,82 +29,94 @@ function addWorkerListener(worker, type, listener) {
   worker[`on${type}`] = listener;
 }
 
+function createAbortError() {
+  const error = new Error("Search canceled.");
+  error.name = "AbortError";
+  return error;
+}
+
+function isAbortError(error) {
+  return error?.name === "AbortError";
+}
+
 function createWorkerRequestRunner({ timeoutMs, workerFactory }) {
   let nextId = 1;
-  let worker = null;
   let unavailable = false;
-  const pending = new Map();
-
-  function rejectPending(error) {
-    for (const { reject, timeout } of pending.values()) {
-      clearTimeout(timeout);
-      reject(error);
+  return function runWorkerSearch(visits, input, options) {
+    if (options.signal?.aborted) {
+      return Promise.reject(createAbortError());
     }
-    pending.clear();
-  }
 
-  function ensureWorker() {
     if (unavailable) {
       return null;
     }
 
-    if (worker) {
-      return worker;
-    }
-
+    let currentWorker;
     try {
-      worker = workerFactory();
+      currentWorker = workerFactory();
     } catch {
       unavailable = true;
       return null;
     }
 
-    if (!worker) {
-      unavailable = true;
-      return null;
-    }
-
-    addWorkerListener(worker, "message", (event) => {
-      const message = event.data || {};
-      const request = pending.get(message.id);
-      if (!request) {
-        return;
-      }
-
-      pending.delete(message.id);
-      clearTimeout(request.timeout);
-      if (message.ok) {
-        request.resolve(message.result);
-      } else {
-        request.reject(new Error(message.error || "Search worker failed."));
-      }
-    });
-
-    const handleWorkerFailure = () => {
-      unavailable = true;
-      rejectPending(new Error("Search worker failed."));
-      worker?.terminate?.();
-      worker = null;
-    };
-    addWorkerListener(worker, "error", handleWorkerFailure);
-    addWorkerListener(worker, "messageerror", handleWorkerFailure);
-    return worker;
-  }
-
-  return function runWorkerSearch(visits, input, options) {
-    const currentWorker = ensureWorker();
     if (!currentWorker) {
+      unavailable = true;
       return null;
     }
 
     const id = String(nextId);
     nextId += 1;
     return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        pending.delete(id);
-        reject(new Error("Search worker timed out."));
+      let settled = false;
+      let timeout;
+
+      const cleanup = () => {
+        clearTimeout(timeout);
+        options.signal?.removeEventListener?.("abort", abortRequest);
+        currentWorker.terminate?.();
+      };
+
+      const finish = (callback, value) => {
+        if (settled) {
+          return;
+        }
+
+        settled = true;
+        cleanup();
+        callback(value);
+      };
+
+      const abortRequest = () => finish(reject, createAbortError());
+
+      timeout = setTimeout(() => {
+        finish(reject, new Error("Search worker timed out."));
       }, timeoutMs);
-      pending.set(id, { reject, resolve, timeout });
+
+      addWorkerListener(currentWorker, "message", (event) => {
+        const message = event.data || {};
+        if (message.id !== id) {
+          return;
+        }
+
+        if (message.ok) {
+          finish(resolve, message.result);
+        } else {
+          finish(reject, new Error(message.error || "Search worker failed."));
+        }
+      });
+
+      const handleWorkerFailure = () => {
+        unavailable = true;
+        finish(reject, new Error("Search worker failed."));
+      };
+      addWorkerListener(currentWorker, "error", handleWorkerFailure);
+      addWorkerListener(currentWorker, "messageerror", handleWorkerFailure);
+
+      options.signal?.addEventListener?.("abort", abortRequest, { once: true });
+      if (options.signal?.aborted) {
+        abortRequest();
+        return;
+      }
 
       try {
         currentWorker.postMessage({
@@ -113,9 +126,7 @@ function createWorkerRequestRunner({ timeoutMs, workerFactory }) {
           visits
         });
       } catch (error) {
-        clearTimeout(timeout);
-        pending.delete(id);
-        reject(error);
+        finish(reject, error);
       }
     });
   };
@@ -144,7 +155,10 @@ export function createWorkerBackedHistorySearch({
         if (workerResult) {
           return workerResult;
         }
-      } catch {
+      } catch (error) {
+        if (isAbortError(error)) {
+          throw error;
+        }
         // The in-page search path is already chunked and preserves behavior when workers are unavailable.
       }
     }

@@ -26,9 +26,29 @@ export function createHistorySearchActions({
     ...defaultServices,
     ...services
   };
+  let activeSearchController = null;
+
+  function beginSearchRequest() {
+    activeSearchController?.abort();
+    activeSearchController = new AbortController();
+    return {
+      requestId: deps.nextHistorySearchRequestId(appState),
+      signal: activeSearchController.signal
+    };
+  }
+
+  function finishSearchRequest(signal) {
+    if (activeSearchController?.signal === signal) {
+      activeSearchController = null;
+    }
+  }
+
+  function isAbortError(error) {
+    return error?.name === "AbortError";
+  }
 
   async function runSearch() {
-    const requestId = deps.nextHistorySearchRequestId(appState);
+    const { requestId, signal } = beginSearchRequest();
     setStatus("Searching local vault");
     appState.currentShownLimit = requestedResultLimit();
     const searchText = getSearchText();
@@ -37,6 +57,7 @@ export function createHistorySearchActions({
     try {
       const { results, total } = await searchVisits(searchText, {
         limit,
+        signal,
         sortOrder: requestedSortOrder()
       });
 
@@ -48,9 +69,11 @@ export function createHistorySearchActions({
       renderResults(results, total);
       setStatus("Ready");
     } catch (error) {
-      if (deps.isCurrentHistorySearchRequestId(appState, requestId)) {
+      if (!isAbortError(error) && deps.isCurrentHistorySearchRequestId(appState, requestId)) {
         setStatus(error.message);
       }
+    } finally {
+      finishSearchRequest(signal);
     }
   }
 
@@ -64,19 +87,28 @@ export function createHistorySearchActions({
     const step = requestedResultLimit();
     appState.currentShownLimit = Math.min(appState.currentResults.length + step, appState.currentTotal, maxResultLimit);
     setStatus("Loading more results");
-    const requestId = deps.nextHistorySearchRequestId(appState);
+    const { requestId, signal } = beginSearchRequest();
 
-    const { results, total } = await searchVisits(getSearchText(), {
-      limit: appState.currentShownLimit,
-      sortOrder: requestedSortOrder()
-    });
+    try {
+      const { results, total } = await searchVisits(getSearchText(), {
+        limit: appState.currentShownLimit,
+        signal,
+        sortOrder: requestedSortOrder()
+      });
 
-    if (!deps.isCurrentHistorySearchRequestId(appState, requestId)) {
-      return;
+      if (!deps.isCurrentHistorySearchRequestId(appState, requestId)) {
+        return;
+      }
+
+      renderResults(results, total);
+      setStatus(`Showing ${results.length} of ${total} results`);
+    } catch (error) {
+      if (!isAbortError(error) && deps.isCurrentHistorySearchRequestId(appState, requestId)) {
+        setStatus(error.message);
+      }
+    } finally {
+      finishSearchRequest(signal);
     }
-
-    renderResults(results, total);
-    setStatus(`Showing ${results.length} of ${total} results`);
   }
 
   async function loadAllResults() {
@@ -93,22 +125,31 @@ export function createHistorySearchActions({
       ? `Loading first ${maxResultLabel} results`
       : "Loading all results"
     );
-    const requestId = deps.nextHistorySearchRequestId(appState);
+    const { requestId, signal } = beginSearchRequest();
 
-    const { results, total } = await searchVisits(getSearchText(), {
-      limit: appState.currentShownLimit,
-      sortOrder: requestedSortOrder()
-    });
+    try {
+      const { results, total } = await searchVisits(getSearchText(), {
+        limit: appState.currentShownLimit,
+        signal,
+        sortOrder: requestedSortOrder()
+      });
 
-    if (!deps.isCurrentHistorySearchRequestId(appState, requestId)) {
-      return;
+      if (!deps.isCurrentHistorySearchRequestId(appState, requestId)) {
+        return;
+      }
+
+      renderResults(results, total);
+      setStatus(total > maxResultLimit
+        ? `Showing first ${results.length} of ${total} results`
+        : `Showing all ${results.length} results`
+      );
+    } catch (error) {
+      if (!isAbortError(error) && deps.isCurrentHistorySearchRequestId(appState, requestId)) {
+        setStatus(error.message);
+      }
+    } finally {
+      finishSearchRequest(signal);
     }
-
-    renderResults(results, total);
-    setStatus(total > maxResultLimit
-      ? `Showing first ${results.length} of ${total} results`
-      : `Showing all ${results.length} results`
-    );
   }
 
   return {

@@ -8,6 +8,18 @@ export function yieldToEventLoop() {
   });
 }
 
+function createAbortError() {
+  const error = new Error("Search canceled.");
+  error.name = "AbortError";
+  return error;
+}
+
+function throwIfAborted(signal) {
+  if (signal?.aborted) {
+    throw createAbortError();
+  }
+}
+
 function normalizeLimit(value, fallback = Infinity) {
   if (value === "all") {
     return Infinity;
@@ -101,9 +113,11 @@ export async function searchVisitRecords(visits, input = "", options = {}) {
   const chunkSize = normalizeChunkSize(options.chunkSize);
   const sortOrder = normalizeSortOrder(options.sortOrder);
   const scheduler = options.scheduler || yieldToEventLoop;
+  const signal = options.signal;
   const retained = [];
   let total = 0;
 
+  throwIfAborted(signal);
   for (let start = 0; start < visits.length; start += chunkSize) {
     const end = Math.min(start + chunkSize, visits.length);
 
@@ -121,7 +135,9 @@ export async function searchVisitRecords(visits, input = "", options = {}) {
     }
 
     if (end < visits.length) {
+      throwIfAborted(signal);
       await scheduler();
+      throwIfAborted(signal);
     }
   }
 

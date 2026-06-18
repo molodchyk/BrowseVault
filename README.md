@@ -30,7 +30,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 - visible archive health for startup, Chrome sync, live capture status, malformed vault rows, tombstones, and duplicate active records;
 - query syntax for site/host/domain, title, URL, manual category/tag, source, transition, visit count, exact-day/date ranges, local-hour filters, exclusions, wildcards, phrases, and regex;
 - bounded typo-tolerant matching for longer plain keyword searches;
-- worker-backed, chunked local search scanning for large vaults, covered by synthetic large-history tests;
+- cancellable worker-backed, chunked local search scanning for large vaults, covered by synthetic large-history tests;
 - bounded result retention for limited searches, covered by a 100k-record synthetic history test;
 - one-click Today, Yesterday, 7 Days, 30 Days, and All Dates shortcuts that fill ISO-style date filters;
 - saved searches for repeated local history queries, date/limit filter sets, and newest/oldest result ordering;

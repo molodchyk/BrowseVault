@@ -47,6 +47,17 @@ function createHarness({
   return { actions, appState, renderCalls, requestIds, statusMessages, updateLoadMoreCalls };
 }
 
+function searchCallSummary(calls) {
+  return calls.map(({ query, options }) => ({
+    query,
+    options: {
+      limit: options.limit,
+      signal: Boolean(options.signal),
+      sortOrder: options.sortOrder
+    }
+  }));
+}
+
 test("runSearch applies requested limit, reconciles selection, and renders fresh results", async () => {
   const resultOne = { id: "visit-1" };
   const resultTwo = { id: "visit-2" };
@@ -65,10 +76,10 @@ test("runSearch applies requested limit, reconciles selection, and renders fresh
 
   await actions.runSearch();
 
-  assert.deepEqual(searchCalls, [
+  assert.deepEqual(searchCallSummary(searchCalls), [
     {
       query: "docs site:example.com",
-      options: { limit: 10, sortOrder: "oldest" }
+      options: { limit: 10, signal: true, sortOrder: "oldest" }
     }
   ]);
   assert.equal(appState.currentShownLimit, 10);
@@ -80,6 +91,39 @@ test("runSearch applies requested limit, reconciles selection, and renders fresh
     }
   ]);
   assert.deepEqual(statusMessages, ["Searching local vault", "Ready"]);
+});
+
+test("runSearch aborts the previous active search", async () => {
+  let resolveFirst;
+  const searchCalls = [];
+  const { actions, renderCalls, statusMessages } = createHarness({
+    isCurrentHistorySearchRequestId: (state, id) => state.historySearchRequestId === id,
+    searchVisits: async (query, options) => {
+      searchCalls.push({ query, options });
+      if (searchCalls.length === 1) {
+        return new Promise((resolve) => {
+          resolveFirst = () => resolve({ results: [{ id: "stale" }], total: 1 });
+        });
+      }
+
+      return { results: [{ id: "fresh" }], total: 1 };
+    }
+  });
+
+  const firstRun = actions.runSearch();
+  const secondRun = actions.runSearch();
+  assert.equal(searchCalls[0].options.signal.aborted, true);
+  await secondRun;
+  resolveFirst();
+  await firstRun;
+
+  assert.deepEqual(renderCalls, [
+    {
+      results: [{ id: "fresh" }],
+      total: 1
+    }
+  ]);
+  assert.deepEqual(statusMessages, ["Searching local vault", "Searching local vault", "Ready"]);
 });
 
 test("runSearch ignores stale responses and reports active errors", async () => {
@@ -140,10 +184,10 @@ test("loadMoreResults expands visible limit, renders fresh results, and ignores 
   await fresh.actions.loadMoreResults();
 
   assert.equal(fresh.appState.currentShownLimit, 9);
-  assert.deepEqual(searchCalls, [
+  assert.deepEqual(searchCallSummary(searchCalls), [
     {
       query: "docs site:example.com",
-      options: { limit: 9, sortOrder: "newest" }
+      options: { limit: 9, signal: true, sortOrder: "newest" }
     }
   ]);
   assert.deepEqual(fresh.renderCalls, [
@@ -202,10 +246,10 @@ test("loadAllResults expands current results to the total match count", async ()
   await actions.loadAllResults();
 
   assert.equal(appState.currentShownLimit, 12);
-  assert.deepEqual(searchCalls, [
+  assert.deepEqual(searchCallSummary(searchCalls), [
     {
       query: "docs site:example.com",
-      options: { limit: 12, sortOrder: "newest" }
+      options: { limit: 12, signal: true, sortOrder: "newest" }
     }
   ]);
   assert.equal(renderCalls.length, 1);
@@ -231,10 +275,10 @@ test("loadAllResults respects the maximum result cap and ignores stale responses
   await capped.actions.loadAllResults();
 
   assert.equal(capped.appState.currentShownLimit, 50);
-  assert.deepEqual(searchCalls, [
+  assert.deepEqual(searchCallSummary(searchCalls), [
     {
       query: "docs site:example.com",
-      options: { limit: 50, sortOrder: "newest" }
+      options: { limit: 50, signal: true, sortOrder: "newest" }
     }
   ]);
   assert.equal(capped.renderCalls.length, 1);

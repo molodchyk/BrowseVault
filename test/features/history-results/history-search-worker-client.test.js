@@ -124,3 +124,42 @@ test("worker-backed search falls back when worker posting fails", async () => {
   assert.equal(result.total, 3);
   assert.deepEqual(result.results.map((visit) => visit.id), ["visit-0", "visit-1"]);
 });
+
+test("worker-backed search aborts active worker requests without falling back", async () => {
+  const visits = [syntheticVisit(0), syntheticVisit(1), syntheticVisit(2)];
+  const controller = new AbortController();
+  let fallbackRan = false;
+  let markPosted;
+  const posted = new Promise((resolve) => {
+    markPosted = resolve;
+  });
+  let terminated = false;
+  const searchVisits = createWorkerBackedHistorySearch({
+    getSearchableVisits: async () => visits,
+    minWorkerVisits: 2,
+    searchRecords: async () => {
+      fallbackRan = true;
+      return { query: { terms: [] }, results: [], total: 0 };
+    },
+    workerFactory: () => ({
+      addEventListener() {},
+      postMessage() {
+        markPosted();
+      },
+      terminate() {
+        terminated = true;
+      }
+    })
+  });
+
+  const searchPromise = searchVisits("history", {
+    limit: 2,
+    signal: controller.signal
+  });
+  await posted;
+  controller.abort();
+
+  await assert.rejects(searchPromise, { name: "AbortError", message: "Search canceled." });
+  assert.equal(terminated, true);
+  assert.equal(fallbackRan, false);
+});

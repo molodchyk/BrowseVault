@@ -132,3 +132,23 @@ test("searchVisitRecords preserves input order for equal timestamps within limit
   assert.equal(result.total, 4);
   assert.deepEqual(result.results.map((visit) => visit.id), ["a", "b", "c"]);
 });
+
+test("searchVisitRecords aborts chunked scans", async () => {
+  const visits = Array.from({ length: 1200 }, (_value, index) => syntheticVisit(index));
+  const controller = new AbortController();
+  let yields = 0;
+
+  await assert.rejects(
+    () => searchVisitRecords(visits, "", {
+      chunkSize: 500,
+      limit: 10,
+      scheduler: async () => {
+        yields += 1;
+        controller.abort();
+      },
+      signal: controller.signal
+    }),
+    { name: "AbortError", message: "Search canceled." }
+  );
+  assert.equal(yields, 1);
+});

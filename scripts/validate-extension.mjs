@@ -362,6 +362,7 @@ assert(appBootstrap.includes("localizeAppShell") && appBootstrap.includes("getCh
 assert(appBootstrap.includes("createWorkerBackedHistorySearch"), "App shell should use the worker-backed history search service.");
 const searchWorkerClient = fs.readFileSync(path.join(root, "src", "features", "history-results", "ui", "search-worker-client.js"), "utf8");
 assert(searchWorkerClient.includes("new Worker") && searchWorkerClient.includes("search-worker.js"), "History search should have a dedicated worker-backed path.");
+assert(searchWorkerClient.includes("AbortError") && searchWorkerClient.includes("terminate"), "History search worker path should support cancellation.");
 const searchWorker = fs.readFileSync(path.join(root, "src", "features", "history-results", "worker", "search-worker.js"), "utf8");
 assert(searchWorker.includes("searchVisitRecords"), "History search worker should reuse the audited search index.");
 
