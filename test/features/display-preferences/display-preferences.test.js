@@ -257,6 +257,21 @@ test("archiveInsightDetails formats secondary archive summaries", () => {
   });
 });
 
+test("archiveInsightDetails accepts localized empty insight labels", () => {
+  assert.deepEqual(archiveInsightDetails({}, {
+    labels: {
+      noActiveDaysYet: "Noch keine aktiven Tage",
+      noDomainsYet: "Noch keine Domains",
+      noVisitsYet: "Noch keine Besuche"
+    }
+  }), {
+    topDomainsText: "Noch keine Domains",
+    busiestDayText: "Noch keine Besuche",
+    activeDaysText: "Noch keine aktiven Tage",
+    dateRangeText: "Noch keine Besuche"
+  });
+});
+
 test("backupStatusDetails summarizes missing, fresh, and stale backups", () => {
   assert.deepEqual(backupStatusDetails(null), {
     healthText: "No backup yet",

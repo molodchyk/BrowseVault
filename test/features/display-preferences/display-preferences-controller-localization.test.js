@@ -190,3 +190,21 @@ test("refreshStats passes localized archive recorder empty labels", async () => 
   assert.equal(elements.archiveStorage.textContent, "Noch nicht geprueft");
   assert.equal(elements.archiveTombstones.textContent, "Keine geloeschten Merker");
 });
+
+test("refreshStats passes localized archive insight empty labels", async () => {
+  const messages = new Map([
+    ["noActiveDaysYet", "Noch keine aktiven Tage"],
+    ["noDomainsYet", "Noch keine Domains"],
+    ["noVisitsYet", "Noch keine Besuche"]
+  ]);
+  const { controller, elements } = createHarness({
+    getMessage: (key) => messages.get(key) || ""
+  });
+
+  await controller.refreshStats();
+
+  assert.equal(elements.archiveTopDomains.textContent, "Noch keine Domains");
+  assert.equal(elements.archiveBusiestDay.textContent, "Noch keine Besuche");
+  assert.equal(elements.archiveActiveDays.textContent, "Noch keine aktiven Tage");
+  assert.equal(elements.archiveDateRange.textContent, "Noch keine Besuche");
+});

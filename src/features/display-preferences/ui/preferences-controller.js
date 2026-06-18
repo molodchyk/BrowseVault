@@ -108,7 +108,12 @@ export function createDisplayPreferencesController({
 
   function renderArchiveInsights(insights) {
     const status = deps.archiveInsightDetails(insights, {
-      dateFormat: appState.preferences.dateFormat
+      dateFormat: appState.preferences.dateFormat,
+      labels: {
+        noActiveDaysYet: getMessage("noActiveDaysYet") || "No active days yet",
+        noDomainsYet: getMessage("noDomainsYet") || "No domains yet",
+        noVisitsYet: getMessage("noVisitsYet") || "No visits yet"
+      }
     });
 
     elements.archiveTopDomains.textContent = status.topDomainsText;

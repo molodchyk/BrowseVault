@@ -115,18 +115,18 @@ export function archiveInsightDetails(insights = {}, options = {}) {
 
   const topDomainsText = topDomains.length
     ? topDomains.map((entry) => `${entry.domain || "unknown"} (${formatCount(entry.count)})`).join(" · ")
-    : "No domains yet";
+    : label(options, "noDomainsYet", "No domains yet");
   const busiestDayText = busiest
     ? `${formatShortDate(timestampFromLocalDay(busiest.day), dateFormat)} · ${pluralVisit(busiest.count)}`
-    : "No visits yet";
+    : label(options, "noVisitsYet", "No visits yet");
   const activeDaysText = activeDays
     ? `${formatCount(activeDays)} day${activeDays === 1 ? "" : "s"} · ${averageVisitsPerActiveDay.toFixed(1)} visits/day`
-    : "No active days yet";
+    : label(options, "noActiveDaysYet", "No active days yet");
   const dateRangeText = oldestVisitTime && newestVisitTime
     ? oldestVisitTime === newestVisitTime
       ? formatShortDate(newestVisitTime, dateFormat)
       : `${formatShortDate(oldestVisitTime, dateFormat)} to ${formatShortDate(newestVisitTime, dateFormat)}`
-    : "No visits yet";
+    : label(options, "noVisitsYet", "No visits yet");
 
   return {
     topDomainsText,

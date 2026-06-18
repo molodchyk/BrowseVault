@@ -8,6 +8,9 @@ export const displayPreferencesLocalization = [
   { key: "backupHealthEmpty" },
   { key: "backupNextAfterFirst" },
   { key: "backupReminderOff" },
+  { key: "noActiveDaysYet" },
+  { key: "noDomainsYet" },
+  { key: "noVisitsYet" },
   { key: "statBackupEmpty" },
   { key: "statusSettingsSaved" }
 ];
