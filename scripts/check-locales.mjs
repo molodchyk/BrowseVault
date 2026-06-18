@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { appShellLocalization } from "../src/features/app-shell/ui/localization-map.js";
 import { backgroundRuntimeLocalization } from "../src/features/background-runtime/ui/localization-keys.js";
+import { backupImportLocalization } from "../src/features/backup-import/ui/localization-keys.js";
 import { browserMemoryLocalization } from "../src/features/browser-memory/ui/localization-keys.js";
 import { displayPreferencesLocalization } from "../src/features/display-preferences/ui/localization-keys.js";
 import { historyResultsLocalization } from "../src/features/history-results/ui/localization-keys.js";
@@ -76,6 +77,7 @@ const referencedKeys = new Set(references.map((reference) => reference.key));
 const uiLocalizationBindings = [
   ...appShellLocalization,
   ...backgroundRuntimeLocalization,
+  ...backupImportLocalization,
   ...browserMemoryLocalization,
   ...displayPreferencesLocalization,
   ...historyResultsLocalization,

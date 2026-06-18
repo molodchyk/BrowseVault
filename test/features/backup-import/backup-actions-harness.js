@@ -15,6 +15,7 @@ export function previewElements() {
 }
 
 export function createBackupActionsHarness({
+  getMessage = () => "",
   getSortOrder = () => "newest",
   getSearchText = () => "docs site:example.com",
   preferences = {
@@ -39,6 +40,7 @@ export function createBackupActionsHarness({
   const actions = createBackupActions({
     appState,
     elements: previewElements(),
+    getMessage,
     getSortOrder,
     getSearchText,
     notifyVaultChanged: (reason) => notifications.push(reason),

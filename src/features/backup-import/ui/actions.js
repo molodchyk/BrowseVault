@@ -38,6 +38,10 @@ const defaultServices = {
   visitsToHtml: visitsToHtmlAsync
 };
 
+function localizedMessage(getMessage, key, fallback, substitutions) {
+  return getMessage?.(key, substitutions) || fallback;
+}
+
 export function backupImportPreviewElements(elements) {
   return {
     importPreview: elements.importPreview,
@@ -55,6 +59,7 @@ export function backupImportPreviewElements(elements) {
 export function createBackupActions({
   appState,
   elements,
+  getMessage = () => "",
   getSortOrder = () => "newest",
   getSearchText = () => "",
   notifyVaultChanged = () => false,
@@ -110,11 +115,11 @@ export function createBackupActions({
   }
 
   async function exportAll() {
-    setStatus("Preparing archive");
+    setStatus(localizedMessage(getMessage, "statusPreparingArchive", "Preparing archive"));
     const archive = await deps.attachArchiveIntegrity(await deps.exportArchive());
     const selfTest = await deps.createBackupSelfTest(archive, deps.verifyArchiveIntegrity, deps.now);
     if (selfTest.status !== "passed") {
-      setStatus("Backup self-test failed");
+      setStatus(localizedMessage(getMessage, "statusBackupSelfTestFailed", "Backup self-test failed"));
       return;
     }
 
@@ -134,11 +139,11 @@ export function createBackupActions({
       detail: `${sizeBytes} bytes`,
       occurredAt: archive.exportedAt
     });
-    setStatus("Exported archive");
+    setStatus(localizedMessage(getMessage, "statusExportedArchive", "Exported archive"));
   }
 
   async function exportCsv() {
-    setStatus("Preparing CSV");
+    setStatus(localizedMessage(getMessage, "statusPreparingCsv", "Preparing CSV"));
     const archive = await deps.exportArchive(null, { includeCategories: true });
     const sizeBytes = await deps.downloadText(
       exportFilename("history", archive.exportedAt, "csv"),
@@ -153,11 +158,11 @@ export function createBackupActions({
       detail: `${sizeBytes} bytes`,
       occurredAt: archive.exportedAt
     });
-    setStatus("Exported CSV");
+    setStatus(localizedMessage(getMessage, "statusExportedCsv", "Exported CSV"));
   }
 
   async function exportHtml() {
-    setStatus("Preparing HTML");
+    setStatus(localizedMessage(getMessage, "statusPreparingHtml", "Preparing HTML"));
     const archive = await deps.exportArchive(null, { includeCategories: true });
     const sizeBytes = await deps.downloadText(
       exportFilename("history", archive.exportedAt, "html"),
@@ -172,13 +177,13 @@ export function createBackupActions({
       detail: `${sizeBytes} bytes`,
       occurredAt: archive.exportedAt
     });
-    setStatus("Exported HTML");
+    setStatus(localizedMessage(getMessage, "statusExportedHtml", "Exported HTML"));
   }
 
   async function exportSelected() {
     const items = await selectedResults();
     if (!items.length) {
-      setStatus("Select records first");
+      setStatus(localizedMessage(getMessage, "statusSelectRecordsFirst", "Select records first"));
       return;
     }
 
@@ -190,13 +195,13 @@ export function createBackupActions({
       count: items.length,
       occurredAt: archive.exportedAt
     });
-    setStatus(`Exported ${items.length} selected records as JSON`);
+    setStatus(localizedMessage(getMessage, "statusExportedSelectedJson", `Exported ${items.length} selected records as JSON`, [String(items.length)]));
   }
 
   async function exportSelectedCsv() {
     const items = await selectedResults();
     if (!items.length) {
-      setStatus("Select records first");
+      setStatus(localizedMessage(getMessage, "statusSelectRecordsFirst", "Select records first"));
       return;
     }
 
@@ -213,13 +218,13 @@ export function createBackupActions({
       count: items.length,
       occurredAt: exportedAt
     });
-    setStatus(`Exported ${items.length} selected records as CSV`);
+    setStatus(localizedMessage(getMessage, "statusExportedSelectedCsv", `Exported ${items.length} selected records as CSV`, [String(items.length)]));
   }
 
   async function exportSelectedHtml() {
     const items = await selectedResults();
     if (!items.length) {
-      setStatus("Select records first");
+      setStatus(localizedMessage(getMessage, "statusSelectRecordsFirst", "Select records first"));
       return;
     }
 
@@ -236,14 +241,14 @@ export function createBackupActions({
       count: items.length,
       occurredAt: exportedAt
     });
-    setStatus(`Exported ${items.length} selected records as HTML`);
+    setStatus(localizedMessage(getMessage, "statusExportedSelectedHtml", `Exported ${items.length} selected records as HTML`, [String(items.length)]));
   }
 
   async function exportFilteredResults() {
-    setStatus("Preparing result archive");
+    setStatus(localizedMessage(getMessage, "statusPreparingResultArchive", "Preparing result archive"));
     const items = await matchingResultsForExport();
     if (!items.length) {
-      setStatus("No matching records to export");
+      setStatus(localizedMessage(getMessage, "statusNoMatchingRecordsToExport", "No matching records to export"));
       return;
     }
 
@@ -256,14 +261,14 @@ export function createBackupActions({
       detail: getSearchText().trim(),
       occurredAt: archive.exportedAt
     });
-    setStatus(`Exported ${items.length} matching records as JSON`);
+    setStatus(localizedMessage(getMessage, "statusExportedMatchingJson", `Exported ${items.length} matching records as JSON`, [String(items.length)]));
   }
 
   async function exportFilteredResultsCsv() {
-    setStatus("Preparing result CSV");
+    setStatus(localizedMessage(getMessage, "statusPreparingResultCsv", "Preparing result CSV"));
     const items = await matchingResultsForExport();
     if (!items.length) {
-      setStatus("No matching records to export");
+      setStatus(localizedMessage(getMessage, "statusNoMatchingRecordsToExport", "No matching records to export"));
       return;
     }
 
@@ -281,14 +286,14 @@ export function createBackupActions({
       detail: getSearchText().trim(),
       occurredAt: exportedAt
     });
-    setStatus(`Exported ${items.length} matching records as CSV`);
+    setStatus(localizedMessage(getMessage, "statusExportedMatchingCsv", `Exported ${items.length} matching records as CSV`, [String(items.length)]));
   }
 
   async function exportFilteredResultsHtml() {
-    setStatus("Preparing result HTML");
+    setStatus(localizedMessage(getMessage, "statusPreparingResultHtml", "Preparing result HTML"));
     const items = await matchingResultsForExport();
     if (!items.length) {
-      setStatus("No matching records to export");
+      setStatus(localizedMessage(getMessage, "statusNoMatchingRecordsToExport", "No matching records to export"));
       return;
     }
 
@@ -306,7 +311,7 @@ export function createBackupActions({
       detail: getSearchText().trim(),
       occurredAt: exportedAt
     });
-    setStatus(`Exported ${items.length} matching records as HTML`);
+    setStatus(localizedMessage(getMessage, "statusExportedMatchingHtml", `Exported ${items.length} matching records as HTML`, [String(items.length)]));
   }
 
   async function importFromFile(file) {

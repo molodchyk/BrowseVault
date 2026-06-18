@@ -26,6 +26,7 @@ export const requiredProjectFiles = [
   "src/features/background-runtime/ui/localization-keys.js",
   "src/features/backup-import/core/archive-import-plan.js",
   "src/features/backup-import/ui/downloads.js",
+  "src/features/backup-import/ui/localization-keys.js",
   "src/features/browser-memory/ui/localization-keys.js",
   "src/features/display-preferences/core/archive-status.js",
   "src/features/display-preferences/core/formatting.js",

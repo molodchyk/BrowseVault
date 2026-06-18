@@ -619,6 +619,110 @@
     "message": "Import, export, and sync",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "statusPreparingArchive": {
+    "message": "Preparing archive",
+    "description": "Status shown while BrowseVault prepares a full JSON backup archive."
+  },
+  "statusBackupSelfTestFailed": {
+    "message": "Backup self-test failed",
+    "description": "Status shown when BrowseVault refuses to download a backup after the generated archive fails its self-test."
+  },
+  "statusExportedArchive": {
+    "message": "Exported archive",
+    "description": "Status shown after BrowseVault exports a full JSON backup archive."
+  },
+  "statusPreparingCsv": {
+    "message": "Preparing CSV",
+    "description": "Status shown while BrowseVault prepares a full CSV export."
+  },
+  "statusExportedCsv": {
+    "message": "Exported CSV",
+    "description": "Status shown after BrowseVault exports a full CSV file."
+  },
+  "statusPreparingHtml": {
+    "message": "Preparing HTML",
+    "description": "Status shown while BrowseVault prepares a full HTML export."
+  },
+  "statusExportedHtml": {
+    "message": "Exported HTML",
+    "description": "Status shown after BrowseVault exports a full HTML report."
+  },
+  "statusExportedSelectedJson": {
+    "message": "Exported $COUNT$ selected records as JSON",
+    "description": "Status shown after BrowseVault exports selected records as JSON.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "statusExportedSelectedCsv": {
+    "message": "Exported $COUNT$ selected records as CSV",
+    "description": "Status shown after BrowseVault exports selected records as CSV.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "statusExportedSelectedHtml": {
+    "message": "Exported $COUNT$ selected records as HTML",
+    "description": "Status shown after BrowseVault exports selected records as HTML.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "statusPreparingResultArchive": {
+    "message": "Preparing result archive",
+    "description": "Status shown while BrowseVault prepares a JSON export for the current search results."
+  },
+  "statusPreparingResultCsv": {
+    "message": "Preparing result CSV",
+    "description": "Status shown while BrowseVault prepares a CSV export for the current search results."
+  },
+  "statusPreparingResultHtml": {
+    "message": "Preparing result HTML",
+    "description": "Status shown while BrowseVault prepares an HTML export for the current search results."
+  },
+  "statusNoMatchingRecordsToExport": {
+    "message": "No matching records to export",
+    "description": "Status shown when BrowseVault cannot export current results because the current search has no matches."
+  },
+  "statusExportedMatchingJson": {
+    "message": "Exported $COUNT$ matching records as JSON",
+    "description": "Status shown after BrowseVault exports matching current search results as JSON.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
+  },
+  "statusExportedMatchingCsv": {
+    "message": "Exported $COUNT$ matching records as CSV",
+    "description": "Status shown after BrowseVault exports matching current search results as CSV.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
+  },
+  "statusExportedMatchingHtml": {
+    "message": "Exported $COUNT$ matching records as HTML",
+    "description": "Status shown after BrowseVault exports matching current search results as HTML.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
+  },
   "buttonSyncChromeHistory": {
     "message": "Sync Chrome History",
     "description": "Static BrowseVault extension-page UI string."

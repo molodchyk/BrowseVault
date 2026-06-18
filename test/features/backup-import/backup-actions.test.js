@@ -9,6 +9,19 @@ import {
   previewElements
 } from "./backup-actions-harness.js";
 
+function messageGetter(messages) {
+  return (key, substitutions = []) => {
+    const value = messages.get(key);
+    if (!value) {
+      return "";
+    }
+    return substitutions.reduce(
+      (text, substitution, index) => text.replace(`$${index + 1}`, substitution),
+      value
+    );
+  };
+}
+
 test("backupImportPreviewElements maps app shell elements for import preview rendering", () => {
   const elements = previewElements();
   assert.deepEqual(backupImportPreviewElements(elements), elements);
@@ -157,6 +170,76 @@ test("exportAll downloads an integrity-protected archive and records backup meta
     occurredAt: archive.exportedAt
   }]]);
   assert.deepEqual(calls, ["refreshStats"]);
+});
+
+test("export actions can localize backup and result statuses", async () => {
+  const archive = {
+    exportedAt: "2026-06-16T12:00:00.000Z",
+    counts: { visits: 2 },
+    visits: [{ id: "visit-1" }, { id: "visit-2" }]
+  };
+  const getMessage = messageGetter(new Map([
+    ["statusPreparingArchive", "Bereite Archiv vor"],
+    ["statusExportedArchive", "Archiv exportiert"],
+    ["statusExportedSelectedCsv", "$1 ausgewaehlte als CSV exportiert"],
+    ["statusPreparingResultHtml", "Bereite Ergebnis-HTML vor"],
+    ["statusExportedMatchingHtml", "$1 Treffer als HTML exportiert"],
+    ["statusNoMatchingRecordsToExport", "Keine Treffer zum Exportieren"]
+  ]));
+  const selected = [{ id: "selected-1" }, { id: "selected-2" }];
+  const matching = [{ id: "match-1" }, { id: "match-2" }, { id: "match-3" }];
+  const harness = createBackupActionsHarness({
+    getMessage,
+    selected,
+    searchVisits: async () => ({ results: matching, total: matching.length }),
+    services: {
+      attachArchiveIntegrity: async (input) => ({
+        ...input,
+        integrity: { sha256: "abc123" }
+      }),
+      createBackupSelfTest: async () => ({
+        checksum: "verified",
+        countMatches: true,
+        records: 2,
+        status: "passed"
+      }),
+      downloadJson: async () => 512,
+      downloadText: async () => 256,
+      exportArchive: async (items) => items
+        ? {
+          exportedAt: archive.exportedAt,
+          counts: { visits: items.length },
+          visits: items
+        }
+        : archive,
+      now: () => new Date("2026-06-16T12:00:00.000Z"),
+      setMeta: async () => {},
+      visitsToCsv: () => "csv",
+      visitsToHtml: () => "html"
+    }
+  });
+
+  await harness.actions.exportAll();
+  await harness.actions.exportSelectedCsv();
+  await harness.actions.exportFilteredResultsHtml();
+
+  assert.deepEqual(harness.statuses, [
+    "Bereite Archiv vor",
+    "Archiv exportiert",
+    "2 ausgewaehlte als CSV exportiert",
+    "Bereite Ergebnis-HTML vor",
+    "3 Treffer als HTML exportiert"
+  ]);
+
+  const empty = createBackupActionsHarness({
+    getMessage,
+    searchVisits: async () => ({ results: [], total: 0 })
+  });
+  await empty.actions.exportFilteredResultsHtml();
+  assert.deepEqual(empty.statuses, [
+    "Bereite Ergebnis-HTML vor",
+    "Keine Treffer zum Exportieren"
+  ]);
 });
 
 test("full CSV and HTML exports use filenames without changing backup metadata", async () => {

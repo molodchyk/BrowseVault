@@ -99,6 +99,7 @@ export async function startBrowseVaultApp({ document: documentRef }) {
   const backupActions = createBackupActions({
     appState,
     elements,
+    getMessage: getChromeMessage,
     getSearchText: historySearchForm.getSearchText,
     notifyVaultChanged: (reason) => notifyVaultChanged(reason),
     refreshStats: displayPreferences.refreshStats,
