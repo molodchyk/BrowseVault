@@ -10,6 +10,7 @@ This folder captures the critical market research, user feedback, product direct
 - `research/implementation-notes.md` - Chrome extension constraints, architecture, storage/search/backup design, and testing risks.
 - `architecture/extension-modularization-playbook.md` - reusable extension modularization rules copied from Defense against Distractions.
 - `architecture/code-structure.md` - BrowseVault-specific ownership map and next split candidates.
+- `architecture/storage-ownership.md` - IndexedDB stores, metadata keys, Chrome local storage keys, owners, retention, migration, and quota notes.
 - `release/reviewer-notes.md` - browser-store reviewer notes for limitations, permissions, package behavior, and user-data handling.
 - `release/browser-extension-playbook-compliance.md` - evidence matrix mapping BrowseVault to the shared browser-extension playbook.
 - `release/browser-extension-playbook-audit.md` - requirement-by-requirement release audit separating verified evidence from manual browser evidence still needed.

@@ -125,6 +125,7 @@ export function validatePlaybookCompliance(root, assert) {
     "automated gate and manual target-browser QA checklist",
     "research/source-inventory.md",
     "architecture/code-structure.md",
+    "architecture/storage-ownership.md",
     "Browser Extension Playbook",
     "StorePilot Project Reference"
   ]) {
@@ -145,6 +146,41 @@ export function validatePlaybookCompliance(root, assert) {
       codeStructure.includes("dynamic history-result UI status keys") &&
       codeStructure.includes("dynamic vault-management action/rule UI keys"),
     "Code structure doc must document dynamic Backup/Import, Quick Open, display-preference summary, history-results, and vault-management localization coverage."
+  );
+  assert(
+    codeStructure.includes("storage-ownership.md") &&
+      codeStructure.includes("known storage keys remain documented"),
+    "Code structure doc must document the storage ownership map and validation guardrail."
+  );
+
+  const storageOwnership = fs.readFileSync(path.join(root, "docs", "architecture", "storage-ownership.md"), "utf8");
+  for (const expected of [
+    "Database: `browsevault`",
+    "Version: `1`",
+    "`visits` store",
+    "`rules` store",
+    "`meta.activityLog`",
+    "`meta.installedAt`",
+    "`meta.lastBackup`",
+    "`meta.lastChromeSync`",
+    "`meta.lastImport`",
+    "`meta.lastLiveCapture`",
+    "`meta.lastNativeHistoryClear`",
+    "`meta.lastStorageSelfCheck`",
+    "`meta.lastVaultDelete`",
+    "`meta.lastVaultRestore`",
+    "`meta.savedSearches`",
+    "`browseVault.preferences`",
+    "`browseVault.vaultInvalidation`",
+    "migration tests",
+    "Quota risk"
+  ]) {
+    assert(storageOwnership.includes(expected), `Storage ownership doc missing: ${expected}`);
+  }
+  assert(
+    storageOwnership.includes("chrome.storage.local") &&
+      storageOwnership.includes("not sync/session/managed storage"),
+    "Storage ownership doc must name Chrome local storage and preserve sync/session/managed-storage review guidance."
   );
 
   const localeCheckScript = fs.readFileSync(path.join(root, "scripts", "check-locales.mjs"), "utf8");

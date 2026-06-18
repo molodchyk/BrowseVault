@@ -58,7 +58,7 @@ This file maps BrowseVault release evidence to the shared browser-extension play
 | Playbook expectation | BrowseVault evidence |
 | --- | --- |
 | Exact browser permissions are listed and justified. | `PRIVACY.md`, `docs/chrome-web-store-privacy-form.md`, `docs/release/reviewer-notes.md`. |
-| Storage areas are named. | `PRIVACY.md` states archive storage in IndexedDB and preferences/metadata in Chrome local extension storage. |
+| Storage areas and keys have owners. | `PRIVACY.md` states archive storage in IndexedDB and preferences/metadata in Chrome local extension storage; `docs/architecture/storage-ownership.md` maps stores, metadata keys, Chrome local keys, owners, migration paths, retention/pruning, and quota risk. |
 | Network, analytics, ads, tracking, content scripts, and remote code are disclosed. | `PRIVACY.md`; `scripts/validate-extension.mjs`; `scripts/check-privacy-permissions.mjs`; `scripts/verify-package.mjs`. |
 | Privacy stays aligned with manifest and package output. | `npm run validate`, `npm run check`, `npm run package`, `npm run verify:package`. |
 

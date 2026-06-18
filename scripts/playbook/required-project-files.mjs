@@ -63,6 +63,7 @@ export const requiredProjectFiles = [
   "docs/README.md",
   "docs/architecture/code-structure.md",
   "docs/architecture/extension-modularization-playbook.md",
+  "docs/architecture/storage-ownership.md",
   "docs/project/decision-records.md",
   "docs/project/repository-metadata.md",
   "docs/chrome-web-store-media.md",
