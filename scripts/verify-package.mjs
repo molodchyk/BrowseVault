@@ -34,6 +34,7 @@ const requiredEntries = [
   "src/browser-memory.js",
   "src/export-format.js"
 ];
+const packageSourceRoots = ["manifest.json", "_locales", "src", "assets", "README.md", "PRIVACY.md", "LICENSE"];
 
 const disallowedEntryPatterns = [
   /^docs\//,
@@ -66,6 +67,34 @@ function assert(condition, message) {
   if (!condition) {
     throw new Error(message);
   }
+}
+
+function collectSourceFiles(entry, prefix = "") {
+  const fullPath = path.join(root, entry);
+  const stat = fs.statSync(fullPath);
+
+  if (stat.isFile()) {
+    return [{ fullPath, zipPath: path.join(prefix, path.basename(entry)).replaceAll("\\", "/") }];
+  }
+
+  return fs
+    .readdirSync(fullPath)
+    .flatMap((child) => collectSourceFiles(path.join(entry, child), path.join(prefix, path.basename(entry))));
+}
+
+function shouldPackageSourceFile(file) {
+  if (file.zipPath.startsWith("src/") && path.extname(file.zipPath).toLowerCase() === ".md") {
+    return false;
+  }
+
+  return true;
+}
+
+function collectExpectedPackageFiles() {
+  return packageSourceRoots
+    .flatMap((entry) => collectSourceFiles(entry))
+    .filter(shouldPackageSourceFile)
+    .sort((left, right) => left.zipPath.localeCompare(right.zipPath));
 }
 
 function readZipEntries(buffer) {
@@ -247,13 +276,27 @@ assert(fs.existsSync(packagePath), `Missing package: ${packagePath}`);
 const entries = readZipEntries(fs.readFileSync(packagePath));
 const entryNames = entries.map((entry) => entry.name).sort((left, right) => left.localeCompare(right));
 const entrySet = new Set(entryNames);
+const entryByName = new Map(entries.map((entry) => [entry.name, entry]));
 
 assert(entries.length > 0, "Package ZIP cannot be empty.");
 for (const required of requiredEntries) {
   assert(entrySet.has(required), `Package missing required entry: ${required}`);
 }
 
+const expectedPackageFiles = collectExpectedPackageFiles();
+const expectedPackageSet = new Set(expectedPackageFiles.map((file) => file.zipPath));
+
+for (const expectedFile of expectedPackageFiles) {
+  const packagedEntry = entryByName.get(expectedFile.zipPath);
+  assert(packagedEntry, `Package missing current source file: ${expectedFile.zipPath}`);
+  assert(
+    packagedEntry.data.equals(fs.readFileSync(expectedFile.fullPath)),
+    `Package entry does not match current source file: ${expectedFile.zipPath}`
+  );
+}
+
 for (const entryName of entryNames) {
+  assert(expectedPackageSet.has(entryName), `Package contains entry not present in current source tree: ${entryName}`);
   assert(
     entryName === "manifest.json"
       || entryName === "README.md"

@@ -103,22 +103,15 @@ assert(packageJson.scripts["verify:package"]?.includes("verify-package.mjs"), "M
 
 const verifyPackageScript = fs.readFileSync(path.join(root, "scripts", "verify-package.mjs"), "utf8");
 for (const expected of [
-  "Package import missing target",
-  "Package module script missing target",
-  "Packaged extension entry must not use bare imports",
-  "Package manifest",
-  "references missing entry"
+  "Package import missing target", "Package module script missing target", "Packaged extension entry must not use bare imports",
+  "Package manifest", "references missing entry", "Package missing current source file", "Package entry does not match current source file",
+  "Package contains entry not present in current source tree"
 ]) {
   assert(verifyPackageScript.includes(expected), `Package verifier missing import-resolution guardrail: ${expected}`);
 }
 
 const fileSizeScript = fs.readFileSync(path.join(root, "scripts", "check-file-sizes.mjs"), "utf8");
-for (const expected of [
-  "knownDebtCaps",
-  "soft target",
-  "hard max",
-  "split follow-up expected"
-]) {
+for (const expected of ["knownDebtCaps", "soft target", "hard max", "split follow-up expected"]) {
   assert(fileSizeScript.includes(expected), `File-size audit missing modularization guardrail: ${expected}`);
 }
 

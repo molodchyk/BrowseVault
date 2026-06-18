@@ -66,5 +66,5 @@ This file maps BrowseVault release evidence to the shared browser-extension play
 | Playbook expectation | BrowseVault evidence |
 | --- | --- |
 | Reviewer notes cover browser-controlled limits. | `docs/release/reviewer-notes.md`. |
-| Narrow checks inspect the release package. | `docs/release/release-qa.md`; `scripts/package-extension.mjs`; `scripts/verify-package.mjs`. |
+| Narrow checks inspect the release package. | `docs/release/release-qa.md`; `scripts/package-extension.mjs`; `scripts/verify-package.mjs` verifies required entries, static imports, locale references, remote-code/network patterns, and exact package freshness against the current source tree. |
 | Load the unpacked extension before release. | `docs/release/release-qa.md` records this as a required manual check when local focus-blocking tools prevent reliable automated Chrome runs. |

@@ -32,6 +32,7 @@ Expected results:
 - unit tests pass;
 - `dist/browsevault-1.0.0.zip` is produced;
 - package ZIP verification passes, including packaged manifest path, locale message, static import, and module script target checks;
+- package ZIP verification rejects missing, extra, or stale entries that do not match the current source tree;
 - package contains runtime extension files, root user-facing docs, and `_locales/en/messages.json`;
 - package excludes repository research, tests, scripts, docs, StorePilot files, and build metadata.
 - release readiness passes only after manual target-browser evidence is recorded in `manual-browser-qa-checklist.md`.
