@@ -10,6 +10,7 @@ export const evidenceHeaderLabels = [
 
 export const expectedAutomatedGateChecks = [
   "npm run store:media",
+  "npm run check:store-media",
   "npm run validate",
   "npm run check",
   "npm test",

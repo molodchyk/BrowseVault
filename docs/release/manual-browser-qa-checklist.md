@@ -46,6 +46,7 @@ Record `Pass`, `Fail`, or `Not run` plus notes for each command. These commands 
 | Command | Result | Notes |
 | --- | --- | --- |
 | npm run store:media | Not run | |
+| npm run check:store-media | Not run | |
 | npm run validate | Not run | |
 | npm run check | Not run | |
 | npm test | Not run | |

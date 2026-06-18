@@ -188,6 +188,7 @@ npm run check
 npm test
 npm run icons
 npm run store:media
+npm run check:store-media
 npm run package
 npm run verify:package
 npm run release:ready
@@ -198,6 +199,8 @@ npm run release:ready
 `npm run check` verifies JavaScript syntax, static JavaScript imports, stylesheet imports, extension-page module script and stylesheet paths, manifest and extension UI locale message coverage, manifest file paths, privacy/permission disclosure parity, Chrome QA profile-safety guardrails, shared reference sync, store metadata sync, store media dimensions, direct playbook-compliance evidence, file-size budgets, and folder-density budgets so flat runtime/support and documentation folders stay at 12 files or fewer, while feature folders and feature test folders stay at 15 files or fewer before being split again. File-size debt is reported as warnings, and known hard-limit debt is capped so it cannot grow unnoticed.
 
 `npm run store:media` regenerates the Chrome Web Store promo PNGs in `store-listing/chrome-web-store/media/promo/`. It uses Python with Pillow as a development-only asset tool; the generated PNGs are committed and are not part of the extension runtime dependency graph.
+
+`npm run check:store-media` verifies the committed Chrome Web Store screenshots and promo images have the required dimensions.
 
 `npm run package` writes `dist/browsevault-1.0.0.zip` and verifies the final ZIP contents, including packaged manifest paths, locale messages, static import targets, module script targets, and exact freshness against the current source tree.
 

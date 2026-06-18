@@ -10,6 +10,7 @@ Last verified for `1.0.0`:
 
 ```text
 npm run store:media
+npm run check:store-media
 npm run validate
 npm run check
 npm test
@@ -28,6 +29,7 @@ Expected results:
 
 - extension validation passes;
 - Chrome Web Store promo PNGs regenerate at the required `440 x 280` and `1400 x 560` dimensions;
+- Chrome Web Store screenshots and promo images pass direct dimension validation;
 - JavaScript syntax, static import resolution, extension-page module script path, manifest and extension UI locale coverage, manifest path, privacy/permission disclosure parity, file-size budget, and runtime/test/script/docs folder-density checks pass;
 - shared reference sync checks pass for the browser-extension playbook snapshot, local modularization playbook copy, and StorePilot reference snapshot when those workspace sources are available;
 - store metadata sync checks pass across the human store draft, StorePilot detailed description, manifest locale strings, package metadata, and repository metadata;
