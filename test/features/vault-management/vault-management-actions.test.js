@@ -5,6 +5,19 @@ import {
   fakeElement
 } from "./vault-management-actions-harness.js";
 
+function messageGetter(messages) {
+  return (key, substitutions = []) => {
+    const value = messages.get(key);
+    if (!value) {
+      return "";
+    }
+    return substitutions.reduce(
+      (text, substitution, index) => text.replace(`$${index + 1}`, substitution),
+      value
+    );
+  };
+}
+
 test("addCategoryRule stores a manual domain category and refreshes visible results", async () => {
   const added = [];
   const activity = [];
@@ -36,6 +49,61 @@ test("addCategoryRule stores a manual domain category and refreshes visible resu
     count: 1,
     detail: "example.com as Research"
   }]]);
+});
+
+test("vault management actions localize confirmations and statuses", async () => {
+  const confirmations = [];
+  const messages = new Map([
+    ["confirmBlacklistSelectedDomainOne", "blockiere $1 domain?"],
+    ["statusBlacklistedDomainsOne", "domain blockiert $1"],
+    ["confirmDeleteSelectedVaultRecordsOne", "loesche $1 record?"],
+    ["statusDeletedVaultRecordsOne", "vault geloescht $1"],
+    ["statusRetentionPreviewMany", "alt $1 tage $2"],
+    ["confirmRetentionCleanupMany", "retention $1 $2?"],
+    ["statusCleanedRetentionMany", "retention fertig $1"],
+    ["confirmResetVault", "reset?"],
+    ["statusBrowseVaultLocalDataErased", "vault reset erledigt"]
+  ]);
+  const { actions, statuses } = createVaultManagementActionsHarness({
+    getMessage: messageGetter(messages),
+    selected: [{ domain: "example.com" }],
+    selectedIds: ["visit-1"],
+    services: {
+      addDomainRule: async () => {},
+      clearVaultData: async () => {},
+      confirmAction: (message) => {
+        confirmations.push(message);
+        return true;
+      },
+      getRetentionCleanupCandidates: async () => [{ id: "old-1" }, { id: "old-2" }],
+      getRules: async () => ({
+        rules: [],
+        blacklist: [],
+        whitelist: []
+      }),
+      markDeletedByIds: async (ids) => ids.length
+    }
+  });
+
+  await actions.blacklistSelectedDomains();
+  await actions.deleteFromVault();
+  await actions.previewRetentionCleanup();
+  await actions.cleanupByRetention();
+  await actions.resetVault();
+
+  assert.deepEqual(confirmations, [
+    "blockiere 1 domain?",
+    "loesche 1 record?",
+    "retention 2 30?",
+    "reset?"
+  ]);
+  assert.deepEqual(statuses, [
+    "domain blockiert 1",
+    "vault geloescht 1",
+    "alt 2 tage 30",
+    "retention fertig 2",
+    "vault reset erledigt"
+  ]);
 });
 
 test("blacklistSelectedDomains adds unique selected domains and reports whitelist moves", async () => {

@@ -17,7 +17,9 @@ import {
   uniqueUrlsForItems
 } from "../../history-results/core/results.js";
 import { sendRuntimeMessage } from "../../../platform/chrome/runtime.js";
+import { createCleanupActions } from "./cleanup-actions.js";
 import { deleteChromeUrls } from "./chrome-delete.js";
+import { chromeUrlLabel, currentResultLabel, localizedCountMessage, localizedMessage, localizedRuleType, selectedRecordLabel } from "./localized-messages.js";
 import { renderRuleList } from "./render-rules.js";
 
 const defaultServices = {
@@ -39,15 +41,6 @@ const defaultServices = {
   uniqueDomainsForItems,
   uniqueUrlsForItems
 };
-
-function localizedMessage(getMessage, key, fallback, substitutions) {
-  return getMessage?.(key, substitutions) || fallback;
-}
-
-function retentionDaysFromInput(value) {
-  const days = Number(value);
-  return Number.isInteger(days) && days >= 1 ? days : null;
-}
 
 export function createVaultManagementActions({
   appState,
@@ -71,6 +64,18 @@ export function createVaultManagementActions({
   async function recordActivity(event) {
     await deps.appendActivityLog(event);
   }
+
+  const cleanupActions = createCleanupActions({
+    appState,
+    deps,
+    elements,
+    getMessage,
+    notifyVaultChanged,
+    recordActivity,
+    refreshStats,
+    runSearch,
+    setStatus
+  });
 
   async function renderRules() {
     const { rules } = await deps.getRules();
@@ -99,19 +104,26 @@ export function createVaultManagementActions({
   async function blacklistSelectedDomains() {
     const items = await selectedResults();
     if (!items.length) {
-      setStatus("Select records first");
+      setStatus(localizedMessage(getMessage, "statusSelectRecordsFirst", "Select records first"));
       return;
     }
 
     const domains = deps.uniqueDomainsForItems(items);
     if (!domains.length) {
-      setStatus("Selected records have no domains to blacklist");
+      setStatus(localizedMessage(getMessage, "statusSelectedRecordsNoBlacklistDomains", "Selected records have no domains to blacklist"));
       return;
     }
 
     const message = `Blacklist ${domains.length} selected domain${domains.length === 1 ? "" : "s"} for future archiving? Existing vault records will stay until you delete them.`;
-    if (!deps.confirmAction(message)) {
-      setStatus("Blacklist canceled");
+    if (!deps.confirmAction(localizedCountMessage(
+      getMessage,
+      domains.length,
+      "confirmBlacklistSelectedDomainOne",
+      "confirmBlacklistSelectedDomainMany",
+      message,
+      message
+    ))) {
+      setStatus(localizedMessage(getMessage, "statusBlacklistCanceled", "Blacklist canceled"));
       return;
     }
 
@@ -130,18 +142,36 @@ export function createVaultManagementActions({
       detail: movedFromWhitelist ? `${movedFromWhitelist} moved from whitelist` : ""
     });
     await refreshStats();
-    setStatus(`Blacklisted ${domains.length} domain${domains.length === 1 ? "" : "s"} for future archiving.${movedLabel}`);
+    setStatus(localizedMessage(
+      getMessage,
+      movedFromWhitelist
+        ? domains.length === 1
+          ? "statusBlacklistedDomainsMovedOne"
+          : "statusBlacklistedDomainsMovedMany"
+        : domains.length === 1
+          ? "statusBlacklistedDomainsOne"
+          : "statusBlacklistedDomainsMany",
+      `Blacklisted ${domains.length} domain${domains.length === 1 ? "" : "s"} for future archiving.${movedLabel}`,
+      [String(domains.length), String(movedFromWhitelist)]
+    ));
     notifyVaultChanged("rule-added");
   }
 
   async function deleteFromVault() {
     const ids = [...appState.selectedIds];
     if (!ids.length) {
-      setStatus("Select records first");
+      setStatus(localizedMessage(getMessage, "statusSelectRecordsFirst", "Select records first"));
       return;
     }
 
-    if (!deps.confirmAction(`Delete ${ids.length} selected records from BrowseVault?`)) {
+    if (!deps.confirmAction(localizedCountMessage(
+      getMessage,
+      ids.length,
+      "confirmDeleteSelectedVaultRecordsOne",
+      "confirmDeleteSelectedVaultRecordsMany",
+      `Delete ${ids.length} selected records from BrowseVault?`,
+      `Delete ${ids.length} selected records from BrowseVault?`
+    ))) {
       return;
     }
 
@@ -155,14 +185,21 @@ export function createVaultManagementActions({
     appState.selectedIds.clear();
     await refreshStats();
     await runSearch();
-    setStatus(`Deleted ${deleted} records from vault`);
+    setStatus(localizedCountMessage(
+      getMessage,
+      deleted,
+      "statusDeletedVaultRecordsOne",
+      "statusDeletedVaultRecordsMany",
+      `Deleted ${deleted} records from vault`,
+      `Deleted ${deleted} records from vault`
+    ));
     notifyVaultChanged("vault-delete");
   }
 
   async function deleteCurrentResultsFromVault() {
     const queryText = getSearchText().trim();
     if (!queryText) {
-      setStatus("Enter a query or date filter before deleting current results");
+      setStatus(localizedMessage(getMessage, "statusEnterSearchBeforeDeletingCurrentResults", "Enter a query or date filter before deleting current results"));
       return;
     }
 
@@ -171,13 +208,21 @@ export function createVaultManagementActions({
     });
 
     if (!results.length) {
-      setStatus("No matching vault records to delete");
+      setStatus(localizedMessage(getMessage, "statusNoMatchingVaultRecordsToDelete", "No matching vault records to delete"));
       return;
     }
 
     const message = `Delete ${total} current result${total === 1 ? "" : "s"} from BrowseVault for "${queryText}"? This will not delete Chrome history and can be undone.`;
-    if (!deps.confirmAction(message)) {
-      setStatus("Current result deletion canceled");
+    if (!deps.confirmAction(localizedCountMessage(
+      getMessage,
+      total,
+      "confirmDeleteCurrentResultsVaultOne",
+      "confirmDeleteCurrentResultsVaultMany",
+      message,
+      message,
+      [queryText]
+    ))) {
+      setStatus(localizedMessage(getMessage, "statusCurrentResultDeletionCanceled", "Current result deletion canceled"));
       return;
     }
 
@@ -191,14 +236,21 @@ export function createVaultManagementActions({
     appState.selectedIds.clear();
     await refreshStats();
     await runSearch();
-    setStatus(`Deleted ${deleted} current result${deleted === 1 ? "" : "s"} from vault`);
+    setStatus(localizedCountMessage(
+      getMessage,
+      deleted,
+      "statusDeletedCurrentVaultResultsOne",
+      "statusDeletedCurrentVaultResultsMany",
+      `Deleted ${deleted} current result${deleted === 1 ? "" : "s"} from vault`,
+      `Deleted ${deleted} current result${deleted === 1 ? "" : "s"} from vault`
+    ));
     notifyVaultChanged("vault-delete");
   }
 
   async function deleteCurrentResultsFromChrome() {
     const queryText = getSearchText().trim();
     if (!queryText) {
-      setStatus("Enter a query or date filter before deleting current results from Chrome");
+      setStatus(localizedMessage(getMessage, "statusEnterSearchBeforeDeletingCurrentResultsChrome", "Enter a query or date filter before deleting current results from Chrome"));
       return;
     }
 
@@ -207,19 +259,24 @@ export function createVaultManagementActions({
     });
 
     if (!results.length) {
-      setStatus("No matching vault records to delete from Chrome");
+      setStatus(localizedMessage(getMessage, "statusNoMatchingVaultRecordsToDeleteFromChrome", "No matching vault records to delete from Chrome"));
       return;
     }
 
     const urls = deps.uniqueUrlsForItems(results);
     if (!urls.length) {
-      setStatus("Matching vault records have no URLs to delete from Chrome");
+      setStatus(localizedMessage(getMessage, "statusMatchingVaultRecordsNoChromeUrls", "Matching vault records have no URLs to delete from Chrome"));
       return;
     }
 
     const message = `Delete ${urls.length} URL${urls.length === 1 ? "" : "s"} from Chrome history and ${total} current BrowseVault result${total === 1 ? "" : "s"} for "${queryText}"? Chrome deletion removes by URL and cannot be undone by BrowseVault.`;
-    if (!deps.confirmAction(message)) {
-      setStatus("Current result Chrome deletion canceled");
+    if (!deps.confirmAction(localizedMessage(
+      getMessage,
+      "confirmDeleteCurrentResultsChrome",
+      message,
+      [chromeUrlLabel(urls.length, getMessage), currentResultLabel(total, getMessage), queryText]
+    ))) {
+      setStatus(localizedMessage(getMessage, "statusCurrentResultChromeDeletionCanceled", "Current result Chrome deletion canceled"));
       return;
     }
 
@@ -234,20 +291,32 @@ export function createVaultManagementActions({
     appState.selectedIds.clear();
     await refreshStats();
     await runSearch();
-    setStatus(`Deleted ${deleted} current result${deleted === 1 ? "" : "s"} from Chrome and vault`);
+    setStatus(localizedCountMessage(
+      getMessage,
+      deleted,
+      "statusDeletedCurrentResultsChromeVaultOne",
+      "statusDeletedCurrentResultsChromeVaultMany",
+      `Deleted ${deleted} current result${deleted === 1 ? "" : "s"} from Chrome and vault`,
+      `Deleted ${deleted} current result${deleted === 1 ? "" : "s"} from Chrome and vault`
+    ));
     notifyVaultChanged("chrome-and-vault-delete");
   }
 
   async function deleteFromChrome() {
     const items = await selectedResults();
     if (!items.length) {
-      setStatus("Select records first");
+      setStatus(localizedMessage(getMessage, "statusSelectRecordsFirst", "Select records first"));
       return;
     }
 
     const urls = deps.uniqueUrlsForItems(items);
 
-    if (!deps.confirmAction(`Delete ${urls.length} selected URL${urls.length === 1 ? "" : "s"} from Chrome history and ${items.length} selected record${items.length === 1 ? "" : "s"} from BrowseVault? Chrome deletion removes history by URL.`)) {
+    if (!deps.confirmAction(localizedMessage(
+      getMessage,
+      "confirmDeleteSelectedChromeUrls",
+      `Delete ${urls.length} selected URL${urls.length === 1 ? "" : "s"} from Chrome history and ${items.length} selected record${items.length === 1 ? "" : "s"} from BrowseVault? Chrome deletion removes history by URL.`,
+      [chromeUrlLabel(urls.length, getMessage), selectedRecordLabel(items.length, getMessage)]
+    ))) {
       return;
     }
 
@@ -262,7 +331,14 @@ export function createVaultManagementActions({
     appState.selectedIds.clear();
     await refreshStats();
     await runSearch();
-    setStatus(`Deleted ${deleted} records from Chrome and vault`);
+    setStatus(localizedCountMessage(
+      getMessage,
+      deleted,
+      "statusDeletedRecordsChromeVaultOne",
+      "statusDeletedRecordsChromeVaultMany",
+      `Deleted ${deleted} records from Chrome and vault`,
+      `Deleted ${deleted} records from Chrome and vault`
+    ));
     notifyVaultChanged("chrome-and-vault-delete");
   }
 
@@ -271,7 +347,7 @@ export function createVaultManagementActions({
     const ids = stats.meta.lastVaultDelete?.ids || [];
 
     if (!ids.length) {
-      setStatus("No vault delete to undo");
+      setStatus(localizedMessage(getMessage, "statusNoVaultDeleteToUndo", "No vault delete to undo"));
       return;
     }
 
@@ -283,7 +359,14 @@ export function createVaultManagementActions({
     });
     await refreshStats();
     await runSearch();
-    setStatus(`Restored ${restored} vault record${restored === 1 ? "" : "s"}`);
+    setStatus(localizedCountMessage(
+      getMessage,
+      restored,
+      "statusRestoredVaultRecordOne",
+      "statusRestoredVaultRecordMany",
+      `Restored ${restored} vault record${restored === 1 ? "" : "s"}`,
+      `Restored ${restored} vault record${restored === 1 ? "" : "s"}`
+    ));
     notifyVaultChanged("vault-restore");
   }
 
@@ -299,7 +382,7 @@ export function createVaultManagementActions({
     elements.ruleDomain.value = "";
     await renderRules();
     await refreshStats();
-    setStatus(`Added ${type} rule`);
+    setStatus(localizedMessage(getMessage, "statusAddedDomainRule", `Added ${type} rule`, [localizedRuleType(type, getMessage)]));
     notifyVaultChanged("rule-added");
   }
 
@@ -318,98 +401,16 @@ export function createVaultManagementActions({
     await renderRules();
     await refreshStats();
     await runSearch();
-    setStatus(`Categorized ${rule.value} as ${rule.category}`);
+    setStatus(localizedMessage(getMessage, "statusCategorizedDomain", `Categorized ${rule.value} as ${rule.category}`, [rule.value, rule.category]));
     notifyVaultChanged("rule-added");
   }
 
-  async function previewRetentionCleanup() {
-    const retentionDays = retentionDaysFromInput(elements.retentionDays.value);
-    if (!retentionDays) {
-      setStatus("Enter retention days of 1 or more");
-      return;
-    }
-
-    const candidates = await deps.getRetentionCleanupCandidates(retentionDays);
-    if (!candidates.length) {
-      setStatus(`No cleanup candidates older than ${retentionDays} days`);
-      return;
-    }
-
-    setStatus(`${candidates.length} vault record${candidates.length === 1 ? "" : "s"} older than ${retentionDays} days can be cleaned up. Whitelisted domains are kept.`);
-  }
-
-  async function cleanupByRetention() {
-    const retentionDays = retentionDaysFromInput(elements.retentionDays.value);
-    if (!retentionDays) {
-      setStatus("Enter retention days of 1 or more");
-      return;
-    }
-
-    const candidates = await deps.getRetentionCleanupCandidates(retentionDays);
-    if (!candidates.length) {
-      setStatus(`No cleanup candidates older than ${retentionDays} days`);
-      return;
-    }
-
-    const message = `Move ${candidates.length} vault record${candidates.length === 1 ? "" : "s"} older than ${retentionDays} days to undoable deletion? Whitelisted domains will be kept.`;
-    if (!deps.confirmAction(message)) {
-      setStatus("Retention cleanup canceled");
-      return;
-    }
-
-    const deleted = await deps.markDeletedByIds(candidates.map((visit) => visit.id));
-    await recordActivity({
-      type: "cleanup",
-      label: "Retention cleanup",
-      count: deleted,
-      detail: `${retentionDays} days`
-    });
-    appState.selectedIds.clear();
-    await refreshStats();
-    await runSearch();
-    setStatus(`Cleaned up ${deleted} old vault record${deleted === 1 ? "" : "s"}. Whitelisted domains kept.`);
-    notifyVaultChanged("vault-cleanup");
-  }
-
-  async function previewDuplicateCleanup() {
-    const candidates = await deps.getDuplicateCleanupCandidates();
-    if (!candidates.length) {
-      setStatus("No duplicate vault records found");
-      return;
-    }
-
-    setStatus(`${candidates.length} duplicate vault record${candidates.length === 1 ? "" : "s"} can be cleaned up. One record per URL and visit time is kept.`);
-  }
-
-  async function cleanupDuplicates() {
-    const candidates = await deps.getDuplicateCleanupCandidates();
-    if (!candidates.length) {
-      setStatus("No duplicate vault records found");
-      return;
-    }
-
-    const message = `Move ${candidates.length} duplicate vault record${candidates.length === 1 ? "" : "s"} to undoable deletion? One record per matching URL and visit time will be kept.`;
-    if (!deps.confirmAction(message)) {
-      setStatus("Duplicate cleanup canceled");
-      return;
-    }
-
-    const deleted = await deps.markDeletedByIds(candidates.map((visit) => visit.id));
-    await recordActivity({
-      type: "cleanup",
-      label: "Duplicate cleanup",
-      count: deleted,
-      detail: "Same URL and visit time"
-    });
-    appState.selectedIds.clear();
-    await refreshStats();
-    await runSearch();
-    setStatus(`Cleaned up ${deleted} duplicate vault record${deleted === 1 ? "" : "s"}`);
-    notifyVaultChanged("vault-cleanup");
-  }
-
   async function resetVault() {
-    if (!deps.confirmAction("Erase all BrowseVault local archive data, rules, and backup metadata? This will not delete Chrome history.")) {
+    if (!deps.confirmAction(localizedMessage(
+      getMessage,
+      "confirmResetVault",
+      "Erase all BrowseVault local archive data, rules, and backup metadata? This will not delete Chrome history."
+    ))) {
       return;
     }
 
@@ -426,7 +427,7 @@ export function createVaultManagementActions({
     await refreshStats();
     await renderRules();
     await runSearch();
-    setStatus("BrowseVault local data erased");
+    setStatus(localizedMessage(getMessage, "statusBrowseVaultLocalDataErased", "BrowseVault local data erased"));
     notifyVaultChanged("vault-reset");
   }
 
@@ -434,14 +435,11 @@ export function createVaultManagementActions({
     addCategoryRule: addCategoryRuleAction,
     addRule,
     blacklistSelectedDomains,
-    cleanupDuplicates,
-    cleanupByRetention,
+    ...cleanupActions,
     deleteCurrentResultsFromChrome,
     deleteCurrentResultsFromVault,
     deleteFromChrome,
     deleteFromVault,
-    previewDuplicateCleanup,
-    previewRetentionCleanup,
     renderRules,
     resetVault,
     undoVaultDelete

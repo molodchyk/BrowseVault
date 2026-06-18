@@ -434,7 +434,7 @@ for (const [id, label] of [
   assertButtonLabel(appHtml, id, label);
 }
 
-const vaultActions = fs.readFileSync(path.join(root, "src", "features", "vault-management", "ui", "actions.js"), "utf8");
+const vaultActionSurface = ["actions.js", "cleanup-actions.js"].map((file) => fs.readFileSync(path.join(root, "src", "features", "vault-management", "ui", file), "utf8")).join("\n");
 for (const expected of [
   "Erase all BrowseVault local archive data, rules, and backup metadata? This will not delete Chrome history.",
   "Chrome history untouched",
@@ -443,7 +443,7 @@ for (const expected of [
   'notifyVaultChanged("vault-cleanup")',
   'notifyVaultChanged("vault-reset")'
 ]) {
-  assert(vaultActions.includes(expected), `Vault actions missing destructive-action guardrail: ${expected}`);
+  assert(vaultActionSurface.includes(expected), `Vault actions missing destructive-action guardrail: ${expected}`);
 }
 
 const sourceFiles = collectFilesByExtension("src", new Set([".js", ".html", ".css"]));

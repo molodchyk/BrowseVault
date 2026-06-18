@@ -142,7 +142,7 @@ export function validatePlaybookCompliance(root, assert) {
       codeStructure.includes("dynamic Backup/Import export status keys") &&
       codeStructure.includes("dynamic display-preference status and summary keys") &&
       codeStructure.includes("dynamic history-result UI status keys") &&
-      codeStructure.includes("dynamic vault-management rule UI keys"),
+      codeStructure.includes("dynamic vault-management action/rule UI keys"),
     "Code structure doc must document dynamic Backup/Import, Quick Open, display-preference summary, history-results, and vault-management localization coverage."
   );
 

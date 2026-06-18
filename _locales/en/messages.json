@@ -1307,6 +1307,548 @@
       }
     }
   },
+  "chromeUrlLabelOne": {
+    "message": "$COUNT$ URL",
+    "description": "Reusable count label for one Chrome history URL.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "chromeUrlLabelMany": {
+    "message": "$COUNT$ URLs",
+    "description": "Reusable count label for multiple Chrome history URLs.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "4"
+      }
+    }
+  },
+  "currentBrowseVaultResultLabelOne": {
+    "message": "$COUNT$ current BrowseVault result",
+    "description": "Reusable count label for one current BrowseVault search result.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "currentBrowseVaultResultLabelMany": {
+    "message": "$COUNT$ current BrowseVault results",
+    "description": "Reusable count label for multiple current BrowseVault search results.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "4"
+      }
+    }
+  },
+  "selectedBrowseVaultRecordLabelOne": {
+    "message": "$COUNT$ selected record",
+    "description": "Reusable count label for one selected BrowseVault record.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "selectedBrowseVaultRecordLabelMany": {
+    "message": "$COUNT$ selected records",
+    "description": "Reusable count label for multiple selected BrowseVault records.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "4"
+      }
+    }
+  },
+  "statusSelectedRecordsNoBlacklistDomains": {
+    "message": "Selected records have no domains to blacklist",
+    "description": "Status shown when selected BrowseVault records do not expose domains for blacklist rules."
+  },
+  "confirmBlacklistSelectedDomainOne": {
+    "message": "Blacklist $COUNT$ selected domain for future archiving? Existing vault records will stay until you delete them.",
+    "description": "Confirmation shown before adding one selected domain to the blacklist.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "confirmBlacklistSelectedDomainMany": {
+    "message": "Blacklist $COUNT$ selected domains for future archiving? Existing vault records will stay until you delete them.",
+    "description": "Confirmation shown before adding selected domains to the blacklist.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "statusBlacklistCanceled": {
+    "message": "Blacklist canceled",
+    "description": "Status shown after the user cancels adding selected domains to the blacklist."
+  },
+  "statusBlacklistedDomainsOne": {
+    "message": "Blacklisted $COUNT$ domain for future archiving.",
+    "description": "Status shown after BrowseVault blacklists one selected domain.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "statusBlacklistedDomainsMany": {
+    "message": "Blacklisted $COUNT$ domains for future archiving.",
+    "description": "Status shown after BrowseVault blacklists selected domains.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "statusBlacklistedDomainsMovedOne": {
+    "message": "Blacklisted $COUNT$ domain for future archiving. $MOVED$ moved from whitelist.",
+    "description": "Status shown after BrowseVault blacklists one domain and moves whitelist entries.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      },
+      "moved": {
+        "content": "$2",
+        "example": "1"
+      }
+    }
+  },
+  "statusBlacklistedDomainsMovedMany": {
+    "message": "Blacklisted $COUNT$ domains for future archiving. $MOVED$ moved from whitelist.",
+    "description": "Status shown after BrowseVault blacklists selected domains and moves whitelist entries.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      },
+      "moved": {
+        "content": "$2",
+        "example": "1"
+      }
+    }
+  },
+  "confirmDeleteSelectedVaultRecordsOne": {
+    "message": "Delete $COUNT$ selected record from BrowseVault?",
+    "description": "Confirmation shown before deleting one selected record from BrowseVault.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "confirmDeleteSelectedVaultRecordsMany": {
+    "message": "Delete $COUNT$ selected records from BrowseVault?",
+    "description": "Confirmation shown before deleting selected records from BrowseVault.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "statusDeletedVaultRecordsOne": {
+    "message": "Deleted $COUNT$ record from vault",
+    "description": "Status shown after deleting one selected BrowseVault record.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "statusDeletedVaultRecordsMany": {
+    "message": "Deleted $COUNT$ records from vault",
+    "description": "Status shown after deleting selected BrowseVault records.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "statusEnterSearchBeforeDeletingCurrentResults": {
+    "message": "Enter a query or date filter before deleting current results",
+    "description": "Status shown when current-result vault deletion requires a search query or date filter."
+  },
+  "statusNoMatchingVaultRecordsToDelete": {
+    "message": "No matching vault records to delete",
+    "description": "Status shown when no BrowseVault records match current-result vault deletion."
+  },
+  "confirmDeleteCurrentResultsVaultOne": {
+    "message": "Delete $COUNT$ current result from BrowseVault for \"$QUERY$\"? This will not delete Chrome history and can be undone.",
+    "description": "Confirmation shown before deleting one current BrowseVault result from the vault.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      },
+      "query": {
+        "content": "$2",
+        "example": "site:example.com"
+      }
+    }
+  },
+  "confirmDeleteCurrentResultsVaultMany": {
+    "message": "Delete $COUNT$ current results from BrowseVault for \"$QUERY$\"? This will not delete Chrome history and can be undone.",
+    "description": "Confirmation shown before deleting current BrowseVault results from the vault.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "12"
+      },
+      "query": {
+        "content": "$2",
+        "example": "site:example.com"
+      }
+    }
+  },
+  "statusCurrentResultDeletionCanceled": {
+    "message": "Current result deletion canceled",
+    "description": "Status shown after canceling current-result vault deletion."
+  },
+  "statusDeletedCurrentVaultResultsOne": {
+    "message": "Deleted $COUNT$ current result from vault",
+    "description": "Status shown after deleting one current BrowseVault result from the vault.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "statusDeletedCurrentVaultResultsMany": {
+    "message": "Deleted $COUNT$ current results from vault",
+    "description": "Status shown after deleting current BrowseVault results from the vault.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
+  },
+  "statusEnterSearchBeforeDeletingCurrentResultsChrome": {
+    "message": "Enter a query or date filter before deleting current results from Chrome",
+    "description": "Status shown when current-result Chrome deletion requires a search query or date filter."
+  },
+  "statusNoMatchingVaultRecordsToDeleteFromChrome": {
+    "message": "No matching vault records to delete from Chrome",
+    "description": "Status shown when no BrowseVault records match current-result Chrome deletion."
+  },
+  "statusMatchingVaultRecordsNoChromeUrls": {
+    "message": "Matching vault records have no URLs to delete from Chrome",
+    "description": "Status shown when current-result Chrome deletion finds no URLs."
+  },
+  "confirmDeleteCurrentResultsChrome": {
+    "message": "Delete $URLS$ from Chrome history and $RESULTS$ for \"$QUERY$\"? Chrome deletion removes by URL and cannot be undone by BrowseVault.",
+    "description": "Confirmation shown before deleting current-result URLs from Chrome history and matching BrowseVault records.",
+    "placeholders": {
+      "urls": {
+        "content": "$1",
+        "example": "2 URLs"
+      },
+      "results": {
+        "content": "$2",
+        "example": "3 current BrowseVault results"
+      },
+      "query": {
+        "content": "$3",
+        "example": "site:example.com"
+      }
+    }
+  },
+  "statusCurrentResultChromeDeletionCanceled": {
+    "message": "Current result Chrome deletion canceled",
+    "description": "Status shown after canceling current-result Chrome history deletion."
+  },
+  "statusDeletedCurrentResultsChromeVaultOne": {
+    "message": "Deleted $COUNT$ current result from Chrome and vault",
+    "description": "Status shown after deleting one current result from Chrome history and BrowseVault.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "statusDeletedCurrentResultsChromeVaultMany": {
+    "message": "Deleted $COUNT$ current results from Chrome and vault",
+    "description": "Status shown after deleting current results from Chrome history and BrowseVault.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "confirmDeleteSelectedChromeUrls": {
+    "message": "Delete $URLS$ from Chrome history and $RECORDS$ from BrowseVault? Chrome deletion removes history by URL.",
+    "description": "Confirmation shown before deleting selected URLs from Chrome history and selected BrowseVault records.",
+    "placeholders": {
+      "urls": {
+        "content": "$1",
+        "example": "2 URLs"
+      },
+      "records": {
+        "content": "$2",
+        "example": "3 selected records"
+      }
+    }
+  },
+  "statusDeletedRecordsChromeVaultOne": {
+    "message": "Deleted $COUNT$ record from Chrome and vault",
+    "description": "Status shown after deleting one selected record from Chrome history and BrowseVault.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "statusDeletedRecordsChromeVaultMany": {
+    "message": "Deleted $COUNT$ records from Chrome and vault",
+    "description": "Status shown after deleting selected records from Chrome history and BrowseVault.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "statusNoVaultDeleteToUndo": {
+    "message": "No vault delete to undo",
+    "description": "Status shown when there is no previous BrowseVault delete action to undo."
+  },
+  "statusRestoredVaultRecordOne": {
+    "message": "Restored $COUNT$ vault record",
+    "description": "Status shown after restoring one deleted BrowseVault record.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "statusRestoredVaultRecordMany": {
+    "message": "Restored $COUNT$ vault records",
+    "description": "Status shown after restoring deleted BrowseVault records.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "statusAddedDomainRule": {
+    "message": "Added $TYPE$ rule",
+    "description": "Status shown after adding a blacklist or whitelist domain rule.",
+    "placeholders": {
+      "type": {
+        "content": "$1",
+        "example": "Blacklist"
+      }
+    }
+  },
+  "statusCategorizedDomain": {
+    "message": "Categorized $DOMAIN$ as $CATEGORY$",
+    "description": "Status shown after assigning a manual category to a domain.",
+    "placeholders": {
+      "domain": {
+        "content": "$1",
+        "example": "example.com"
+      },
+      "category": {
+        "content": "$2",
+        "example": "Research"
+      }
+    }
+  },
+  "statusEnterRetentionDays": {
+    "message": "Enter retention days of 1 or more",
+    "description": "Status shown when retention cleanup needs a positive day count."
+  },
+  "statusNoCleanupCandidatesOlderThan": {
+    "message": "No cleanup candidates older than $DAYS$ days",
+    "description": "Status shown when retention cleanup has no matching old BrowseVault records.",
+    "placeholders": {
+      "days": {
+        "content": "$1",
+        "example": "45"
+      }
+    }
+  },
+  "statusRetentionPreviewOne": {
+    "message": "$COUNT$ vault record older than $DAYS$ days can be cleaned up. Whitelisted domains are kept.",
+    "description": "Status shown when retention cleanup previews one old BrowseVault record.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      },
+      "days": {
+        "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+  "statusRetentionPreviewMany": {
+    "message": "$COUNT$ vault records older than $DAYS$ days can be cleaned up. Whitelisted domains are kept.",
+    "description": "Status shown when retention cleanup previews old BrowseVault records.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      },
+      "days": {
+        "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+  "confirmRetentionCleanupOne": {
+    "message": "Move $COUNT$ vault record older than $DAYS$ days to undoable deletion? Whitelisted domains will be kept.",
+    "description": "Confirmation shown before moving one old BrowseVault record to undoable deletion.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      },
+      "days": {
+        "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+  "confirmRetentionCleanupMany": {
+    "message": "Move $COUNT$ vault records older than $DAYS$ days to undoable deletion? Whitelisted domains will be kept.",
+    "description": "Confirmation shown before moving old BrowseVault records to undoable deletion.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      },
+      "days": {
+        "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+  "statusRetentionCleanupCanceled": {
+    "message": "Retention cleanup canceled",
+    "description": "Status shown after canceling retention cleanup."
+  },
+  "statusCleanedRetentionOne": {
+    "message": "Cleaned up $COUNT$ old vault record. Whitelisted domains kept.",
+    "description": "Status shown after retention cleanup deletes one old BrowseVault record.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "statusCleanedRetentionMany": {
+    "message": "Cleaned up $COUNT$ old vault records. Whitelisted domains kept.",
+    "description": "Status shown after retention cleanup deletes old BrowseVault records.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "statusNoDuplicateVaultRecords": {
+    "message": "No duplicate vault records found",
+    "description": "Status shown when duplicate cleanup finds no duplicate BrowseVault records."
+  },
+  "statusDuplicatePreviewOne": {
+    "message": "$COUNT$ duplicate vault record can be cleaned up. One record per URL and visit time is kept.",
+    "description": "Status shown when duplicate cleanup previews one duplicate BrowseVault record.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "statusDuplicatePreviewMany": {
+    "message": "$COUNT$ duplicate vault records can be cleaned up. One record per URL and visit time is kept.",
+    "description": "Status shown when duplicate cleanup previews duplicate BrowseVault records.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "confirmDuplicateCleanupOne": {
+    "message": "Move $COUNT$ duplicate vault record to undoable deletion? One record per matching URL and visit time will be kept.",
+    "description": "Confirmation shown before moving one duplicate BrowseVault record to undoable deletion.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "confirmDuplicateCleanupMany": {
+    "message": "Move $COUNT$ duplicate vault records to undoable deletion? One record per matching URL and visit time will be kept.",
+    "description": "Confirmation shown before moving duplicate BrowseVault records to undoable deletion.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "statusDuplicateCleanupCanceled": {
+    "message": "Duplicate cleanup canceled",
+    "description": "Status shown after canceling duplicate cleanup."
+  },
+  "statusCleanedDuplicateOne": {
+    "message": "Cleaned up $COUNT$ duplicate vault record",
+    "description": "Status shown after duplicate cleanup deletes one duplicate BrowseVault record.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "statusCleanedDuplicateMany": {
+    "message": "Cleaned up $COUNT$ duplicate vault records",
+    "description": "Status shown after duplicate cleanup deletes duplicate BrowseVault records.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "confirmResetVault": {
+    "message": "Erase all BrowseVault local archive data, rules, and backup metadata? This will not delete Chrome history.",
+    "description": "Confirmation shown before resetting BrowseVault local data."
+  },
+  "statusBrowseVaultLocalDataErased": {
+    "message": "BrowseVault local data erased",
+    "description": "Status shown after resetting BrowseVault local data."
+  },
   "displaySettingsLabel": {
     "message": "Display settings",
     "description": "Static BrowseVault extension-page UI string."
