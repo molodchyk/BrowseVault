@@ -58,6 +58,7 @@ export function validatePlaybookCompliance(root, assert) {
     "playbook/",
     "qa/",
     "zip-utils.mjs",
+    "test/scripts/",
     "activity-log/",
     "app-shell/",
     "background-runtime/",
@@ -68,6 +69,11 @@ export function validatePlaybookCompliance(root, assert) {
     assert(readme.includes(expected), `README project structure missing current tree entry: ${expected}`);
   }
   assert(readme.includes("Reset Vault"), "README must document the visible reset path before uninstall.");
+
+  const testReadme = fs.readFileSync(path.join(root, "test", "README.md"), "utf8");
+  for (const expected of ["features/", "platform/", "query/", "scripts/", "storage/"]) {
+    assert(testReadme.includes(expected), `Test README missing test responsibility folder: ${expected}`);
+  }
 
   const privacy = fs.readFileSync(path.join(root, "PRIVACY.md"), "utf8");
   assert(privacy.includes("Chrome local extension storage"), "Privacy policy must name the storage area used for settings.");

@@ -158,6 +158,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 │   ├── features/
 │   ├── platform/
 │   ├── query/
+│   ├── scripts/
 │   └── storage/
 ├── manifest.json
 ├── package.json
@@ -199,6 +200,8 @@ npm run release:ready
 `npm run package` writes `dist/browsevault-1.0.0.zip` and verifies the final ZIP contents, including packaged manifest paths, locale messages, static import targets, and module script targets.
 
 `npm run release:ready` is a final release gate for the browser-extension playbook's manual target-browser requirement. It intentionally fails until [`docs/release/manual-browser-qa-checklist.md`](docs/release/manual-browser-qa-checklist.md) records a passed load-unpacked check in the target browser.
+
+Release guardrail tests live in `test/scripts/`.
 
 ## Current Search Syntax
 

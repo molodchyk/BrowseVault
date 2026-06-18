@@ -92,5 +92,6 @@ export const requiredProjectFiles = [
   "scripts/playbook/validate-playbook-compliance.mjs",
   "scripts/qa/README.md",
   "scripts/verify-package.mjs",
-  "scripts/zip-utils.mjs"
+  "scripts/zip-utils.mjs",
+  "test/scripts/release-readiness.test.js"
 ];
