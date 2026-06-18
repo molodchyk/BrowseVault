@@ -245,6 +245,7 @@ export function validatePlaybookCompliance(root, assert) {
     "Theme, accent, contrast, text size, date display, and default result-limit settings save and apply",
     "JSON backup export completes and reports backup health/self-test status",
     "Result: Not run",
+    "git rev-parse --short=7 HEAD",
     "Run `npm run release:ready` after filling this checklist"
   ]) {
     assert(manualBrowserQa.includes(expected), `Manual browser QA checklist missing required check: ${expected}`);
@@ -267,6 +268,7 @@ export function validatePlaybookCompliance(root, assert) {
     "Target-browser load-unpacked check",
     "Manual required",
     "npm run release:ready",
+    "current Git commit",
     "Load the unpacked extension in the target browser",
     "Do not use automated Chrome or Playwright runs against a live Chrome profile",
     "do not create or target named personal Chrome profiles such as `Your Chrome`"

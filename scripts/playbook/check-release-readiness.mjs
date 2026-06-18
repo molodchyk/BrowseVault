@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 
 const root = process.cwd();
 const checklistPath = path.join(root, "docs", "release", "manual-browser-qa-checklist.md");
@@ -30,7 +31,7 @@ function escapeRegExp(value) {
 }
 
 function fieldValue(source, label) {
-  const match = source.match(new RegExp(`^- ${escapeRegExp(label)}:\\s*(.*)$`, "mi"));
+  const match = source.match(new RegExp(`^- ${escapeRegExp(label)}:[ \\t]*(.*)$`, "mi"));
   return match ? match[1].trim() : "";
 }
 
@@ -55,6 +56,13 @@ function parseCheckRows(source) {
   return rows;
 }
 
+function currentCommit() {
+  return execFileSync("git", ["rev-parse", "--short=7", "HEAD"], {
+    cwd: root,
+    encoding: "utf8"
+  }).trim();
+}
+
 if (!fs.existsSync(checklistPath)) {
   throw new Error(`Missing manual browser QA checklist: ${path.relative(root, checklistPath)}`);
 }
@@ -73,6 +81,12 @@ for (const label of [
   if (!fieldValue(checklist, label)) {
     fail(`Manual browser QA checklist is missing Evidence Header value: ${label}.`);
   }
+}
+
+const recordedCommit = fieldValue(checklist, "Commit").toLowerCase();
+const headCommit = currentCommit().toLowerCase();
+if (recordedCommit && !recordedCommit.startsWith(headCommit)) {
+  fail(`Manual browser QA checklist Commit must match current HEAD ${headCommit}, got ${recordedCommit}.`);
 }
 
 if (fieldValue(checklist, "Result").toLowerCase() !== "pass") {

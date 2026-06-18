@@ -22,6 +22,7 @@ Set `Result` to `Pass` only after every required flow check is `Pass`.
 ## Preflight
 
 - Confirm `npm run store:media`, `npm run validate`, `npm run check`, `npm test`, `npm run package`, `npm run verify:package`, and `git diff --check` passed on the same commit.
+- Record the current `git rev-parse --short=7 HEAD` value in the `Commit` field.
 - Open `chrome://extensions`.
 - Enable Developer mode.
 - Load this repository folder unpacked.

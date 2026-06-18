@@ -35,6 +35,7 @@ Expected results:
 - package contains runtime extension files, root user-facing docs, and `_locales/en/messages.json`;
 - package excludes repository research, tests, scripts, docs, StorePilot files, and build metadata.
 - release readiness passes only after manual target-browser evidence is recorded in `manual-browser-qa-checklist.md`.
+- release readiness rejects checklist evidence recorded for a different Git commit.
 
 ## Real Browser QA
 
