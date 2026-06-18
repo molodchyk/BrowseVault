@@ -5,6 +5,7 @@ import {
 
 export function renderActivityLog(list, events, options = {}) {
   const documentRef = options.document || globalThis.document;
+  const emptyText = options.emptyText || "No activity logged yet.";
   const formatDate = options.formatDate || ((timestamp) => new Date(timestamp).toLocaleString());
   const normalized = normalizeActivityLog(events);
 
@@ -13,7 +14,7 @@ export function renderActivityLog(list, events, options = {}) {
   if (!normalized.length) {
     const empty = documentRef.createElement("li");
     empty.className = "activity-item is-empty";
-    empty.textContent = "No activity logged yet.";
+    empty.textContent = emptyText;
     list.append(empty);
     return;
   }

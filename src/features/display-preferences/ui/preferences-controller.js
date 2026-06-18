@@ -37,6 +37,7 @@ const defaultServices = {
 export function createDisplayPreferencesController({
   appState,
   elements,
+  getMessage = () => "",
   getStats,
   refreshAfterSave,
   root,
@@ -144,6 +145,7 @@ export function createDisplayPreferencesController({
     renderArchiveHealth(stats.meta);
     renderArchiveInsights(stats.insights);
     deps.renderActivityLog(elements.activityLog, stats.meta.activityLog, {
+      emptyText: getMessage("noActivityLogged") || "No activity logged yet.",
       formatDate: (timestamp) => deps.formatShortDate(timestamp, appState.preferences.dateFormat)
     });
   }

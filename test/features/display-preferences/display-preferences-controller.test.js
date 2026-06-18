@@ -37,6 +37,7 @@ function createHarness({
       lastBackup: null
     }
   },
+  getMessage = () => "",
   storedPreferences,
   preferences = {
     theme: "system",
@@ -109,6 +110,7 @@ function createHarness({
   const controller = createDisplayPreferencesController({
     appState,
     elements,
+    getMessage,
     getStats: async () => stats,
     refreshAfterSave: async () => refreshAfterSaveCalls.push(true),
     root,
@@ -318,7 +320,30 @@ test("refreshStats renders stat cards and backup health details", async () => {
   assert.equal(renderedActivity[0][0], elements.activityLog);
   assert.equal(renderedActivity[0][1].length, 1);
   assert.equal(renderedActivity[0][1][0].label, "JSON backup exported");
+  assert.equal(renderedActivity[0][2].emptyText, "No activity logged yet.");
   assert.equal(renderedActivity[0][2].formatDate(Date.parse(exportedAt)), "2026-06-01");
+});
+
+test("refreshStats passes localized activity-log empty text", async () => {
+  const { controller, renderedActivity } = createHarness({
+    getMessage: (key) => key === "noActivityLogged" ? "Noch keine Aktivitaet protokolliert." : "",
+    stats: {
+      visits: 0,
+      domains: 0,
+      newestVisitTime: 0,
+      insights: {},
+      meta: {
+        activityLog: [],
+        lastBackup: null
+      },
+      vaultHealth: {}
+    }
+  });
+
+  await controller.refreshStats();
+
+  assert.equal(renderedActivity.length, 1);
+  assert.equal(renderedActivity[0][2].emptyText, "Noch keine Aktivitaet protokolliert.");
 });
 
 test("refreshStats applies the configured backup reminder interval", async () => {

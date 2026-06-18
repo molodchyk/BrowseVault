@@ -54,6 +54,7 @@ export async function startBrowseVaultApp({ document: documentRef }) {
   const displayPreferences = createDisplayPreferencesController({
     appState,
     elements,
+    getMessage: getChromeMessage,
     getStats: () => getStats({ runStorageSelfCheck: true }),
     refreshAfterSave: () => searchCoordinator.runSearchesNow(),
     root: documentRef.documentElement,

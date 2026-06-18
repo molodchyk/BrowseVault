@@ -67,6 +67,11 @@ test("renderActivityLog shows empty and populated states", () => {
   assert.equal(list.children[0].className, "activity-item is-empty");
   assert.equal(list.children[0].textContent, "No activity logged yet.");
 
+  renderActivityLog(list, [], { document, emptyText: "Noch keine Aktivitaet protokolliert." });
+  assert.equal(list.children.length, 1);
+  assert.equal(list.children[0].className, "activity-item is-empty");
+  assert.equal(list.children[0].textContent, "Noch keine Aktivitaet protokolliert.");
+
   renderActivityLog(list, [
     {
       id: "import-1",
