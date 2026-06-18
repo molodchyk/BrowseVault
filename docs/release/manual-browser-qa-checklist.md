@@ -65,6 +65,7 @@ Record `Pass`, `Fail`, or `Not run` plus notes for each item. `npm run release:r
 | First screen is the History search workflow, not a marketing screen. | Not run | |
 | Search input is focused or immediately reachable, and a normal query returns usable results. | Not run | |
 | Long URLs and titles stay inside the viewport with no page-level horizontal scrollbar. | Not run | |
+| History result bulk action buttons stay compact and readable at 480 px and 640 px. | Not run | |
 | Settings, Rules, Backup, and retention action buttons stay compact instead of stretching across the page. | Not run | |
 | Opening BrowseVault from a non-BrowseVault active tab creates another BrowseVault tab instead of enforcing one global app tab. | Not run | |
 | Deleting a vault record in one BrowseVault tab refreshes another open BrowseVault tab. | Not run | |

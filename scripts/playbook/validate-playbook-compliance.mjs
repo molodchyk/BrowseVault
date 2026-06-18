@@ -287,15 +287,13 @@ export function validatePlaybookCompliance(root, assert) {
   }
 
   const resultsCss = fs.readFileSync(path.join(root, "src", "styles", "results.css"), "utf8");
-  for (const expected of [
-    ".result-title",
-    ".url",
-    ".meta",
-    "overflow-wrap: anywhere",
-    "word-break: break-word",
-    "text-overflow: ellipsis"
-  ]) {
+  for (const expected of [".result-title", ".url", ".meta", "overflow-wrap: anywhere", "word-break: break-word", "text-overflow: ellipsis"]) {
     assert(resultsCss.includes(expected), `Result CSS missing long-text containment guardrail: ${expected}`);
+  }
+
+  const responsiveCss = fs.readFileSync(path.join(root, "src", "styles", "responsive.css"), "utf8");
+  for (const expected of ["@media (max-width: 480px)", ".bulk-actions", "grid-template-columns: repeat(2, minmax(0, 1fr))", ".bulk-actions button", "min-width: 0", "#delete-results", "#delete-results-chrome"]) {
+    assert(responsiveCss.includes(expected), `Responsive CSS missing compact History bulk-action guardrail: ${expected}`);
   }
 
   const storeDraft = fs.readFileSync(path.join(root, "store", "listing.md"), "utf8");
@@ -382,6 +380,7 @@ export function validatePlaybookCompliance(root, assert) {
     "git diff --check",
     "Toolbar action opens BrowseVault",
     "Long URLs and titles stay inside the viewport",
+    "History result bulk action buttons stay compact and readable at 480 px and 640 px",
     "creates another BrowseVault tab instead of enforcing one global app tab",
     "Deleting a vault record in one BrowseVault tab refreshes another open BrowseVault tab",
     "Theme, accent, contrast, text size, date display, and default result-limit settings save and apply",
@@ -470,6 +469,7 @@ export function validatePlaybookCompliance(root, assert) {
     "small-promo.png",
     "marquee-promo.png",
     "both promo images still match the current name",
+    "History bulk-action buttons",
     "no analytics",
     "no host permissions",
     "no remote code"

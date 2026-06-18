@@ -32,4 +32,4 @@ The reviewer should record `Pass` in `docs/release/manual-browser-qa-checklist.m
 - destructive actions and browser-owned behavior use current labels;
 - visible privacy claims still match `PRIVACY.md`, `manifest.json`, and package verification;
 - screenshots do not imply unavailable features or hide browser-controlled limitations;
-- long text, dates, and compact controls still look consistent with the responsive UI.
+- long text, dates, History bulk-action buttons, and compact controls still look consistent with the responsive UI.
