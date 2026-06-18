@@ -359,6 +359,11 @@ const appJs = fs.readFileSync(path.join(root, "src/app.js"), "utf8");
 assert(appJs.includes("startBrowseVaultApp"), "Runtime entry should delegate to the app-shell bootstrap.");
 const appBootstrap = fs.readFileSync(path.join(root, "src", "features", "app-shell", "ui", "bootstrap.js"), "utf8");
 assert(appBootstrap.includes("localizeAppShell") && appBootstrap.includes("getChromeMessage"), "App shell bootstrap must initialize extension-page localization.");
+assert(appBootstrap.includes("createWorkerBackedHistorySearch"), "App shell should use the worker-backed history search service.");
+const searchWorkerClient = fs.readFileSync(path.join(root, "src", "features", "history-results", "ui", "search-worker-client.js"), "utf8");
+assert(searchWorkerClient.includes("new Worker") && searchWorkerClient.includes("search-worker.js"), "History search should have a dedicated worker-backed path.");
+const searchWorker = fs.readFileSync(path.join(root, "src", "features", "history-results", "worker", "search-worker.js"), "utf8");
+assert(searchWorker.includes("searchVisitRecords"), "History search worker should reuse the audited search index.");
 
 for (const [id, label] of [
   ["open-native-history", "Open Chrome History"],

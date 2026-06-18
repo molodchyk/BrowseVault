@@ -297,8 +297,12 @@ export async function removeRule(id) {
   await transactionDone(tx);
 }
 
+export async function getSearchableVisits() {
+  return decorateVisitsWithRuleCategories(await getAllVisits(), await getRules());
+}
+
 export async function searchVisits(input = "", options = {}) {
-  const visits = decorateVisitsWithRuleCategories(await getAllVisits(), await getRules());
+  const visits = await getSearchableVisits();
   return searchVisitRecords(visits, input, {
     ...options,
     defaultLimit: DEFAULT_RESULT_LIMIT

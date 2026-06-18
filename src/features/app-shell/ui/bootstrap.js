@@ -1,9 +1,9 @@
 import {
   deleteSavedSearch,
+  getSearchableVisits,
   getSavedSearches,
   getStats,
-  saveSavedSearch,
-  searchVisits
+  saveSavedSearch
 } from "../../../storage.js";
 import { createAppShellState } from "../core/state.js";
 import { createVaultInvalidationController } from "../core/vault-invalidation.js";
@@ -22,6 +22,7 @@ import { createResultJumpActions } from "../../history-results/ui/result-jumps.j
 import { createSavedSearchActions } from "../../history-results/ui/saved-search-actions.js";
 import { createHistorySearchActions } from "../../history-results/ui/search-actions.js";
 import { createHistorySearchForm } from "../../history-results/ui/search-form.js";
+import { createWorkerBackedHistorySearch } from "../../history-results/ui/search-worker-client.js";
 import { createSelectedResultLookup } from "../../history-results/ui/selected-results.js";
 import { createVaultManagementActions } from "../../vault-management/ui/actions.js";
 import { copyText } from "../../../platform/clipboard.js";
@@ -53,6 +54,7 @@ export async function startBrowseVaultApp({ document: documentRef }) {
   const historySearchForm = createHistorySearchForm({ elements });
   const selectedResultLookup = createSelectedResultLookup({ appState });
   let notifyVaultChanged = () => false;
+  const searchVisits = createWorkerBackedHistorySearch({ getSearchableVisits });
 
   const appNavigation = createAppNavigation({ elements });
   const displayPreferences = createDisplayPreferencesController({
