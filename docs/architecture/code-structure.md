@@ -32,7 +32,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `scripts/playbook/check-store-metadata.mjs` verifies that the human store draft, StorePilot detailed description, localized manifest name/summary, package metadata, and repository metadata stay synchronized.
 - `scripts/check-file-sizes.mjs` audits the file-size budgets from the modularization playbook for `src/`, `test/`, and `scripts/`, reports soft-budget warnings, and caps known hard-limit debt.
 - `scripts/check-folder-density.mjs` enforces folder-density budgets for `src/`, `test/`, `scripts/`, and `docs/`.
-- `scripts/qa/` is reserved for clone-safe QA helpers and currently documents that browser QA must stay manual or use an explicitly approved disposable profile.
+- `scripts/qa/` is reserved for clone-safe QA helpers and currently documents that BrowseVault browser QA is manual in this workspace.
 
 ## Next Split Candidates
 

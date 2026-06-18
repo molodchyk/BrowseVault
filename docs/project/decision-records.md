@@ -36,13 +36,13 @@ References:
 - [Extension Modularization Playbook](../architecture/extension-modularization-playbook.md)
 - [StorePilot Project Reference](../../StorePilot/docs/reference.md)
 
-## ADR-006: Do Not Automate Against Live Chrome Profiles
+## ADR-006: Keep BrowseVault Browser QA Manual In This Workspace
 
-Automated browser QA must not launch or attach to the active Chrome profile, including the real Chrome user-data directory, named folders such as `Default`, `Profile`, or `Profile 1`, or named personal profiles such as `Your Chrome`.
+Repo-owned QA must not launch or attach to Chrome, Chromium, Playwright, CDP, browser-control tools, the active Chrome profile, the real Chrome user-data directory, named folders such as `Default`, `Profile`, or `Profile 1`, or named personal profiles such as `Your Chrome`.
 
-Reason: profile-level automation can collide with focus-blocking tools, active sessions, and Chrome's profile registry. BrowseVault release checks should stay repo-only unless a browser run is explicitly confirmed, and browser automation must use a disposable temporary user-data directory.
+Reason: profile-level automation can collide with focus-blocking tools, active sessions, and Chrome's profile registry. BrowseVault release checks stay repo-only in this workspace. Target-browser QA is manual and recorded in the release checklist.
 
-Repo scripts and tests reject Chrome profile-selection, extension-load, remote-debugging, persistent-context, direct Chromium launch, and CDP attachment patterns so the failure mode does not silently return through a convenience QA script.
+Repo scripts and tests reject Chrome profile-selection, extension-load, remote-debugging, persistent-context, direct Chromium launch, browser-control tooling, Playwright browser test, and CDP attachment patterns so the failure mode does not silently return through a convenience QA script.
 
 ## ADR-007: Do Not Enforce One Global BrowseVault Tab
 

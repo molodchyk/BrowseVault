@@ -319,7 +319,7 @@ for (const expected of [
   "local-first",
   "Do Not Replace Chrome History By Default",
   "Separate Vault Deletion From Chrome History Deletion",
-  "Do Not Automate Against Live Chrome Profiles",
+  "Keep BrowseVault Browser QA Manual In This Workspace",
   "Do Not Enforce One Global BrowseVault Tab",
   "StorePilot Project Reference"
 ]) {

@@ -92,6 +92,12 @@ export function validatePlaybookCompliance(root, assert) {
   for (const expected of ["features/", "platform/", "query/", "scripts/", "storage/"]) {
     assert(testReadme.includes(expected), `Test README missing test responsibility folder: ${expected}`);
   }
+  for (const expected of [
+    "Do not add automated tests that launch or attach to Chrome",
+    "BrowseVault target-browser QA is manual in this workspace"
+  ]) {
+    assert(testReadme.includes(expected), `Test README missing browser-safety detail: ${expected}`);
+  }
 
   const privacy = fs.readFileSync(path.join(root, "PRIVACY.md"), "utf8");
   assert(privacy.includes("Chrome local extension storage"), "Privacy policy must name the storage area used for settings.");
@@ -163,7 +169,7 @@ export function validatePlaybookCompliance(root, assert) {
     "chromium-browser",
     "Google Chrome.app",
     "manual",
-    "disposable temporary browser profile",
+    "Browser QA for BrowseVault is manual",
     "npm run validate",
     "npm run check",
     "npm test",
@@ -355,6 +361,15 @@ export function validatePlaybookCompliance(root, assert) {
     "do not create or target named personal Chrome profiles such as `Your Chrome`"
   ]) {
     assert(playbookAudit.includes(expected), `Browser extension playbook audit missing: ${expected}`);
+  }
+
+  const decisionRecords = fs.readFileSync(path.join(root, "docs", "project", "decision-records.md"), "utf8");
+  for (const expected of [
+    "Keep BrowseVault Browser QA Manual In This Workspace",
+    "Repo-owned QA must not launch or attach to Chrome",
+    "Target-browser QA is manual and recorded in the release checklist"
+  ]) {
+    assert(decisionRecords.includes(expected), `Decision records missing browser-safety decision: ${expected}`);
   }
 
   const storeMedia = fs.readFileSync(path.join(root, "docs", "chrome-web-store-media.md"), "utf8");

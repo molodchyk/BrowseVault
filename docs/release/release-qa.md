@@ -54,11 +54,14 @@ Current workstation note:
 - Never use the active Chrome profile for automated QA.
 - Do not use `%LOCALAPPDATA%\\Google\\Chrome\\User Data`, `Default`, `Profile`, or `Profile 1` as an automated QA profile.
 - Do not create or target named personal Chrome profiles such as `Your Chrome` for automated QA.
-- Automated browser QA must use a disposable temporary user-data directory, or stay manual.
+- Do not troubleshoot, clean up, delete, or otherwise mutate Chrome profile folders or Chrome user-data folders from Codex.
+- Do not use browser-control plugins, Chrome-control MCP tools, Playwright browser launches, CDP attachment, or the in-app browser for BrowseVault repo work.
+- Automated browser QA is out of scope for BrowseVault repo-owned checks in this workspace; keep target-browser QA manual.
 - Do not add npm scripts that launch Chrome, Playwright, or a remote-debugging session against a real user profile.
 - Do not add repo scripts that launch Chrome or Chromium executables such as `chrome.exe`, `google-chrome`, `chromium-browser`, or `Google Chrome.app`.
 - Do not pass `--profile-directory`, `--load-extension`, `--disable-extensions-except`, or CDP attachment flags from repo scripts.
 - Validation scans package scripts, repository scripts, and tests for live Chrome profile automation patterns.
 - Do not treat that process-level closure as a BrowseVault product failure without reproducing it in a normal Chrome session.
+- If a Chrome/profile issue happens, stop repo work that touches Chrome and ask the user to handle Chrome manually.
 - Manual release check: pause the local focus blockers, open `chrome://extensions`, enable Developer mode, load this repository folder unpacked, then verify the toolbar action opens BrowseVault, a second non-BrowseVault active tab creates another BrowseVault tab, deleting a vault record in one BrowseVault tab refreshes the other BrowseVault tab, and Chrome Web Store screenshots still match the current UI and store listing copy.
 - `npm run release:ready` intentionally fails while the manual checklist is still `Not run`.

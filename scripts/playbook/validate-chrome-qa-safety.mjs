@@ -8,7 +8,12 @@ const forbiddenAutomationPatterns = [
   /--disable-extensions-except/i,
   /launchPersistentContext/i,
   /chromium\.launch/i,
+  /playwright\.chromium/i,
+  /\bplaywright\s+test\b/i,
   /connectOverCDP/i,
+  /chrome:control-chrome/i,
+  /control-in-app-browser/i,
+  /mcp__.*chrome/i,
   /remote-debugging-port/i,
   /chrome\.exe/i,
   /\bgoogle-chrome(?:-stable)?\b/i,
@@ -52,10 +57,14 @@ export function validateChromeQaSafety(root, packageJson, assert) {
   for (const expected of [
     "Do not launch Chrome, Chromium, Playwright, the Chrome MCP, the in-app browser, or any browser automation for this project.",
     "Do not create, target, rename, delete, or otherwise manage Chrome profiles from Codex.",
+    "Do not troubleshoot, clean up, delete, or otherwise mutate Chrome profile folders or Chrome user-data folders from Codex.",
     "Do not use the active Chrome profile, `%LOCALAPPDATA%\\Google\\Chrome\\User Data`, `Default`, `Profile`, `Profile 1`, or named personal profiles such as `Your Chrome`.",
     "Do not pass `--profile-directory`, `--user-data-dir`, `--load-extension`, `--disable-extensions-except`, remote debugging, or CDP attachment flags from repo scripts or assistant-driven commands.",
+    "Do not use browser-control plugins, Chrome-control MCP tools, Playwright browser launches, CDP attachment, or the in-app browser for BrowseVault repo work.",
     "Do not treat Chrome or Playwright closing under local focus blockers as a BrowseVault product failure.",
-    "Manual target-browser QA belongs in `docs/release/manual-browser-qa-checklist.md`"
+    "If a Chrome/profile issue happens, stop repo work that touches Chrome and ask the user to handle Chrome manually.",
+    "Manual target-browser QA belongs in `docs/release/manual-browser-qa-checklist.md`",
+    "Repo-owned checks stay non-browser for BrowseVault work in this workspace."
   ]) {
     assert(agents.includes(expected), `AGENTS.md missing Chrome/browser safety invariant: ${expected}`);
   }
@@ -65,11 +74,14 @@ export function validateChromeQaSafety(root, packageJson, assert) {
     "Never use the active Chrome profile for automated QA.",
     "Do not use `%LOCALAPPDATA%\\\\Google\\\\Chrome\\\\User Data`, `Default`, `Profile`, or `Profile 1` as an automated QA profile.",
     "Do not create or target named personal Chrome profiles such as `Your Chrome` for automated QA.",
-    "Automated browser QA must use a disposable temporary user-data directory, or stay manual.",
+    "Do not troubleshoot, clean up, delete, or otherwise mutate Chrome profile folders or Chrome user-data folders from Codex.",
+    "Do not use browser-control plugins, Chrome-control MCP tools, Playwright browser launches, CDP attachment, or the in-app browser for BrowseVault repo work.",
+    "Automated browser QA is out of scope for BrowseVault repo-owned checks in this workspace; keep target-browser QA manual.",
     "Do not add npm scripts that launch Chrome, Playwright, or a remote-debugging session against a real user profile.",
     "Do not add repo scripts that launch Chrome or Chromium executables such as `chrome.exe`, `google-chrome`, `chromium-browser`, or `Google Chrome.app`.",
     "Do not pass `--profile-directory`, `--load-extension`, `--disable-extensions-except`, or CDP attachment flags from repo scripts.",
-    "Validation scans package scripts, repository scripts, and tests for live Chrome profile automation patterns."
+    "Validation scans package scripts, repository scripts, and tests for live Chrome profile automation patterns.",
+    "If a Chrome/profile issue happens, stop repo work that touches Chrome and ask the user to handle Chrome manually."
   ]) {
     assert(releaseQa.includes(expected), `Release QA notes missing Chrome profile safety invariant: ${expected}`);
   }

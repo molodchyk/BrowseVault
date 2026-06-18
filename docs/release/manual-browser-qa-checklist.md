@@ -6,9 +6,15 @@ Do not use automated Chrome or Playwright runs against a live Chrome profile for
 
 Do not create or target named personal Chrome profiles such as `Your Chrome` for this checklist.
 
+Do not troubleshoot, clean up, delete, or otherwise mutate Chrome profile folders or Chrome user-data folders from Codex.
+
 Do not use repo scripts or assistant-driven browser automation to pass `--profile-directory`, `--load-extension`, `--disable-extensions-except`, or remote debugging flags to Chrome for this checklist.
 
+Do not use browser-control plugins, Chrome-control MCP tools, Playwright browser launches, CDP attachment, or the in-app browser for BrowseVault repo work.
+
 Do not add repo scripts that launch Chrome or Chromium executables such as `chrome.exe`, `google-chrome`, `chromium-browser`, or `Google Chrome.app`.
+
+If a Chrome/profile issue happens, stop repo work that touches Chrome and handle Chrome manually.
 
 ## Evidence Header
 

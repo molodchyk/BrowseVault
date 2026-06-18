@@ -26,11 +26,14 @@ function safeReleaseQa() {
 - Never use the active Chrome profile for automated QA.
 - Do not use \`${userDataPath}\`, \`Default\`, \`Profile\`, or \`Profile 1\` as an automated QA profile.
 - Do not create or target named personal Chrome profiles such as \`${namedProfile}\` for automated QA.
-- Automated browser QA must use a disposable temporary user-data directory, or stay manual.
+- Do not troubleshoot, clean up, delete, or otherwise mutate Chrome profile folders or Chrome user-data folders from Codex.
+- Do not use browser-control plugins, Chrome-control MCP tools, Playwright browser launches, CDP attachment, or the in-app browser for BrowseVault repo work.
+- Automated browser QA is out of scope for BrowseVault repo-owned checks in this workspace; keep target-browser QA manual.
 - Do not add npm scripts that launch Chrome, Playwright, or a remote-debugging session against a real user profile.
 - Do not add repo scripts that launch Chrome or Chromium executables such as \`${chromeExe}\`, \`${googleChrome}\`, \`${chromiumBrowser}\`, or \`${chromeApp}\`.
 - Do not pass \`${profileFlag}\`, \`${loadFlag}\`, \`${disableExceptFlag}\`, or CDP attachment flags from repo scripts.
 - Validation scans package scripts, repository scripts, and tests for live Chrome profile automation patterns.
+- If a Chrome/profile issue happens, stop repo work that touches Chrome and ask the user to handle Chrome manually.
 `;
 }
 
@@ -51,11 +54,14 @@ This repository is browser-sensitive because local tools such as Cold Turkey and
 
 - Do not launch Chrome, Chromium, Playwright, the Chrome MCP, the in-app browser, or any browser automation for this project.
 - Do not create, target, rename, delete, or otherwise manage Chrome profiles from Codex.
+- Do not troubleshoot, clean up, delete, or otherwise mutate Chrome profile folders or Chrome user-data folders from Codex.
 - Do not use the active Chrome profile, \`${userDataPath}\`, \`Default\`, \`Profile\`, \`Profile 1\`, or named personal profiles such as \`${namedProfile}\`.
 - Do not pass \`${profileFlag}\`, \`${userDataFlag}\`, \`${loadFlag}\`, \`${disableExceptFlag}\`, remote debugging, or CDP attachment flags from repo scripts or assistant-driven commands.
+- Do not use browser-control plugins, Chrome-control MCP tools, Playwright browser launches, CDP attachment, or the in-app browser for BrowseVault repo work.
 - Do not treat Chrome or Playwright closing under local focus blockers as a BrowseVault product failure.
+- If a Chrome/profile issue happens, stop repo work that touches Chrome and ask the user to handle Chrome manually.
 
-Manual target-browser QA belongs in \`docs/release/manual-browser-qa-checklist.md\` and should be performed by the user in their normal browser session. Repo-owned checks should stay non-browser unless the user explicitly approves a disposable browser-profile plan in the current turn.
+Manual target-browser QA belongs in \`docs/release/manual-browser-qa-checklist.md\` and should be performed by the user in their normal browser session. Repo-owned checks stay non-browser for BrowseVault work in this workspace.
 `;
 }
 
@@ -163,5 +169,26 @@ test("validateChromeQaSafety rejects scripts that target the macOS Chrome app bu
   assert.throws(
     () => runSafety(root),
     /scripts\/macos\.mjs contains forbidden live Chrome profile automation pattern/
+  );
+});
+
+test("validateChromeQaSafety rejects scripts that invoke Chrome-control tooling", () => {
+  const root = makeFixture();
+  const blockedTool = "chrome:" + "control-chrome";
+  fs.writeFileSync(path.join(root, "scripts", "tool.mjs"), `const tool = "${blockedTool}";\n`);
+
+  assert.throws(
+    () => runSafety(root),
+    /scripts\/tool\.mjs contains forbidden live Chrome profile automation pattern/
+  );
+});
+
+test("validateChromeQaSafety rejects package scripts that run Playwright browser tests", () => {
+  const root = makeFixture();
+  const blockedCommand = "playwright" + " test";
+
+  assert.throws(
+    () => runSafety(root, { bad: blockedCommand }),
+    /package script "bad" contains forbidden live Chrome profile automation pattern/
   );
 });
