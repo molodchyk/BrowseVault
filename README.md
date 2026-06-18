@@ -200,7 +200,7 @@ npm run release:ready
 
 `npm run package` writes `dist/browsevault-1.0.0.zip` and verifies the final ZIP contents, including packaged manifest paths, locale messages, static import targets, module script targets, and exact freshness against the current source tree.
 
-`npm run release:ready` is a final release gate for the browser-extension playbook's manual target-browser and screenshot/store-copy review requirements. It intentionally fails until [`docs/release/manual-browser-qa-checklist.md`](docs/release/manual-browser-qa-checklist.md) records passed load-unpacked and store-media review evidence for the current Git commit.
+`npm run release:ready` is a final release gate for the browser-extension playbook's automated gate, manual target-browser, and screenshot/store-copy review requirements. It intentionally fails until [`docs/release/manual-browser-qa-checklist.md`](docs/release/manual-browser-qa-checklist.md) records passed automated commands, load-unpacked checks, and store-media review evidence for the current Git commit.
 
 Release guardrail tests live in `test/scripts/`.
 

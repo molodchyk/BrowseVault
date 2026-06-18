@@ -309,7 +309,7 @@ for (const expected of [
   assert(releaseQa.includes(expected), `Release QA notes missing: ${expected}`);
 }
 
-for (const expected of ["Chrome QA profile-safety guardrails", "shared reference sync", "fresh against the current source tree", "screenshot/store-copy review evidence"]) {
+for (const expected of ["Chrome QA profile-safety guardrails", "shared reference sync", "fresh against the current source tree", "automated gate results", "screenshot/store-copy review evidence"]) {
   assert(reviewerNotes.includes(expected), `Reviewer notes missing current release guardrail: ${expected}`);
 }
 validateChromeQaSafety(root, packageJson, assert);
