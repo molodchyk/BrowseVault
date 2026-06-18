@@ -723,6 +723,124 @@
       }
     }
   },
+  "statusReadingArchive": {
+    "message": "Reading archive",
+    "description": "Status shown while BrowseVault reads a selected archive import file."
+  },
+  "statusNoImportableRecordsOrRules": {
+    "message": "No importable history records or rules found",
+    "description": "Status shown when a selected archive file contains no importable BrowseVault history records or rules."
+  },
+  "statusReviewImportPreview": {
+    "message": "Review import preview",
+    "description": "Status shown after BrowseVault stages an archive and shows the import preview."
+  },
+  "statusImportCanceled": {
+    "message": "Import canceled",
+    "description": "Status shown after the user cancels an archive import action."
+  },
+  "statusChooseArchiveFirst": {
+    "message": "Choose an archive first",
+    "description": "Status shown when the user tries to confirm import before choosing an archive file."
+  },
+  "confirmImportChecksumMismatch": {
+    "message": "This archive checksum does not match. Import anyway?",
+    "description": "Confirmation shown before importing an archive whose checksum no longer matches."
+  },
+  "statusImportingArchive": {
+    "message": "Importing archive",
+    "description": "Status shown while BrowseVault imports a staged archive."
+  },
+  "importStatusRecordOne": {
+    "message": "$COUNT$ record",
+    "description": "Imported archive summary segment for one imported history record.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "importStatusRecordMany": {
+    "message": "$COUNT$ records",
+    "description": "Imported archive summary segment for multiple imported history records.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "24"
+      }
+    }
+  },
+  "importStatusRuleOne": {
+    "message": " and $COUNT$ rule",
+    "description": "Imported archive summary segment for one imported domain rule.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "importStatusRuleMany": {
+    "message": " and $COUNT$ rules",
+    "description": "Imported archive summary segment for multiple imported domain rules.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "4"
+      }
+    }
+  },
+  "importStatusVerifiedChecksum": {
+    "message": " with verified checksum",
+    "description": "Imported archive summary segment shown when the import checksum is verified."
+  },
+  "importStatusChecksumWarning": {
+    "message": " after checksum warning",
+    "description": "Imported archive summary segment shown after importing despite a checksum mismatch."
+  },
+  "importStatusDuplicateOne": {
+    "message": "; $COUNT$ duplicate row merged",
+    "description": "Imported archive summary segment for one merged duplicate import row.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "importStatusDuplicateMany": {
+    "message": "; $COUNT$ duplicate rows merged",
+    "description": "Imported archive summary segment for multiple merged duplicate import rows.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "9"
+      }
+    }
+  },
+  "statusImportedArchive": {
+    "message": "Imported $RECORDS$$RULES$$INTEGRITY$$DUPLICATES$",
+    "description": "Status shown after BrowseVault imports a staged archive.",
+    "placeholders": {
+      "records": {
+        "content": "$1",
+        "example": "24 records"
+      },
+      "rules": {
+        "content": "$2",
+        "example": " and 2 rules"
+      },
+      "integrity": {
+        "content": "$3",
+        "example": " with verified checksum"
+      },
+      "duplicates": {
+        "content": "$4",
+        "example": "; 3 duplicate rows merged"
+      }
+    }
+  },
   "buttonSyncChromeHistory": {
     "message": "Sync Chrome History",
     "description": "Static BrowseVault extension-page UI string."

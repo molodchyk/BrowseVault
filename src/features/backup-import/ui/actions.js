@@ -42,6 +42,42 @@ function localizedMessage(getMessage, key, fallback, substitutions) {
   return getMessage?.(key, substitutions) || fallback;
 }
 
+function importIntegrityStatusLabel(integrity, getMessage) {
+  if (!integrity.checked) {
+    return "";
+  }
+
+  return integrity.ok
+    ? localizedMessage(getMessage, "importStatusVerifiedChecksum", " with verified checksum")
+    : localizedMessage(getMessage, "importStatusChecksumWarning", " after checksum warning");
+}
+
+function importRuleStatusLabel(ruleCount, getMessage) {
+  if (!ruleCount) {
+    return "";
+  }
+
+  return localizedMessage(
+    getMessage,
+    ruleCount === 1 ? "importStatusRuleOne" : "importStatusRuleMany",
+    ` and ${ruleCount} rule${ruleCount === 1 ? "" : "s"}`,
+    [String(ruleCount)]
+  );
+}
+
+function importDuplicateStatusLabel(duplicateCount, getMessage) {
+  if (!duplicateCount) {
+    return "";
+  }
+
+  return localizedMessage(
+    getMessage,
+    duplicateCount === 1 ? "importStatusDuplicateOne" : "importStatusDuplicateMany",
+    `; ${duplicateCount} duplicate row${duplicateCount === 1 ? "" : "s"} merged`,
+    [String(duplicateCount)]
+  );
+}
+
 export function backupImportPreviewElements(elements) {
   return {
     importPreview: elements.importPreview,
@@ -315,14 +351,14 @@ export function createBackupActions({
   }
 
   async function importFromFile(file) {
-    setStatus("Reading archive");
+    setStatus(localizedMessage(getMessage, "statusReadingArchive", "Reading archive"));
     const text = await file.text();
     const archive = deps.archiveFromFileText(file, text);
     const integrity = await deps.verifyArchiveIntegrity(archive);
     const analysis = await deps.analyzeImportArchive(archive);
 
     if (!analysis.validRows && !analysis.rules) {
-      setStatus("No importable history records or rules found");
+      setStatus(localizedMessage(getMessage, "statusNoImportableRecordsOrRules", "No importable history records or rules found"));
       return;
     }
 
@@ -334,42 +370,40 @@ export function createBackupActions({
     };
     renderImportPreview();
     switchTab("backup");
-    setStatus("Review import preview");
+    setStatus(localizedMessage(getMessage, "statusReviewImportPreview", "Review import preview"));
   }
 
   function cancelStagedImport() {
     appState.stagedImport = null;
     renderImportPreview();
-    setStatus("Import canceled");
+    setStatus(localizedMessage(getMessage, "statusImportCanceled", "Import canceled"));
   }
 
   async function confirmStagedImport() {
     if (!appState.stagedImport) {
-      setStatus("Choose an archive first");
+      setStatus(localizedMessage(getMessage, "statusChooseArchiveFirst", "Choose an archive first"));
       return;
     }
 
     const { archive, integrity } = appState.stagedImport;
-    if (integrity.checked && !integrity.ok && !deps.confirmAction("This archive checksum does not match. Import anyway?")) {
-      setStatus("Import canceled");
+    if (integrity.checked && !integrity.ok && !deps.confirmAction(localizedMessage(
+      getMessage,
+      "confirmImportChecksumMismatch",
+      "This archive checksum does not match. Import anyway?"
+    ))) {
+      setStatus(localizedMessage(getMessage, "statusImportCanceled", "Import canceled"));
       return;
     }
 
-    setStatus("Importing archive");
+    setStatus(localizedMessage(getMessage, "statusImportingArchive", "Importing archive"));
     const result = await deps.importArchive(archive);
     appState.stagedImport = null;
     renderImportPreview();
     await renderRules();
     await runSearch();
-    const integrityLabel = integrity.checked
-      ? integrity.ok
-        ? " with verified checksum"
-        : " after checksum warning"
-      : "";
-    const ruleLabel = result.rules ? ` and ${result.rules} rule${result.rules === 1 ? "" : "s"}` : "";
-    const duplicateLabel = result.duplicateRows
-      ? `; ${result.duplicateRows} duplicate row${result.duplicateRows === 1 ? "" : "s"} merged`
-      : "";
+    const integrityLabel = importIntegrityStatusLabel(integrity, getMessage);
+    const ruleLabel = importRuleStatusLabel(result.rules, getMessage);
+    const duplicateLabel = importDuplicateStatusLabel(result.duplicateRows, getMessage);
     const activityDetail = [
       result.rules ? `${result.rules} rule${result.rules === 1 ? "" : "s"}` : "",
       result.duplicateRows ? `${result.duplicateRows} duplicate row${result.duplicateRows === 1 ? "" : "s"} merged` : ""
@@ -381,7 +415,18 @@ export function createBackupActions({
       detail: activityDetail,
       occurredAt: result.importedAt
     });
-    setStatus(`Imported ${result.visits} record${result.visits === 1 ? "" : "s"}${ruleLabel}${integrityLabel}${duplicateLabel}`);
+    const recordLabel = localizedMessage(
+      getMessage,
+      result.visits === 1 ? "importStatusRecordOne" : "importStatusRecordMany",
+      `${result.visits} record${result.visits === 1 ? "" : "s"}`,
+      [String(result.visits)]
+    );
+    setStatus(localizedMessage(
+      getMessage,
+      "statusImportedArchive",
+      `Imported ${recordLabel}${ruleLabel}${integrityLabel}${duplicateLabel}`,
+      [recordLabel, ruleLabel, integrityLabel, duplicateLabel]
+    ));
     notifyVaultChanged("vault-import");
   }
 

@@ -1,5 +1,15 @@
 export const backupImportLocalization = [
+  { key: "confirmImportChecksumMismatch" },
+  { key: "importStatusChecksumWarning" },
+  { key: "importStatusDuplicateMany" },
+  { key: "importStatusDuplicateOne" },
+  { key: "importStatusRecordMany" },
+  { key: "importStatusRecordOne" },
+  { key: "importStatusRuleMany" },
+  { key: "importStatusRuleOne" },
+  { key: "importStatusVerifiedChecksum" },
   { key: "statusBackupSelfTestFailed" },
+  { key: "statusChooseArchiveFirst" },
   { key: "statusExportedArchive" },
   { key: "statusExportedCsv" },
   { key: "statusExportedHtml" },
@@ -10,10 +20,16 @@ export const backupImportLocalization = [
   { key: "statusExportedSelectedHtml" },
   { key: "statusExportedSelectedJson" },
   { key: "statusNoMatchingRecordsToExport" },
+  { key: "statusNoImportableRecordsOrRules" },
   { key: "statusPreparingArchive" },
   { key: "statusPreparingCsv" },
   { key: "statusPreparingHtml" },
   { key: "statusPreparingResultArchive" },
   { key: "statusPreparingResultCsv" },
-  { key: "statusPreparingResultHtml" }
+  { key: "statusPreparingResultHtml" },
+  { key: "statusReadingArchive" },
+  { key: "statusReviewImportPreview" },
+  { key: "statusImportCanceled" },
+  { key: "statusImportedArchive" },
+  { key: "statusImportingArchive" }
 ];
