@@ -93,5 +93,6 @@ export const requiredProjectFiles = [
   "scripts/qa/README.md",
   "scripts/verify-package.mjs",
   "scripts/zip-utils.mjs",
+  "test/scripts/chrome-qa-safety.test.js",
   "test/scripts/release-readiness.test.js"
 ];

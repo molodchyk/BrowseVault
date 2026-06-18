@@ -3,7 +3,12 @@ import path from "node:path";
 
 const forbiddenAutomationPatterns = [
   /--user-data-dir/i,
+  /--profile-directory/i,
+  /--load-extension/i,
+  /--disable-extensions-except/i,
   /launchPersistentContext/i,
+  /chromium\.launch/i,
+  /connectOverCDP/i,
   /remote-debugging-port/i,
   /chrome\.exe/i,
   /Google[\\/]+Chrome[\\/]+User Data/i,
@@ -43,6 +48,7 @@ export function validateChromeQaSafety(root, packageJson, assert) {
     "Do not create or target named personal Chrome profiles such as `Your Chrome` for automated QA.",
     "Automated browser QA must use a disposable temporary user-data directory, or stay manual.",
     "Do not add npm scripts that launch Chrome, Playwright, or a remote-debugging session against a real user profile.",
+    "Do not pass `--profile-directory`, `--load-extension`, `--disable-extensions-except`, or CDP attachment flags from repo scripts.",
     "Validation scans package scripts, repository scripts, and tests for live Chrome profile automation patterns."
   ]) {
     assert(releaseQa.includes(expected), `Release QA notes missing Chrome profile safety invariant: ${expected}`);

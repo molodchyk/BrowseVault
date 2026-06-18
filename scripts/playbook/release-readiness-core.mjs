@@ -96,8 +96,25 @@ export function checkReleaseReadinessChecklist(checklist, { currentCommit }) {
     fail("Manual browser QA checklist must include a screenshots or notes location.");
   }
 
-  if (/automated Chrome or Playwright runs against a live Chrome profile/i.test(checklist) === false) {
-    fail("Manual browser QA checklist must preserve the live Chrome profile automation warning.");
+  const requiredWarnings = [
+    {
+      message: "Manual browser QA checklist must preserve the live Chrome profile automation warning.",
+      pattern: /automated Chrome or Playwright runs against a live Chrome profile/i
+    },
+    {
+      message: "Manual browser QA checklist must preserve the named Chrome profile warning.",
+      pattern: /Do not create or target named personal Chrome profiles/i
+    },
+    {
+      message: "Manual browser QA checklist must preserve the Chrome launch-flag automation warning.",
+      pattern: /--profile-directory.*--load-extension.*--disable-extensions-except.*remote debugging flags/i
+    }
+  ];
+
+  for (const warning of requiredWarnings) {
+    if (warning.pattern.test(checklist) === false) {
+      fail(warning.message);
+    }
   }
 
   return errors;

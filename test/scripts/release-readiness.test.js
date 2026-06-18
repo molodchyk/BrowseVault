@@ -9,12 +9,20 @@ import {
 function completeChecklist({
   commit = "abc1234",
   flowResult = "Pass",
-  includeWarning = true,
+  includeLaunchFlagWarning = true,
+  includeLiveProfileWarning = true,
+  includeNamedProfileWarning = true,
   result = "Pass",
   shipDecision = "Ship"
 } = {}) {
-  const warning = includeWarning
+  const liveProfileWarning = includeLiveProfileWarning
     ? "Do not use automated Chrome or Playwright runs against a live Chrome profile for this checklist."
+    : "";
+  const namedProfileWarning = includeNamedProfileWarning
+    ? `Do not create or target named personal Chrome profiles such as \`${"Your " + "Chrome"}\` for this checklist.`
+    : "";
+  const launchFlagWarning = includeLaunchFlagWarning
+    ? `Do not use repo scripts or assistant-driven browser automation to pass ${"--profile-" + "directory"}, ${"--load-" + "extension"}, ${"--disable-extensions-" + "except"}, or remote debugging flags to Chrome for this checklist.`
     : "";
   const flowRows = expectedManualBrowserQaChecks
     .map((check) => `| ${check} | ${flowResult} | checked |`)
@@ -22,7 +30,9 @@ function completeChecklist({
 
   return `# Manual Browser QA Checklist
 
-${warning}
+${liveProfileWarning}
+${namedProfileWarning}
+${launchFlagWarning}
 
 ## Evidence Header
 
@@ -83,9 +93,25 @@ test("checkReleaseReadinessChecklist rejects incomplete manual flow evidence", (
 });
 
 test("checkReleaseReadinessChecklist preserves the live-profile automation warning", () => {
-  const errors = checkReleaseReadinessChecklist(completeChecklist({ includeWarning: false }), {
+  const errors = checkReleaseReadinessChecklist(completeChecklist({ includeLiveProfileWarning: false }), {
     currentCommit: "abc1234"
   });
 
   assert(errors.includes("Manual browser QA checklist must preserve the live Chrome profile automation warning."));
+});
+
+test("checkReleaseReadinessChecklist preserves the named-profile warning", () => {
+  const errors = checkReleaseReadinessChecklist(completeChecklist({ includeNamedProfileWarning: false }), {
+    currentCommit: "abc1234"
+  });
+
+  assert(errors.includes("Manual browser QA checklist must preserve the named Chrome profile warning."));
+});
+
+test("checkReleaseReadinessChecklist preserves the Chrome launch-flag warning", () => {
+  const errors = checkReleaseReadinessChecklist(completeChecklist({ includeLaunchFlagWarning: false }), {
+    currentCommit: "abc1234"
+  });
+
+  assert(errors.includes("Manual browser QA checklist must preserve the Chrome launch-flag automation warning."));
 });

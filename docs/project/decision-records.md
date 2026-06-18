@@ -42,6 +42,8 @@ Automated browser QA must not launch or attach to the active Chrome profile, inc
 
 Reason: profile-level automation can collide with focus-blocking tools, active sessions, and Chrome's profile registry. BrowseVault release checks should stay repo-only unless a browser run is explicitly confirmed, and browser automation must use a disposable temporary user-data directory.
 
+Repo scripts and tests reject Chrome profile-selection, extension-load, remote-debugging, persistent-context, direct Chromium launch, and CDP attachment patterns so the failure mode does not silently return through a convenience QA script.
+
 ## ADR-007: Do Not Enforce One Global BrowseVault Tab
 
 Toolbar and keyboard-command opening reuses BrowseVault only when the current active tab is already the BrowseVault app. Otherwise, it creates a new BrowseVault tab.

@@ -6,6 +6,8 @@ Do not use automated Chrome or Playwright runs against a live Chrome profile for
 
 Do not create or target named personal Chrome profiles such as `Your Chrome` for this checklist.
 
+Do not use repo scripts or assistant-driven browser automation to pass `--profile-directory`, `--load-extension`, `--disable-extensions-except`, or remote debugging flags to Chrome for this checklist.
+
 ## Evidence Header
 
 - Tester:
