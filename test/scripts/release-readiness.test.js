@@ -10,6 +10,7 @@ import {
 function completeChecklist({
   automatedGateResult = "Pass",
   commit = "abc1234",
+  includeExecutableWarning = true,
   flowResult = "Pass",
   includeLaunchFlagWarning = true,
   includeLiveProfileWarning = true,
@@ -26,6 +27,9 @@ function completeChecklist({
   const launchFlagWarning = includeLaunchFlagWarning
     ? `Do not use repo scripts or assistant-driven browser automation to pass ${"--profile-" + "directory"}, ${"--load-" + "extension"}, ${"--disable-extensions-" + "except"}, or remote debugging flags to Chrome for this checklist.`
     : "";
+  const executableWarning = includeExecutableWarning
+    ? `Do not add repo scripts that launch Chrome or Chromium executables such as ${"`chrome." + "exe`"}, ${"`google-" + "chrome`"}, ${"`chromium-" + "browser`"}, or ${"`Google " + "Chrome.app`"}.`
+    : "";
   const flowRows = expectedManualBrowserQaChecks
     .map((check) => `| ${check} | ${flowResult} | checked |`)
     .join("\n");
@@ -38,6 +42,7 @@ function completeChecklist({
 ${liveProfileWarning}
 ${namedProfileWarning}
 ${launchFlagWarning}
+${executableWarning}
 
 ## Evidence Header
 
@@ -133,4 +138,12 @@ test("checkReleaseReadinessChecklist preserves the Chrome launch-flag warning", 
   });
 
   assert(errors.includes("Manual browser QA checklist must preserve the Chrome launch-flag automation warning."));
+});
+
+test("checkReleaseReadinessChecklist preserves the Chrome executable launch warning", () => {
+  const errors = checkReleaseReadinessChecklist(completeChecklist({ includeExecutableWarning: false }), {
+    currentCommit: "abc1234"
+  });
+
+  assert(errors.includes("Manual browser QA checklist must preserve the Chrome executable launch warning."));
 });

@@ -16,6 +16,10 @@ function safeReleaseQa() {
   const profileFlag = "--profile-" + "directory";
   const loadFlag = "--load-" + "extension";
   const disableExceptFlag = "--disable-extensions-" + "except";
+  const chromeExe = "chrome." + "exe";
+  const googleChrome = "google-" + "chrome";
+  const chromiumBrowser = "chromium-" + "browser";
+  const chromeApp = "Google " + "Chrome.app";
 
   return `# Release QA
 
@@ -24,6 +28,7 @@ function safeReleaseQa() {
 - Do not create or target named personal Chrome profiles such as \`${namedProfile}\` for automated QA.
 - Automated browser QA must use a disposable temporary user-data directory, or stay manual.
 - Do not add npm scripts that launch Chrome, Playwright, or a remote-debugging session against a real user profile.
+- Do not add repo scripts that launch Chrome or Chromium executables such as \`${chromeExe}\`, \`${googleChrome}\`, \`${chromiumBrowser}\`, or \`${chromeApp}\`.
 - Do not pass \`${profileFlag}\`, \`${loadFlag}\`, \`${disableExceptFlag}\`, or CDP attachment flags from repo scripts.
 - Validation scans package scripts, repository scripts, and tests for live Chrome profile automation patterns.
 `;
@@ -90,5 +95,37 @@ test("validateChromeQaSafety rejects scripts that attach to an existing Chrome s
   assert.throws(
     () => runSafety(root),
     /scripts\/cdp\.mjs contains forbidden live Chrome profile automation pattern/
+  );
+});
+
+test("validateChromeQaSafety rejects package scripts that launch Chrome executables directly", () => {
+  const root = makeFixture();
+  const blockedBinary = "google-" + "chrome";
+
+  assert.throws(
+    () => runSafety(root, { bad: `${blockedBinary} --version` }),
+    /package script "bad" contains forbidden live Chrome profile automation pattern/
+  );
+});
+
+test("validateChromeQaSafety rejects scripts that launch Chromium executables directly", () => {
+  const root = makeFixture();
+  const blockedBinary = "chromium-" + "browser";
+  fs.writeFileSync(path.join(root, "scripts", "browser.mjs"), `const command = "${blockedBinary}";\n`);
+
+  assert.throws(
+    () => runSafety(root),
+    /scripts\/browser\.mjs contains forbidden live Chrome profile automation pattern/
+  );
+});
+
+test("validateChromeQaSafety rejects scripts that target the macOS Chrome app bundle", () => {
+  const root = makeFixture();
+  const blockedApp = "Google " + "Chrome.app";
+  fs.writeFileSync(path.join(root, "scripts", "macos.mjs"), `const app = "${blockedApp}";\n`);
+
+  assert.throws(
+    () => runSafety(root),
+    /scripts\/macos\.mjs contains forbidden live Chrome profile automation pattern/
   );
 });

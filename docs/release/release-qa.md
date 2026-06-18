@@ -56,6 +56,7 @@ Current workstation note:
 - Do not create or target named personal Chrome profiles such as `Your Chrome` for automated QA.
 - Automated browser QA must use a disposable temporary user-data directory, or stay manual.
 - Do not add npm scripts that launch Chrome, Playwright, or a remote-debugging session against a real user profile.
+- Do not add repo scripts that launch Chrome or Chromium executables such as `chrome.exe`, `google-chrome`, `chromium-browser`, or `Google Chrome.app`.
 - Do not pass `--profile-directory`, `--load-extension`, `--disable-extensions-except`, or CDP attachment flags from repo scripts.
 - Validation scans package scripts, repository scripts, and tests for live Chrome profile automation patterns.
 - Do not treat that process-level closure as a BrowseVault product failure without reproducing it in a normal Chrome session.

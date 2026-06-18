@@ -131,6 +131,10 @@ export function checkReleaseReadinessChecklist(checklist, { currentCommit }) {
     {
       message: "Manual browser QA checklist must preserve the Chrome launch-flag automation warning.",
       pattern: /--profile-directory.*--load-extension.*--disable-extensions-except.*remote debugging flags/i
+    },
+    {
+      message: "Manual browser QA checklist must preserve the Chrome executable launch warning.",
+      pattern: /chrome\.exe.*google-chrome.*chromium-browser.*Google Chrome\.app/i
     }
   ];
 

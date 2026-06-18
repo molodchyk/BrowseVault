@@ -8,6 +8,8 @@ Do not create or target named personal Chrome profiles such as `Your Chrome` for
 
 Do not use repo scripts or assistant-driven browser automation to pass `--profile-directory`, `--load-extension`, `--disable-extensions-except`, or remote debugging flags to Chrome for this checklist.
 
+Do not add repo scripts that launch Chrome or Chromium executables such as `chrome.exe`, `google-chrome`, `chromium-browser`, or `Google Chrome.app`.
+
 ## Evidence Header
 
 - Tester:
