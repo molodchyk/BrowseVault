@@ -66,6 +66,8 @@ export const requiredProjectFiles = [
   "docs/release/release-qa.md",
   "docs/release/release-notes.md",
   "docs/research/source-inventory.md",
+  "docs/research/raw-sources/browser-extension-playbook-reference.txt",
+  "docs/research/raw-sources/storepilot-chrome-web-store-reference.txt",
   "docs/storepilot-project-structure.md",
   "docs/chrome-web-store-additional-fields.md",
   "docs/chrome-web-store-category.md",

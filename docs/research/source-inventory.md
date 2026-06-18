@@ -16,6 +16,7 @@ The raw files are preserved in [`raw-sources/`](raw-sources/) so future product,
 | [`raw-sources/history-trends-unlimited-reviews.txt`](raw-sources/history-trends-unlimited-reviews.txt) | History Trends Unlimited Chrome Web Store reviews | `f872aa64-cb8f-4eab-8de0-cda9f5b6b2fe` | Long-term archive, backup trust, analytics expectations |
 | [`raw-sources/recent-history-reviews.txt`](raw-sources/recent-history-reviews.txt) | Recent History Chrome Web Store reviews | `dbc92d6f-d0cb-4fcc-ba6f-b9f8c76010c0` | Recent-history workflow expectations and reliability issues |
 | [`raw-sources/view-chrome-history-overview.txt`](raw-sources/view-chrome-history-overview.txt) | View Chrome History Chrome Web Store listing and reviews | `434aff07-a23e-4f98-829b-a5474f2b3d60` | Default-history replacement, date-range browsing, theme/readability complaints |
+| [`raw-sources/browser-extension-playbook-reference.txt`](raw-sources/browser-extension-playbook-reference.txt) | Browser Extension Playbook, refreshed from `settings/browser-extension-playbook.md` | Current workspace reference | Shared product, repository, privacy, store listing, reviewer, and release standards |
 | [`raw-sources/storepilot-chrome-web-store-reference.txt`](raw-sources/storepilot-chrome-web-store-reference.txt) | StorePilot Chrome Web Store automation import reference, refreshed from `settings/StorePilot/docs/reference.md` | `4a5ebccd-d431-4ee1-86c8-9970b67fca80` prompted the first snapshot | Store-facing file layout and dashboard field automation |
 
 ## Handling Notes
@@ -24,6 +25,7 @@ The raw files are preserved in [`raw-sources/`](raw-sources/) so future product,
 - Absolute local attachment paths are intentionally not stored here.
 - Treat these files as evidence snapshots, not current market truth. Re-check Chrome Web Store pages before launch-sensitive claims about ratings, users, or recent reviews.
 - Treat the StorePilot reference as launch tooling documentation and re-check it before changing the automation-facing file layout. `npm run check:reference-sync` compares the committed snapshot against `settings/StorePilot/docs/reference.md` when that sibling project is available.
+- Treat the Browser Extension Playbook as the active release contract. `npm run check:reference-sync` compares the committed snapshot against `settings/browser-extension-playbook.md` when this repository is inside the settings workspace.
 - Summaries derived from these sources live in:
   - [`browser-history-extension-research.md`](browser-history-extension-research.md)
   - [`user-feedback-taxonomy.md`](user-feedback-taxonomy.md)

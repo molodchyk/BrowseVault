@@ -6,6 +6,11 @@ const root = process.cwd();
 const settingsRoot = path.resolve(root, "..");
 const references = [
   {
+    label: "Browser extension playbook snapshot",
+    localPath: path.join(root, "docs", "research", "raw-sources", "browser-extension-playbook-reference.txt"),
+    sourcePath: path.join(settingsRoot, "browser-extension-playbook.md")
+  },
+  {
     label: "Extension modularization playbook",
     localPath: path.join(root, "docs", "architecture", "extension-modularization-playbook.md"),
     sourcePath: path.join(settingsRoot, "Defense_against_Distractions", "docs", "extension-modularization-playbook.md")

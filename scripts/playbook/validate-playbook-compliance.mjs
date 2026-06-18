@@ -118,6 +118,15 @@ export function validatePlaybookCompliance(root, assert) {
     "Docs README must link the shared localization workflow reference."
   );
 
+  const sourceInventory = fs.readFileSync(path.join(root, "docs", "research", "source-inventory.md"), "utf8");
+  for (const expected of [
+    "browser-extension-playbook-reference.txt",
+    "refreshed from `settings/browser-extension-playbook.md`",
+    "StorePilot reference as launch tooling documentation"
+  ]) {
+    assert(sourceInventory.includes(expected), `Source inventory missing playbook/tooling snapshot detail: ${expected}`);
+  }
+
   const qaReadme = fs.readFileSync(path.join(root, "scripts", "qa", "README.md"), "utf8");
   for (const expected of [
     "Do not add scripts here that launch, attach to, or mutate an active Chrome profile.",

@@ -1,0 +1,148 @@
+# Browser Extension Playbook
+
+This playbook captures the reusable product, release, and repository standards for small browser extensions. It is written so Codex can apply the same shape to new extensions without needing to rediscover the expectations from each project.
+
+For architecture and code organization, use the related [Extension Modularization Playbook](C:/Users/molod/Documents/Personal/settings/Defense_against_Distractions/docs/extension-modularization-playbook.md). This document focuses on how a finished extension should present itself to users, browser stores, reviewers, and future maintainers.
+
+## Product Shape
+
+Extensions should be narrow and honest about their job.
+
+- The name should describe the concrete browser behavior.
+- The summary should say what changes for the user in one sentence.
+- The first screen should perform the core job, not explain the project.
+- Keep permissions minimal and explainable.
+- Avoid analytics, remote calls, search changes, dashboards, and broad host permissions unless the product specifically needs them.
+- Give users a visible reset path before uninstall.
+
+## Repository Shape
+
+Every extension repo should make review and release mechanics obvious.
+
+- `README.md` explains the product goal, load-unpacked steps, checks, privacy posture, license, and source URL.
+- `LICENSE` contains the full license text.
+- `PRIVACY.md` explains stored data, network behavior, permissions, and sale/sharing posture in plain language.
+- `manifest.json` stays small and auditable.
+- `src/` contains human-authored extension source.
+- `assets/` contains icons and packaged static assets.
+- `docs/` contains reviewer notes, privacy form answers, release notes, and decision records.
+- `store-listing/` or `store/` contains browser-store copy and media.
+- For Chrome Web Store automation files prepared for StorePilot, follow [StorePilot Project Reference](C:/Users/molod/Documents/Personal/settings/StorePilot/docs/reference.md).
+- `scripts/` contains repeatable validation and packaging commands.
+- `test/` or feature-owned tests cover pure logic and migration-sensitive behavior.
+
+## Store Listing Copy
+
+Store copy should be direct, concrete, and free of inflated claims.
+
+Recommended structure:
+
+1. One sentence naming what the extension lets the user do.
+2. One short paragraph that names supported inputs and privacy boundaries.
+3. A small list of popular examples when useful.
+4. A plain feature list.
+5. Notes for browser-specific limitations.
+6. An open-source footer with the license and GitHub link.
+
+Use visible claims only when the repo can prove them. For example, "no tracking" should match the permission set, source, package output, and privacy policy.
+
+## Localization
+
+When an extension has localized UI strings, `_locales/` metadata, translated store listing text, or right-to-left languages, use the [Defense against Distractions Localization Reference](C:/Users/molod/Documents/Personal/settings/Defense_against_Distractions/docs/localization.md) as the canonical workflow reference.
+
+Use it for the non-obvious parts: Chrome Web Store visible-language coverage can differ from older Chrome extension i18n lists, regional locale codes use underscores, and Arabic, Persian, Hebrew, and Urdu need right-to-left checks on extension pages and extension-owned injected surfaces.
+
+If a project is only partially localized, first externalize the English UI strings into `_locales/en/messages.json` and wire the extension to read them there. Store listing translations or scattered hardcoded English strings are not a complete localization setup.
+
+## Open Source And License
+
+Default to GPL-3.0 for personal browser extensions unless a project has a specific reason to choose another license.
+
+Required places:
+
+- `LICENSE` contains GPLv3 text.
+- `package.json` uses the SPDX identifier `GPL-3.0-only`.
+- `README.md` has an Open Source or License section.
+- Store listing footer says the extension is open source and links to the GitHub page.
+
+Use the current repository slug with the `molodchyk` GitHub account:
+
+```text
+Open source under the GPL-3.0 license:
+https://github.com/molodchyk/<repo-slug>
+```
+
+## README Donation Links
+
+Use the existing house Support block near the bottom of `README.md`, after privacy and license/source information.
+
+Do not use placeholders. The canonical block is:
+
+```markdown
+## Support
+
+If this extension saves you time and you want to support its development:
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-FFDD00?logo=buymeacoffee&logoColor=000)](https://buymeacoffee.com/molodchyk)
+[![Patreon](https://img.shields.io/badge/Patreon-support-F96854?logo=patreon&logoColor=fff)](https://www.patreon.com/OMolodchyk)
+```
+
+Rules:
+
+- If an existing extension already has this block, preserve it.
+- If an existing extension has a different donation block, normalize it to this wording and these two badges.
+- Do not add donation links to Chrome Web Store listing copy by default.
+
+## Privacy And Permissions
+
+Privacy copy should be specific rather than decorative.
+
+- List the exact browser permissions.
+- Explain why each permission exists.
+- Say whether settings are stored in sync, local, session, or managed storage.
+- State whether the extension makes network requests.
+- State whether it uses analytics, ads, tracking, content scripts, or remote code.
+- Keep the privacy policy aligned with the manifest and package output.
+
+## UI Expectations
+
+Small utility extensions should feel quiet and useful.
+
+- Options pages should expose the main setting immediately.
+- Popups should support quick changes and status, not marketing copy.
+- Use browser-native vocabulary when the browser owns the behavior.
+- Prefer clear labels over clever language.
+- Keep destructive actions explicit.
+- Design dark, light, and blank states intentionally when the extension can show an empty page.
+
+## Reviewer Notes
+
+Browser-store reviewers should not have to infer intent.
+
+- Document file URL limitations if the extension supports local files.
+- Document incognito limitations when relevant.
+- Mention browser-controlled behavior that may vary by version.
+- Avoid claiming control over browser features that extensions cannot guarantee.
+- Keep screenshots consistent with the current UI and store copy.
+
+## Release Checks
+
+Before release, run the narrow checks and inspect the package users will receive.
+
+- Validate manifest paths.
+- Verify icons and screenshots exist.
+- Run unit tests.
+- Check package output for remote code and missing files.
+- Confirm the privacy policy matches the manifest.
+- Confirm the store listing footer includes the GitHub URL and license.
+- Load the unpacked extension in the target browser.
+
+## Codex Protocol
+
+When Codex works on an extension:
+
+1. Read the local README, manifest, privacy policy, store copy, localization docs, and any project playbooks.
+2. Preserve existing uncommitted user changes.
+3. Keep claims synchronized across README, store listing, privacy docs, manifest, and package metadata.
+4. Add or update validation scripts when a rule should remain true after the current edit.
+5. Run the smallest useful checks before reporting completion.

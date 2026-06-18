@@ -21,7 +21,7 @@ This folder captures the critical market research, user feedback, product direct
 - `storepilot-project-structure.md` - checklist that maps BrowseVault files to the StorePilot Chrome Web Store import reference.
 - `chrome-web-store-media.md` - screenshot coverage and manual review checklist for store media consistency.
 - `research/source-inventory.md` - index of raw source snapshots and how they map to the research notes.
-- `research/raw-sources/` - preserved Chrome Web Store listing/review text snapshots used as evidence.
+- `research/raw-sources/` - preserved Chrome Web Store listing/review text snapshots and tooling/playbook reference snapshots used as evidence.
 
 ## Related Playbooks
 
