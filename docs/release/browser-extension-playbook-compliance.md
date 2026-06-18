@@ -68,3 +68,13 @@ This file maps BrowseVault release evidence to the shared browser-extension play
 | Reviewer notes cover browser-controlled limits. | `docs/release/reviewer-notes.md`. |
 | Narrow checks inspect the release package. | `docs/release/release-qa.md`; `scripts/package-extension.mjs`; `scripts/verify-package.mjs` verifies required entries, static imports, locale references, remote-code/network patterns, and exact package freshness against the current source tree. |
 | Load the unpacked extension before release. | `docs/release/release-qa.md` records this as a required manual check when local focus-blocking tools prevent reliable automated Chrome runs. |
+
+## Codex Protocol
+
+| Playbook expectation | BrowseVault evidence |
+| --- | --- |
+| Read local README, manifest, privacy policy, store copy, localization docs, and project playbooks before acting. | `docs/README.md`, `docs/research/source-inventory.md`, and `npm run check:reference-sync` keep the relevant playbook/reference inputs visible and current. |
+| Preserve existing uncommitted user changes. | The project relies on normal Git dirty-worktree inspection before edits; release docs keep browser/profile work manual to avoid mutating user state. |
+| Keep claims synchronized across README, store listing, privacy docs, manifest, and package metadata. | `npm run validate`, `npm run check:store-metadata`, `scripts/check-privacy-permissions.mjs`, and `scripts/verify-package.mjs`. |
+| Add or update validation scripts when a rule should remain true. | `scripts/playbook/` contains release-readiness, reference-sync, store-metadata, manifest-surface, and Chrome QA safety guardrails. |
+| Run the smallest useful checks before reporting completion. | `README.md`, `docs/release/release-qa.md`, and `docs/release/manual-browser-qa-checklist.md` list the repo and manual release checks. |

@@ -29,7 +29,7 @@ Expected results:
 - extension validation passes;
 - Chrome Web Store promo PNGs regenerate at the required `440 x 280` and `1400 x 560` dimensions;
 - JavaScript syntax, static import resolution, extension-page module script path, manifest and extension UI locale coverage, manifest path, privacy/permission disclosure parity, file-size budget, and runtime/test/script/docs folder-density checks pass;
-- shared reference sync checks pass for the local modularization playbook copy and StorePilot reference snapshot when those sibling projects are available;
+- shared reference sync checks pass for the browser-extension playbook snapshot, local modularization playbook copy, and StorePilot reference snapshot when those workspace sources are available;
 - store metadata sync checks pass across the human store draft, StorePilot detailed description, manifest locale strings, package metadata, and repository metadata;
 - unit tests pass;
 - `dist/browsevault-1.0.0.zip` is produced;

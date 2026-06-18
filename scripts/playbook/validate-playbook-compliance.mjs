@@ -155,6 +155,8 @@ export function validatePlaybookCompliance(root, assert) {
     "UI Expectations",
     "Privacy And Permissions",
     "Reviewer Notes And Release Checks",
+    "Codex Protocol",
+    "check:store-metadata",
     "manifest key allowlist",
     "chrome_settings_overrides",
     "manual check"
@@ -300,10 +302,12 @@ export function validatePlaybookCompliance(root, assert) {
     "UI expectations",
     "Reviewer notes",
     "Release package checks",
+    "Codex protocol",
     "Target-browser load-unpacked check",
     "Manual required",
     "npm run release:ready",
     "current Git commit",
+    "Reference sync keeps local playbooks current",
     "Load the unpacked extension in the target browser",
     "Do not use automated Chrome or Playwright runs against a live Chrome profile",
     "do not create or target named personal Chrome profiles such as `Your Chrome`"
