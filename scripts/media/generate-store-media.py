@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 try:
@@ -7,6 +8,7 @@ except ImportError as exc:
 
 
 ROOT = Path(__file__).resolve().parents[2]
+LOCALE_PATH = ROOT / "_locales" / "en" / "messages.json"
 PROMO_DIR = ROOT / "store-listing" / "chrome-web-store" / "media" / "promo"
 
 COLORS = {
@@ -23,6 +25,23 @@ COLORS = {
     "red": "#A12C3D",
     "ink": "#081A1B",
 }
+
+
+def locale_message(key, fallback):
+    with LOCALE_PATH.open(encoding="utf-8") as handle:
+        messages = json.load(handle)
+    value = messages.get(key, {}).get("message", "").strip()
+    return value or fallback
+
+
+BRAND_NAME = locale_message("extensionShortName", "BrowseVault")
+APP_HEADING = locale_message("appHeading", "History Search & Backup")
+SHORT_DESCRIPTION = locale_message(
+    "extensionDescription",
+    "Search, back up, export, and preserve your browser history locally.",
+)
+EXPORT_CSV_LABEL = locale_message("buttonExportCsv", "Export CSV")
+IMPORT_ARCHIVE_LABEL = locale_message("buttonImportArchive", "Import Archive")
 
 FONT_CANDIDATES = {
     "regular": [
@@ -72,6 +91,23 @@ def text_width(value, size, style="regular"):
     return right - left
 
 
+def wrap_text(value, size, style, max_width):
+    words = value.split()
+    lines = []
+    current = ""
+    for word in words:
+        candidate = f"{current} {word}".strip()
+        if current and text_width(candidate, size, style) > max_width:
+            lines.append(current)
+            current = word
+        else:
+            current = candidate
+
+    if current:
+        lines.append(current)
+    return lines
+
+
 def rounded(draw, xy, radius, fill, outline=None, width=1):
     draw.rounded_rectangle(xy, radius=radius, fill=fill, outline=outline, width=width)
 
@@ -83,6 +119,10 @@ def chip(draw, xy, label, fill, text_fill=None, pad_x=14, pad_y=8, size=17):
     rounded(draw, (x, y, x + width, y + height), 10, fill)
     draw_text(draw, (x + pad_x, y + pad_y - 1), label, size, text_fill or COLORS["text"], "semibold")
     return width
+
+
+def chip_width(label, pad_x=14, size=17):
+    return text_width(label, size, "semibold") + pad_x * 2
 
 
 def card(draw, xy, radius=18, fill=None):
@@ -161,8 +201,12 @@ def backup_card(draw, x, y, width, height):
     card(draw, (x, y, x + width, y + height), 18, COLORS["panel_2"])
     draw_text(draw, (x + 22, y + 20), "Backup status", 22, style="bold")
     draw_text(draw, (x + 22, y + 52), "JSON archive verified", 16, COLORS["muted"], "regular")
-    chip(draw, (x + 392, y + 20), "export CSV", COLORS["blue"], size=15)
-    chip(draw, (x + 505, y + 20), "restore", COLORS["teal_dark"], size=15)
+    import_width = chip_width(IMPORT_ARCHIVE_LABEL, size=15)
+    export_width = chip_width(EXPORT_CSV_LABEL, size=15)
+    import_x = x + width - 22 - import_width
+    export_x = import_x - 8 - export_width
+    chip(draw, (export_x, y + 20), EXPORT_CSV_LABEL, COLORS["blue"], size=15)
+    chip(draw, (import_x, y + 20), IMPORT_ARCHIVE_LABEL, COLORS["teal_dark"], size=15)
     rows = [
         ("16,435", "records"),
         ("177", "domains"),
@@ -183,8 +227,8 @@ def small_promo():
 
     draw.rectangle((0, 0, 440, 6), fill=COLORS["teal_dark"])
     vault_mark(draw, (30, 36), 34)
-    draw_text(draw, (74, 38), "BrowseVault", 25, style="bold")
-    draw_text(draw, (75, 69), "History Search & Backup", 12, COLORS["muted"], "regular")
+    draw_text(draw, (74, 38), BRAND_NAME, 25, style="bold")
+    draw_text(draw, (75, 69), APP_HEADING, 12, COLORS["muted"], "regular")
 
     chip(draw, (34, 114), "Local vault", COLORS["teal_dark"], size=13, pad_x=11, pad_y=7)
     chip(draw, (34, 154), "Search operators", COLORS["blue"], size=13, pad_x=11, pad_y=7)
@@ -219,10 +263,10 @@ def marquee_promo():
     draw.rectangle((0, 0, 1400, 10), fill=COLORS["teal_dark"])
     draw.rectangle((0, 550, 1400, 560), fill=COLORS["blue"])
     vault_mark(draw, (94, 78), 58)
-    draw_text(draw, (170, 80), "BrowseVault", 64, style="bold")
-    draw_text(draw, (172, 150), "History Search & Backup", 31, COLORS["muted"], "regular")
-    draw_text(draw, (98, 230), "Private browser history search, backup,", 28, COLORS["text"], "semibold")
-    draw_text(draw, (98, 266), "export, and preservation.", 28, COLORS["text"], "semibold")
+    draw_text(draw, (170, 80), BRAND_NAME, 64, style="bold")
+    draw_text(draw, (172, 150), APP_HEADING, 31, COLORS["muted"], "regular")
+    for index, line in enumerate(wrap_text(SHORT_DESCRIPTION, 28, "semibold", 560)[:3]):
+        draw_text(draw, (98, 230 + index * 36), line, 28, COLORS["text"], "semibold")
 
     chip(draw, (98, 335), "local-first", COLORS["teal_dark"], size=20)
     chip(draw, (254, 335), "advanced search", COLORS["blue"], size=20)

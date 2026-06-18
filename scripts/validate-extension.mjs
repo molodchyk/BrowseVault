@@ -4,6 +4,7 @@ import { requiredProjectFiles } from "./playbook/required-project-files.mjs";
 import { validateChromeQaSafety } from "./playbook/validate-chrome-qa-safety.mjs";
 import { validateManifestSurface } from "./playbook/validate-manifest-surface.mjs";
 import { validatePlaybookCompliance } from "./playbook/validate-playbook-compliance.mjs";
+import { validateStoreMedia } from "./playbook/validate-store-media.mjs";
 
 const root = process.cwd();
 
@@ -24,44 +25,6 @@ function escapeRegExp(value) {
 function assertButtonLabel(source, id, label) {
   const pattern = new RegExp(`<button\\b(?=[^>]*\\bid="${escapeRegExp(id)}")[^>]*>${escapeRegExp(label)}<\\/button>`);
   assert(pattern.test(source), `Missing #${id} button labeled "${label}".`);
-}
-
-function jpegDimensions(buffer) {
-  if (buffer[0] !== 0xff || buffer[1] !== 0xd8) {
-    return null;
-  }
-
-  let offset = 2;
-  while (offset + 9 < buffer.length) {
-    if (buffer[offset] !== 0xff) {
-      offset += 1;
-      continue;
-    }
-
-    const marker = buffer[offset + 1];
-    const length = buffer.readUInt16BE(offset + 2);
-    if (marker >= 0xc0 && marker <= 0xc3) {
-      return {
-        height: buffer.readUInt16BE(offset + 5),
-        width: buffer.readUInt16BE(offset + 7)
-      };
-    }
-    offset += 2 + length;
-  }
-
-  return null;
-}
-
-function imageDimensions(file) {
-  const buffer = fs.readFileSync(path.join(root, file));
-  if (buffer[0] === 137 && buffer[1] === 80 && buffer[2] === 78 && buffer[3] === 71) {
-    return {
-      height: buffer.readUInt32BE(20),
-      width: buffer.readUInt32BE(16)
-    };
-  }
-
-  return jpegDimensions(buffer);
 }
 
 function collectFilesByExtension(entry, extensions) {
@@ -172,34 +135,7 @@ for (const size of [16, 32, 48, 128]) {
   assert(icon.readUInt32BE(16) === size && icon.readUInt32BE(20) === size, `Icon ${size} has wrong dimensions.`);
 }
 
-for (const screenshot of [
-  "01-history-search.jpg",
-  "02-quick-open.jpg",
-  "03-backup-health.jpg",
-  "04-rules-cleanup.jpg",
-  "05-settings-privacy.jpg"
-]) {
-  const dimensions = imageDimensions(path.join("store-listing", "chrome-web-store", "media", "screenshots", screenshot));
-  assert(dimensions?.width === 1280 && dimensions?.height === 800, `Store screenshot ${screenshot} must be 1280 x 800.`);
-}
-
-for (const [promo, width, height] of [
-  ["small-promo.png", 440, 280],
-  ["marquee-promo.png", 1400, 560]
-]) {
-  const dimensions = imageDimensions(path.join("store-listing", "chrome-web-store", "media", "promo", promo));
-  assert(dimensions?.width === width && dimensions?.height === height, `Store promo ${promo} must be ${width} x ${height}.`);
-}
-
-const storePilotIcon = fs.readFileSync(path.join(root, "store-listing", "chrome-web-store", "media", "icon-128.png"));
-assert(
-  storePilotIcon[0] === 137 && storePilotIcon[1] === 80 && storePilotIcon[2] === 78 && storePilotIcon[3] === 71,
-  "StorePilot icon is not a PNG."
-);
-assert(
-  storePilotIcon.readUInt32BE(16) === 128 && storePilotIcon.readUInt32BE(20) === 128,
-  "StorePilot icon must be 128 x 128."
-);
+validateStoreMedia(root, assert);
 
 const storePilotListing = fs.readFileSync(path.join(root, "store-listing", "chrome-web-store", "listing", "en.md"), "utf8").trim();
 assert(storePilotListing.length > 0, "StorePilot English detailed description cannot be empty.");

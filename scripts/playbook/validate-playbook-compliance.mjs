@@ -393,6 +393,9 @@ export function validatePlaybookCompliance(root, assert) {
     "03-backup-health.jpg",
     "04-rules-cleanup.jpg",
     "05-settings-privacy.jpg",
+    "small-promo.png",
+    "marquee-promo.png",
+    "both promo images still match the current name",
     "no analytics",
     "no host permissions",
     "no remote code"
