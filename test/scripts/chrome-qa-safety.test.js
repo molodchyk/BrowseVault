@@ -34,11 +34,37 @@ function safeReleaseQa() {
 `;
 }
 
+function safeAgents() {
+  const localAppData = "%" + "LOCALAPPDATA" + "%";
+  const userDataPath = [localAppData, "Google", "Chrome", "User Data"].join("\\");
+  const namedProfile = "Your " + "Chrome";
+  const profileFlag = "--profile-" + "directory";
+  const userDataFlag = "--user-" + "data-dir";
+  const loadFlag = "--load-" + "extension";
+  const disableExceptFlag = "--disable-extensions-" + "except";
+
+  return `# Codex Working Rules
+
+This repository is browser-sensitive because local tools such as Cold Turkey and FocusMe can interfere with Chrome processes and because accidental Chrome profile creation is stressful user-state mutation.
+
+## Browser Safety
+
+- Do not launch Chrome, Chromium, Playwright, the Chrome MCP, the in-app browser, or any browser automation for this project.
+- Do not create, target, rename, delete, or otherwise manage Chrome profiles from Codex.
+- Do not use the active Chrome profile, \`${userDataPath}\`, \`Default\`, \`Profile\`, \`Profile 1\`, or named personal profiles such as \`${namedProfile}\`.
+- Do not pass \`${profileFlag}\`, \`${userDataFlag}\`, \`${loadFlag}\`, \`${disableExceptFlag}\`, remote debugging, or CDP attachment flags from repo scripts or assistant-driven commands.
+- Do not treat Chrome or Playwright closing under local focus blockers as a BrowseVault product failure.
+
+Manual target-browser QA belongs in \`docs/release/manual-browser-qa-checklist.md\` and should be performed by the user in their normal browser session. Repo-owned checks should stay non-browser unless the user explicitly approves a disposable browser-profile plan in the current turn.
+`;
+}
+
 function makeFixture() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "browsevault-chrome-qa-"));
   fs.mkdirSync(path.join(root, "docs", "release"), { recursive: true });
   fs.mkdirSync(path.join(root, "scripts"), { recursive: true });
   fs.mkdirSync(path.join(root, "test"), { recursive: true });
+  fs.writeFileSync(path.join(root, "AGENTS.md"), safeAgents());
   fs.writeFileSync(path.join(root, "docs", "release", "release-qa.md"), safeReleaseQa());
   fs.writeFileSync(path.join(root, "scripts", "safe.mjs"), "console.log('repo-only check');\n");
   fs.writeFileSync(path.join(root, "test", "safe.test.js"), "const check = 'repo-only';\n");
@@ -53,6 +79,16 @@ test("validateChromeQaSafety accepts repo-only QA fixtures", () => {
   const root = makeFixture();
 
   runSafety(root, { check: "node scripts/safe.mjs" });
+});
+
+test("validateChromeQaSafety requires root Codex browser-safety instructions", () => {
+  const root = makeFixture();
+  fs.writeFileSync(path.join(root, "AGENTS.md"), "# Codex Working Rules\n");
+
+  assert.throws(
+    () => runSafety(root),
+    /AGENTS\.md missing Chrome\/browser safety invariant/
+  );
 });
 
 test("validateChromeQaSafety rejects package scripts that set a Chrome user data directory", () => {

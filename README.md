@@ -90,6 +90,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 
 ```text
 .
+├── AGENTS.md
 ├── _locales/
 │   └── en/
 │       └── messages.json

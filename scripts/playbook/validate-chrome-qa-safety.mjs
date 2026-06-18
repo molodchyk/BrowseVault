@@ -48,6 +48,18 @@ function assertNoForbiddenAutomation(label, source, assert) {
 }
 
 export function validateChromeQaSafety(root, packageJson, assert) {
+  const agents = fs.readFileSync(path.join(root, "AGENTS.md"), "utf8");
+  for (const expected of [
+    "Do not launch Chrome, Chromium, Playwright, the Chrome MCP, the in-app browser, or any browser automation for this project.",
+    "Do not create, target, rename, delete, or otherwise manage Chrome profiles from Codex.",
+    "Do not use the active Chrome profile, `%LOCALAPPDATA%\\Google\\Chrome\\User Data`, `Default`, `Profile`, `Profile 1`, or named personal profiles such as `Your Chrome`.",
+    "Do not pass `--profile-directory`, `--user-data-dir`, `--load-extension`, `--disable-extensions-except`, remote debugging, or CDP attachment flags from repo scripts or assistant-driven commands.",
+    "Do not treat Chrome or Playwright closing under local focus blockers as a BrowseVault product failure.",
+    "Manual target-browser QA belongs in `docs/release/manual-browser-qa-checklist.md`"
+  ]) {
+    assert(agents.includes(expected), `AGENTS.md missing Chrome/browser safety invariant: ${expected}`);
+  }
+
   const releaseQa = fs.readFileSync(path.join(root, "docs", "release", "release-qa.md"), "utf8");
   for (const expected of [
     "Never use the active Chrome profile for automated QA.",

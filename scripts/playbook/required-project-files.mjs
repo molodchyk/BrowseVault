@@ -1,5 +1,6 @@
 export const requiredProjectFiles = [
   "manifest.json",
+  "AGENTS.md",
   "_locales/en/messages.json",
   "README.md",
   "CHANGELOG.md",
