@@ -129,6 +129,18 @@ export function validatePlaybookCompliance(root, assert) {
     "Docs README must link the shared localization workflow reference."
   );
 
+  const codeStructure = fs.readFileSync(path.join(root, "docs", "architecture", "code-structure.md"), "utf8");
+  assert(
+    codeStructure.includes("dynamic history-result UI status keys"),
+    "Code structure doc must document dynamic history-results localization coverage."
+  );
+
+  const localeCheckScript = fs.readFileSync(path.join(root, "scripts", "check-locales.mjs"), "utf8");
+  assert(
+    localeCheckScript.includes("historyResultsLocalization"),
+    "Locale checker must include dynamic history-results UI localization keys."
+  );
+
   const sourceInventory = fs.readFileSync(path.join(root, "docs", "research", "source-inventory.md"), "utf8");
   for (const expected of [
     "browser-extension-playbook-reference.txt",

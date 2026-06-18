@@ -135,6 +135,52 @@
     "message": "Saved searches",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "savedSearchNamePrompt": {
+    "message": "Save search name",
+    "description": "Prompt title shown before saving a BrowseVault saved search."
+  },
+  "statusEnterSearchBeforeSaving": {
+    "message": "Enter a search before saving",
+    "description": "Status shown when the user tries to save an empty BrowseVault search."
+  },
+  "statusSaveSearchCanceled": {
+    "message": "Save search canceled",
+    "description": "Status shown when the saved-search name prompt is canceled."
+  },
+  "statusSavedSearch": {
+    "message": "Saved search: $NAME$",
+    "description": "Status shown after a BrowseVault saved search is stored.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "GitHub docs"
+      }
+    }
+  },
+  "statusChooseSavedSearchFirst": {
+    "message": "Choose a saved search first",
+    "description": "Status shown when a saved-search action is used without selecting a saved search."
+  },
+  "statusAppliedSavedSearch": {
+    "message": "Applied saved search: $NAME$",
+    "description": "Status shown after BrowseVault applies a saved search.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "GitHub docs"
+      }
+    }
+  },
+  "statusDeletedSavedSearch": {
+    "message": "Deleted saved search: $NAME$",
+    "description": "Status shown after BrowseVault deletes a saved search.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "GitHub docs"
+      }
+    }
+  },
   "buttonApply": {
     "message": "Apply",
     "description": "Static BrowseVault extension-page UI string."

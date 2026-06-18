@@ -140,6 +140,7 @@ export async function startBrowseVaultApp({ document: documentRef }) {
   const savedSearchActions = createSavedSearchActions({
     deleteSavedSearch,
     elements,
+    getMessage: getChromeMessage,
     getSavedSearches,
     readSearchValues: historySearchForm.readSearchValues,
     runSearchesNow: () => searchCoordinator.runSearchesNow(),

@@ -32,7 +32,7 @@ function fakeSelect() {
   return select;
 }
 
-function createHarness() {
+function createHarness(options = {}) {
   let searches = [{
     id: "saved:docs",
     name: "Docs",
@@ -48,6 +48,7 @@ function createHarness() {
   const statuses = [];
   const appliedValues = [];
   const runCalls = [];
+  const prompts = [];
   let currentValues = {
     query: "github site:github.com",
     onDate: "",
@@ -65,6 +66,7 @@ function createHarness() {
     elements: {
       savedSearches
     },
+    getMessage: options.getMessage,
     getSavedSearches: async () => searches,
     readSearchValues: () => currentValues,
     runSearchesNow: async () => runCalls.push("runSearchesNow"),
@@ -84,7 +86,10 @@ function createHarness() {
       return searches;
     },
     services: {
-      promptForName: () => "GitHub docs"
+      promptForName: (message, fallback) => {
+        prompts.push([message, fallback]);
+        return options.promptResult ?? "GitHub docs";
+      }
     },
     setStatus: (message) => statuses.push(message),
     writeSearchValues: (values) => {
@@ -93,7 +98,7 @@ function createHarness() {
     }
   });
 
-  return { actions, appliedValues, runCalls, savedSearches, statuses };
+  return { actions, appliedValues, prompts, runCalls, savedSearches, statuses };
 }
 
 test("saved search actions render, save, apply, and delete saved searches", async () => {
@@ -120,6 +125,41 @@ test("saved search actions render, save, apply, and delete saved searches", asyn
     ["", "Saved searches"]
   ]);
   assert.equal(statuses.at(-1), "Deleted saved search: GitHub docs");
+});
+
+test("saved search actions use localized dynamic labels and statuses", async () => {
+  const messages = {
+    savedSearchesOption: "Gespeicherte Suchen",
+    savedSearchNamePrompt: "Suchname speichern",
+    statusSavedSearch: (substitutions) => `Gespeichert: ${substitutions[0]}`,
+    statusAppliedSavedSearch: (substitutions) => `Angewendet: ${substitutions[0]}`,
+    statusDeletedSavedSearch: (substitutions) => `Geloescht: ${substitutions[0]}`
+  };
+  const { actions, prompts, savedSearches, statuses } = createHarness({
+    getMessage: (key, substitutions = []) => {
+      const value = messages[key];
+      return typeof value === "function" ? value(substitutions) : value || "";
+    }
+  });
+
+  await actions.loadSavedSearches();
+  assert.deepEqual(savedSearches.children.map((option) => [option.value, option.textContent]), [
+    ["", "Gespeicherte Suchen"],
+    ["saved:docs", "Docs"]
+  ]);
+
+  await actions.saveCurrentSearch();
+  assert.deepEqual(prompts[0], ["Suchname speichern", "github site:github.com"]);
+  assert.equal(statuses.at(-1), "Gespeichert: GitHub docs");
+
+  await actions.applySelectedSearch();
+  assert.equal(statuses.at(-1), "Angewendet: GitHub docs");
+
+  await actions.deleteSelectedSearch();
+  assert.deepEqual(savedSearches.children.map((option) => [option.value, option.textContent]), [
+    ["", "Gespeicherte Suchen"]
+  ]);
+  assert.equal(statuses.at(-1), "Geloescht: GitHub docs");
 });
 
 test("saved search actions report missing criteria or selection", async () => {

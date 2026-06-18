@@ -7,9 +7,14 @@ const defaultServices = {
   promptForName: (message, fallback) => globalThis.prompt(message, fallback)
 };
 
+function localizedMessage(getMessage, key, fallback, substitutions) {
+  return getMessage?.(key, substitutions) || fallback;
+}
+
 export function createSavedSearchActions({
   deleteSavedSearch,
   elements,
+  getMessage = () => "",
   getSavedSearches,
   readSearchValues,
   runSearchesNow,
@@ -36,7 +41,7 @@ export function createSavedSearchActions({
 
     const placeholder = ownerDocument.createElement("option");
     placeholder.value = "";
-    placeholder.textContent = "Saved searches";
+    placeholder.textContent = localizedMessage(getMessage, "savedSearchesOption", "Saved searches");
     elements.savedSearches.append(placeholder);
 
     for (const search of searches) {
@@ -56,14 +61,17 @@ export function createSavedSearchActions({
   async function saveCurrentSearch() {
     const values = readSearchValues();
     if (!savedSearchHasCriteria(values)) {
-      setStatus("Enter a search before saving");
+      setStatus(localizedMessage(getMessage, "statusEnterSearchBeforeSaving", "Enter a search before saving"));
       return;
     }
 
     const selected = selectedSearch();
-    const name = deps.promptForName("Save search name", selected?.name || defaultSavedSearchName(values));
+    const name = deps.promptForName(
+      localizedMessage(getMessage, "savedSearchNamePrompt", "Save search name"),
+      selected?.name || defaultSavedSearchName(values)
+    );
     if (name === null) {
-      setStatus("Save search canceled");
+      setStatus(localizedMessage(getMessage, "statusSaveSearchCanceled", "Save search canceled"));
       return;
     }
 
@@ -74,31 +82,32 @@ export function createSavedSearchActions({
     });
     const saved = nextSearches.find((search) => search.name === name.trim()) || nextSearches.find((search) => search.id === selected?.id);
     renderSavedSearches(nextSearches, saved?.id);
-    setStatus(`Saved search: ${saved?.name || name.trim()}`);
+    const savedName = saved?.name || name.trim();
+    setStatus(localizedMessage(getMessage, "statusSavedSearch", `Saved search: ${savedName}`, [savedName]));
   }
 
   async function applySelectedSearch() {
     const selected = selectedSearch();
     if (!selected) {
-      setStatus("Choose a saved search first");
+      setStatus(localizedMessage(getMessage, "statusChooseSavedSearchFirst", "Choose a saved search first"));
       return;
     }
 
     writeSearchValues(selected);
     await runSearchesNow();
-    setStatus(`Applied saved search: ${selected.name}`);
+    setStatus(localizedMessage(getMessage, "statusAppliedSavedSearch", `Applied saved search: ${selected.name}`, [selected.name]));
   }
 
   async function deleteSelectedSearch() {
     const selected = selectedSearch();
     if (!selected) {
-      setStatus("Choose a saved search first");
+      setStatus(localizedMessage(getMessage, "statusChooseSavedSearchFirst", "Choose a saved search first"));
       return;
     }
 
     const nextSearches = await deleteSavedSearch(selected.id);
     renderSavedSearches(nextSearches);
-    setStatus(`Deleted saved search: ${selected.name}`);
+    setStatus(localizedMessage(getMessage, "statusDeletedSavedSearch", `Deleted saved search: ${selected.name}`, [selected.name]));
   }
 
   return {

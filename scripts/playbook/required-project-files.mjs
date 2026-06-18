@@ -33,6 +33,7 @@ export const requiredProjectFiles = [
   "src/features/history-results/core/query-matcher.js",
   "src/features/history-results/core/query-parser.js",
   "src/features/history-results/core/query-text.js",
+  "src/features/history-results/ui/localization-keys.js",
   "src/features/vault-management/core/domain-rules.js",
   "src/features/vault-management/core/history-records.js",
   "src/features/vault-management/core/vault-analysis.js",
