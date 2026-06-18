@@ -309,10 +309,15 @@ export function validatePlaybookCompliance(root, assert) {
   ]) {
     assert(releaseQa.includes(expected), `Release QA missing browser-extension playbook check: ${expected}`);
   }
+  assert(
+    releaseQa.includes("leave the completed evidence in the working tree while running `npm run release:ready`"),
+    "Release QA must explain working-tree manual evidence for release readiness."
+  );
 
   const manualBrowserQa = fs.readFileSync(path.join(root, "docs", "release", "manual-browser-qa-checklist.md"), "utf8");
   for (const expected of [
     "Load this repository folder unpacked",
+    "completed release evidence should remain uncommitted while running the final release-readiness gate",
     "Do not use automated Chrome or Playwright runs against a live Chrome profile",
     "Do not create or target named personal Chrome profiles such as `Your Chrome`",
     "chrome.exe",

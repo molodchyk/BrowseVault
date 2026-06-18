@@ -2,6 +2,8 @@
 
 This checklist records the browser-extension playbook requirement to load the unpacked extension in the target browser before release.
 
+Fill this checklist after the final source commit. `npm run release:ready` reads the working-tree checklist and compares the `Commit` field to the current `HEAD`, so completed release evidence should remain uncommitted while running the final release-readiness gate.
+
 Do not use automated Chrome or Playwright runs against a live Chrome profile for this checklist. Run it manually in the target browser after pausing local focus-blocking tools if needed.
 
 Do not create or target named personal Chrome profiles such as `Your Chrome` for this checklist.

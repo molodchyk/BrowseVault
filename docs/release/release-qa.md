@@ -48,6 +48,8 @@ Required: Load the unpacked extension in the target browser before release.
 
 Use [`manual-browser-qa-checklist.md`](manual-browser-qa-checklist.md) to record the manual target-browser evidence.
 
+Fill the checklist after the final source commit and leave the completed evidence in the working tree while running `npm run release:ready`; the readiness gate compares the checklist `Commit` value to the current `HEAD`.
+
 Current workstation note:
 
 - Automated Chrome/Playwright launches may be closed by local focus-blocking tools such as Cold Turkey or FocusMe before the extension service worker can be inspected.
