@@ -101,6 +101,7 @@ export const requiredProjectFiles = [
   "scripts/verify-package.mjs",
   "scripts/zip-utils.mjs",
   "test/scripts/chrome-qa-safety.test.js",
+  "test/scripts/playbook-compliance.test.js",
   "test/scripts/reference-sync.test.js",
   "test/scripts/release-readiness.test.js",
   "test/scripts/store-metadata.test.js"

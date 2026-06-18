@@ -17,7 +17,7 @@ This file maps BrowseVault release evidence to the shared browser-extension play
 
 | Playbook expectation | BrowseVault evidence |
 | --- | --- |
-| README explains goal, load-unpacked steps, checks, privacy, license, and source URL. | `README.md`; exact license/source and support blocks are enforced by `npm run validate`. |
+| README explains goal, load-unpacked steps, checks, privacy, license, and source URL. | `README.md`; exact license/source and support blocks are enforced by `npm run validate` and `npm run check:playbook-compliance`. |
 | Full license text and SPDX metadata. | `LICENSE`; `package.json` uses `GPL-3.0-only`; both are checked by `npm run validate`. |
 | Plain-language privacy policy. | `PRIVACY.md` lists stored data, storage area, network behavior, permissions, and sale/sharing posture. |
 | Small auditable manifest. | `manifest.json`; `scripts/validate-extension.mjs` manifest key allowlist; `scripts/check-manifest-paths.mjs`; `scripts/check-privacy-permissions.mjs`. |
@@ -74,8 +74,8 @@ This file maps BrowseVault release evidence to the shared browser-extension play
 
 | Playbook expectation | BrowseVault evidence |
 | --- | --- |
-| Read local README, manifest, privacy policy, store copy, localization docs, and project playbooks before acting. | `docs/README.md`, `docs/research/source-inventory.md`, and `npm run check:reference-sync` keep the relevant playbook/reference inputs visible and current. |
+| Read local README, manifest, privacy policy, store copy, localization docs, and project playbooks before acting. | `docs/README.md`, `docs/research/source-inventory.md`, `npm run check:reference-sync`, and `npm run check:playbook-compliance` keep the relevant playbook/reference inputs visible and current. |
 | Preserve existing uncommitted user changes. | The project relies on normal Git dirty-worktree inspection before edits; release docs keep browser/profile work manual to avoid mutating user state. |
 | Keep claims synchronized across README, store listing, privacy docs, manifest, and package metadata. | `npm run validate`, `npm run check:store-metadata`, `scripts/check-privacy-permissions.mjs`, and `scripts/verify-package.mjs`. |
-| Add or update validation scripts when a rule should remain true. | `scripts/playbook/` contains release-readiness, reference-sync, store-metadata, manifest-surface, and Chrome QA safety guardrails. |
+| Add or update validation scripts when a rule should remain true. | `scripts/playbook/` contains release-readiness, reference-sync, store-metadata, manifest-surface, playbook-compliance, and Chrome QA safety guardrails. |
 | Run the smallest useful checks before reporting completion. | `README.md`, `docs/release/release-qa.md`, and `docs/release/manual-browser-qa-checklist.md` list the repo and manual release checks. |

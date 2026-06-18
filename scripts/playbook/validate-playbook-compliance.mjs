@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 const canonicalSupportBlock = `## Support
 
@@ -17,6 +18,14 @@ The full license text is in [\`LICENSE\`](LICENSE).`;
 
 export function validatePlaybookCompliance(root, assert) {
   const packageJson = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
+  assert(
+    packageJson.scripts["check:playbook-compliance"]?.includes("validate-playbook-compliance.mjs"),
+    "package.json must expose check:playbook-compliance for direct playbook evidence validation."
+  );
+  assert(
+    packageJson.scripts.check?.includes("check:playbook-compliance"),
+    "package.json check script must run playbook compliance validation."
+  );
   assert(
     packageJson.scripts["release:ready"]?.includes("check-release-readiness.mjs"),
     "package.json must expose release:ready for manual browser QA evidence."
@@ -163,6 +172,7 @@ export function validatePlaybookCompliance(root, assert) {
     "Reviewer Notes And Release Checks",
     "Codex Protocol",
     "check:store-metadata",
+    "check:playbook-compliance",
     "manifest key allowlist",
     "chrome_settings_overrides",
     "manual check"
@@ -347,4 +357,15 @@ export function validatePlaybookCompliance(root, assert) {
   ]) {
     assert(storeMedia.includes(expected), `Chrome Web Store media review doc missing: ${expected}`);
   }
+}
+
+function cliAssert(condition, message) {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  validatePlaybookCompliance(process.cwd(), cliAssert);
+  console.log("Playbook compliance checked.");
 }
