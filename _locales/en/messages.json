@@ -671,6 +671,22 @@
     "message": "System locale",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "isoDateOption": {
+    "message": "ISO 2026-06-16",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "dayMonthYearDateOption": {
+    "message": "16/06/2026",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "monthDayYearDateOption": {
+    "message": "06/16/2026",
+    "description": "Static BrowseVault extension-page UI string."
+  },
+  "yearMonthDayDateOption": {
+    "message": "2026/06/16",
+    "description": "Static BrowseVault extension-page UI string."
+  },
   "defaultResultLimitLabel": {
     "message": "Default result limit",
     "description": "Static BrowseVault extension-page UI string."
