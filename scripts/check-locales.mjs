@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { activityLogLocalization } from "../src/features/activity-log/ui/localization-keys.js";
 import { appShellLocalization } from "../src/features/app-shell/ui/localization-map.js";
 import { backgroundRuntimeLocalization } from "../src/features/background-runtime/ui/localization-keys.js";
 import { backupImportLocalization } from "../src/features/backup-import/ui/localization-keys.js";
@@ -75,6 +76,7 @@ const messages = readJson(localePath);
 const references = collectManifestReferences(manifest);
 const referencedKeys = new Set(references.map((reference) => reference.key));
 const uiLocalizationBindings = [
+  ...activityLogLocalization,
   ...appShellLocalization,
   ...backgroundRuntimeLocalization,
   ...backupImportLocalization,

@@ -165,7 +165,8 @@ export function createDisplayPreferencesController({
     renderArchiveInsights(stats.insights);
     deps.renderActivityLog(elements.activityLog, stats.meta.activityLog, {
       emptyText: getMessage("noActivityLogged") || "No activity logged yet.",
-      formatDate: (timestamp) => deps.formatShortDate(timestamp, appState.preferences.dateFormat)
+      formatDate: (timestamp) => deps.formatShortDate(timestamp, appState.preferences.dateFormat),
+      getMessage
     });
   }
 

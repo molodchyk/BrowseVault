@@ -91,3 +91,46 @@ test("renderActivityLog shows empty and populated states", () => {
   assert.equal(list.children[0].children[0].textContent, "Archive imported (12) - 2 rules");
   assert.equal(list.children[0].children[1].textContent, "2026-06-17 10:00");
 });
+
+test("renderActivityLog localizes known stored event labels without rewriting events", () => {
+  const list = fakeList();
+  const document = {
+    createElement: fakeElement
+  };
+  const event = {
+    id: "backup-1",
+    type: "backup",
+    label: "JSON backup exported",
+    count: 42,
+    occurredAt: "2026-06-17T10:00:00.000Z"
+  };
+
+  renderActivityLog(list, [event], {
+    document,
+    formatDate: () => "2026-06-17",
+    getMessage: (key) => key === "activityLabelJsonBackupExported" ? "JSON Sicherung exportiert" : ""
+  });
+
+  assert.equal(event.label, "JSON backup exported");
+  assert.equal(list.children[0].children[0].textContent, "JSON Sicherung exportiert (42)");
+});
+
+test("renderActivityLog falls back to localized activity type labels", () => {
+  const list = fakeList();
+  const document = {
+    createElement: fakeElement
+  };
+
+  renderActivityLog(list, [{
+    id: "custom-cleanup",
+    type: "cleanup",
+    label: "Custom cleanup label",
+    occurredAt: "2026-06-17T10:00:00.000Z"
+  }], {
+    document,
+    formatDate: () => "2026-06-17",
+    getMessage: (key) => key === "activityTypeCleanup" ? "Bereinigung" : ""
+  });
+
+  assert.equal(list.children[0].children[0].textContent, "Bereinigung");
+});

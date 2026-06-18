@@ -129,6 +129,34 @@ test("refreshStats passes localized activity-log empty text", async () => {
   assert.equal(renderedActivity[0][2].emptyText, "Noch keine Aktivitaet protokolliert.");
 });
 
+test("refreshStats passes activity-log label localization through the renderer", async () => {
+  const { controller, renderedActivity } = createHarness({
+    getMessage: (key) => key === "activityLabelJsonBackupExported" ? "JSON Sicherung exportiert" : "",
+    stats: {
+      visits: 1,
+      domains: 1,
+      newestVisitTime: Date.parse("2026-06-16T00:00:00.000Z"),
+      insights: {},
+      meta: {
+        activityLog: [{
+          id: "backup-1",
+          type: "backup",
+          label: "JSON backup exported",
+          count: 1,
+          occurredAt: "2026-06-16T00:00:00.000Z"
+        }],
+        lastBackup: null
+      },
+      vaultHealth: {}
+    }
+  });
+
+  await controller.refreshStats();
+
+  assert.equal(renderedActivity.length, 1);
+  assert.equal(renderedActivity[0][2].getMessage("activityLabelJsonBackupExported"), "JSON Sicherung exportiert");
+});
+
 test("refreshStats can localize the empty backup stat", async () => {
   const { controller, elements } = createHarness({
     getMessage: (key) => key === "statBackupEmpty" ? "Nie" : ""

@@ -1005,6 +1005,134 @@
     "message": "No activity logged yet.",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "activityFallbackLabel": {
+    "message": "Activity",
+    "description": "Fallback label for an activity-log event whose stored label and type are not recognized."
+  },
+  "activityTypeBackup": {
+    "message": "Backup",
+    "description": "Fallback activity-log label for backup events."
+  },
+  "activityTypeCleanup": {
+    "message": "Cleanup",
+    "description": "Fallback activity-log label for cleanup events."
+  },
+  "activityTypeDelete": {
+    "message": "Delete",
+    "description": "Fallback activity-log label for delete events."
+  },
+  "activityTypeExport": {
+    "message": "Export",
+    "description": "Fallback activity-log label for export events."
+  },
+  "activityTypeImport": {
+    "message": "Import",
+    "description": "Fallback activity-log label for import events."
+  },
+  "activityTypeReset": {
+    "message": "Reset",
+    "description": "Fallback activity-log label for reset events."
+  },
+  "activityTypeRestore": {
+    "message": "Restore",
+    "description": "Fallback activity-log label for restore events."
+  },
+  "activityTypeRule": {
+    "message": "Rule",
+    "description": "Fallback activity-log label for rule events."
+  },
+  "activityLabelArchiveImported": {
+    "message": "Archive imported",
+    "description": "Activity-log label shown after importing a BrowseVault archive."
+  },
+  "activityLabelBlacklistRuleAdded": {
+    "message": "Blacklist rule added",
+    "description": "Activity-log label shown after adding a domain blacklist rule."
+  },
+  "activityLabelCategoryRuleAdded": {
+    "message": "Category rule added",
+    "description": "Activity-log label shown after adding a manual domain category rule."
+  },
+  "activityLabelChromeUrlsAndVaultRecordsDeleted": {
+    "message": "Chrome URLs and vault records deleted",
+    "description": "Activity-log label shown after deleting selected URLs from Chrome history and matching BrowseVault records."
+  },
+  "activityLabelCurrentChromeUrlsAndVaultRecordsDeleted": {
+    "message": "Current Chrome URLs and vault records deleted",
+    "description": "Activity-log label shown after deleting current-result URLs from Chrome history and matching BrowseVault records."
+  },
+  "activityLabelCurrentResultsCsvExported": {
+    "message": "Current results CSV exported",
+    "description": "Activity-log label shown after exporting current search results as CSV."
+  },
+  "activityLabelCurrentResultsDeleted": {
+    "message": "Current results deleted",
+    "description": "Activity-log label shown after deleting the current BrowseVault search results."
+  },
+  "activityLabelCurrentResultsHtmlExported": {
+    "message": "Current results HTML exported",
+    "description": "Activity-log label shown after exporting current search results as HTML."
+  },
+  "activityLabelCurrentResultsJsonExported": {
+    "message": "Current results JSON exported",
+    "description": "Activity-log label shown after exporting current search results as JSON."
+  },
+  "activityLabelDomainRuleRemoved": {
+    "message": "Domain rule removed",
+    "description": "Activity-log label shown after removing a domain rule."
+  },
+  "activityLabelDomainsBlacklisted": {
+    "message": "Domains blacklisted",
+    "description": "Activity-log label shown after adding selected domains to the blacklist."
+  },
+  "activityLabelDuplicateCleanup": {
+    "message": "Duplicate cleanup",
+    "description": "Activity-log label shown after cleaning duplicate BrowseVault records."
+  },
+  "activityLabelFullCsvExported": {
+    "message": "Full CSV exported",
+    "description": "Activity-log label shown after exporting the full vault as CSV."
+  },
+  "activityLabelFullHtmlExported": {
+    "message": "Full HTML exported",
+    "description": "Activity-log label shown after exporting the full vault as HTML."
+  },
+  "activityLabelJsonBackupExported": {
+    "message": "JSON backup exported",
+    "description": "Activity-log label shown after exporting a full JSON backup."
+  },
+  "activityLabelLocalVaultReset": {
+    "message": "Local vault reset",
+    "description": "Activity-log label shown after resetting BrowseVault local data."
+  },
+  "activityLabelRetentionCleanup": {
+    "message": "Retention cleanup",
+    "description": "Activity-log label shown after cleaning old BrowseVault records by retention age."
+  },
+  "activityLabelSelectedCsvExported": {
+    "message": "Selected CSV exported",
+    "description": "Activity-log label shown after exporting selected records as CSV."
+  },
+  "activityLabelSelectedHtmlExported": {
+    "message": "Selected HTML exported",
+    "description": "Activity-log label shown after exporting selected records as HTML."
+  },
+  "activityLabelSelectedJsonExported": {
+    "message": "Selected JSON exported",
+    "description": "Activity-log label shown after exporting selected records as JSON."
+  },
+  "activityLabelVaultDeleteUndone": {
+    "message": "Vault delete undone",
+    "description": "Activity-log label shown after restoring deleted BrowseVault records."
+  },
+  "activityLabelVaultRecordsDeleted": {
+    "message": "Vault records deleted",
+    "description": "Activity-log label shown after deleting BrowseVault records from the local vault."
+  },
+  "activityLabelWhitelistRuleAdded": {
+    "message": "Whitelist rule added",
+    "description": "Activity-log label shown after adding a domain whitelist rule."
+  },
   "statusSettingsSaved": {
     "message": "Settings saved",
     "description": "Status shown after BrowseVault saves display and search preference changes."
