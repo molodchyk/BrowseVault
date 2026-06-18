@@ -34,6 +34,10 @@ const defaultServices = {
   themeDatasetValue
 };
 
+function localizedLabel(getMessage, key, fallback) {
+  return (substitutions = [], resolvedFallback = fallback) => getMessage(key, substitutions) || resolvedFallback;
+}
+
 export function createDisplayPreferencesController({
   appState,
   elements,
@@ -61,11 +65,25 @@ export function createDisplayPreferencesController({
     const status = deps.backupStatusDetails(backup, {
       dateFormat: appState.preferences.dateFormat,
       labels: {
-        backupChecksumUnavailable: getMessage("backupChecksumUnavailable") || "Not available",
-        backupHealthEmpty: getMessage("backupHealthEmpty") || "No backup yet",
-        backupNextAfterFirst: getMessage("backupNextAfterFirst") || "After first backup",
-        backupReminderOff: getMessage("backupReminderOff") || "Off",
-        statBackupEmpty: getMessage("statBackupEmpty") || "Never"
+        backupChecksumUnavailable: localizedLabel(getMessage, "backupChecksumUnavailable", "Not available"),
+        backupFormatUnknown: localizedLabel(getMessage, "backupFormatUnknown", "unknown"),
+        backupHealthCurrent: localizedLabel(getMessage, "backupHealthCurrent", "Backup current"),
+        backupHealthDueMany: localizedLabel(getMessage, "backupHealthDueMany", "Backup due after 30 days"),
+        backupHealthDueOne: localizedLabel(getMessage, "backupHealthDueOne", "Backup due after 1 day"),
+        backupHealthEmpty: localizedLabel(getMessage, "backupHealthEmpty", "No backup yet"),
+        backupHealthReminderOff: localizedLabel(getMessage, "backupHealthReminderOff", "Backup reminder off"),
+        backupNextAfterFirst: localizedLabel(getMessage, "backupNextAfterFirst", "After first backup"),
+        backupReminderOff: localizedLabel(getMessage, "backupReminderOff", "Off"),
+        backupSelfTestFailed: localizedLabel(getMessage, "backupSelfTestFailed", "Failed"),
+        backupSelfTestFailedChecksum: localizedLabel(getMessage, "backupSelfTestFailedChecksum", "Failed checksum"),
+        backupSelfTestFailedCount: localizedLabel(getMessage, "backupSelfTestFailedCount", "Failed count"),
+        backupSelfTestFailedRestoreRows: localizedLabel(getMessage, "backupSelfTestFailedRestoreRows", "Failed restore rows"),
+        backupSelfTestNotTested: localizedLabel(getMessage, "backupSelfTestNotTested", "Not tested"),
+        backupSelfTestPassed: localizedLabel(getMessage, "backupSelfTestPassed", "Passed"),
+        backupSelfTestPassedRecordMany: localizedLabel(getMessage, "backupSelfTestPassedRecordMany", "Passed 12 records"),
+        backupSelfTestPassedRecordOne: localizedLabel(getMessage, "backupSelfTestPassedRecordOne", "Passed 1 record"),
+        backupSizeNotRecorded: localizedLabel(getMessage, "backupSizeNotRecorded", "Not recorded"),
+        statBackupEmpty: localizedLabel(getMessage, "statBackupEmpty", "Never")
       },
       reminderDays: appState.preferences.backupReminderDays
     });
@@ -86,11 +104,27 @@ export function createDisplayPreferencesController({
     const status = deps.archiveHealthDetails(meta, {
       dateFormat: appState.preferences.dateFormat,
       labels: {
-        archiveNoTombstones: getMessage("archiveNoTombstones") || "No deleted tombstones",
-        archiveNotChecked: getMessage("archiveNotChecked") || "Not checked yet",
-        archiveNotRecorded: getMessage("archiveNotRecorded") || "Not recorded",
-        archiveNotSynced: getMessage("archiveNotSynced") || "Not synced yet",
-        archiveWaitingForVisit: getMessage("archiveWaitingForVisit") || "Waiting for next visit"
+        archiveDeletedTombstoneMany: localizedLabel(getMessage, "archiveDeletedTombstoneMany", "2 deleted tombstones"),
+        archiveDeletedTombstoneOne: localizedLabel(getMessage, "archiveDeletedTombstoneOne", "1 deleted tombstone"),
+        archiveHealthReady: localizedLabel(getMessage, "archiveHealthReady", "Archive recording ready"),
+        archiveHealthStorageNotRun: localizedLabel(getMessage, "archiveHealthStorageNotRun", "Storage check not run"),
+        archiveHealthVaultReview: localizedLabel(getMessage, "archiveHealthVaultReview", "Vault data needs review"),
+        archiveIssueBadTimeMany: localizedLabel(getMessage, "archiveIssueBadTimeMany", "2 bad times"),
+        archiveIssueBadTimeOne: localizedLabel(getMessage, "archiveIssueBadTimeOne", "1 bad time"),
+        archiveIssueDuplicateActiveMany: localizedLabel(getMessage, "archiveIssueDuplicateActiveMany", "2 duplicate active"),
+        archiveIssueDuplicateActiveOne: localizedLabel(getMessage, "archiveIssueDuplicateActiveOne", "1 duplicate active"),
+        archiveIssueMissingUrlMany: localizedLabel(getMessage, "archiveIssueMissingUrlMany", "2 missing URLs"),
+        archiveIssueMissingUrlOne: localizedLabel(getMessage, "archiveIssueMissingUrlOne", "1 missing URL"),
+        archiveNoTombstones: localizedLabel(getMessage, "archiveNoTombstones", "No deleted tombstones"),
+        archiveNotChecked: localizedLabel(getMessage, "archiveNotChecked", "Not checked yet"),
+        archiveNotRecorded: localizedLabel(getMessage, "archiveNotRecorded", "Not recorded"),
+        archiveNotSynced: localizedLabel(getMessage, "archiveNotSynced", "Not synced yet"),
+        archiveStorageFailed: localizedLabel(getMessage, "archiveStorageFailed", "Failed"),
+        archiveStoragePassed: localizedLabel(getMessage, "archiveStoragePassed", "Passed 2026-06-16"),
+        archiveSyncNotRun: localizedLabel(getMessage, "archiveSyncNotRun", "Archive sync not run yet"),
+        archiveSyncStored: localizedLabel(getMessage, "archiveSyncStored", "2026-06-16 · 42 stored"),
+        archiveVaultRecordCounts: localizedLabel(getMessage, "archiveVaultRecordCounts", "0 active · 0 stored"),
+        archiveWaitingForVisit: localizedLabel(getMessage, "archiveWaitingForVisit", "Waiting for next visit")
       },
       vaultHealth: appState.vaultHealth
     });
@@ -110,9 +144,17 @@ export function createDisplayPreferencesController({
     const status = deps.archiveInsightDetails(insights, {
       dateFormat: appState.preferences.dateFormat,
       labels: {
-        noActiveDaysYet: getMessage("noActiveDaysYet") || "No active days yet",
-        noDomainsYet: getMessage("noDomainsYet") || "No domains yet",
-        noVisitsYet: getMessage("noVisitsYet") || "No visits yet"
+        archiveActiveDayStatsMany: localizedLabel(getMessage, "archiveActiveDayStatsMany", "2 days · 2.5 visits/day"),
+        archiveActiveDayStatsOne: localizedLabel(getMessage, "archiveActiveDayStatsOne", "1 day · 2.5 visits/day"),
+        archiveBusiestDayVisits: localizedLabel(getMessage, "archiveBusiestDayVisits", "2026-06-17 · 4 visits"),
+        archiveDateRange: localizedLabel(getMessage, "archiveDateRange", "2026-06-16 to 2026-06-17"),
+        archiveDomainCount: localizedLabel(getMessage, "archiveDomainCount", "example.com (3)"),
+        archiveUnknownDomain: localizedLabel(getMessage, "archiveUnknownDomain", "unknown"),
+        archiveVisitMany: localizedLabel(getMessage, "archiveVisitMany", "2 visits"),
+        archiveVisitOne: localizedLabel(getMessage, "archiveVisitOne", "1 visit"),
+        noActiveDaysYet: localizedLabel(getMessage, "noActiveDaysYet", "No active days yet"),
+        noDomainsYet: localizedLabel(getMessage, "noDomainsYet", "No domains yet"),
+        noVisitsYet: localizedLabel(getMessage, "noVisitsYet", "No visits yet")
       }
     });
 
@@ -155,7 +197,9 @@ export function createDisplayPreferencesController({
     appState.vaultHealth = stats.vaultHealth;
     elements.statVisits.textContent = String(stats.visits);
     elements.statDomains.textContent = String(stats.domains);
-    elements.statNewest.textContent = deps.formatShortDate(stats.newestVisitTime, appState.preferences.dateFormat);
+    elements.statNewest.textContent = stats.newestVisitTime
+      ? deps.formatShortDate(stats.newestVisitTime, appState.preferences.dateFormat)
+      : getMessage("statNewestEmpty") || "No visits";
     const backup = deps.restorableBackupMetadata(stats.meta.lastBackup);
     elements.statBackup.textContent = backup?.exportedAt
       ? deps.formatShortDate(Date.parse(backup.exportedAt), appState.preferences.dateFormat)

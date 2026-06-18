@@ -167,6 +167,16 @@ test("refreshStats can localize the empty backup stat", async () => {
   assert.equal(elements.statBackup.textContent, "Nie");
 });
 
+test("refreshStats can localize the empty newest stat", async () => {
+  const { controller, elements } = createHarness({
+    getMessage: (key) => key === "statNewestEmpty" ? "Keine Besuche" : ""
+  });
+
+  await controller.refreshStats();
+
+  assert.equal(elements.statNewest.textContent, "Keine Besuche");
+});
+
 test("refreshStats passes localized empty backup status labels", async () => {
   const messages = new Map([
     ["backupChecksumUnavailable", "Nicht verfuegbar"],
@@ -198,6 +208,47 @@ test("refreshStats passes localized empty backup status labels", async () => {
   assert.equal(elements.backupChecksum.textContent, "Nicht verfuegbar");
 });
 
+test("refreshStats passes localized dynamic backup status labels", async () => {
+  const { controller, elements } = createHarness({
+    getMessage(key, substitutions = []) {
+      if (key === "backupHealthDueMany") {
+        return `Sicherung faellig nach ${substitutions[0]} Tagen`;
+      }
+
+      if (key === "backupSelfTestPassedRecordMany") {
+        return `${substitutions[0]} Datensaetze bestanden`;
+      }
+
+      return "";
+    },
+    stats: {
+      visits: 1,
+      domains: 1,
+      newestVisitTime: Date.parse("2026-06-16T00:00:00.000Z"),
+      insights: {},
+      meta: {
+        activityLog: [],
+        lastBackup: {
+          exportedAt: "2026-05-01T00:00:00.000Z",
+          format: "json",
+          records: 12,
+          sizeBytes: 1536,
+          selfTest: {
+            records: 12,
+            status: "passed"
+          }
+        }
+      },
+      vaultHealth: {}
+    }
+  });
+
+  await controller.refreshStats();
+
+  assert.equal(elements.backupHealth.textContent, "Sicherung faellig nach 30 Tagen");
+  assert.equal(elements.backupSelfTest.textContent, "12 Datensaetze bestanden");
+});
+
 test("refreshStats passes localized archive recorder empty labels", async () => {
   const messages = new Map([
     ["archiveNoTombstones", "Keine geloeschten Merker"],
@@ -219,6 +270,66 @@ test("refreshStats passes localized archive recorder empty labels", async () => 
   assert.equal(elements.archiveTombstones.textContent, "Keine geloeschten Merker");
 });
 
+test("refreshStats passes localized dynamic archive recorder labels", async () => {
+  const { controller, elements } = createHarness({
+    getMessage(key, substitutions = []) {
+      if (key === "archiveHealthReady") {
+        return "Archiv bereit";
+      }
+
+      if (key === "archiveSyncStored") {
+        return `${substitutions[1]} gespeichert`;
+      }
+
+      if (key === "archiveVaultRecordCounts") {
+        return `${substitutions[0]} aktiv / ${substitutions[1]} gespeichert`;
+      }
+
+      return "";
+    },
+    preferences: {
+      theme: "system",
+      accent: "teal",
+      contrast: "standard",
+      textSize: "standard",
+      dateFormat: "iso",
+      defaultLimit: 500,
+      backupReminderDays: 30,
+      backupSaveMode: "downloads",
+      backupFilenamePrefix: "browsevault",
+      backupFilenameTemplate: "{prefix}-{kind}-{date}"
+    },
+    stats: {
+      visits: 3,
+      domains: 1,
+      newestVisitTime: Date.parse("2026-06-16T00:00:00.000Z"),
+      insights: {},
+      meta: {
+        activityLog: [],
+        lastBackup: null,
+        lastChromeSync: {
+          stored: 42,
+          syncedAt: "2026-06-16T09:00:00.000Z"
+        },
+        lastStorageSelfCheck: {
+          checkedAt: "2026-06-16T09:30:00.000Z",
+          status: "passed"
+        }
+      },
+      vaultHealth: {
+        activeRecords: 3,
+        storedRows: 5
+      }
+    }
+  });
+
+  await controller.refreshStats();
+
+  assert.equal(elements.archiveHealth.textContent, "Archiv bereit");
+  assert.equal(elements.archiveSync.textContent, "42 gespeichert");
+  assert.equal(elements.archiveVault.textContent, "3 aktiv / 5 gespeichert");
+});
+
 test("refreshStats passes localized archive insight empty labels", async () => {
   const messages = new Map([
     ["noActiveDaysYet", "Noch keine aktiven Tage"],
@@ -235,4 +346,73 @@ test("refreshStats passes localized archive insight empty labels", async () => {
   assert.equal(elements.archiveBusiestDay.textContent, "Noch keine Besuche");
   assert.equal(elements.archiveActiveDays.textContent, "Noch keine aktiven Tage");
   assert.equal(elements.archiveDateRange.textContent, "Noch keine Besuche");
+});
+
+test("refreshStats passes localized dynamic archive insight labels", async () => {
+  const { controller, elements } = createHarness({
+    getMessage(key, substitutions = []) {
+      if (key === "archiveDomainCount") {
+        return `${substitutions[0]} mit ${substitutions[1]}`;
+      }
+
+      if (key === "archiveVisitMany") {
+        return `${substitutions[0]} Besuche`;
+      }
+
+      if (key === "archiveBusiestDayVisits") {
+        return `${substitutions[0]}: ${substitutions[1]}`;
+      }
+
+      if (key === "archiveActiveDayStatsMany") {
+        return `${substitutions[0]} aktive Tage`;
+      }
+
+      if (key === "archiveDateRange") {
+        return `${substitutions[0]} bis ${substitutions[1]}`;
+      }
+
+      return "";
+    },
+    preferences: {
+      theme: "system",
+      accent: "teal",
+      contrast: "standard",
+      textSize: "standard",
+      dateFormat: "iso",
+      defaultLimit: 500,
+      backupReminderDays: 30,
+      backupSaveMode: "downloads",
+      backupFilenamePrefix: "browsevault",
+      backupFilenameTemplate: "{prefix}-{kind}-{date}"
+    },
+    stats: {
+      visits: 4,
+      domains: 1,
+      newestVisitTime: Date.parse("2026-06-17T00:00:00.000Z"),
+      insights: {
+        activeDays: 2,
+        averageVisitsPerActiveDay: 2,
+        oldestVisitTime: new Date(2026, 5, 16, 10, 0).getTime(),
+        newestVisitTime: new Date(2026, 5, 17, 11, 0).getTime(),
+        topDomains: [
+          { domain: "example.com", count: 4 }
+        ],
+        busiestDays: [
+          { day: "2026-06-17", count: 4 }
+        ]
+      },
+      meta: {
+        activityLog: [],
+        lastBackup: null
+      },
+      vaultHealth: {}
+    }
+  });
+
+  await controller.refreshStats();
+
+  assert.equal(elements.archiveTopDomains.textContent, "example.com mit 4");
+  assert.equal(elements.archiveBusiestDay.textContent, "2026-06-17: 4 Besuche");
+  assert.equal(elements.archiveActiveDays.textContent, "2 aktive Tage");
+  assert.equal(elements.archiveDateRange.textContent, "2026-06-16 bis 2026-06-17");
 });

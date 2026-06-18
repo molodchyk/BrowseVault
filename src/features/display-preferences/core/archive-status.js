@@ -1,18 +1,11 @@
 import {
-  formatBackupSelfTest,
-  formatChecksum,
   formatCount,
   formatDate,
-  formatFileSize,
   formatShortDate
 } from "./formatting.js";
+import { countMessage, label, message } from "./status-labels.js";
 
 const DEFAULT_DATE_FORMAT = "system";
-const DEFAULT_BACKUP_REMINDER_DAYS = 30;
-
-function label(options, key, fallback) {
-  return options.labels?.[key] || fallback;
-}
 
 function timestampFromIso(value) {
   const timestamp = Date.parse(value || "");
@@ -49,38 +42,87 @@ export function archiveHealthDetails(meta = {}, options = {}) {
   const invalidTimeRecords = Number(vaultHealth.invalidTimeRecords || 0);
 
   const issueDetails = [
-    missingUrlRecords ? `${formatCount(missingUrlRecords)} missing URL` : "",
-    invalidTimeRecords ? `${formatCount(invalidTimeRecords)} bad time` : "",
-    duplicateActiveRecords ? `${formatCount(duplicateActiveRecords)} duplicate active` : ""
+    missingUrlRecords
+      ? countMessage(
+        options,
+        missingUrlRecords,
+        "archiveIssueMissingUrlOne",
+        "archiveIssueMissingUrlMany",
+        "1 missing URL",
+        `${formatCount(missingUrlRecords)} missing URLs`
+      )
+      : "",
+    invalidTimeRecords
+      ? countMessage(
+        options,
+        invalidTimeRecords,
+        "archiveIssueBadTimeOne",
+        "archiveIssueBadTimeMany",
+        "1 bad time",
+        `${formatCount(invalidTimeRecords)} bad times`
+      )
+      : "",
+    duplicateActiveRecords
+      ? countMessage(
+        options,
+        duplicateActiveRecords,
+        "archiveIssueDuplicateActiveOne",
+        "archiveIssueDuplicateActiveMany",
+        "1 duplicate active",
+        `${formatCount(duplicateActiveRecords)} duplicate active`
+      )
+      : ""
   ].filter(Boolean);
 
   return {
     healthText: hasVaultIssues
-      ? "Vault data needs review"
+      ? label(options, "archiveHealthVaultReview", "Vault data needs review")
       : !storageCheckOk && hasSync
-        ? "Storage check not run"
+        ? label(options, "archiveHealthStorageNotRun", "Storage check not run")
         : hasSync
-          ? "Archive recording ready"
-          : "Archive sync not run yet",
+          ? label(options, "archiveHealthReady", "Archive recording ready")
+          : label(options, "archiveSyncNotRun", "Archive sync not run yet"),
     isWarning: hasVaultIssues || !hasSync || !storageCheckOk,
     isOk: !hasVaultIssues && hasSync && storageCheckOk,
     startupText: startupTimestamp ? formatDate(startupTimestamp, dateFormat) : label(options, "archiveNotRecorded", "Not recorded"),
     syncText: hasSync
-      ? `${formatDate(syncTimestamp, dateFormat)} · ${formatCount(sync.stored)} stored`
+      ? message(
+        options,
+        "archiveSyncStored",
+        `${formatDate(syncTimestamp, dateFormat)} · ${formatCount(sync.stored)} stored`,
+        [formatDate(syncTimestamp, dateFormat), formatCount(sync.stored)]
+      )
       : label(options, "archiveNotSynced", "Not synced yet"),
     captureText: captureTimestamp
       ? `${formatDate(captureTimestamp, dateFormat)}${domainFromUrl(capture.url) ? ` · ${domainFromUrl(capture.url)}` : ""}`
       : label(options, "archiveWaitingForVisit", "Waiting for next visit"),
     storageText: storageCheckOk
-      ? `Passed ${formatDate(storageCheckTimestamp, dateFormat)}`
+      ? message(
+        options,
+        "archiveStoragePassed",
+        `Passed ${formatDate(storageCheckTimestamp, dateFormat)}`,
+        [formatDate(storageCheckTimestamp, dateFormat)]
+      )
       : storageCheck?.status === "failed"
-        ? "Failed"
+        ? label(options, "archiveStorageFailed", "Failed")
         : label(options, "archiveNotChecked", "Not checked yet"),
     vaultText: hasVaultIssues
       ? issueDetails.join(" · ")
-      : `${formatCount(activeRecords)} active · ${formatCount(storedRows)} stored`,
+      : message(
+        options,
+        "archiveVaultRecordCounts",
+        `${formatCount(activeRecords)} active · ${formatCount(storedRows)} stored`,
+        [formatCount(activeRecords), formatCount(storedRows)]
+      ),
     tombstoneText: deletedRecords
-      ? `${formatCount(deletedRecords)} deleted tombstone${deletedRecords === 1 ? "" : "s"}`
+      ? countMessage(
+        options,
+        deletedRecords,
+        "archiveDeletedTombstoneOne",
+        "archiveDeletedTombstoneMany",
+        "1 deleted tombstone",
+        `${formatCount(deletedRecords)} deleted tombstones`
+      )
       : label(options, "archiveNoTombstones", "No deleted tombstones")
   };
 }
@@ -94,9 +136,16 @@ function timestampFromLocalDay(value) {
   return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])).getTime();
 }
 
-function pluralVisit(count) {
+function pluralVisit(count, options) {
   const visits = Number(count || 0);
-  return `${formatCount(visits)} visit${visits === 1 ? "" : "s"}`;
+  return countMessage(
+    options,
+    visits,
+    "archiveVisitOne",
+    "archiveVisitMany",
+    "1 visit",
+    `${formatCount(visits)} visits`
+  );
 }
 
 export function archiveInsightDetails(insights = {}, options = {}) {
@@ -114,18 +163,44 @@ export function archiveInsightDetails(insights = {}, options = {}) {
   const busiest = busiestDays[0];
 
   const topDomainsText = topDomains.length
-    ? topDomains.map((entry) => `${entry.domain || "unknown"} (${formatCount(entry.count)})`).join(" · ")
+    ? topDomains.map((entry) => {
+      const domain = entry.domain || label(options, "archiveUnknownDomain", "unknown");
+      return message(
+        options,
+        "archiveDomainCount",
+        `${domain} (${formatCount(entry.count)})`,
+        [domain, formatCount(entry.count)]
+      );
+    }).join(" · ")
     : label(options, "noDomainsYet", "No domains yet");
   const busiestDayText = busiest
-    ? `${formatShortDate(timestampFromLocalDay(busiest.day), dateFormat)} · ${pluralVisit(busiest.count)}`
+    ? message(
+      options,
+      "archiveBusiestDayVisits",
+      `${formatShortDate(timestampFromLocalDay(busiest.day), dateFormat)} · ${pluralVisit(busiest.count, options)}`,
+      [formatShortDate(timestampFromLocalDay(busiest.day), dateFormat), pluralVisit(busiest.count, options)]
+    )
     : label(options, "noVisitsYet", "No visits yet");
   const activeDaysText = activeDays
-    ? `${formatCount(activeDays)} day${activeDays === 1 ? "" : "s"} · ${averageVisitsPerActiveDay.toFixed(1)} visits/day`
+    ? countMessage(
+      options,
+      activeDays,
+      "archiveActiveDayStatsOne",
+      "archiveActiveDayStatsMany",
+      `1 day · ${averageVisitsPerActiveDay.toFixed(1)} visits/day`,
+      `${formatCount(activeDays)} days · ${averageVisitsPerActiveDay.toFixed(1)} visits/day`,
+      [averageVisitsPerActiveDay.toFixed(1)]
+    )
     : label(options, "noActiveDaysYet", "No active days yet");
   const dateRangeText = oldestVisitTime && newestVisitTime
     ? oldestVisitTime === newestVisitTime
       ? formatShortDate(newestVisitTime, dateFormat)
-      : `${formatShortDate(oldestVisitTime, dateFormat)} to ${formatShortDate(newestVisitTime, dateFormat)}`
+      : message(
+        options,
+        "archiveDateRange",
+        `${formatShortDate(oldestVisitTime, dateFormat)} to ${formatShortDate(newestVisitTime, dateFormat)}`,
+        [formatShortDate(oldestVisitTime, dateFormat), formatShortDate(newestVisitTime, dateFormat)]
+      )
     : label(options, "noVisitsYet", "No visits yet");
 
   return {
@@ -133,70 +208,5 @@ export function archiveInsightDetails(insights = {}, options = {}) {
     busiestDayText,
     activeDaysText,
     dateRangeText
-  };
-}
-
-export function backupTimestamp(backup) {
-  if (!backup?.exportedAt) {
-    return 0;
-  }
-
-  const timestamp = Date.parse(backup.exportedAt);
-  return Number.isFinite(timestamp) ? timestamp : 0;
-}
-
-export function restorableBackupMetadata(backup) {
-  if (!backup || backup.format !== "json") {
-    return null;
-  }
-
-  return backup;
-}
-
-export function backupStatusDetails(backup, options = {}) {
-  const timestamp = backupTimestamp(backup);
-  const dateFormat = options.dateFormat || DEFAULT_DATE_FORMAT;
-  const now = Number.isFinite(options.now) ? options.now : Date.now();
-  const reminderDays = Number.isFinite(options.reminderDays)
-    ? options.reminderDays
-    : Number.isFinite(options.staleDays)
-      ? options.staleDays
-      : DEFAULT_BACKUP_REMINDER_DAYS;
-
-  if (!timestamp) {
-    return {
-      healthText: label(options, "backupHealthEmpty", "No backup yet"),
-      isWarning: true,
-      isOk: false,
-      lastText: label(options, "statBackupEmpty", "Never"),
-      nextText: reminderDays > 0
-        ? label(options, "backupNextAfterFirst", "After first backup")
-        : label(options, "backupReminderOff", "Off"),
-      formatText: "-",
-      recordsText: "0",
-      sizeText: "-",
-      selfTestText: "-",
-      checksumText: label(options, "backupChecksumUnavailable", "Not available")
-    };
-  }
-
-  const remindersEnabled = reminderDays > 0;
-  const nextTimestamp = remindersEnabled ? timestamp + (reminderDays * 86400000) : 0;
-  const isDue = remindersEnabled && now >= nextTimestamp;
-  return {
-    healthText: remindersEnabled
-      ? isDue
-        ? `Backup due after ${reminderDays} day${reminderDays === 1 ? "" : "s"}`
-        : "Backup current"
-      : "Backup reminder off",
-    isWarning: isDue,
-    isOk: remindersEnabled && !isDue,
-    lastText: formatDate(timestamp, dateFormat),
-    nextText: remindersEnabled ? formatDate(nextTimestamp, dateFormat) : label(options, "backupReminderOff", "Off"),
-    formatText: String(backup.format || "unknown").toUpperCase(),
-    recordsText: formatCount(backup.records),
-    sizeText: formatFileSize(backup.sizeBytes),
-    selfTestText: formatBackupSelfTest(backup.selfTest),
-    checksumText: formatChecksum(backup.sha256)
   };
 }

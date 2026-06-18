@@ -193,6 +193,43 @@ test("archiveHealthDetails accepts localized empty recorder labels", () => {
   assert.equal(status.tombstoneText, "Keine geloeschten Merker");
 });
 
+test("archiveHealthDetails accepts localized dynamic recorder labels", () => {
+  const status = archiveHealthDetails(
+    {
+      lastStartedAt: "2026-06-16T08:00:00.000Z",
+      lastChromeSync: {
+        stored: 42,
+        syncedAt: "2026-06-16T09:00:00.000Z"
+      },
+      lastStorageSelfCheck: {
+        checkedAt: "2026-06-16T09:30:00.000Z",
+        status: "passed"
+      }
+    },
+    {
+      dateFormat: "iso",
+      labels: {
+        archiveDeletedTombstoneMany: ([count]) => `${count} geloeschte Merker`,
+        archiveHealthReady: () => "Archiv bereit",
+        archiveStoragePassed: ([date]) => `Bestanden ${date}`,
+        archiveSyncStored: ([date, count]) => `${count} gespeichert am ${date}`,
+        archiveVaultRecordCounts: ([active, stored]) => `${active} aktiv / ${stored} gespeichert`
+      },
+      vaultHealth: {
+        activeRecords: 3,
+        deletedRecords: 2,
+        storedRows: 5
+      }
+    }
+  );
+
+  assert.equal(status.healthText, "Archiv bereit");
+  assert.match(status.syncText, /^42 gespeichert am 2026-06-16 \d{2}:00$/);
+  assert.match(status.storageText, /^Bestanden 2026-06-16 \d{2}:30$/);
+  assert.equal(status.vaultText, "3 aktiv / 5 gespeichert");
+  assert.equal(status.tombstoneText, "2 geloeschte Merker");
+});
+
 test("archiveHealthDetails warns about vault data issues", () => {
   const status = archiveHealthDetails(
     {
@@ -220,6 +257,36 @@ test("archiveHealthDetails warns about vault data issues", () => {
   assert.equal(status.storageText, "Not checked yet");
   assert.equal(status.vaultText, "1 missing URL · 1 bad time · 3 duplicate active");
   assert.equal(status.tombstoneText, "2 deleted tombstones");
+});
+
+test("archiveHealthDetails accepts localized vault issue labels", () => {
+  const status = archiveHealthDetails(
+    {
+      lastChromeSync: {
+        stored: 12,
+        syncedAt: "2026-06-16T09:00:00.000Z"
+      }
+    },
+    {
+      labels: {
+        archiveHealthVaultReview: () => "Vault pruefen",
+        archiveIssueBadTimeMany: ([count]) => `${count} falsche Zeiten`,
+        archiveIssueDuplicateActiveOne: ([count]) => `${count} Dublette aktiv`,
+        archiveIssueMissingUrlMany: ([count]) => `${count} fehlende URLs`
+      },
+      vaultHealth: {
+        activeRecords: 10,
+        storedRows: 12,
+        missingUrlRecords: 2,
+        invalidTimeRecords: 3,
+        duplicateActiveRecords: 1,
+        issueRecords: 6
+      }
+    }
+  );
+
+  assert.equal(status.healthText, "Vault pruefen");
+  assert.equal(status.vaultText, "2 fehlende URLs · 3 falsche Zeiten · 1 Dublette aktiv");
 });
 
 test("archiveInsightDetails formats secondary archive summaries", () => {
@@ -254,6 +321,41 @@ test("archiveInsightDetails formats secondary archive summaries", () => {
     busiestDayText: "No visits yet",
     activeDaysText: "No active days yet",
     dateRangeText: "No visits yet"
+  });
+});
+
+test("archiveInsightDetails accepts localized dynamic insight labels", () => {
+  const details = archiveInsightDetails(
+    {
+      activeDays: 2,
+      averageVisitsPerActiveDay: 2.5,
+      oldestVisitTime: new Date(2026, 5, 16, 10, 0).getTime(),
+      newestVisitTime: new Date(2026, 5, 17, 11, 0).getTime(),
+      topDomains: [
+        { domain: "", count: 3 }
+      ],
+      busiestDays: [
+        { day: "2026-06-17", count: 4 }
+      ]
+    },
+    {
+      dateFormat: "iso",
+      labels: {
+        archiveActiveDayStatsMany: ([days, average]) => `${days} aktive Tage mit ${average}`,
+        archiveBusiestDayVisits: ([date, visits]) => `${date}: ${visits}`,
+        archiveDateRange: ([oldest, newest]) => `${oldest} bis ${newest}`,
+        archiveDomainCount: ([domain, count]) => `${domain}: ${count}`,
+        archiveUnknownDomain: "unbekannt",
+        archiveVisitMany: ([count]) => `${count} Besuche`
+      }
+    }
+  );
+
+  assert.deepEqual(details, {
+    topDomainsText: "unbekannt: 3",
+    busiestDayText: "2026-06-17: 4 Besuche",
+    activeDaysText: "2 aktive Tage mit 2.5",
+    dateRangeText: "2026-06-16 bis 2026-06-17"
   });
 });
 
@@ -364,4 +466,35 @@ test("backupStatusDetails accepts localized empty backup labels", () => {
     }
   );
   assert.equal(disabled.nextText, "Aus");
+});
+
+test("backupStatusDetails accepts localized dynamic backup labels", () => {
+  const due = backupStatusDetails(
+    {
+      exportedAt: "2026-06-01T00:00:00.000Z",
+      format: "",
+      records: 1,
+      selfTest: {
+        checksum: "mismatch",
+        status: "failed"
+      }
+    },
+    {
+      labels: {
+        backupChecksumUnavailable: "Nicht verfuegbar",
+        backupFormatUnknown: "unbekannt",
+        backupHealthDueOne: ([days]) => `Faellig nach ${days} Tag`,
+        backupSelfTestFailedChecksum: "Pruefsumme fehlgeschlagen",
+        backupSizeNotRecorded: "Nicht aufgezeichnet"
+      },
+      now: Date.parse("2026-06-02T00:00:00.000Z"),
+      reminderDays: 1
+    }
+  );
+
+  assert.equal(due.healthText, "Faellig nach 1 Tag");
+  assert.equal(due.formatText, "unbekannt");
+  assert.equal(due.sizeText, "Nicht aufgezeichnet");
+  assert.equal(due.selfTestText, "Pruefsumme fehlgeschlagen");
+  assert.equal(due.checksumText, "Nicht verfuegbar");
 });

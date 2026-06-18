@@ -6,11 +6,13 @@ import {
 } from "../../backup-import/core/backup-filenames.js";
 export {
   archiveHealthDetails,
-  archiveInsightDetails,
+  archiveInsightDetails
+} from "./archive-status.js";
+export {
   backupStatusDetails,
   backupTimestamp,
   restorableBackupMetadata
-} from "./archive-status.js";
+} from "./backup-status.js";
 export {
   formatBackupSelfTest,
   formatChecksum,

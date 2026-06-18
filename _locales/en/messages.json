@@ -853,6 +853,34 @@
     "message": "No backup yet",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "backupHealthCurrent": {
+    "message": "Backup current",
+    "description": "Backup health status shown when the latest backup is inside the reminder window."
+  },
+  "backupHealthDueOne": {
+    "message": "Backup due after $DAYS$ day",
+    "description": "Backup health status shown when a one-day backup reminder window has elapsed.",
+    "placeholders": {
+      "days": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "backupHealthDueMany": {
+    "message": "Backup due after $DAYS$ days",
+    "description": "Backup health status shown when a multi-day backup reminder window has elapsed.",
+    "placeholders": {
+      "days": {
+        "content": "$1",
+        "example": "30"
+      }
+    }
+  },
+  "backupHealthReminderOff": {
+    "message": "Backup reminder off",
+    "description": "Backup health status shown when backup reminders are disabled."
+  },
   "backupLastLabel": {
     "message": "Last backup",
     "description": "Static BrowseVault extension-page UI string."
@@ -873,6 +901,10 @@
     "message": "Format",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "backupFormatUnknown": {
+    "message": "unknown",
+    "description": "Fallback backup file format label when backup metadata has no format."
+  },
   "backupRecordsLabel": {
     "message": "Records",
     "description": "Static BrowseVault extension-page UI string."
@@ -885,6 +917,50 @@
     "message": "Self-test",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "backupSelfTestNotTested": {
+    "message": "Not tested",
+    "description": "Backup self-test status shown when no restore self-test has run."
+  },
+  "backupSelfTestPassed": {
+    "message": "Passed",
+    "description": "Backup self-test status shown when a backup self-test passed without a record count."
+  },
+  "backupSelfTestPassedRecordOne": {
+    "message": "Passed $COUNT$ record",
+    "description": "Backup self-test status shown when one record passed restore verification.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "backupSelfTestPassedRecordMany": {
+    "message": "Passed $COUNT$ records",
+    "description": "Backup self-test status shown when multiple records passed restore verification.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
+  },
+  "backupSelfTestFailedChecksum": {
+    "message": "Failed checksum",
+    "description": "Backup self-test status shown when backup checksum verification fails."
+  },
+  "backupSelfTestFailedCount": {
+    "message": "Failed count",
+    "description": "Backup self-test status shown when backup record count verification fails."
+  },
+  "backupSelfTestFailedRestoreRows": {
+    "message": "Failed restore rows",
+    "description": "Backup self-test status shown when restored row count verification fails."
+  },
+  "backupSelfTestFailed": {
+    "message": "Failed",
+    "description": "Backup self-test status shown when verification fails without a narrower reason."
+  },
   "backupChecksumLabel": {
     "message": "Checksum",
     "description": "Static BrowseVault extension-page UI string."
@@ -893,6 +969,10 @@
     "message": "Not available",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "backupSizeNotRecorded": {
+    "message": "Not recorded",
+    "description": "Backup size status shown when backup metadata has no recorded byte size."
+  },
   "archiveRecorderHealthLabel": {
     "message": "Archive recorder health",
     "description": "Static BrowseVault extension-page UI string."
@@ -900,6 +980,18 @@
   "archiveSyncNotRun": {
     "message": "Archive sync not run yet",
     "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveHealthReady": {
+    "message": "Archive recording ready",
+    "description": "Archive health status shown when sync and storage checks are current."
+  },
+  "archiveHealthStorageNotRun": {
+    "message": "Storage check not run",
+    "description": "Archive health status shown after sync succeeds but storage self-check evidence is missing."
+  },
+  "archiveHealthVaultReview": {
+    "message": "Vault data needs review",
+    "description": "Archive health status shown when local vault data integrity issues are detected."
   },
   "archiveStartupLabel": {
     "message": "Startup",
@@ -917,6 +1009,20 @@
     "message": "Not synced yet",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "archiveSyncStored": {
+    "message": "$DATE$ · $COUNT$ stored",
+    "description": "Archive sync detail showing when Chrome history sync ran and how many records were stored.",
+    "placeholders": {
+      "date": {
+        "content": "$1",
+        "example": "2026-06-16, 09:00"
+      },
+      "count": {
+        "content": "$2",
+        "example": "42"
+      }
+    }
+  },
   "archiveLiveCaptureLabel": {
     "message": "Live capture",
     "description": "Static BrowseVault extension-page UI string."
@@ -933,6 +1039,20 @@
     "message": "Not checked yet",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "archiveStoragePassed": {
+    "message": "Passed $DATE$",
+    "description": "Archive storage self-check detail shown after storage verification passes.",
+    "placeholders": {
+      "date": {
+        "content": "$1",
+        "example": "2026-06-16, 09:30"
+      }
+    }
+  },
+  "archiveStorageFailed": {
+    "message": "Failed",
+    "description": "Archive storage self-check detail shown after storage verification fails."
+  },
   "archiveVaultCheckLabel": {
     "message": "Vault check",
     "description": "Static BrowseVault extension-page UI string."
@@ -941,6 +1061,80 @@
     "message": "0 active · 0 stored",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "archiveVaultRecordCounts": {
+    "message": "$ACTIVE$ active · $STORED$ stored",
+    "description": "Archive vault integrity detail showing active and stored local row counts.",
+    "placeholders": {
+      "active": {
+        "content": "$1",
+        "example": "120"
+      },
+      "stored": {
+        "content": "$2",
+        "example": "128"
+      }
+    }
+  },
+  "archiveIssueMissingUrlOne": {
+    "message": "$COUNT$ missing URL",
+    "description": "Archive vault issue detail shown when one active record has no URL.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "archiveIssueMissingUrlMany": {
+    "message": "$COUNT$ missing URLs",
+    "description": "Archive vault issue detail shown when multiple active records have no URL.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "archiveIssueBadTimeOne": {
+    "message": "$COUNT$ bad time",
+    "description": "Archive vault issue detail shown when one active record has an invalid visit time.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "archiveIssueBadTimeMany": {
+    "message": "$COUNT$ bad times",
+    "description": "Archive vault issue detail shown when multiple active records have invalid visit times.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "archiveIssueDuplicateActiveOne": {
+    "message": "$COUNT$ duplicate active",
+    "description": "Archive vault issue detail shown when one duplicate active vault record is detected.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "archiveIssueDuplicateActiveMany": {
+    "message": "$COUNT$ duplicate active",
+    "description": "Archive vault issue detail shown when multiple duplicate active vault records are detected.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
   "archiveTombstonesLabel": {
     "message": "Tombstones",
     "description": "Static BrowseVault extension-page UI string."
@@ -948,6 +1142,26 @@
   "archiveNoTombstones": {
     "message": "No deleted tombstones",
     "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveDeletedTombstoneOne": {
+    "message": "$COUNT$ deleted tombstone",
+    "description": "Archive tombstone detail shown when one deleted vault marker exists.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "archiveDeletedTombstoneMany": {
+    "message": "$COUNT$ deleted tombstones",
+    "description": "Archive tombstone detail shown when multiple deleted vault markers exist.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "11"
+      }
+    }
   },
   "archiveInsightsLabel": {
     "message": "Archive insights",
@@ -969,6 +1183,24 @@
     "message": "No domains yet",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "archiveUnknownDomain": {
+    "message": "unknown",
+    "description": "Archive insight fallback domain label for records without a parsed domain."
+  },
+  "archiveDomainCount": {
+    "message": "$DOMAIN$ ($COUNT$)",
+    "description": "Archive insight top-domain entry showing a domain and visit count.",
+    "placeholders": {
+      "domain": {
+        "content": "$1",
+        "example": "example.com"
+      },
+      "count": {
+        "content": "$2",
+        "example": "42"
+      }
+    }
+  },
   "busiestDayLabel": {
     "message": "Busiest day",
     "description": "Static BrowseVault extension-page UI string."
@@ -976,6 +1208,40 @@
   "noVisitsYet": {
     "message": "No visits yet",
     "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveVisitOne": {
+    "message": "$COUNT$ visit",
+    "description": "Archive insight visit-count phrase for one visit.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "archiveVisitMany": {
+    "message": "$COUNT$ visits",
+    "description": "Archive insight visit-count phrase for multiple visits.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "4"
+      }
+    }
+  },
+  "archiveBusiestDayVisits": {
+    "message": "$DATE$ · $VISITS$",
+    "description": "Archive insight busiest-day detail showing the day and visit-count phrase.",
+    "placeholders": {
+      "date": {
+        "content": "$1",
+        "example": "2026-06-17"
+      },
+      "visits": {
+        "content": "$2",
+        "example": "4 visits"
+      }
+    }
   },
   "activeDaysLabel": {
     "message": "Active days",
@@ -985,9 +1251,51 @@
     "message": "No active days yet",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "archiveActiveDayStatsOne": {
+    "message": "$DAYS$ day · $AVERAGE$ visits/day",
+    "description": "Archive insight active-days detail for one active day.",
+    "placeholders": {
+      "days": {
+        "content": "$1",
+        "example": "1"
+      },
+      "average": {
+        "content": "$2",
+        "example": "2.5"
+      }
+    }
+  },
+  "archiveActiveDayStatsMany": {
+    "message": "$DAYS$ days · $AVERAGE$ visits/day",
+    "description": "Archive insight active-days detail for multiple active days.",
+    "placeholders": {
+      "days": {
+        "content": "$1",
+        "example": "2"
+      },
+      "average": {
+        "content": "$2",
+        "example": "2.5"
+      }
+    }
+  },
   "dateRangeLabel": {
     "message": "Date range",
     "description": "Static BrowseVault extension-page UI string."
+  },
+  "archiveDateRange": {
+    "message": "$OLDEST$ to $NEWEST$",
+    "description": "Archive insight date range shown when oldest and newest visit days differ.",
+    "placeholders": {
+      "oldest": {
+        "content": "$1",
+        "example": "2026-06-16"
+      },
+      "newest": {
+        "content": "$2",
+        "example": "2026-06-17"
+      }
+    }
   },
   "recentActivityLabel": {
     "message": "Recent activity",
