@@ -100,6 +100,7 @@ This repository contains a working Manifest V3 extension implementation. It incl
 │   ├── research/
 │   ├── chrome-web-store-additional-fields.md
 │   ├── chrome-web-store-category.md
+│   ├── chrome-web-store-media.md
 │   ├── chrome-web-store-privacy-form.md
 │   ├── README.md
 │   └── storepilot-project-structure.md
@@ -193,13 +194,13 @@ npm run release:ready
 
 `npm run validate` also enforces the current trust baseline: exact manifest permissions, no host permissions, no optional permission prompts, no content scripts, no web-accessible resources, no external extension messaging surface, no remote source URLs, no source-level network APIs or dynamic code loaders, and no default `chrome_url_overrides` replacement of Chrome history.
 
-`npm run check` verifies JavaScript syntax, static JavaScript imports, stylesheet imports, extension-page module script and stylesheet paths, manifest and extension UI locale message coverage, manifest file paths, privacy/permission disclosure parity, file-size budgets, and folder-density budgets so flat runtime/support and documentation folders stay at 12 files or fewer, while feature folders and feature test folders stay at 15 files or fewer before being split again. File-size debt is reported as warnings, and known hard-limit debt is capped so it cannot grow unnoticed.
+`npm run check` verifies JavaScript syntax, static JavaScript imports, stylesheet imports, extension-page module script and stylesheet paths, manifest and extension UI locale message coverage, manifest file paths, privacy/permission disclosure parity, Chrome QA profile-safety guardrails, shared reference sync, file-size budgets, and folder-density budgets so flat runtime/support and documentation folders stay at 12 files or fewer, while feature folders and feature test folders stay at 15 files or fewer before being split again. File-size debt is reported as warnings, and known hard-limit debt is capped so it cannot grow unnoticed.
 
 `npm run store:media` regenerates the Chrome Web Store promo PNGs in `store-listing/chrome-web-store/media/promo/`. It uses Python with Pillow as a development-only asset tool; the generated PNGs are committed and are not part of the extension runtime dependency graph.
 
-`npm run package` writes `dist/browsevault-1.0.0.zip` and verifies the final ZIP contents, including packaged manifest paths, locale messages, static import targets, and module script targets.
+`npm run package` writes `dist/browsevault-1.0.0.zip` and verifies the final ZIP contents, including packaged manifest paths, locale messages, static import targets, module script targets, and exact freshness against the current source tree.
 
-`npm run release:ready` is a final release gate for the browser-extension playbook's manual target-browser requirement. It intentionally fails until [`docs/release/manual-browser-qa-checklist.md`](docs/release/manual-browser-qa-checklist.md) records a passed load-unpacked check in the target browser.
+`npm run release:ready` is a final release gate for the browser-extension playbook's manual target-browser and screenshot/store-copy review requirements. It intentionally fails until [`docs/release/manual-browser-qa-checklist.md`](docs/release/manual-browser-qa-checklist.md) records passed load-unpacked and store-media review evidence for the current Git commit.
 
 Release guardrail tests live in `test/scripts/`.
 

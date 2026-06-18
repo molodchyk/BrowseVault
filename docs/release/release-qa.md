@@ -36,7 +36,7 @@ Expected results:
 - package ZIP verification rejects missing, extra, or stale entries that do not match the current source tree;
 - package contains runtime extension files, root user-facing docs, and `_locales/en/messages.json`;
 - package excludes repository research, tests, scripts, docs, StorePilot files, and build metadata.
-- release readiness passes only after manual target-browser evidence is recorded in `manual-browser-qa-checklist.md`.
+- release readiness passes only after manual target-browser and screenshot/store-copy review evidence is recorded in `manual-browser-qa-checklist.md`.
 - release readiness rejects checklist evidence recorded for a different Git commit.
 
 ## Real Browser QA
@@ -58,5 +58,5 @@ Current workstation note:
 - Do not pass `--profile-directory`, `--load-extension`, `--disable-extensions-except`, or CDP attachment flags from repo scripts.
 - Validation scans package scripts, repository scripts, and tests for live Chrome profile automation patterns.
 - Do not treat that process-level closure as a BrowseVault product failure without reproducing it in a normal Chrome session.
-- Manual release check: pause the local focus blockers, open `chrome://extensions`, enable Developer mode, load this repository folder unpacked, then verify the toolbar action opens BrowseVault, a second non-BrowseVault active tab creates another BrowseVault tab, and deleting a vault record in one BrowseVault tab refreshes the other BrowseVault tab.
+- Manual release check: pause the local focus blockers, open `chrome://extensions`, enable Developer mode, load this repository folder unpacked, then verify the toolbar action opens BrowseVault, a second non-BrowseVault active tab creates another BrowseVault tab, deleting a vault record in one BrowseVault tab refreshes the other BrowseVault tab, and Chrome Web Store screenshots still match the current UI and store listing copy.
 - `npm run release:ready` intentionally fails while the manual checklist is still `Not run`.

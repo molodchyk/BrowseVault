@@ -300,11 +300,17 @@ for (const expected of [
   "npm run package",
   "npm run verify:package",
   "git diff --check",
+  "shared reference sync",
+  "screenshot/store-copy review evidence",
   "load this repository folder unpacked",
   "Cold Turkey",
   "FocusMe"
 ]) {
   assert(releaseQa.includes(expected), `Release QA notes missing: ${expected}`);
+}
+
+for (const expected of ["Chrome QA profile-safety guardrails", "shared reference sync", "fresh against the current source tree", "screenshot/store-copy review evidence"]) {
+  assert(reviewerNotes.includes(expected), `Reviewer notes missing current release guardrail: ${expected}`);
 }
 validateChromeQaSafety(root, packageJson, assert);
 
