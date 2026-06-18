@@ -243,7 +243,8 @@ export function validatePlaybookCompliance(root, assert) {
     "npm test",
     "npm run package",
     "npm run verify:package",
-    "git diff --check"
+    "git diff --check",
+    "automated gate"
   ]) {
     assert(releaseQa.includes(expected), `Release QA missing browser-extension playbook check: ${expected}`);
   }
@@ -253,6 +254,15 @@ export function validatePlaybookCompliance(root, assert) {
     "Load this repository folder unpacked",
     "Do not use automated Chrome or Playwright runs against a live Chrome profile",
     "Do not create or target named personal Chrome profiles such as `Your Chrome`",
+    "Automated Gate Checks",
+    "These commands must pass on the same commit recorded in the Evidence Header",
+    "npm run store:media",
+    "npm run validate",
+    "npm run check",
+    "npm test",
+    "npm run package",
+    "npm run verify:package",
+    "git diff --check",
     "Toolbar action opens BrowseVault",
     "Long URLs and titles stay inside the viewport",
     "creates another BrowseVault tab instead of enforcing one global app tab",

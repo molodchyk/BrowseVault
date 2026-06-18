@@ -2,11 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   checkReleaseReadinessChecklist,
+  expectedAutomatedGateChecks,
   expectedManualBrowserQaChecks,
   fieldValue
 } from "../../scripts/playbook/release-readiness-core.mjs";
 
 function completeChecklist({
+  automatedGateResult = "Pass",
   commit = "abc1234",
   flowResult = "Pass",
   includeLaunchFlagWarning = true,
@@ -27,6 +29,9 @@ function completeChecklist({
   const flowRows = expectedManualBrowserQaChecks
     .map((check) => `| ${check} | ${flowResult} | checked |`)
     .join("\n");
+  const automatedGateRows = expectedAutomatedGateChecks
+    .map((command) => `| ${command} | ${automatedGateResult} | checked |`)
+    .join("\n");
 
   return `# Manual Browser QA Checklist
 
@@ -44,6 +49,12 @@ ${launchFlagWarning}
 - Loaded folder: C:\\Users\\molod\\Documents\\Personal\\settings\\BrowseVault
 - Extension ID: abcdefghijklmnop
 - Result: ${result}
+
+## Automated Gate Checks
+
+| Command | Result | Notes |
+| --- | --- | --- |
+${automatedGateRows}
 
 ## Required Flow Checks
 
@@ -90,6 +101,14 @@ test("checkReleaseReadinessChecklist rejects incomplete manual flow evidence", (
 
   assert(errors.some((error) => error.includes("Result must be set to Pass")));
   assert(errors.some((error) => error.includes("Toolbar action opens BrowseVault")));
+});
+
+test("checkReleaseReadinessChecklist rejects incomplete automated gate evidence", () => {
+  const errors = checkReleaseReadinessChecklist(completeChecklist({ automatedGateResult: "Not run" }), {
+    currentCommit: "abc1234"
+  });
+
+  assert(errors.some((error) => error.includes("npm run validate")));
 });
 
 test("checkReleaseReadinessChecklist preserves the live-profile automation warning", () => {

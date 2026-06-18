@@ -8,6 +8,16 @@ export const evidenceHeaderLabels = [
   "Extension ID"
 ];
 
+export const expectedAutomatedGateChecks = [
+  "npm run store:media",
+  "npm run validate",
+  "npm run check",
+  "npm test",
+  "npm run package",
+  "npm run verify:package",
+  "git diff --check"
+];
+
 export const expectedManualBrowserQaChecks = [
   "Toolbar action opens BrowseVault.",
   "Keyboard command opens BrowseVault when configured by the browser.",
@@ -38,7 +48,7 @@ export function fieldValue(source, label) {
 export function parseCheckRows(source) {
   const rows = new Map();
   for (const line of source.split(/\r?\n/)) {
-    if (!line.startsWith("|") || /^\|\s*-+/.test(line) || /^\|\s*Check\s*\|/i.test(line)) {
+    if (!line.startsWith("|") || /^\|\s*-+/.test(line) || /^\|\s*(Check|Command)\s*\|/i.test(line)) {
       continue;
     }
 
@@ -77,6 +87,18 @@ export function checkReleaseReadinessChecklist(checklist, { currentCommit }) {
   }
 
   const checkRows = parseCheckRows(checklist);
+  for (const expectedCommand of expectedAutomatedGateChecks) {
+    const row = checkRows.get(expectedCommand);
+    if (!row) {
+      fail(`Manual browser QA checklist is missing automated gate check: ${expectedCommand}`);
+      continue;
+    }
+
+    if (row.result.toLowerCase() !== "pass") {
+      fail(`Manual browser QA preflight command must be Pass: ${expectedCommand}. Current result: ${row.result || "(blank)"}.`);
+    }
+  }
+
   for (const expectedCheck of expectedManualBrowserQaChecks) {
     const row = checkRows.get(expectedCheck);
     if (!row) {

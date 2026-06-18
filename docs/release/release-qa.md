@@ -37,7 +37,7 @@ Expected results:
 - package ZIP verification rejects missing, extra, or stale entries that do not match the current source tree;
 - package contains runtime extension files, root user-facing docs, and `_locales/en/messages.json`;
 - package excludes repository research, tests, scripts, docs, StorePilot files, and build metadata.
-- release readiness passes only after manual target-browser and screenshot/store-copy review evidence is recorded in `manual-browser-qa-checklist.md`.
+- release readiness passes only after automated gate results, manual target-browser evidence, and screenshot/store-copy review evidence are recorded in `manual-browser-qa-checklist.md` for the current Git commit.
 - release readiness rejects checklist evidence recorded for a different Git commit.
 
 ## Real Browser QA

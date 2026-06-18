@@ -23,12 +23,25 @@ Set `Result` to `Pass` only after every required flow check is `Pass`.
 
 ## Preflight
 
-- Confirm `npm run store:media`, `npm run validate`, `npm run check`, `npm test`, `npm run package`, `npm run verify:package`, and `git diff --check` passed on the same commit.
 - Record the current `git rev-parse --short=7 HEAD` value in the `Commit` field.
 - Open `chrome://extensions`.
 - Enable Developer mode.
 - Load this repository folder unpacked.
 - Confirm the extension loads without manifest, service-worker, or console errors that block normal use.
+
+## Automated Gate Checks
+
+Record `Pass`, `Fail`, or `Not run` plus notes for each command. These commands must pass on the same commit recorded in the Evidence Header.
+
+| Command | Result | Notes |
+| --- | --- | --- |
+| npm run store:media | Not run | |
+| npm run validate | Not run | |
+| npm run check | Not run | |
+| npm test | Not run | |
+| npm run package | Not run | |
+| npm run verify:package | Not run | |
+| git diff --check | Not run | |
 
 ## Required Flow Checks
 
