@@ -1,9 +1,24 @@
 export const historyResultsLocalization = [
+  { key: "confirmOpenSelectedLimited" },
+  { key: "confirmOpenSelectedMany" },
+  { key: "confirmOpenSelectedOne" },
+  { key: "errorOpenSelectedFailed" },
   { key: "savedSearchNamePrompt" },
   { key: "statusEnterSearchBeforeSaving" },
   { key: "statusSaveSearchCanceled" },
   { key: "statusSavedSearch" },
   { key: "statusChooseSavedSearchFirst" },
   { key: "statusAppliedSavedSearch" },
-  { key: "statusDeletedSavedSearch" }
+  { key: "statusDeletedSavedSearch" },
+  { key: "statusCopiedSelectedUrlMany" },
+  { key: "statusCopiedSelectedUrlOne" },
+  { key: "statusInvertedVisibleResults" },
+  { key: "statusNoVisibleResultsToInvert" },
+  { key: "statusOpenCanceled" },
+  { key: "statusOpenedSelectedMany" },
+  { key: "statusOpenedSelectedOne" },
+  { key: "statusSelectedMatchingVaultRecords" },
+  { key: "statusSelectedRecordsNoCopyUrls" },
+  { key: "statusSelectedRecordsNoOpenUrls" },
+  { key: "statusSelectRecordsFirst" }
 ];

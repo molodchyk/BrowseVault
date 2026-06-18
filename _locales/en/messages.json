@@ -317,6 +317,124 @@
     "message": "Copy URLs",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "confirmOpenSelectedLimited": {
+    "message": "Open the first $OPENED$ selected URLs? $OVERFLOW$ additional selected URLs will be left unopened to avoid flooding tabs.",
+    "description": "Confirmation shown before BrowseVault opens only the first selected URLs because the selected URL count exceeds the open limit.",
+    "placeholders": {
+      "opened": {
+        "content": "$1",
+        "example": "25"
+      },
+      "overflow": {
+        "content": "$2",
+        "example": "8"
+      }
+    }
+  },
+  "confirmOpenSelectedMany": {
+    "message": "Open $COUNT$ selected URLs?",
+    "description": "Confirmation shown before BrowseVault opens multiple selected URLs.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "confirmOpenSelectedOne": {
+    "message": "Open $COUNT$ selected URL?",
+    "description": "Confirmation shown before BrowseVault opens one selected URL.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "errorOpenSelectedFailed": {
+    "message": "Open selected failed.",
+    "description": "Fallback error shown when BrowseVault cannot open selected URLs."
+  },
+  "statusCopiedSelectedUrlMany": {
+    "message": "Copied $COUNT$ selected URLs",
+    "description": "Status shown after BrowseVault copies multiple selected result URLs.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "statusCopiedSelectedUrlOne": {
+    "message": "Copied $COUNT$ selected URL",
+    "description": "Status shown after BrowseVault copies one selected result URL.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "statusInvertedVisibleResults": {
+    "message": "Inverted $COUNT$ visible results",
+    "description": "Status shown after BrowseVault inverts selection for visible results.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
+  },
+  "statusNoVisibleResultsToInvert": {
+    "message": "No visible results to invert",
+    "description": "Status shown when there are no visible BrowseVault results to invert."
+  },
+  "statusOpenCanceled": {
+    "message": "Open canceled",
+    "description": "Status shown when opening selected result URLs is canceled."
+  },
+  "statusOpenedSelectedMany": {
+    "message": "Opened $COUNT$ selected URLs",
+    "description": "Status shown after BrowseVault opens multiple selected result URLs.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "statusOpenedSelectedOne": {
+    "message": "Opened $COUNT$ selected URL",
+    "description": "Status shown after BrowseVault opens one selected result URL.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "statusSelectedMatchingVaultRecords": {
+    "message": "Selected $COUNT$ matching vault records",
+    "description": "Status shown after BrowseVault selects every record matching the current search.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "42"
+      }
+    }
+  },
+  "statusSelectedRecordsNoCopyUrls": {
+    "message": "Selected records have no URLs to copy",
+    "description": "Status shown when selected BrowseVault results have no URLs to copy."
+  },
+  "statusSelectedRecordsNoOpenUrls": {
+    "message": "Selected records have no URLs to open",
+    "description": "Status shown when selected BrowseVault results have no URLs to open."
+  },
+  "statusSelectRecordsFirst": {
+    "message": "Select records first",
+    "description": "Status shown when a bulk action requires selected BrowseVault result records."
+  },
   "buttonExportJson": {
     "message": "Export JSON",
     "description": "Static BrowseVault extension-page UI string."

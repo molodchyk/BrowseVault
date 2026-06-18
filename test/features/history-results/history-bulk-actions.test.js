@@ -4,6 +4,7 @@ import { createHistoryBulkActions } from "../../../src/features/history-results/
 
 function createHarness({
   appState = {},
+  getMessage = () => "",
   selected = [],
   services = {}
 } = {}) {
@@ -20,6 +21,7 @@ function createHarness({
   const actions = createHistoryBulkActions({
     appState: state,
     copyText: async (text) => copied.push(text),
+    getMessage,
     getSearchText: () => "docs site:example.com",
     openSelectedLimit: 2,
     renderResults: (...args) => rendered.push(args),
@@ -40,6 +42,19 @@ function createHarness({
   });
 
   return { actions, copied, rendered, runtimeMessages, state, statuses };
+}
+
+function messageGetter(messages) {
+  return (key, substitutions = []) => {
+    const value = messages.get(key);
+    if (!value) {
+      return "";
+    }
+    return substitutions.reduce(
+      (text, substitution, index) => text.replace(`$${index + 1}`, substitution),
+      value
+    );
+  };
 }
 
 test("openSelected opens unique selected URLs and respects the open limit", async () => {
@@ -80,6 +95,56 @@ test("openSelected handles empty, URL-less, and canceled selections", async () =
   });
   await canceled.actions.openSelected();
   assert.deepEqual(canceled.statuses, ["Open canceled"]);
+});
+
+test("bulk actions use localized confirmations and statuses", async () => {
+  const confirmations = [];
+  const getMessage = messageGetter(new Map([
+    ["confirmOpenSelectedLimited", "open first $1 leave $2"],
+    ["statusOpenedSelectedMany", "opened localized $1"],
+    ["statusCopiedSelectedUrlMany", "copied localized $1"],
+    ["statusSelectedMatchingVaultRecords", "selected localized $1"],
+    ["statusInvertedVisibleResults", "inverted localized $1"],
+    ["statusNoVisibleResultsToInvert", "nothing localized"]
+  ]));
+  const harness = createHarness({
+    getMessage,
+    selected: [
+      { url: "https://example.com/a" },
+      { url: "https://example.com/b" },
+      { url: "https://example.com/c" }
+    ],
+    services: {
+      confirmAction: (message) => {
+        confirmations.push(message);
+        return true;
+      }
+    }
+  });
+
+  await harness.actions.openSelected();
+  await harness.actions.copySelectedUrls();
+  await harness.actions.selectAllFiltered();
+  harness.actions.invertVisibleSelection();
+
+  assert.deepEqual(confirmations, ["open first 2 leave 1"]);
+  assert.deepEqual(harness.statuses, [
+    "opened localized 2",
+    "copied localized 3",
+    "selected localized 2",
+    "inverted localized 2"
+  ]);
+
+  const empty = createHarness({
+    appState: {
+      currentResults: [],
+      currentTotal: 0,
+      selectedIds: new Set()
+    },
+    getMessage
+  });
+  empty.actions.invertVisibleSelection();
+  assert.deepEqual(empty.statuses, ["nothing localized"]);
 });
 
 test("copySelectedUrls copies unique URLs", async () => {

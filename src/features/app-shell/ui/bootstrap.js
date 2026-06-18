@@ -132,6 +132,7 @@ export async function startBrowseVaultApp({ document: documentRef }) {
   const bulkActions = createHistoryBulkActions({
     appState,
     copyText,
+    getMessage: getChromeMessage,
     getSearchText: historySearchForm.getSearchText,
     renderResults: historyResults.renderResults,
     searchVisits,

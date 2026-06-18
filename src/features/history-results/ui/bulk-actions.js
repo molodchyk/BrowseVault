@@ -14,9 +14,14 @@ const defaultServices = {
   uniqueUrlsForItems
 };
 
+function localizedMessage(getMessage, key, fallback, substitutions) {
+  return getMessage?.(key, substitutions) || fallback;
+}
+
 export function createHistoryBulkActions({
   appState,
   copyText,
+  getMessage = () => "",
   getSearchText,
   openSelectedLimit = DEFAULT_OPEN_SELECTED_LIMIT,
   renderResults,
@@ -33,24 +38,34 @@ export function createHistoryBulkActions({
   async function openSelected() {
     const items = await selectedResults();
     if (!items.length) {
-      setStatus("Select records first");
+      setStatus(localizedMessage(getMessage, "statusSelectRecordsFirst", "Select records first"));
       return;
     }
 
     const urls = deps.uniqueUrlsForItems(items);
     if (!urls.length) {
-      setStatus("Selected records have no URLs to open");
+      setStatus(localizedMessage(getMessage, "statusSelectedRecordsNoOpenUrls", "Selected records have no URLs to open"));
       return;
     }
 
     const urlsToOpen = urls.slice(0, openSelectedLimit);
     const overflow = urls.length - urlsToOpen.length;
     const message = overflow
-      ? `Open the first ${urlsToOpen.length} selected URLs? ${overflow} additional selected URLs will be left unopened to avoid flooding tabs.`
-      : `Open ${urlsToOpen.length} selected URL${urlsToOpen.length === 1 ? "" : "s"}?`;
+      ? localizedMessage(
+        getMessage,
+        "confirmOpenSelectedLimited",
+        `Open the first ${urlsToOpen.length} selected URLs? ${overflow} additional selected URLs will be left unopened to avoid flooding tabs.`,
+        [String(urlsToOpen.length), String(overflow)]
+      )
+      : localizedMessage(
+        getMessage,
+        urlsToOpen.length === 1 ? "confirmOpenSelectedOne" : "confirmOpenSelectedMany",
+        `Open ${urlsToOpen.length} selected URL${urlsToOpen.length === 1 ? "" : "s"}?`,
+        [String(urlsToOpen.length)]
+      );
 
     if (!deps.confirmAction(message)) {
-      setStatus("Open canceled");
+      setStatus(localizedMessage(getMessage, "statusOpenCanceled", "Open canceled"));
       return;
     }
 
@@ -60,27 +75,37 @@ export function createHistoryBulkActions({
     });
 
     if (!response?.ok) {
-      throw new Error(response?.error || "Open selected failed.");
+      throw new Error(response?.error || localizedMessage(getMessage, "errorOpenSelectedFailed", "Open selected failed."));
     }
 
-    setStatus(`Opened ${response.opened} selected URL${response.opened === 1 ? "" : "s"}`);
+    setStatus(localizedMessage(
+      getMessage,
+      response.opened === 1 ? "statusOpenedSelectedOne" : "statusOpenedSelectedMany",
+      `Opened ${response.opened} selected URL${response.opened === 1 ? "" : "s"}`,
+      [String(response.opened)]
+    ));
   }
 
   async function copySelectedUrls() {
     const items = await selectedResults();
     if (!items.length) {
-      setStatus("Select records first");
+      setStatus(localizedMessage(getMessage, "statusSelectRecordsFirst", "Select records first"));
       return;
     }
 
     const urls = deps.uniqueUrlsForItems(items);
     if (!urls.length) {
-      setStatus("Selected records have no URLs to copy");
+      setStatus(localizedMessage(getMessage, "statusSelectedRecordsNoCopyUrls", "Selected records have no URLs to copy"));
       return;
     }
 
     await copyText(urls.join("\n"));
-    setStatus(`Copied ${urls.length} selected URL${urls.length === 1 ? "" : "s"}`);
+    setStatus(localizedMessage(
+      getMessage,
+      urls.length === 1 ? "statusCopiedSelectedUrlOne" : "statusCopiedSelectedUrlMany",
+      `Copied ${urls.length} selected URL${urls.length === 1 ? "" : "s"}`,
+      [String(urls.length)]
+    ));
   }
 
   async function selectAllFiltered() {
@@ -89,18 +114,23 @@ export function createHistoryBulkActions({
     });
     appState.selectedIds = selectedIdsForResults(results);
     renderResults(appState.currentResults, appState.currentTotal);
-    setStatus(`Selected ${total} matching vault records`);
+    setStatus(localizedMessage(getMessage, "statusSelectedMatchingVaultRecords", `Selected ${total} matching vault records`, [String(total)]));
   }
 
   function invertVisibleSelection() {
     if (!appState.currentResults.length) {
-      setStatus("No visible results to invert");
+      setStatus(localizedMessage(getMessage, "statusNoVisibleResultsToInvert", "No visible results to invert"));
       return;
     }
 
     appState.selectedIds = invertSelectionForResults(appState.selectedIds, appState.currentResults);
     renderResults(appState.currentResults, appState.currentTotal);
-    setStatus(`Inverted ${appState.currentResults.length} visible results`);
+    setStatus(localizedMessage(
+      getMessage,
+      "statusInvertedVisibleResults",
+      `Inverted ${appState.currentResults.length} visible results`,
+      [String(appState.currentResults.length)]
+    ));
   }
 
   function selectVisibleResults() {
