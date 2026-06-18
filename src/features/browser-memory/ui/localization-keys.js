@@ -1,0 +1,21 @@
+export const browserMemoryLocalization = [
+  { key: "quickActionSwitch" },
+  { key: "quickActionRestore" },
+  { key: "quickNoSourceResults" },
+  { key: "quickNoSourceResultsWithWarnings" },
+  { key: "quickUnknownDomain" },
+  { key: "quickStatusSwitchedTo" },
+  { key: "quickStatusRestored" },
+  { key: "quickStatusOpened" },
+  { key: "quickStatusOpenedInBackground" },
+  { key: "quickActionFailed" },
+  { key: "quickNoUrlToOpen" },
+  { key: "quickBackgroundOpenFailed" },
+  { key: "quickNoUrlToCopy" },
+  { key: "quickStatusCopiedUrlFor" },
+  { key: "quickStatusSearchingBrowserSources" },
+  { key: "quickStatusSourceResultOne" },
+  { key: "quickStatusSourceResultMany" },
+  { key: "quickStatusSourceWarningOne" },
+  { key: "quickStatusSourceWarningMany" }
+];

@@ -353,6 +353,142 @@
     "message": "Uses the same query text and ISO day/date filters as the History tab. Results here are read-only and never affected by vault cleanup.",
     "description": "Static BrowseVault extension-page UI string."
   },
+  "quickActionSwitch": {
+    "message": "Switch",
+    "description": "Quick Open action label for switching to an existing browser tab."
+  },
+  "quickActionRestore": {
+    "message": "Restore",
+    "description": "Quick Open action label for restoring a recently closed browser tab or window."
+  },
+  "quickNoSourceResults": {
+    "message": "No source results.",
+    "description": "Quick Open empty state when no live browser source results are found."
+  },
+  "quickNoSourceResultsWithWarnings": {
+    "message": "No source results. $WARNINGS$",
+    "description": "Quick Open empty state when no live browser source results are found and source warnings are available.",
+    "placeholders": {
+      "warnings": {
+        "content": "$1",
+        "example": "Bookmarks unavailable."
+      }
+    }
+  },
+  "quickUnknownDomain": {
+    "message": "unknown domain",
+    "description": "Fallback domain label for Quick Open results without a parsed domain."
+  },
+  "quickStatusSwitchedTo": {
+    "message": "Switched to $TARGET$",
+    "description": "Status shown after Quick Open switches to an existing tab.",
+    "placeholders": {
+      "target": {
+        "content": "$1",
+        "example": "Documentation"
+      }
+    }
+  },
+  "quickStatusRestored": {
+    "message": "Restored $TARGET$",
+    "description": "Status shown after Quick Open restores a recently closed tab or window.",
+    "placeholders": {
+      "target": {
+        "content": "$1",
+        "example": "Documentation"
+      }
+    }
+  },
+  "quickStatusOpened": {
+    "message": "Opened $TARGET$",
+    "description": "Status shown after Quick Open opens a result.",
+    "placeholders": {
+      "target": {
+        "content": "$1",
+        "example": "Documentation"
+      }
+    }
+  },
+  "quickStatusOpenedInBackground": {
+    "message": "Opened $TARGET$ in background",
+    "description": "Status shown after Quick Open opens a result in a background tab.",
+    "placeholders": {
+      "target": {
+        "content": "$1",
+        "example": "Documentation"
+      }
+    }
+  },
+  "quickActionFailed": {
+    "message": "Quick action failed.",
+    "description": "Fallback error shown when a Quick Open action fails."
+  },
+  "quickNoUrlToOpen": {
+    "message": "No URL to open",
+    "description": "Status shown when Quick Open cannot open a result because it has no URL."
+  },
+  "quickBackgroundOpenFailed": {
+    "message": "Background open failed.",
+    "description": "Fallback error shown when Quick Open cannot open a result in the background."
+  },
+  "quickNoUrlToCopy": {
+    "message": "No URL to copy",
+    "description": "Status shown when Quick Open cannot copy a result because it has no URL."
+  },
+  "quickStatusCopiedUrlFor": {
+    "message": "Copied URL for $TARGET$",
+    "description": "Status shown after Quick Open copies a result URL.",
+    "placeholders": {
+      "target": {
+        "content": "$1",
+        "example": "Documentation"
+      }
+    }
+  },
+  "quickStatusSearchingBrowserSources": {
+    "message": "Searching browser sources",
+    "description": "Status shown while Quick Open searches tabs, bookmarks, downloads, and sessions."
+  },
+  "quickStatusSourceResultOne": {
+    "message": "$COUNT$ source result",
+    "description": "Quick Open status for one live browser source result.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "quickStatusSourceResultMany": {
+    "message": "$COUNT$ source results",
+    "description": "Quick Open status for multiple live browser source results.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
+  },
+  "quickStatusSourceWarningOne": {
+    "message": "$COUNT$ source warning",
+    "description": "Quick Open status for one live browser source warning.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "quickStatusSourceWarningMany": {
+    "message": "$COUNT$ source warnings",
+    "description": "Quick Open status for multiple live browser source warnings.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
   "backupImportLabel": {
     "message": "Backup and import",
     "description": "Static BrowseVault extension-page UI string."

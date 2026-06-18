@@ -25,7 +25,7 @@ BrowseVault follows the local `extension-modularization-playbook.md` gradually. 
 - `test/features/` mirrors feature-owned tests by product area so no single flat test folder becomes a dumping ground.
 - `test/platform/`, `test/query/`, and `test/storage/` own cross-feature platform, query compatibility, and storage tests.
 - `test/scripts/` owns tests for repository and release guardrails such as manual browser QA release-readiness validation.
-- `scripts/check-locales.mjs` verifies manifest `__MSG_*__` references, static extension-page localization bindings, and dynamic history-result UI status keys against `_locales/en/messages.json`, then rejects unresolved or unused locale keys.
+- `scripts/check-locales.mjs` verifies manifest `__MSG_*__` references, static extension-page localization bindings, dynamic Quick Open keys, and dynamic history-result UI status keys against `_locales/en/messages.json`, then rejects unresolved or unused locale keys.
 - `scripts/check-manifest-paths.mjs` verifies manifest-owned extension paths such as icons, service workers, popups, options pages, content scripts, and web-accessible resources.
 - `scripts/check-privacy-permissions.mjs` verifies that manifest permissions, `PRIVACY.md`, and the StorePilot privacy form stay aligned.
 - `scripts/playbook/check-reference-sync.mjs` verifies that workspace reference copies stay in sync with the browser-extension playbook, Defense against Distractions, and StorePilot when those sources are available.

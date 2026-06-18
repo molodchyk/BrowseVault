@@ -113,6 +113,7 @@ export async function startBrowseVaultApp({ document: documentRef }) {
     copyText,
     elements,
     getDateFormat: () => appState.preferences.dateFormat,
+    getMessage: getChromeMessage,
     getSearchText: historySearchForm.getSearchText,
     quickResultLimit: displayPreferences.quickResultLimit,
     setStatus

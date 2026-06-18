@@ -78,7 +78,7 @@ function fakeList() {
   };
 }
 
-function createHarness({ searchResults, services = {} } = {}) {
+function createHarness({ getMessage, searchResults, services = {} } = {}) {
   const statuses = [];
   const copied = [];
   const runtimeMessages = [];
@@ -103,6 +103,7 @@ function createHarness({ searchResults, services = {} } = {}) {
       }
     },
     getDateFormat: () => "iso",
+    getMessage,
     getSearchText: () => "docs site:example.com",
     quickResultLimit: () => 25,
     services: {
@@ -227,6 +228,58 @@ test("runQuickSearch renders results and wires quick action and copy buttons", a
     "Opened Docs in background",
     "Copied URL for Docs"
   ]);
+});
+
+test("runQuickSearch uses localized labels, metadata fallback, empty states, and statuses", async () => {
+  const item = {
+    type: "tab",
+    title: "Docs",
+    url: "https://example.com/docs",
+    detail: "Open tab",
+    visitTime: 123,
+    action: { type: "activate-tab", tabId: 7, windowId: 2 }
+  };
+  const messages = {
+    quickActionSwitch: "Localized switch",
+    quickUnknownDomain: "localized unknown domain",
+    quickStatusSearchingBrowserSources: "localized searching",
+    quickStatusSourceResultMany: (substitutions) => `localized results ${substitutions[0]}`,
+    quickStatusSourceWarningOne: (substitutions) => `localized warning ${substitutions[0]}`,
+    quickStatusSwitchedTo: (substitutions) => `localized switched ${substitutions[0]}`,
+    quickStatusOpenedInBackground: (substitutions) => `localized background ${substitutions[0]}`,
+    quickStatusCopiedUrlFor: (substitutions) => `localized copied ${substitutions[0]}`,
+    quickNoSourceResultsWithWarnings: (substitutions) => `localized empty ${substitutions[0]}`
+  };
+  const getMessage = (key, substitutions = []) => {
+    const value = messages[key];
+    return typeof value === "function" ? value(substitutions) : value || "";
+  };
+  const { actions, fragments, quickResults, statuses } = createHarness({
+    getMessage,
+    searchResults: {
+      results: [item],
+      total: 2,
+      warnings: ["Bookmarks unavailable"]
+    }
+  });
+
+  await actions.runQuickSearch();
+
+  assert.equal(fragments[0].nodes[".meta"].textContent, "Open tab · localized unknown domain · iso:123");
+  assert.equal(fragments[0].nodes[".quick-action"].textContent, "Localized switch");
+  assert.deepEqual(statuses, ["localized searching", "localized results 2; localized warning 1"]);
+
+  await fragments[0].nodes[".quick-action"].listeners.click();
+  await fragments[0].nodes[".quick-background"].listeners.click();
+  await fragments[0].nodes[".quick-copy"].listeners.click();
+  assert.deepEqual(statuses.slice(2), [
+    "localized switched Docs",
+    "localized background Docs",
+    "localized copied Docs"
+  ]);
+
+  actions.renderQuickResults([], 0, ["Bookmarks unavailable"]);
+  assert.equal(quickResults.children[0].textContent, "localized empty Bookmarks unavailable");
 });
 
 test("runQuickSearch ignores stale source results", async () => {

@@ -24,6 +24,10 @@ const defaultServices = {
 
 const QUICK_RESULT_SELECTOR = ".quick-result[data-quick-index]";
 
+function localizedMessage(getMessage, key, fallback, substitutions) {
+  return getMessage?.(key, substitutions) || fallback;
+}
+
 function quickResultItems(resultsElement) {
   return Array.from(resultsElement.querySelectorAll(QUICK_RESULT_SELECTOR));
 }
@@ -111,23 +115,25 @@ export function quickActionMessage(item) {
   return messageByType[action.type] || messageByType["open-url"];
 }
 
-export function quickActionLabel(item) {
+export function quickActionLabel(item, getMessage = () => "") {
   return item.action?.type === "activate-tab"
-    ? "Switch"
+    ? localizedMessage(getMessage, "quickActionSwitch", "Switch")
     : item.action?.type === "restore-session"
-      ? "Restore"
-      : "Open";
+      ? localizedMessage(getMessage, "quickActionRestore", "Restore")
+      : localizedMessage(getMessage, "buttonOpen", "Open");
 }
 
-export function quickActionStatusLabel(item) {
+export function quickActionStatusLabel(item, getMessage = () => "") {
   const action = item.action || { type: "open-url" };
-  const verbByAction = {
-    "activate-tab": "Switched to",
-    "restore-session": "Restored",
-    "open-url": "Opened"
+  const target = item.title || item.url;
+  const statusByAction = {
+    "activate-tab": ["quickStatusSwitchedTo", `Switched to ${target}`],
+    "restore-session": ["quickStatusRestored", `Restored ${target}`],
+    "open-url": ["quickStatusOpened", `Opened ${target}`]
   };
+  const [key, fallback] = statusByAction[action.type] || statusByAction["open-url"];
 
-  return `${verbByAction[action.type] || "Opened"} ${item.title || item.url}`;
+  return localizedMessage(getMessage, key, fallback, [target]);
 }
 
 export function quickBackgroundActionMessage(item) {
@@ -137,8 +143,9 @@ export function quickBackgroundActionMessage(item) {
   };
 }
 
-export function quickBackgroundActionStatusLabel(item) {
-  return `Opened ${item.title || item.url} in background`;
+export function quickBackgroundActionStatusLabel(item, getMessage = () => "") {
+  const target = item.title || item.url;
+  return localizedMessage(getMessage, "quickStatusOpenedInBackground", `Opened ${target} in background`, [target]);
 }
 
 export function createQuickOpenActions({
@@ -146,6 +153,7 @@ export function createQuickOpenActions({
   copyText,
   elements,
   getDateFormat,
+  getMessage = () => "",
   getSearchText,
   quickResultLimit,
   services = {},
@@ -166,9 +174,10 @@ export function createQuickOpenActions({
     if (!results.length) {
       const empty = deps.document.createElement("li");
       empty.className = "quick-result";
+      const warningsText = warnings.join(" ");
       empty.textContent = warnings.length
-        ? `No source results. ${warnings.join(" ")}`
-        : "No source results.";
+        ? localizedMessage(getMessage, "quickNoSourceResultsWithWarnings", `No source results. ${warningsText}`, [warningsText])
+        : localizedMessage(getMessage, "quickNoSourceResults", "No source results.");
       elements.quickResults.append(empty);
       return;
     }
@@ -194,11 +203,11 @@ export function createQuickOpenActions({
       deps.appendHighlightedText(url, item.url, urlTokens, query.regex);
       deps.appendHighlightedText(
         meta,
-        `${item.detail} · ${item.domain || "unknown domain"} · ${deps.formatDate(item.visitTime, getDateFormat())}`,
+        `${item.detail} · ${item.domain || localizedMessage(getMessage, "quickUnknownDomain", "unknown domain")} · ${deps.formatDate(item.visitTime, getDateFormat())}`,
         metaTokens,
         query.regex
       );
-      action.textContent = quickActionLabel(item);
+      action.textContent = quickActionLabel(item, getMessage);
       action.addEventListener("click", () => performQuickAction(item).catch((error) => setStatus(error.message)));
       background.addEventListener("click", () => openQuickUrlInBackground(item).catch((error) => setStatus(error.message)));
       copy.addEventListener("click", () => copyQuickUrl(item).catch((error) => setStatus(error.message)));
@@ -211,39 +220,40 @@ export function createQuickOpenActions({
   async function performQuickAction(item) {
     const response = await deps.sendRuntimeMessage(quickActionMessage(item));
     if (!response?.ok) {
-      throw new Error(response?.error || "Quick action failed.");
+      throw new Error(response?.error || localizedMessage(getMessage, "quickActionFailed", "Quick action failed."));
     }
-    setStatus(quickActionStatusLabel(item));
+    setStatus(quickActionStatusLabel(item, getMessage));
   }
 
   async function openQuickUrlInBackground(item) {
     if (!item.url) {
-      setStatus("No URL to open");
+      setStatus(localizedMessage(getMessage, "quickNoUrlToOpen", "No URL to open"));
       return;
     }
 
     const response = await deps.sendRuntimeMessage(quickBackgroundActionMessage(item));
     if (!response?.ok) {
-      throw new Error(response?.error || "Background open failed.");
+      throw new Error(response?.error || localizedMessage(getMessage, "quickBackgroundOpenFailed", "Background open failed."));
     }
-    setStatus(quickBackgroundActionStatusLabel(item));
+    setStatus(quickBackgroundActionStatusLabel(item, getMessage));
   }
 
   async function copyQuickUrl(item) {
     if (!item.url) {
-      setStatus("No URL to copy");
+      setStatus(localizedMessage(getMessage, "quickNoUrlToCopy", "No URL to copy"));
       return;
     }
 
     await copyText(item.url);
-    setStatus(`Copied URL for ${item.title || item.url}`);
+    const target = item.title || item.url;
+    setStatus(localizedMessage(getMessage, "quickStatusCopiedUrlFor", `Copied URL for ${target}`, [target]));
   }
 
   async function runQuickSearch() {
     const requestId = nextQuickSearchRequestId(appState);
     const searchText = getSearchText();
     const limit = quickResultLimit();
-    setStatus("Searching browser sources");
+    setStatus(localizedMessage(getMessage, "quickStatusSearchingBrowserSources", "Searching browser sources"));
     const { results, total, warnings } = await deps.searchBrowserMemory(searchText, {
       limit
     });
@@ -252,10 +262,14 @@ export function createQuickOpenActions({
       return;
     }
 
-    setStatus(warnings.length
-      ? `${total} source results; ${warnings.length} source warning${warnings.length === 1 ? "" : "s"}`
-      : `${total} source result${total === 1 ? "" : "s"}`
-    );
+    const sourceResultsText = total === 1
+      ? localizedMessage(getMessage, "quickStatusSourceResultOne", "1 source result", [String(total)])
+      : localizedMessage(getMessage, "quickStatusSourceResultMany", `${total} source results`, [String(total)]);
+    const sourceWarningsText = warnings.length === 1
+      ? localizedMessage(getMessage, "quickStatusSourceWarningOne", "1 source warning", [String(warnings.length)])
+      : localizedMessage(getMessage, "quickStatusSourceWarningMany", `${warnings.length} source warnings`, [String(warnings.length)]);
+
+    setStatus(warnings.length ? `${sourceResultsText}; ${sourceWarningsText}` : sourceResultsText);
     renderQuickResults(results, total, warnings);
   }
 
