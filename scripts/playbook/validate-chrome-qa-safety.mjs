@@ -30,6 +30,12 @@ const forbiddenAutomationPatterns = [
   /\$env:LOCALAPPDATA/i
 ];
 
+const selfReferentialSafetyFiles = new Set([
+  "scripts/playbook/release-readiness-core.mjs",
+  "scripts/playbook/validate-chrome-qa-safety.mjs",
+  "scripts/playbook/validate-playbook-compliance.mjs"
+]);
+
 function projectPath(root, fullPath) {
   return path.relative(root, fullPath).split(path.sep).join("/");
 }
@@ -93,7 +99,7 @@ export function validateChromeQaSafety(root, packageJson, assert) {
   for (const entry of ["scripts", "test"]) {
     for (const fullPath of scriptFiles(root, entry)) {
       const relativePath = projectPath(root, fullPath);
-      if (relativePath.startsWith("scripts/playbook/")) {
+      if (selfReferentialSafetyFiles.has(relativePath)) {
         continue;
       }
       assertNoForbiddenAutomation(relativePath, fs.readFileSync(fullPath, "utf8"), assert);

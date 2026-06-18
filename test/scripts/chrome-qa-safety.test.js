@@ -87,6 +87,18 @@ test("validateChromeQaSafety accepts repo-only QA fixtures", () => {
   runSafety(root, { check: "node scripts/safe.mjs" });
 });
 
+test("validateChromeQaSafety allows self-referential safety validator terms", () => {
+  const root = makeFixture();
+  const blockedFlag = "--profile-" + "directory";
+  fs.mkdirSync(path.join(root, "scripts", "playbook"), { recursive: true });
+  fs.writeFileSync(
+    path.join(root, "scripts", "playbook", "validate-chrome-qa-safety.mjs"),
+    `const forbiddenPattern = "${blockedFlag}";\n`
+  );
+
+  runSafety(root);
+});
+
 test("validateChromeQaSafety requires root Codex browser-safety instructions", () => {
   const root = makeFixture();
   fs.writeFileSync(path.join(root, "AGENTS.md"), "# Codex Working Rules\n");
@@ -126,6 +138,18 @@ test("validateChromeQaSafety rejects scripts that select a Chrome profile direct
   assert.throws(
     () => runSafety(root),
     /scripts\/bad\.mjs contains forbidden live Chrome profile automation pattern/
+  );
+});
+
+test("validateChromeQaSafety rejects playbook helpers that select a Chrome profile directory", () => {
+  const root = makeFixture();
+  const blockedFlag = "--profile-" + "directory";
+  fs.mkdirSync(path.join(root, "scripts", "playbook"), { recursive: true });
+  fs.writeFileSync(path.join(root, "scripts", "playbook", "bad-helper.mjs"), `console.log("${blockedFlag}=Default");\n`);
+
+  assert.throws(
+    () => runSafety(root),
+    /scripts\/playbook\/bad-helper\.mjs contains forbidden live Chrome profile automation pattern/
   );
 });
 
