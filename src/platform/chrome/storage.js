@@ -71,3 +71,21 @@ export function setLocalStorage(items) {
   });
   return Promise.resolve();
 }
+
+export function onLocalStorageChanged(listener) {
+  const event = globalThis.chrome?.storage?.onChanged;
+  if (!event?.addListener) {
+    return () => {};
+  }
+
+  const wrapped = (changes, areaName) => {
+    if (areaName === "local") {
+      listener(changes);
+    }
+  };
+
+  event.addListener(wrapped);
+  return () => {
+    event.removeListener?.(wrapped);
+  };
+}

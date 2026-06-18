@@ -23,6 +23,7 @@ import {
   onStartup
 } from "./platform/chrome/runtime.js";
 import { restoreSession } from "./platform/chrome/sessions.js";
+import { setLocalStorage } from "./platform/chrome/storage.js";
 import { activateTab, createTab, queryTabs } from "./platform/chrome/tabs.js";
 import { focusWindow } from "./platform/chrome/windows.js";
 import { createChromeHistoryRemovalReconciler } from "./features/background-runtime/background/chrome-history-removal.js";
@@ -44,7 +45,10 @@ function isAllowedBackgroundMessageSender(sender) {
 }
 
 const vaultInvalidation = createVaultChangeNotifier({
-  sourceId: "background"
+  sourceId: "background",
+  storageNotifier: {
+    setLocalStorage
+  }
 });
 
 const chromeHistorySync = createChromeHistorySync({

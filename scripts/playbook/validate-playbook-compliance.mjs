@@ -60,7 +60,8 @@ export function validatePlaybookCompliance(root, assert) {
     "Buy Me a Coffee",
     "https://buymeacoffee.com/molodchyk",
     "Patreon",
-    "https://www.patreon.com/OMolodchyk"
+    "https://www.patreon.com/OMolodchyk",
+    "Chrome local-storage revision fallback"
   ]) {
     assert(readme.includes(expected), `README missing playbook-required text: ${expected}`);
   }
@@ -217,6 +218,11 @@ export function validatePlaybookCompliance(root, assert) {
   ]) {
     assert(playbookCompliance.includes(expected), `Playbook UI expectations matrix missing: ${expected}`);
   }
+  assert(
+    playbookCompliance.includes("Chrome local-storage fallback") &&
+      playbookCompliance.includes("cross-tab invalidation"),
+    "Playbook compliance must document storage-backed cross-tab invalidation evidence."
+  );
   assert(
     playbookCompliance.includes("action.default_popup") &&
       playbookCompliance.includes("validate-manifest-surface.mjs"),
@@ -378,9 +384,36 @@ export function validatePlaybookCompliance(root, assert) {
   for (const expected of [
     "Keep BrowseVault Browser QA Manual In This Workspace",
     "Repo-owned QA must not launch or attach to Chrome",
-    "Target-browser QA is manual and recorded in the release checklist"
+    "Target-browser QA is manual and recorded in the release checklist",
+    "Chrome local-storage revision fallback"
   ]) {
     assert(decisionRecords.includes(expected), `Decision records missing browser-safety decision: ${expected}`);
+  }
+
+  const vaultInvalidation = fs.readFileSync(
+    path.join(root, "src", "features", "app-shell", "core", "vault-invalidation.js"),
+    "utf8"
+  );
+  for (const expected of [
+    "VAULT_INVALIDATION_STORAGE_KEY",
+    "storageNotifier",
+    "setLocalStorage",
+    "onLocalStorageChanged",
+    "markSeen"
+  ]) {
+    assert(vaultInvalidation.includes(expected), `Vault invalidation missing cross-tab fallback guardrail: ${expected}`);
+  }
+
+  const vaultInvalidationTests = fs.readFileSync(
+    path.join(root, "test", "features", "app-shell", "app-shell-vault-invalidation.test.js"),
+    "utf8"
+  );
+  for (const expected of [
+    "storage revision fallback",
+    "refreshes from storage changes and ignores duplicate channel delivery",
+    "background vault notifier can publish through storage without a channel"
+  ]) {
+    assert(vaultInvalidationTests.includes(expected), `Vault invalidation tests missing storage fallback coverage: ${expected}`);
   }
 
   const storeMedia = fs.readFileSync(path.join(root, "docs", "chrome-web-store-media.md"), "utf8");

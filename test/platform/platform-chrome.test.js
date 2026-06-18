@@ -20,7 +20,11 @@ import {
   sendRuntimeMessage
 } from "../../src/platform/chrome/runtime.js";
 import { getRecentlyClosedSessions, restoreSession } from "../../src/platform/chrome/sessions.js";
-import { getLocalStorage, setLocalStorage } from "../../src/platform/chrome/storage.js";
+import {
+  getLocalStorage,
+  onLocalStorageChanged,
+  setLocalStorage
+} from "../../src/platform/chrome/storage.js";
 import { activateTab, createTab, queryTabs } from "../../src/platform/chrome/tabs.js";
 import { focusWindow } from "../../src/platform/chrome/windows.js";
 
@@ -134,6 +138,34 @@ test("storage wrapper falls back when Chrome storage is unavailable", async () =
     },
     missing: "fallback"
   });
+});
+
+test("storage change wrapper listens only to local Chrome storage changes", () => {
+  const calls = [];
+  let listener;
+  globalThis.chrome = {
+    storage: {
+      onChanged: {
+        addListener: (callback) => {
+          listener = callback;
+          calls.push(["storage.onChanged.addListener", callback]);
+        },
+        removeListener: (callback) => calls.push(["storage.onChanged.removeListener", callback])
+      }
+    }
+  };
+
+  const received = [];
+  const unsubscribe = onLocalStorageChanged((changes) => received.push(changes));
+  listener({ syncValue: { newValue: true } }, "sync");
+  listener({ localValue: { newValue: true } }, "local");
+  unsubscribe();
+
+  assert.deepEqual(received, [{ localValue: { newValue: true } }]);
+  assert.equal(calls.length, 2);
+  assert.equal(calls[0][0], "storage.onChanged.addListener");
+  assert.equal(calls[1][0], "storage.onChanged.removeListener");
+  assert.equal(calls[1][1], calls[0][1]);
 });
 
 test("background platform wrappers delegate to Chrome APIs and listeners", async () => {

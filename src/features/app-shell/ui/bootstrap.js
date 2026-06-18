@@ -26,6 +26,10 @@ import { createSelectedResultLookup } from "../../history-results/ui/selected-re
 import { createVaultManagementActions } from "../../vault-management/ui/actions.js";
 import { copyText } from "../../../platform/clipboard.js";
 import { getChromeMessage } from "../../../platform/chrome/i18n.js";
+import {
+  onLocalStorageChanged,
+  setLocalStorage
+} from "../../../platform/chrome/storage.js";
 import { collectAppElements } from "./elements.js";
 import { bindAppEvents } from "./events.js";
 import { localizeAppShell } from "./localization.js";
@@ -171,7 +175,11 @@ export async function startBrowseVaultApp({ document: documentRef }) {
       await vaultActions.renderRules();
       await historySearchActions.runSearch();
     },
-    setStatus
+    setStatus,
+    storageNotifier: {
+      onLocalStorageChanged,
+      setLocalStorage
+    }
   });
   notifyVaultChanged = vaultInvalidation.notifyVaultChanged;
 
